@@ -30,7 +30,7 @@ $(STATICCHECK_BIN): deps
 ###########
 
 .PHONY: golangci-lint
-golangci-lint:
+golangci-lint: $(GOLANGCILINT_BIN)
 ifdef CI
 	@echo '+ $@'
 	@echo 'The environment indicates we are in CI; running linters in check mode.'
@@ -41,7 +41,7 @@ else
 endif
 
 .PHONY: staticcheck
-staticcheck:
+staticcheck: $(STATICCHECK_BIN)
 	staticcheck -checks=all ./...
 
 .PHONY: lint
