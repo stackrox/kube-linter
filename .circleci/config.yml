@@ -1,0 +1,25 @@
+executors:
+  custom:
+    docker:
+      - image: cimg/go:1.15
+
+version: 2.1
+
+jobs:
+  lint:
+    executor: custom
+    steps:
+    - checkout
+
+    - run:
+        name: Run lint checks
+        command: echo "Will run lint checks once there are lint checks to run"
+
+workflows:
+  version: 2
+  build:
+    jobs:
+    - lint:
+        filters:
+          tags:
+            only: /.*/
