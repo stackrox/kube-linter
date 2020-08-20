@@ -13,7 +13,8 @@ jobs:
 
     - run:
         name: Run lint checks
-        command: make lint
+        command: |
+          make lint
 
 workflows:
   version: 2
