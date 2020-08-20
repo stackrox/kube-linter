@@ -13,7 +13,8 @@ jobs:
 
     - run:
         name: Run lint checks
-        command: echo "Will run lint checks once there are lint checks to run"
+        command: |
+          make lint
 
 workflows:
   version: 2
