@@ -1,6 +1,6 @@
 // +build tools
 
-package tool_imports
+package toolimports
 
 // This file declares dependencies on tool for `go mod` purposes.
 // See https://github.com/golang/go/wiki/Modules#how-can-i-track-tool-dependencies-for-a-module
@@ -9,4 +9,5 @@ package tool_imports
 import (
 	_ "github.com/golangci/golangci-lint/cmd/golangci-lint"
 	_ "honnef.co/go/tools/cmd/staticcheck"
+	_ "github.com/gobuffalo/packr/packr"
 )
