@@ -7,7 +7,6 @@ import (
 	"golang.stackrox.io/kube-linter/internal/lintcontext"
 )
 
-
 // Result represents the result from a run of the linter.
 type Result struct {
 	Reports []diagnostic.WithContext

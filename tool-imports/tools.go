@@ -7,7 +7,7 @@ package toolimports
 // for an explanation of the approach.
 
 import (
+	_ "github.com/gobuffalo/packr/packr"
 	_ "github.com/golangci/golangci-lint/cmd/golangci-lint"
 	_ "honnef.co/go/tools/cmd/staticcheck"
-	_ "github.com/gobuffalo/packr/packr"
 )
