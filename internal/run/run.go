@@ -18,7 +18,7 @@ func Run(lintCtx *lintcontext.LintContext, cfg *config.Config) (Result, error) {
 	for i, check := range cfg.Checks {
 		instantiatedCheck, err := validateAndInstantiate(&cfg.Checks[i])
 		if err != nil {
-			return Result{}, errors.Wrapf(err, "invalid check %s", check.Name)
+			return Result{}, errors.Wrapf(err, "invalid check %q", check.Name)
 		}
 		instantiatedChecks = append(instantiatedChecks, instantiatedCheck)
 	}

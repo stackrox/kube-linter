@@ -2,6 +2,9 @@ package diagnostic
 
 import (
 	"fmt"
+	"io"
+
+	"github.com/fatih/color"
 
 	"golang.stackrox.io/kube-linter/internal/lintcontext"
 )
@@ -21,9 +24,15 @@ type WithContext struct {
 	Object     lintcontext.ObjectWithMetadata
 }
 
-// Format formats the diagnostic for human readability.
-func (w *WithContext) Format() string {
+var (
+	bold = color.New(color.Bold)
+)
+
+// FormatTo formats the diagnostic for human readability.
+func (w *WithContext) FormatTo(out io.Writer) {
+	fmt.Fprintf(out, "%s %s", bold.Sprintf("%s:", w.Object.FilePath), color.RedString(w.Diagnostic.Message))
 	obj := w.Object.K8sObject
-	return fmt.Sprintf("%s: %s (check: %s, object: %s %s/%s)", w.Object.FilePath, w.Diagnostic.Message, w.Check,
-		obj.GetObjectKind().GroupVersionKind(), obj.GetNamespace(), obj.GetName())
+	fmt.Fprintf(out, " (check: %s, object: %s %s)\n\n", color.YellowString(w.Check),
+		color.YellowString("%s/%s", obj.GetNamespace(), obj.GetName()), color.YellowString(obj.GetObjectKind().GroupVersionKind().String()))
+
 }

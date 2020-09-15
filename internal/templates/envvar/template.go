@@ -1,4 +1,4 @@
-package requiredlabel
+package envvar
 
 import (
 	"fmt"
@@ -10,14 +10,13 @@ import (
 	"golang.stackrox.io/kube-linter/internal/lintcontext"
 	"golang.stackrox.io/kube-linter/internal/matcher"
 	"golang.stackrox.io/kube-linter/internal/objectkinds"
-	"golang.stackrox.io/kube-linter/internal/stringutils"
 	"golang.stackrox.io/kube-linter/internal/templates"
 )
 
 const (
-	// TemplateName is the name of the required label template.
-	TemplateName   = "required-label"
-	keyParamName   = "key"
+	// TemplateName is the name of this template.
+	TemplateName   = "env-var"
+	nameParamName  = "name"
 	valueParamName = "value"
 )
 
@@ -25,14 +24,14 @@ func init() {
 	templates.Register(check.Template{
 		Name: TemplateName,
 		SupportedObjectKinds: check.ObjectKindsDesc{
-			ObjectKindNames: []string{objectkinds.Any},
+			ObjectKindNames: []string{objectkinds.DeploymentLike},
 		},
 		Parameters: []check.ParameterDesc{
-			{ParamName: keyParamName, Required: true, Description: "A regex for the key of the required label"},
-			{ParamName: valueParamName, Required: false, Description: "A  regex for the value of the required label"},
+			{ParamName: nameParamName, Required: true, Description: "A regex for the env var name"},
+			{ParamName: valueParamName, Description: "A regex for the env var value"},
 		},
 		Instantiate: func(params map[string]string) (check.Func, error) {
-			keyMatcher, err := matcher.ForString(params[keyParamName])
+			nameMatcher, err := matcher.ForString(params[nameParamName])
 			if err != nil {
 				return nil, errors.Wrap(err, "invalid key")
 			}
@@ -40,17 +39,23 @@ func init() {
 			if err != nil {
 				return nil, errors.Wrap(err, "invalid value")
 			}
-
 			return func(_ *lintcontext.LintContext, object lintcontext.ObjectWithMetadata) []diagnostic.Diagnostic {
-				labels := extract.Labels(object.K8sObject)
-				for k, v := range labels {
-					if keyMatcher(k) && valueMatcher(v) {
-						return nil
+				podSpec, found := extract.PodSpec(object.K8sObject)
+				if !found {
+					return nil
+				}
+				var results []diagnostic.Diagnostic
+				for i := range podSpec.Containers {
+					container := &podSpec.Containers[i]
+					for _, envVar := range container.Env {
+						if nameMatcher(envVar.Name) && valueMatcher(envVar.Value) {
+							results = append(results, diagnostic.Diagnostic{
+								Message: fmt.Sprintf("environment variable %s in container %q found", envVar.Name, container.Name),
+							})
+						}
 					}
 				}
-				return []diagnostic.Diagnostic{{
-					Message: fmt.Sprintf("no label matching \"%s=%s\" found", params[keyParamName], stringutils.OrDefault(params[valueParamName], "<any>")),
-				}}
+				return results
 			}, nil
 		},
 	})

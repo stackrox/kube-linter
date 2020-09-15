@@ -37,8 +37,9 @@ func Command() *cobra.Command {
 				return nil
 			}
 			for _, report := range result.Reports {
-				fmt.Fprintln(os.Stderr, report.Format())
+				report.FormatTo(os.Stderr)
 			}
+			os.Exit(1)
 			return nil
 		},
 	}

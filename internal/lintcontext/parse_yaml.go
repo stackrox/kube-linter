@@ -37,7 +37,7 @@ func (l *LintContext) LoadObjectsFromDir(path string) error {
 		}
 		// Skip sub-directories, for now.
 		if info.IsDir() {
-			return filepath.SkipDir
+			return nil
 		}
 		if filepath.Ext(currentPath) != ".yaml" {
 			return nil

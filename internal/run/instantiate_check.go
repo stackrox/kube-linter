@@ -21,7 +21,7 @@ func validateAndInstantiate(c *check.Check) (*instantiatedCheck, error) {
 	}
 	template, found := templates.Get(c.Template)
 	if !found {
-		validationErrs.AddStringf("template %s not found", c.Template)
+		validationErrs.AddStringf("template %q not found", c.Template)
 		return nil, validationErrs.ToError()
 	}
 
@@ -29,14 +29,14 @@ func validateAndInstantiate(c *check.Check) (*instantiatedCheck, error) {
 	for _, param := range template.Parameters {
 		if param.Required {
 			if _, found := c.Params[param.ParamName]; !found {
-				validationErrs.AddStringf("required param %s not specified", param.ParamName)
+				validationErrs.AddStringf("required param %q not specified", param.ParamName)
 			}
 		}
 		supportedParams[param.ParamName] = struct{}{}
 	}
 	for passedParam := range c.Params {
 		if _, isSupported := supportedParams[passedParam]; !isSupported {
-			validationErrs.AddStringf("unknown param %s passed", passedParam)
+			validationErrs.AddStringf("unknown param %q passed", passedParam)
 		}
 	}
 	if err := validationErrs.ToError(); err != nil {
