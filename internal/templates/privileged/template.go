@@ -20,7 +20,7 @@ func init() {
 	templates.Register(check.Template{
 		Name: TemplateName,
 		SupportedObjectKinds: check.ObjectKindsDesc{
-			ObjectKindNames: []string{objectkinds.DeploymentLike},
+			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
 		Parameters: nil,
 		Instantiate: func(_ map[string]string) (check.Func, error) {

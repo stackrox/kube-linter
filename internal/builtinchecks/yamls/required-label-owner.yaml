@@ -1,0 +1,9 @@
+name: "required-label-owner"
+description: "Alert on objects without the 'owner' label"
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "required-label"
+params:
+  key: "owner"
+

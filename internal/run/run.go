@@ -2,8 +2,9 @@ package run
 
 import (
 	"github.com/pkg/errors"
-	"golang.stackrox.io/kube-linter/internal/config"
+	"golang.stackrox.io/kube-linter/internal/checkregistry"
 	"golang.stackrox.io/kube-linter/internal/diagnostic"
+	"golang.stackrox.io/kube-linter/internal/instantiatedcheck"
 	"golang.stackrox.io/kube-linter/internal/lintcontext"
 )
 
@@ -13,14 +14,15 @@ type Result struct {
 }
 
 // Run runs the linter on the given context, with the given config.
-func Run(lintCtx *lintcontext.LintContext, cfg *config.Config) (Result, error) {
-	var instantiatedChecks []*instantiatedCheck
-	for i, check := range cfg.Checks {
-		instantiatedCheck, err := validateAndInstantiate(&cfg.Checks[i])
-		if err != nil {
-			return Result{}, errors.Wrapf(err, "invalid check %q", check.Name)
+func Run(lintCtx *lintcontext.LintContext, registry checkregistry.CheckRegistry, checks []string) (Result, error) {
+
+	instantiatedChecks := make([]*instantiatedcheck.InstantiatedCheck, 0, len(checks))
+	for _, checkName := range checks {
+		instantiedCheck := registry.Load(checkName)
+		if instantiedCheck == nil {
+			return Result{}, errors.Errorf("check %q not found", checkName)
 		}
-		instantiatedChecks = append(instantiatedChecks, instantiatedCheck)
+		instantiatedChecks = append(instantiatedChecks, instantiedCheck)
 	}
 
 	var result Result

@@ -33,6 +33,11 @@ $(STATICCHECK_BIN): deps
 	@echo "+ $@"
 	@go install honnef.co/go/tools/cmd/staticcheck
 
+PACKR_BIN := $(GOBIN)/packr
+$(PACKR_BIN): deps
+	@echo "+ $@"
+	@go install github.com/gobuffalo/packr/packr
+
 ###########
 ## Lint ##
 ###########
@@ -59,6 +64,10 @@ lint: golangci-lint staticcheck
 ## Compile ##
 #############
 
+.PHONY: packr
+packr: $(PACKR_BIN)
+	packr
+
 .PHONY: build
-build:
+build: packr
 	go build -o kube-linter ./cmd/kubelinter

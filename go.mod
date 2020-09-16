@@ -5,6 +5,7 @@ go 1.14
 require (
 	github.com/fatih/color v1.9.0
 	github.com/ghodss/yaml v1.0.0
+	github.com/gobuffalo/packr v1.30.1
 	github.com/golangci/golangci-lint v1.30.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.0.0

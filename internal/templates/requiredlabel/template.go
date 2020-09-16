@@ -25,7 +25,7 @@ func init() {
 	templates.Register(check.Template{
 		Name: TemplateName,
 		SupportedObjectKinds: check.ObjectKindsDesc{
-			ObjectKindNames: []string{objectkinds.Any},
+			ObjectKinds: []string{objectkinds.Any},
 		},
 		Parameters: []check.ParameterDesc{
 			{ParamName: keyParamName, Required: true, Description: "A regex for the key of the required label"},

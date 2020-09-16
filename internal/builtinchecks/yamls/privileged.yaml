@@ -1,0 +1,6 @@
+name: "privileged-container"
+description: "Alert on deployments with containers running in privileged mode"
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "privileged"

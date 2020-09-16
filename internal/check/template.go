@@ -19,7 +19,7 @@ type ParameterDesc struct {
 
 // ObjectKindsDesc describes a list of supported object kinds for a check template.
 type ObjectKindsDesc struct {
-	ObjectKindNames []string
+	ObjectKinds []string `json:"objectKinds"`
 }
 
 // A Template is a template for a check.

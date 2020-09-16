@@ -24,7 +24,7 @@ func init() {
 	templates.Register(check.Template{
 		Name: TemplateName,
 		SupportedObjectKinds: check.ObjectKindsDesc{
-			ObjectKindNames: []string{objectkinds.DeploymentLike},
+			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
 		Parameters: []check.ParameterDesc{
 			{ParamName: nameParamName, Required: true, Description: "A regex for the env var name"},

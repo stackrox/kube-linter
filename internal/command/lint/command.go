@@ -6,7 +6,10 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"golang.stackrox.io/kube-linter/internal/builtinchecks"
+	"golang.stackrox.io/kube-linter/internal/checkregistry"
 	"golang.stackrox.io/kube-linter/internal/config"
+	"golang.stackrox.io/kube-linter/internal/configresolver"
 	"golang.stackrox.io/kube-linter/internal/lintcontext"
 	"golang.stackrox.io/kube-linter/internal/run"
 	"golang.stackrox.io/kube-linter/internal/utils"
@@ -20,15 +23,38 @@ func Command() *cobra.Command {
 		Use:  "lint",
 		Args: cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			cfg, err := config.Load(configPath)
+			checkRegistry := checkregistry.New()
+			if err := builtinchecks.LoadInto(checkRegistry); err != nil {
+				return err
+			}
+			var cfg config.Config
+			if configPath != "" {
+				var err error
+				cfg, err = config.Load(configPath)
+				if err != nil {
+					return errors.Wrap(err, "failed to load config")
+				}
+			}
+			if err := configresolver.LoadCustomChecksInto(&cfg, checkRegistry); err != nil {
+				return err
+			}
+			enabledChecks, err := configresolver.GetEnabledChecksAndValidate(&cfg, checkRegistry)
 			if err != nil {
-				return errors.Wrap(err, "failed to load config")
+				return err
+			}
+			if len(enabledChecks) == 0 {
+				fmt.Fprintln(os.Stderr, "Warning: no checks enabled.")
+				return nil
 			}
 			lintCtx := lintcontext.New()
 			if err := lintCtx.LoadObjectsFromDir(dir); err != nil {
 				return err
 			}
-			result, err := run.Run(lintCtx, cfg)
+			if len(lintCtx.Objects) == 0 {
+				fmt.Fprintln(os.Stderr, "Warning: no objects found.")
+				return nil
+			}
+			result, err := run.Run(lintCtx, checkRegistry, enabledChecks)
 			if err != nil {
 				return err
 			}
@@ -44,10 +70,9 @@ func Command() *cobra.Command {
 		},
 	}
 	c.Flags().StringVar(&dir, "dir", "", "directory of YAML files to lint")
-	c.Flags().StringVar(&configPath, "config", "", "path to config file")
 	utils.Must(
 		c.MarkFlagRequired("dir"),
-		c.MarkFlagRequired("config"),
 	)
+	c.Flags().StringVar(&configPath, "config", "", "path to config file")
 	return c
 }

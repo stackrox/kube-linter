@@ -1,4 +1,4 @@
-package run
+package instantiatedcheck
 
 import (
 	"github.com/pkg/errors"
@@ -8,13 +8,17 @@ import (
 	"golang.stackrox.io/kube-linter/internal/templates"
 )
 
-type instantiatedCheck struct {
+// An InstantiatedCheck is the runtime instantiation of a check, which fuses the metadata in a check
+// spec with the runtime information from a template.
+type InstantiatedCheck struct {
 	Name    string
 	Func    check.Func
 	Matcher objectkinds.Matcher
 }
 
-func validateAndInstantiate(c *check.Check) (*instantiatedCheck, error) {
+// ValidateAndInstantiate validates the check, and creates an instantiated check if the check
+// is valid.
+func ValidateAndInstantiate(c *check.Check) (*InstantiatedCheck, error) {
 	validationErrs := errorhelpers.NewErrorList("validating check")
 	if c.Name == "" {
 		validationErrs.AddString("no name specified")
@@ -43,14 +47,14 @@ func validateAndInstantiate(c *check.Check) (*instantiatedCheck, error) {
 		return nil, err
 	}
 
-	i := &instantiatedCheck{Name: c.Name}
+	i := &InstantiatedCheck{Name: c.Name}
 	var objectKinds check.ObjectKindsDesc
 	if c.Scope != nil {
 		objectKinds = *c.Scope
 	} else {
 		objectKinds = template.SupportedObjectKinds
 	}
-	matcher, err := objectkinds.ConstructMatcher(objectKinds.ObjectKindNames...)
+	matcher, err := objectkinds.ConstructMatcher(objectKinds.ObjectKinds...)
 	if err != nil {
 		return nil, err
 	}
