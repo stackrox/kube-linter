@@ -6,4 +6,3 @@ scope:
 template: "required-label"
 params:
   key: "owner"
-
