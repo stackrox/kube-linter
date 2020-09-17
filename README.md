@@ -12,7 +12,7 @@ are enabled by default. Users can also create custom checks.
 
 ## Install
 
-Binary downloads of can be found on [the Releases page](https://github.com/stackrox/kube-linter/releases).
+`kube-linter` binaries can be downloaded from [the Releases page](https://github.com/stackrox/kube-linter/releases).
 
 Download the `kube-linter` binary, and add it to your PATH.
 
@@ -26,7 +26,7 @@ it is parsed irrespective of extension.
 Users can pass a config file to control which checks are executed, and to configure custom checks. An example config
 file is provided in `config.yaml.example`.
 
-# WARNING
+# WARNING: Breaking changes possible
 
 kube-linter is currently in a very early stage of development. There may be breaking changes to the command usage, flags
 and config file formats.
