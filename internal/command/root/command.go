@@ -5,6 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"golang.stackrox.io/kube-linter/internal/command/lint"
+	"golang.stackrox.io/kube-linter/internal/command/templates"
 )
 
 // Command is the root command.
@@ -14,6 +15,9 @@ func Command() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	c.AddCommand(lint.Command())
+	c.AddCommand(
+		lint.Command(),
+		templates.Command(),
+	)
 	return c
 }

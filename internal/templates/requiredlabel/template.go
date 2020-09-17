@@ -15,21 +15,20 @@ import (
 )
 
 const (
-	// TemplateName is the name of the required label template.
-	TemplateName   = "required-label"
 	keyParamName   = "key"
 	valueParamName = "value"
 )
 
 func init() {
 	templates.Register(check.Template{
-		Name: TemplateName,
+		Name:        "required-label",
+		Description: "Flag objects not carrying at least one label matching the provided patterns",
 		SupportedObjectKinds: check.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.Any},
 		},
 		Parameters: []check.ParameterDesc{
 			{ParamName: keyParamName, Required: true, Description: "A regex for the key of the required label"},
-			{ParamName: valueParamName, Required: false, Description: "A  regex for the value of the required label"},
+			{ParamName: valueParamName, Required: false, Description: "A regex for the value of the required label"},
 		},
 		Instantiate: func(params map[string]string) (check.Func, error) {
 			keyMatcher, err := matcher.ForString(params[keyParamName])

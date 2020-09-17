@@ -25,6 +25,7 @@ type ObjectKindsDesc struct {
 // A Template is a template for a check.
 type Template struct {
 	Name                 string
+	Description          string
 	SupportedObjectKinds ObjectKindsDesc
 	Parameters           []ParameterDesc
 	Instantiate          func(params map[string]string) (Func, error)

@@ -16,6 +16,12 @@ jobs:
         command: |
           make lint
 
+    - run:
+        name: Ensure generated docs are up-to-date
+        command: |
+          make build
+          git diff --exit-code HEAD
+
 workflows:
   version: 2
   build:

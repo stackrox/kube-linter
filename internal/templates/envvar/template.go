@@ -14,15 +14,14 @@ import (
 )
 
 const (
-	// TemplateName is the name of this template.
-	TemplateName   = "env-var"
 	nameParamName  = "name"
 	valueParamName = "value"
 )
 
 func init() {
 	templates.Register(check.Template{
-		Name: TemplateName,
+		Name:        "env-var",
+		Description: "Flag environment variables that match the provided patterns",
 		SupportedObjectKinds: check.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},

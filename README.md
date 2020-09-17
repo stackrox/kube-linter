@@ -16,15 +16,14 @@ are enabled by default. Users can also create custom checks.
 
 Download the `kube-linter` binary, and add it to your PATH.
 
-
 ## Usage
 
 To lint directories or files, simply run `./kube-linter lint files_or_dirs ...`. If a directory is passed, all files
 with `.yaml` or `.yml` extensions are parsed, and Kubernetes objects are loaded from them. If a file is passed,
 it is parsed irrespective of extension.
 
-Users can pass a config file to control which checks are executed, and to configure custom checks. An example config
-file is provided in `config.yaml.example`.
+Users can pass a config file using the `--config` file to control which checks are executed, and to configure custom checks.
+An example config file is provided in `config.yaml.example`.
 
 # WARNING: Breaking changes possible
 

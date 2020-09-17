@@ -2,6 +2,7 @@ package templates
 
 import (
 	"fmt"
+	"sort"
 
 	"golang.stackrox.io/kube-linter/internal/check"
 )
@@ -23,4 +24,16 @@ func Register(t check.Template) {
 func Get(name string) (check.Template, bool) {
 	t, ok := allTemplates[name]
 	return t, ok
+}
+
+// List returns all known templates, sorted by name.
+func List() []check.Template {
+	out := make([]check.Template, 0, len(allTemplates))
+	for _, t := range allTemplates {
+		out = append(out, t)
+	}
+	sort.Slice(out, func(i, j int) bool {
+		return out[i].Name < out[j].Name
+	})
+	return out
 }
