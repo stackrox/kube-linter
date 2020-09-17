@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+	"golang.stackrox.io/kube-linter/internal/command/checks"
 	"golang.stackrox.io/kube-linter/internal/command/lint"
 	"golang.stackrox.io/kube-linter/internal/command/templates"
 )
@@ -16,6 +17,7 @@ func Command() *cobra.Command {
 		SilenceErrors: true,
 	}
 	c.AddCommand(
+		checks.Command(),
 		lint.Command(),
 		templates.Command(),
 	)

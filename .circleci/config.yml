@@ -22,6 +22,15 @@ jobs:
           make build
           git diff --exit-code HEAD
 
+  test:
+    executor: custom
+    steps:
+    - checkout
+    - run:
+        name: Run unit tests
+        command: |
+          make test
+
 workflows:
   version: 2
   build:

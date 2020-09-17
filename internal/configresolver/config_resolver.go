@@ -24,7 +24,7 @@ func LoadCustomChecksInto(cfg *config.Config, checkRegistry checkregistry.CheckR
 func GetEnabledChecksAndValidate(cfg *config.Config, checkRegistry checkregistry.CheckRegistry) ([]string, error) {
 	enabledChecks := set.NewStringSet()
 	if !cfg.Checks.DoNotAutoAddDefaults {
-		enabledChecks.AddAll(defaultchecks.List...)
+		enabledChecks.AddAll(defaultchecks.List.AsSlice()...)
 	}
 	for _, check := range cfg.CustomChecks {
 		enabledChecks.Add(check.Name)

@@ -67,10 +67,12 @@ lint: golangci-lint staticcheck
 .PHONY: generated-docs
 generated-docs: build
 	./bin/kube-linter templates list --format markdown > docs/templates.md
+	./bin/kube-linter checks list --format markdown > docs/checks.md
 
 .PHONY: packr
 packr: $(PACKR_BIN)
 	packr
+
 #############
 ## Compile ##
 #############
@@ -80,5 +82,11 @@ packr: $(PACKR_BIN)
 build: packr
 	go build -o ./bin/kube-linter ./cmd/kubelinter
 
+##########
+## Test ##
+##########
 
+.PHONY: test
+test: packr
+	go test ./...
 
