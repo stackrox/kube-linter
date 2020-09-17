@@ -39,7 +39,7 @@ func init() {
 			if err != nil {
 				return nil, errors.Wrap(err, "invalid value")
 			}
-			return func(_ *lintcontext.LintContext, object lintcontext.ObjectWithMetadata) []diagnostic.Diagnostic {
+			return func(_ *lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				podSpec, found := extract.PodSpec(object.K8sObject)
 				if !found {
 					return nil

@@ -5,8 +5,9 @@ import (
 	"io"
 
 	"github.com/fatih/color"
-
+	"golang.stackrox.io/kube-linter/internal/k8sutil"
 	"golang.stackrox.io/kube-linter/internal/lintcontext"
+	"golang.stackrox.io/kube-linter/internal/stringutils"
 )
 
 // A Diagnostic represents one specific problem diagnosed by a check.
@@ -21,18 +22,26 @@ type Diagnostic struct {
 type WithContext struct {
 	Diagnostic Diagnostic
 	Check      string
-	Object     lintcontext.ObjectWithMetadata
+	Object     lintcontext.Object
 }
 
 var (
 	bold = color.New(color.Bold)
 )
 
-// FormatTo formats the diagnostic for human readability.
-func (w *WithContext) FormatTo(out io.Writer) {
-	fmt.Fprintf(out, "%s %s", bold.Sprintf("%s:", w.Object.FilePath), color.RedString(w.Diagnostic.Message))
-	obj := w.Object.K8sObject
-	fmt.Fprintf(out, " (check: %s, object: %s %s)\n\n", color.YellowString(w.Check),
-		color.YellowString("%s/%s", obj.GetNamespace(), obj.GetName()), color.YellowString(obj.GetObjectKind().GroupVersionKind().String()))
+func formatObj(obj k8sutil.Object) string {
+	return fmt.Sprintf("%s/%s %s", stringutils.OrDefault(obj.GetNamespace(), "<no namespace>"), obj.GetName(), obj.GetObjectKind().GroupVersionKind())
+}
 
+// FormatToTerminal writes the result to the given writer, which is expected to support
+// terminal-based formatting.
+func (w *WithContext) FormatToTerminal(out io.Writer) {
+	fmt.Fprintf(out, "%s %s", bold.Sprintf("%s:", w.Object.Metadata.FilePath), color.RedString(w.Diagnostic.Message))
+	fmt.Fprintf(out, " (check: %s, object: %s)\n\n", color.YellowString(w.Check),
+		color.YellowString(formatObj(w.Object.K8sObject)))
+}
+
+// FormatPlain prints out the result to the given writer, without colors/special formatting.
+func (w *WithContext) FormatPlain(out io.Writer) {
+	fmt.Fprintf(out, "%s %s (check: %s, object: %s)\n\n", w.Object.Metadata.FilePath, w.Diagnostic.Message, w.Check, formatObj(w.Object.K8sObject))
 }

@@ -5,6 +5,7 @@ import (
 	"golang.stackrox.io/kube-linter/internal/check"
 	"golang.stackrox.io/kube-linter/internal/errorhelpers"
 	"golang.stackrox.io/kube-linter/internal/objectkinds"
+	"golang.stackrox.io/kube-linter/internal/set"
 	"golang.stackrox.io/kube-linter/internal/templates"
 )
 
@@ -29,17 +30,17 @@ func ValidateAndInstantiate(c *check.Check) (*InstantiatedCheck, error) {
 		return nil, validationErrs.ToError()
 	}
 
-	supportedParams := make(map[string]struct{}, len(template.Parameters))
+	supportedParams := set.NewStringSet()
 	for _, param := range template.Parameters {
 		if param.Required {
 			if _, found := c.Params[param.ParamName]; !found {
 				validationErrs.AddStringf("required param %q not specified", param.ParamName)
 			}
 		}
-		supportedParams[param.ParamName] = struct{}{}
+		supportedParams.Add(param.ParamName)
 	}
 	for passedParam := range c.Params {
-		if _, isSupported := supportedParams[passedParam]; !isSupported {
+		if !supportedParams.Contains(passedParam) {
 			validationErrs.AddStringf("unknown param %q passed", passedParam)
 		}
 	}

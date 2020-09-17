@@ -6,23 +6,24 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+	"golang.org/x/crypto/ssh/terminal"
 	"golang.stackrox.io/kube-linter/internal/builtinchecks"
 	"golang.stackrox.io/kube-linter/internal/checkregistry"
 	"golang.stackrox.io/kube-linter/internal/config"
 	"golang.stackrox.io/kube-linter/internal/configresolver"
 	"golang.stackrox.io/kube-linter/internal/lintcontext"
 	"golang.stackrox.io/kube-linter/internal/run"
-	"golang.stackrox.io/kube-linter/internal/utils"
 )
 
 // Command is the command for the lint command.
 func Command() *cobra.Command {
-	var dir string
 	var configPath string
+	var verbose bool
+
 	c := &cobra.Command{
 		Use:  "lint",
-		Args: cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, _ []string) error {
+		Args: cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
 			checkRegistry := checkregistry.New()
 			if err := builtinchecks.LoadInto(checkRegistry); err != nil {
 				return err
@@ -47,11 +48,16 @@ func Command() *cobra.Command {
 				return nil
 			}
 			lintCtx := lintcontext.New()
-			if err := lintCtx.LoadObjectsFromDir(dir); err != nil {
+			if err := lintCtx.LoadObjectsFromPath(args[0]); err != nil {
 				return err
 			}
-			if len(lintCtx.Objects) == 0 {
-				fmt.Fprintln(os.Stderr, "Warning: no objects found.")
+			if verbose {
+				for _, invalidObj := range lintCtx.InvalidObjects() {
+					fmt.Fprintf(os.Stderr, "Warning: failed to load object from %s: %v\n", invalidObj.Metadata.FilePath, invalidObj.LoadErr)
+				}
+			}
+			if len(lintCtx.Objects()) == 0 {
+				fmt.Fprintln(os.Stderr, "Warning: no valid objects found.")
 				return nil
 			}
 			result, err := run.Run(lintCtx, checkRegistry, enabledChecks)
@@ -63,16 +69,16 @@ func Command() *cobra.Command {
 				return nil
 			}
 			for _, report := range result.Reports {
-				report.FormatTo(os.Stderr)
+				if terminal.IsTerminal(int(os.Stderr.Fd())) {
+					report.FormatToTerminal(os.Stderr)
+				} else {
+					report.FormatPlain(os.Stderr)
+				}
 			}
-			os.Exit(1)
-			return nil
+			return errors.Errorf("found %d lint errors", len(result.Reports))
 		},
 	}
-	c.Flags().StringVar(&dir, "dir", "", "directory of YAML files to lint")
-	utils.Must(
-		c.MarkFlagRequired("dir"),
-	)
 	c.Flags().StringVar(&configPath, "config", "", "path to config file")
+	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "whether to enable verbose logs")
 	return c
 }

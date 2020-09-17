@@ -18,19 +18,16 @@ func Run(lintCtx *lintcontext.LintContext, registry checkregistry.CheckRegistry,
 
 	instantiatedChecks := make([]*instantiatedcheck.InstantiatedCheck, 0, len(checks))
 	for _, checkName := range checks {
-		instantiedCheck := registry.Load(checkName)
-		if instantiedCheck == nil {
+		instantiatedCheck := registry.Load(checkName)
+		if instantiatedCheck == nil {
 			return Result{}, errors.Errorf("check %q not found", checkName)
 		}
-		instantiatedChecks = append(instantiatedChecks, instantiedCheck)
+		instantiatedChecks = append(instantiatedChecks, instantiatedCheck)
 	}
 
 	var result Result
-	for _, obj := range lintCtx.Objects {
+	for _, obj := range lintCtx.Objects() {
 		for _, check := range instantiatedChecks {
-			if obj.K8sObject == nil {
-				continue
-			}
 			if !check.Matcher.Matches(obj.K8sObject.GetObjectKind().GroupVersionKind()) {
 				continue
 			}

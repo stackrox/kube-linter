@@ -25,17 +25,23 @@ var (
 	decoder      = serializer.NewCodecFactory(clientSchema).UniversalDeserializer()
 )
 
-// LoadObjectsFromDir loads the objects in the directory given by `path`
+// LoadObjectsFromPath loads the objects in the file or directory given by `path`
 // into the lint context.
-func (l *LintContext) LoadObjectsFromDir(path string) error {
-	err := filepath.Walk(path, func(currentPath string, info os.FileInfo, walkErr error) error {
+func (l *LintContext) LoadObjectsFromPath(path string) error {
+	info, err := os.Stat(path)
+	if err != nil {
+		return err
+	}
+	if !info.IsDir() {
+		return l.loadObjectsFromYAMLFile(path, info)
+	}
+	err = filepath.Walk(path, func(currentPath string, info os.FileInfo, walkErr error) error {
 		if walkErr != nil {
 			return walkErr
 		}
 		if currentPath == path {
 			return nil
 		}
-		// Skip sub-directories, for now.
 		if info.IsDir() {
 			return nil
 		}
@@ -76,18 +82,23 @@ func (l *LintContext) loadObjectFromYAMLReader(filePath string, r *yaml.YAMLRead
 		return nil
 	}
 
-	objRef := ObjectWithMetadata{
+	metadata := ObjectMetadata{
 		FilePath: filePath,
 		Raw:      doc,
 	}
 
 	obj, err := parseObject(doc)
 	if err != nil {
-		objRef.LoadErr = err
+		l.invalidObjects = append(l.invalidObjects, InvalidObject{
+			Metadata: metadata,
+			LoadErr:  err,
+		})
 	} else {
-		objRef.K8sObject = obj
+		l.objects = append(l.objects, Object{
+			Metadata:  metadata,
+			K8sObject: obj,
+		})
 	}
-	l.Objects = append(l.Objects, objRef)
 	return nil
 }
 
@@ -99,6 +110,9 @@ func (l *LintContext) loadObjectsFromYAMLFile(filePath string, info os.FileInfo)
 	if err != nil {
 		return errors.Wrapf(err, "opening file at %s", filePath)
 	}
+	defer func() {
+		_ = file.Close()
+	}()
 
 	yamlReader := yaml.NewYAMLReader(bufio.NewReader(file))
 	for {
@@ -109,4 +123,14 @@ func (l *LintContext) loadObjectsFromYAMLFile(filePath string, info os.FileInfo)
 			return err
 		}
 	}
+}
+
+// Objects returns the (valid) objects loaded from this LintContext.
+func (l *LintContext) Objects() []Object {
+	return l.objects
+}
+
+// InvalidObjects returns any objects that we attempted to load, but which were invalid.
+func (l *LintContext) InvalidObjects() []InvalidObject {
+	return l.invalidObjects
 }

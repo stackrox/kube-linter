@@ -10,8 +10,9 @@ import (
 // Command is the root command.
 func Command() *cobra.Command {
 	c := &cobra.Command{
-		Use:          os.Args[0],
-		SilenceUsage: true,
+		Use:           os.Args[0],
+		SilenceUsage:  true,
+		SilenceErrors: true,
 	}
 	c.AddCommand(lint.Command())
 	return c

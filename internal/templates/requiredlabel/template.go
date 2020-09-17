@@ -41,7 +41,7 @@ func init() {
 				return nil, errors.Wrap(err, "invalid value")
 			}
 
-			return func(_ *lintcontext.LintContext, object lintcontext.ObjectWithMetadata) []diagnostic.Diagnostic {
+			return func(_ *lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				labels := extract.Labels(object.K8sObject)
 				for k, v := range labels {
 					if keyMatcher(k) && valueMatcher(v) {
