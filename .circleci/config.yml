@@ -39,3 +39,7 @@ workflows:
         filters:
           tags:
             only: /.*/
+    - test:
+        filters:
+          tags:
+            only: /.*/
