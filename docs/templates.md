@@ -1,4 +1,4 @@
-T he following table enumerates supported check templates:
+The following table enumerates supported check templates:
 
 
 | Name | Description | Supported Objects | Parameters |
