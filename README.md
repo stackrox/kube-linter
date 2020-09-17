@@ -25,3 +25,8 @@ it is parsed irrespective of extension.
 
 Users can pass a config file to control which checks are executed, and to configure custom checks. An example config
 file is provided in `config.yaml.example`.
+
+# WARNING
+
+kube-linter is currently in a very early stage of development. There may be breaking changes to the command usage, flags
+and config file formats.
