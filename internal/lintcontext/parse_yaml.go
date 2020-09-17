@@ -6,9 +6,11 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/k8sutil"
+	"golang.stackrox.io/kube-linter/internal/set"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -23,6 +25,8 @@ const (
 var (
 	clientSchema = scheme.Scheme
 	decoder      = serializer.NewCodecFactory(clientSchema).UniversalDeserializer()
+
+	knownYAMLExtensions = set.NewFrozenStringSet(".yaml", ".yml")
 )
 
 // LoadObjectsFromPath loads the objects in the file or directory given by `path`
@@ -45,7 +49,7 @@ func (l *LintContext) LoadObjectsFromPath(path string) error {
 		if info.IsDir() {
 			return nil
 		}
-		if filepath.Ext(currentPath) != ".yaml" {
+		if !knownYAMLExtensions.Contains(strings.ToLower(filepath.Ext(currentPath))) {
 			return nil
 		}
 		if err := l.loadObjectsFromYAMLFile(currentPath, info); err != nil {

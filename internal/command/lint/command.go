@@ -22,7 +22,7 @@ func Command() *cobra.Command {
 
 	c := &cobra.Command{
 		Use:  "lint",
-		Args: cobra.ExactArgs(1),
+		Args: cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			checkRegistry := checkregistry.New()
 			if err := builtinchecks.LoadInto(checkRegistry); err != nil {
@@ -48,8 +48,10 @@ func Command() *cobra.Command {
 				return nil
 			}
 			lintCtx := lintcontext.New()
-			if err := lintCtx.LoadObjectsFromPath(args[0]); err != nil {
-				return err
+			for _, dir := range args {
+				if err := lintCtx.LoadObjectsFromPath(dir); err != nil {
+					return err
+				}
 			}
 			if verbose {
 				for _, invalidObj := range lintCtx.InvalidObjects() {
@@ -68,8 +70,9 @@ func Command() *cobra.Command {
 				fmt.Fprintln(os.Stderr, "No lint errors found!")
 				return nil
 			}
+			stderrIsTerminal := terminal.IsTerminal(int(os.Stderr.Fd()))
 			for _, report := range result.Reports {
-				if terminal.IsTerminal(int(os.Stderr.Fd())) {
+				if stderrIsTerminal {
 					report.FormatToTerminal(os.Stderr)
 				} else {
 					report.FormatPlain(os.Stderr)
