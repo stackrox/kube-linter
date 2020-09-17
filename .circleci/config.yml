@@ -19,7 +19,7 @@ jobs:
     - run:
         name: Ensure generated docs are up-to-date
         command: |
-          make build
+          make generated-docs
           git diff --exit-code HEAD
 
   test:
