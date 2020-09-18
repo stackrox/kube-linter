@@ -1,0 +1,6 @@
+name: "no-read-only-root-fs"
+description: "Alert on containers not running with a read-only root filesystem"
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "read-only-root-fs"
