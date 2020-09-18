@@ -66,8 +66,8 @@ lint: golangci-lint staticcheck
 
 .PHONY: generated-docs
 generated-docs: build
-	./bin/kube-linter templates list --format markdown > docs/templates.md
-	./bin/kube-linter checks list --format markdown > docs/checks.md
+	./bin/kube-linter templates list --format markdown > docs/generated/templates.md
+	./bin/kube-linter checks list --format markdown > docs/generated/checks.md
 
 .PHONY: packr
 packr: $(PACKR_BIN)
