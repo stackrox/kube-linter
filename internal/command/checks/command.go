@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -81,6 +82,9 @@ func listCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			sort.Slice(checks, func(i, j int) bool {
+				return checks[i].Name < checks[j].Name
+			})
 			renderFunc := formatsToRenderFuncs[format.Format]
 			if renderFunc == nil {
 				return errors.Errorf("unknown format: %q", format.Format)
