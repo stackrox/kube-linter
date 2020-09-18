@@ -27,7 +27,7 @@ var (
 	formatsToRenderFuncs = map[string]func([]check.Check, io.Writer){
 		common.PlainFormat: func(checks []check.Check, out io.Writer) {
 			for i, check := range checks {
-				fmt.Fprintf(out, "Name: %s\nDescription: %s\nTemplate:%s\nParameters:%v\nEnabled by default:%v\n",
+				fmt.Fprintf(out, "Name: %s\nDescription: %s\nTemplate: %s\nParameters: %v\nEnabled by default: %v\n",
 					check.Name, check.Description, check.Template, check.Params, defaultchecks.List.Contains(check.Name))
 				if i != len(checks)-1 {
 					fmt.Fprintf(out, "\n%s\n\n", dashes)

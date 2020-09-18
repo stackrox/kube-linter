@@ -12,8 +12,9 @@ are enabled by default. Users can also create custom checks.
 
 ## Install
 
-`kube-linter` binaries can be downloaded from [the Releases page](https://github.com/stackrox/kube-linter/releases).
+If you have `go` installed, you can run `go get golang.stackrox.io/kube-linter/cmd/kube-linter`.
 
+`kube-linter` binaries can be downloaded from [the Releases page](https://github.com/stackrox/kube-linter/releases).
 Download the `kube-linter` binary, and add it to your PATH.
 
 ## Usage

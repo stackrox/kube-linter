@@ -80,7 +80,7 @@ packr: $(PACKR_BIN)
 
 .PHONY: build
 build: packr
-	go build -o ./bin/kube-linter ./cmd/kubelinter
+	go build -o ./bin/kube-linter ./cmd/kube-linter
 
 ##########
 ## Test ##
