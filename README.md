@@ -14,19 +14,18 @@ are enabled by default. Users can also create custom checks.
 
 If you have `go` installed, you can run `go get golang.stackrox.io/kube-linter/cmd/kube-linter`.
 
-`kube-linter` binaries can be downloaded from [the Releases page](https://github.com/stackrox/kube-linter/releases).
+Alternatively, `kube-linter` binaries can be downloaded from [the Releases page](https://github.com/stackrox/kube-linter/releases).
 Download the `kube-linter` binary, and add it to your PATH.
+
+You can also build `kube-linter` from source by cloning the repo, and running `make build`. This will compile a `kube-linter`
+binary into the `bin` folder inside the repo.
+
+Note that you will need to have the `go` command installed for this to work.
+To install the Go command, follow the instructions [here](https://golang.org/doc/install).
 
 ## Usage
 
-To lint directories or files, simply run `./kube-linter lint files_or_dirs ...`. If a directory is passed, all files
-with `.yaml` or `.yml` extensions are parsed, and Kubernetes objects are loaded from them. If a file is passed,
-it is parsed irrespective of extension.
-
-Users can pass a config file using the `--config` file to control which checks are executed, and to configure custom checks.
-An example config file is provided in `config.yaml.example`.
-
-See the [documentation](./docs) for more details.
+See the [documentation](./docs) for details on how to get started.
 
 # WARNING: Breaking changes possible
 

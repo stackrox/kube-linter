@@ -3,7 +3,7 @@
 
 Welcome to the `kube-linter` documentation. Read on for more detailed information about using and configuring the tool.
 
-## Exporing the CLI
+## Exploring the CLI
 
 You can run `kube-linter --help` to see a list of supported commands and flags. For each subcommand, you can
 run `kube-linter <subcommand> --help` to see detailed help text and flags for it.
@@ -14,7 +14,7 @@ To lint directories or files, simply run `./kube-linter lint files_or_dirs ...`.
 with `.yaml` or `.yml` extensions are parsed, and Kubernetes objects are loaded from them. If a file is passed,
 it is parsed irrespective of extension.
 
-Users can pass a config file using the `--config` file to control which checks are executed, and to configure custom checks.
+Users can pass a config file using the `--config` flag to control which checks are executed, and to configure custom checks.
 An example config file is provided [here](../config.yaml.example).
 
 ## Built-in checks 

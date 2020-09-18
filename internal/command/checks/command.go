@@ -12,7 +12,6 @@ import (
 	"golang.stackrox.io/kube-linter/internal/check"
 	"golang.stackrox.io/kube-linter/internal/command/common"
 	"golang.stackrox.io/kube-linter/internal/defaultchecks"
-	"golang.stackrox.io/kube-linter/internal/ternary"
 )
 
 var (
@@ -24,38 +23,52 @@ var (
 		return sb.String()
 	}()
 
-	formatsToRenderFuncs = map[string]func([]check.Check, io.Writer){
-		common.PlainFormat: func(checks []check.Check, out io.Writer) {
-			for i, check := range checks {
-				fmt.Fprintf(out, "Name: %s\nDescription: %s\nTemplate: %s\nParameters: %v\nEnabled by default: %v\n",
-					check.Name, check.Description, check.Template, check.Params, defaultchecks.List.Contains(check.Name))
-				if i != len(checks)-1 {
-					fmt.Fprintf(out, "\n%s\n\n", dashes)
-				}
-			}
-		},
-		common.MarkdownFormat: func(checks []check.Check, out io.Writer) {
-			fmt.Fprintf(out, "The following table enumerates built-in checks:\n")
-			fmt.Fprintf(out, "\n\n| Name | Enabled by default | Description | Template | Parameters |\n --- | --- | --- | --- | --- | \n")
-			for _, check := range checks {
-				var params string
-				if len(check.Params) == 0 {
-					params = "none"
-				} else {
-					var sb strings.Builder
-					for key, value := range check.Params {
-						sb.WriteString(fmt.Sprintf("- `%s`: `%s` <br />", key, value))
-					}
-					params = sb.String()
-				}
-				fmt.Fprintf(out, "|`%s`|%s|%s|%s|%s|\n",
-					check.Name,
-					ternary.String(defaultchecks.List.Contains(check.Name), "Yes", "No"),
-					check.Description, check.Template, params)
-			}
-		},
+	formatsToRenderFuncs = map[string]func([]check.Check, io.Writer) error{
+		common.PlainFormat:    renderPlain,
+		common.MarkdownFormat: renderMarkdown,
 	}
 )
+
+func renderPlain(checks []check.Check, out io.Writer) error { //nolint:unparam // The function signature is required to match formatToRenderFuncs
+	for i, chk := range checks {
+		fmt.Fprintf(out, "Name: %s\nDescription: %s\nTemplate: %s\nParameters: %v\nEnabled by default: %v\n",
+			chk.Name, chk.Description, chk.Template, chk.Params, defaultchecks.List.Contains(chk.Name))
+		if i != len(checks)-1 {
+			fmt.Fprintf(out, "\n%s\n\n", dashes)
+		}
+	}
+	return nil
+}
+
+const (
+	markDownTemplateStr = `The following table enumerates built-in checks:
+
+| Name | Enabled by default | Description | Template | Parameters |
+| ---- | ------------------ | ----------- | -------- | ---------- |
+{{ range . }} | {{ .Check.Name}} | {{ if .Default }}Yes{{ else }}No{{ end }} | {{.Check.Description}} | {{.Check.Template}} | 
+{{- range $key, $value := .Check.Params -}}
+- {{backtick}}{{$key}}{{backtick}}: {{backtick}}{{$value}}{{backtick}} <br />
+{{- else }} none {{ end -}}
+|
+{{ end -}}
+`
+)
+
+var (
+	markDownTemplate = common.MustInstantiateTemplate(markDownTemplateStr)
+)
+
+func renderMarkdown(checks []check.Check, out io.Writer) error {
+	type augmentedCheck struct {
+		Check   check.Check
+		Default bool
+	}
+	augmentedChecks := make([]augmentedCheck, 0, len(checks))
+	for _, chk := range checks {
+		augmentedChecks = append(augmentedChecks, augmentedCheck{Check: chk, Default: defaultchecks.List.Contains(chk.Name)})
+	}
+	return markDownTemplate.Execute(out, augmentedChecks)
+}
 
 func listCommand() *cobra.Command {
 	format := common.FormatWrapper{Format: common.PlainFormat}
@@ -72,8 +85,7 @@ func listCommand() *cobra.Command {
 			if renderFunc == nil {
 				return errors.Errorf("unknown format: %q", format.Format)
 			}
-			renderFunc(checks, os.Stdout)
-			return nil
+			return renderFunc(checks, os.Stdout)
 		},
 	}
 	c.Flags().Var(&format, "format", "output format")
