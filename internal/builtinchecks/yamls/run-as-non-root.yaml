@@ -1,0 +1,6 @@
+name: "run-as-non-root"
+description: "Alert on containers not set to runAsNonRoot"
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "run-as-non-root"

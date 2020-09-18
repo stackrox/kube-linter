@@ -55,6 +55,7 @@ linters-settings:
       - importShadow
       - emptyStringTest
       - hugeParam
+      - rangeValCopy
   nolintlint:
     allow-leading-space: false # require machine-readable nolint directives (i.e. with no leading space)
     allow-unused: false # report any unused nolint directives
