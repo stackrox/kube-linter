@@ -50,11 +50,11 @@ var (
 				} else {
 					var sb strings.Builder
 					for _, param := range template.Parameters {
-						sb.WriteString(fmt.Sprintf("- %s%s: %s <br />", param.ParamName, ternary.String(param.Required, " (required)", ""), param.Description))
+						sb.WriteString(fmt.Sprintf("- `%s`%s: %s <br />", param.ParamName, ternary.String(param.Required, " (required)", ""), param.Description))
 					}
 					params = sb.String()
 				}
-				fmt.Fprintf(out, "|%s|%s|%s|%s|\n", template.Name, template.Description, strings.Join(template.SupportedObjectKinds.ObjectKinds, ", "), params)
+				fmt.Fprintf(out, "|`%s`|%s|%s|%s|\n", template.Name, template.Description, strings.Join(template.SupportedObjectKinds.ObjectKinds, ", "), params)
 			}
 		},
 	}

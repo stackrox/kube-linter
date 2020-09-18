@@ -44,11 +44,11 @@ var (
 				} else {
 					var sb strings.Builder
 					for key, value := range check.Params {
-						sb.WriteString(fmt.Sprintf("- %s: %s <br />", key, value))
+						sb.WriteString(fmt.Sprintf("- `%s`: `%s` <br />", key, value))
 					}
 					params = sb.String()
 				}
-				fmt.Fprintf(out, "|%s|%s|%s|%s|%s|\n",
+				fmt.Fprintf(out, "|`%s`|%s|%s|%s|%s|\n",
 					check.Name,
 					ternary.String(defaultchecks.List.Contains(check.Name), "Yes", "No"),
 					check.Description, check.Template, params)

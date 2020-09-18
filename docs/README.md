@@ -35,4 +35,4 @@ The list of supported check templates, along with their metadata, can be found [
 
 All checks in `kube-linter` are defined by referencing a check template, passing parameters to it, and adding additional
 check specific metadata (like check name and description). Users can configure custom checks the same way built-in checks
-are configured, and add them to the config file. The built-in checks are specified in [internal/builtinchecks](internal/builtinchecks). 
+are configured, and add them to the config file. The built-in checks are specified [here](../internal/builtinchecks).
