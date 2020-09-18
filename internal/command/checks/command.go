@@ -5,7 +5,6 @@ import (
 	"io"
 	"os"
 	"sort"
-	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -13,16 +12,11 @@ import (
 	"golang.stackrox.io/kube-linter/internal/check"
 	"golang.stackrox.io/kube-linter/internal/command/common"
 	"golang.stackrox.io/kube-linter/internal/defaultchecks"
+	"golang.stackrox.io/kube-linter/internal/stringutils"
 )
 
 var (
-	dashes = func() string {
-		var sb strings.Builder
-		for i := 0; i < 30; i++ {
-			sb.WriteRune('-')
-		}
-		return sb.String()
-	}()
+	dashes = stringutils.Repeat("-", 30)
 
 	formatsToRenderFuncs = map[string]func([]check.Check, io.Writer) error{
 		common.PlainFormat:    renderPlain,

@@ -3,6 +3,7 @@ module golang.stackrox.io/kube-linter
 go 1.14
 
 require (
+	github.com/Masterminds/sprig/v3 v3.1.0
 	github.com/fatih/color v1.9.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/gobuffalo/packr v1.30.1

@@ -4,23 +4,17 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"golang.stackrox.io/kube-linter/internal/check"
 	"golang.stackrox.io/kube-linter/internal/command/common"
+	"golang.stackrox.io/kube-linter/internal/stringutils"
 	"golang.stackrox.io/kube-linter/internal/templates"
 )
 
 var (
-	dashes = func() string {
-		var sb strings.Builder
-		for i := 0; i < 30; i++ {
-			sb.WriteRune('-')
-		}
-		return sb.String()
-	}()
+	dashes = stringutils.Repeat("-", 30)
 
 	formatsToRenderFuncs = map[string]func([]check.Template, io.Writer) error{
 		common.PlainFormat:    renderPlain,
@@ -33,7 +27,7 @@ const (
 
 | Name | Description | Supported Objects | Parameters |
 | ---- | ----------- | ----------------- | ---------- |
-{{ range . }} | {{ .Name}} | {{ .Description }} | {{ joinstrings .SupportedObjectKinds.ObjectKinds "," }} | 
+{{ range . }} | {{ .Name}} | {{ .Description }} | {{ join "," .SupportedObjectKinds.ObjectKinds }} |
 {{- range .Parameters -}}
 - {{backtick}}{{.ParamName}}{{backtick}}{{ if .Required }} (required){{ end }}: {{ .Description }} <br />
 {{- else }} none {{ end -}}
