@@ -4,11 +4,6 @@ customChecks:
   template: "required-label"
   params:
     key: "app"
-- name: "env-var-not-rox"
-  template: "env-var"
-  params:
-    name: "!ROX_.*"
-    value: ".+"
 checks:
   # if doNotAutoAddDefaults is true, default checks are not automatically added.
   # Otherwise, they are.
