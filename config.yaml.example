@@ -6,7 +6,6 @@ customChecks:
     key: "app"
 checks:
   # if doNotAutoAddDefaults is true, default checks are not automatically added.
-  # Otherwise, they are.
   doNotAutoAddDefaults: false
 
   # include explicitly adds checks, by name. You can reference any of the built-in checks.
