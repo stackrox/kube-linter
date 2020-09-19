@@ -60,14 +60,33 @@ staticcheck: $(STATICCHECK_BIN)
 .PHONY: lint
 lint: golangci-lint staticcheck
 
-#############
-## Compile ##
-#############
+####################
+## Code generation #
+####################
+
+.PHONY: generated-docs
+generated-docs: build
+	./bin/kube-linter templates list --format markdown > docs/generated/templates.md
+	./bin/kube-linter checks list --format markdown > docs/generated/checks.md
 
 .PHONY: packr
 packr: $(PACKR_BIN)
 	packr
 
+#############
+## Compile ##
+#############
+
+
 .PHONY: build
 build: packr
-	go build -o kube-linter ./cmd/kubelinter
+	go build -o ./bin/kube-linter ./cmd/kube-linter
+
+##########
+## Test ##
+##########
+
+.PHONY: test
+test: packr
+	go test ./...
+

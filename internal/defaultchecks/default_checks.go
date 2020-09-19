@@ -1,8 +1,12 @@
 package defaultchecks
 
+import (
+	"golang.stackrox.io/kube-linter/internal/set"
+)
+
 var (
 	// List is the list of built-in checks that are enabled by default.
-	List = []string{
+	List = set.NewFrozenStringSet(
 		"privileged-container",
-	}
+	)
 )

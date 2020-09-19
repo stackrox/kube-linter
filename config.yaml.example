@@ -1,0 +1,18 @@
+# customChecks defines custom checks.
+customChecks:
+- name: "required-label-app"
+  template: "required-label"
+  params:
+    key: "app"
+checks:
+  # if doNotAutoAddDefaults is true, default checks are not automatically added.
+  doNotAutoAddDefaults: false
+
+  # include explicitly adds checks, by name. You can reference any of the built-in checks.
+  # Note that customChecks defined above are included automatically.
+  include:
+  - "required-label-owner"
+  # exclude explicitly excludes checks, by name. exclude has the highest priority: if a check is
+  # in exclude, then it is not considered, even if it is in include as well.
+  exclude:
+  - "privileged"

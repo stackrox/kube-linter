@@ -11,14 +11,10 @@ import (
 	"golang.stackrox.io/kube-linter/internal/templates"
 )
 
-const (
-	// TemplateName is the name of this template.
-	TemplateName = "privileged"
-)
-
 func init() {
 	templates.Register(check.Template{
-		Name: TemplateName,
+		Name:        "privileged",
+		Description: "Flag privileged containers",
 		SupportedObjectKinds: check.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
