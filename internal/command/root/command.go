@@ -7,6 +7,7 @@ import (
 	"golang.stackrox.io/kube-linter/internal/command/checks"
 	"golang.stackrox.io/kube-linter/internal/command/lint"
 	"golang.stackrox.io/kube-linter/internal/command/templates"
+	"golang.stackrox.io/kube-linter/internal/command/version"
 )
 
 // Command is the root command.
@@ -20,6 +21,7 @@ func Command() *cobra.Command {
 		checks.Command(),
 		lint.Command(),
 		templates.Command(),
+		version.Command(),
 	)
 	return c
 }

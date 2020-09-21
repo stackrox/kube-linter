@@ -10,10 +10,12 @@ deps: go.mod
 	@go mod verify
 	@touch deps
 
+UNAME_S := $(shell uname -s)
+HOST_OS := linux
+ifeq ($(UNAME_S),Darwin)
+    HOST_OS := darwin
+endif
 
-#####################################################################
-###### Binaries we depend on ############
-#####################################################################
 
 GOBIN := $(CURDIR)/.gobin
 PATH := $(GOBIN):$(PATH)
@@ -22,6 +24,10 @@ PATH := $(GOBIN):$(PATH)
 # trying commands in $(GOBIN) first.
 # See https://stackoverflow.com/a/36226784/3690207
 SHELL := env PATH=$(PATH) /bin/bash
+
+########################################
+###### Binaries we depend on ###########
+########################################
 
 GOLANGCILINT_BIN := $(GOBIN)/golangci-lint
 $(GOLANGCILINT_BIN): deps
@@ -66,8 +72,8 @@ lint: golangci-lint staticcheck
 
 .PHONY: generated-docs
 generated-docs: build
-	./bin/kube-linter templates list --format markdown > docs/generated/templates.md
-	./bin/kube-linter checks list --format markdown > docs/generated/checks.md
+	kube-linter templates list --format markdown > docs/generated/templates.md
+	kube-linter checks list --format markdown > docs/generated/checks.md
 
 .PHONY: packr
 packr: $(PACKR_BIN)
@@ -80,7 +86,12 @@ packr: $(PACKR_BIN)
 
 .PHONY: build
 build: packr
-	go build -o ./bin/kube-linter ./cmd/kube-linter
+	@CGO_ENABLED=0 GOOS=darwin scripts/go-build.sh ./cmd/kube-linter
+	@CGO_ENABLED=0 GOOS=linux scripts/go-build.sh ./cmd/kube-linter
+	@CGO_ENABLED=0 GOOS=windows scripts/go-build.sh ./cmd/kube-linter
+	@mkdir -p "$(GOBIN)"
+	@cp "bin/$(HOST_OS)/kube-linter" "$(GOBIN)/kube-linter"
+	@chmod u+w "$(GOBIN)/kube-linter"
 
 ##########
 ## Test ##
