@@ -48,12 +48,12 @@ func init() {
 				}
 				var results []diagnostic.Diagnostic
 				for _, container := range podSpec.Containers {
-					runAsNonRoot := effectiveRunAsNonRoot(podSpec.SecurityContext, container.SecurityContext)
 					runAsUser := effectiveRunAsUser(podSpec.SecurityContext, container.SecurityContext)
 					// runAsUser explicitly set to non-root. All good.
 					if runAsUser != nil && *runAsUser > 0 {
 						continue
 					}
+					runAsNonRoot := effectiveRunAsNonRoot(podSpec.SecurityContext, container.SecurityContext)
 					if runAsNonRoot {
 						// runAsNonRoot set, but runAsUser set to 0. This will result in a runtime failure.
 						if runAsUser != nil && *runAsUser == 0 {
