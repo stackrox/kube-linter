@@ -3,6 +3,11 @@ executors:
     docker:
       - image: cimg/go:1.15
 
+runOnAllTags: &runOnAllTags
+  filters:
+    tags:
+      only: /.*/
+
 version: 2.1
 
 jobs:
@@ -31,15 +36,32 @@ jobs:
         command: |
           make test
 
+  build:
+    executor: custom
+    steps:
+    - checkout
+
+    - run:
+        name: Build binaries
+        command: |
+          make build
+
+    - run:
+        name: Ensure `kube-linter version` returns the expected value.
+        command: |
+          version="$(kube-linter version)"
+          expected_version="$(get-tag)"
+          echo "Version from kube-linter: ${version}. Expected version: ${expected_version}"
+          [[ "${version}" == "${expected_version}" ]]
+
+
 workflows:
   version: 2
   build:
     jobs:
     - lint:
-        filters:
-          tags:
-            only: /.*/
+        <<: *runOnAllTags
     - test:
-        filters:
-          tags:
-            only: /.*/
+        <<: *runOnAllTags
+    - build:
+        <<: *runOnAllTags
