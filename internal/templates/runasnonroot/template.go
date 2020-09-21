@@ -9,12 +9,33 @@ import (
 	"golang.stackrox.io/kube-linter/internal/lintcontext"
 	"golang.stackrox.io/kube-linter/internal/objectkinds"
 	"golang.stackrox.io/kube-linter/internal/templates"
+	v1 "k8s.io/api/core/v1"
 )
+
+func effectiveRunAsNonRoot(podSC *v1.PodSecurityContext, containerSC *v1.SecurityContext) bool {
+	if containerSC != nil && containerSC.RunAsNonRoot != nil {
+		return *containerSC.RunAsNonRoot
+	}
+	if podSC != nil && podSC.RunAsNonRoot != nil {
+		return *podSC.RunAsNonRoot
+	}
+	return false
+}
+
+func effectiveRunAsUser(podSC *v1.PodSecurityContext, containerSC *v1.SecurityContext) *int64 {
+	if containerSC != nil && containerSC.RunAsUser != nil {
+		return containerSC.RunAsUser
+	}
+	if podSC != nil {
+		return podSC.RunAsUser
+	}
+	return nil
+}
 
 func init() {
 	templates.Register(check.Template{
 		Name:        "run-as-non-root",
-		Description: "Flag containers without runAsUser specified",
+		Description: "Flag containers set to run as a root user",
 		SupportedObjectKinds: check.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
@@ -26,20 +47,20 @@ func init() {
 					return nil
 				}
 				var results []diagnostic.Diagnostic
-				var podSCValue bool
-				if podSpec.SecurityContext != nil && podSpec.SecurityContext.RunAsNonRoot != nil {
-					podSCValue = *podSpec.SecurityContext.RunAsNonRoot
-				}
-				for i := range podSpec.Containers {
-					container := podSpec.Containers[i]
-					var runAsNonRoot *bool
-					if container.SecurityContext != nil {
-						runAsNonRoot = container.SecurityContext.RunAsNonRoot
-					}
-					if runAsNonRoot != nil && *runAsNonRoot {
+				for _, container := range podSpec.Containers {
+					runAsNonRoot := effectiveRunAsNonRoot(podSpec.SecurityContext, container.SecurityContext)
+					runAsUser := effectiveRunAsUser(podSpec.SecurityContext, container.SecurityContext)
+					// runAsUser explicitly set to non-root. All good.
+					if runAsUser != nil && *runAsUser > 0 {
 						continue
 					}
-					if runAsNonRoot == nil && podSCValue {
+					if runAsNonRoot {
+						// runAsNonRoot set, but runAsUser set to 0. This will result in a runtime failure.
+						if runAsUser != nil && *runAsUser == 0 {
+							results = append(results, diagnostic.Diagnostic{
+								Message: fmt.Sprintf("container %q is set to runAsNonRoot, but runAsUser set to %d", container.Name, *runAsUser),
+							})
+						}
 						continue
 					}
 					results = append(results, diagnostic.Diagnostic{Message: fmt.Sprintf("container %q is not set to runAsNonRoot", container.Name)})

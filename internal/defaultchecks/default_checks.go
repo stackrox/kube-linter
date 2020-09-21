@@ -9,7 +9,6 @@ var (
 	List = set.NewFrozenStringSet(
 		"privileged-container",
 		"env-var-secret",
-		"no-v1beta-deployments",
 		"no-read-only-root-fs",
 		"run-as-non-root",
 	)

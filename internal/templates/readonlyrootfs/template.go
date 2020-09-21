@@ -26,8 +26,7 @@ func init() {
 					return nil
 				}
 				var results []diagnostic.Diagnostic
-				for i := range podSpec.Containers {
-					container := podSpec.Containers[i]
+				for _, container := range podSpec.Containers {
 					sc := container.SecurityContext
 					if sc == nil || sc.ReadOnlyRootFilesystem == nil || !*sc.ReadOnlyRootFilesystem {
 						results = append(results, diagnostic.Diagnostic{Message: fmt.Sprintf("container %q does not have a read-only root file system", container.Name)})
