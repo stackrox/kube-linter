@@ -58,7 +58,7 @@ jobs:
         name: Create a GitHub release, if on tag.
         command: |
           if [[ -n "${CIRCLE_TAG}" ]]; then
-
+            ./scripts/create_github_release.sh "${CIRCLE_TAG}" ./bin
           fi
 
 
