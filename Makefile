@@ -11,9 +11,9 @@ deps: go.mod
 	@touch deps
 
 UNAME_S := $(shell uname -s)
-HOST_OS:=linux
+HOST_OS := linux
 ifeq ($(UNAME_S),Darwin)
-    HOST_OS:=darwin
+    HOST_OS := darwin
 endif
 
 
@@ -87,8 +87,8 @@ packr: $(PACKR_BIN)
 .PHONY: build
 build: packr
 	@CGO_ENABLED=0 GOOS=darwin scripts/go-build.sh ./cmd/kube-linter
-	@GOOS=linux scripts/go-build.sh ./cmd/kube-linter
-	@GOOS=windows scripts/go-build.sh ./cmd/kube-linter
+	@CGO_ENABLED=0 GOOS=linux scripts/go-build.sh ./cmd/kube-linter
+	@CGO_ENABLED=0 GOOS=windows scripts/go-build.sh ./cmd/kube-linter
 	@mkdir -p "$(GOBIN)"
 	@cp "bin/$(HOST_OS)/kube-linter" "$(GOBIN)/kube-linter"
 	@chmod u+w "$(GOBIN)/kube-linter"

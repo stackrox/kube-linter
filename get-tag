@@ -1,4 +1,7 @@
 #!/bin/sh
 
-set -e
-git describe --tags --abbrev=10 --dirty
+if [ -n "${CIRCLE_TAG}" ]; then
+  echo "${CIRCLE_TAG}"
+else
+  git describe --long --tags --abbrev=10 --dirty
+fi
