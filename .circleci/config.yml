@@ -49,7 +49,7 @@ jobs:
     - run:
         name: Ensure `kube-linter version` returns the expected value.
         command: |
-          version="$(kube-linter version)"
+          version="$(.gobin/kube-linter version)"
           expected_version="$(get-tag)"
           echo "Version from kube-linter: ${version}. Expected version: ${expected_version}"
           [[ "${version}" == "${expected_version}" ]]
