@@ -54,6 +54,13 @@ jobs:
           echo "Version from kube-linter: ${version}. Expected version: ${expected_version}"
           [[ "${version}" == "${expected_version}" ]]
 
+    - run:
+        name: Create a GitHub release, if on tag.
+        command: |
+          if [[ -n "${CIRCLE_TAG}" ]]; then
+
+          fi
+
 
 workflows:
   version: 2
