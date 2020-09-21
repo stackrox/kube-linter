@@ -3,7 +3,7 @@
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 source "${SCRIPT_DIR}/utils.sh"
 
-set -euo pipefail
+set -eo pipefail
 
 main_srcdir="$1"
 [[ -n "${main_srcdir}" ]] || die "Usage: $0 <directory with main file>"

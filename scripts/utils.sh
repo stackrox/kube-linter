@@ -1,11 +1,15 @@
 #!/usr/bin/env bash
 
-bold="$(tput bold)"
-reset="$(tput sgr0)"
-green="$(tput setaf 2)"
-yellow="$(tput setaf 3)"
-red="$(tput setaf 1)"
-black="$(tput setaf 0; tput setab 7)"
+function safe_tput() {
+  tput "$@" 2>/dev/null || true
+}
+
+bold="$(safe_tput bold)"
+reset="$(safe_tput sgr0)"
+green="$(safe_tput setaf 2)"
+yellow="$(safe_tput setaf 3)"
+red="$(safe_tput setaf 1)"
+black="$(safe_tput setaf 0; safe_tput setab 7)"
 
 function eecho() {
   echo >&2 "$@"

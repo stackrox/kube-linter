@@ -89,6 +89,7 @@ build: packr
 	@CGO_ENABLED=0 GOOS=darwin scripts/go-build.sh ./cmd/kube-linter
 	@GOOS=linux scripts/go-build.sh ./cmd/kube-linter
 	@GOOS=windows scripts/go-build.sh ./cmd/kube-linter
+	@mkdir -p "$(GOBIN)"
 	@cp "bin/$(HOST_OS)/kube-linter" "$(GOBIN)/kube-linter"
 	@chmod u+w "$(GOBIN)/kube-linter"
 
