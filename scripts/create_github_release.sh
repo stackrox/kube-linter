@@ -12,9 +12,13 @@ bin_dir="$2"
 [[ -n "${tag}" && -n "${bin_dir}" ]] || die "Usage: $0 <tag> <binary_directory>"
 
 mkdir /tmp/release-artifacts
-tar -czf /tmp/release-artifacts/kube-linter-darwin.tar.gz "${bin_dir}/darwin/kube-linter"
-tar -czf /tmp/release-artifacts/kube-linter-linux.tar.gz "${bin_dir}/linux/kube-linter"
-tar -czf /tmp/release-artifacts/kube-linter-windows.tar.gz "${bin_dir}/windows/kube-linter.exe"
+for os in darwin linux windows; do
+  bin_name="kube-linter"
+  if [[ "${os}" == "windows" ]]; then
+    bin_name="kube-linter.exe"
+  fi
+  tar -C "${bin_dir}/${os}" -czf "/tmp/release-artifacts/kube-linter-${os}.tar.gz" "${bin_name}"
+done
 
 ghr -prerelease -n "v${tag}" "${tag}" /tmp/release-artifacts
 rm -r /tmp/release-artifacts
