@@ -54,6 +54,19 @@ jobs:
           echo "Version from kube-linter: ${version}. Expected version: ${expected_version}"
           [[ "${version}" == "${expected_version}" ]]
 
+    - run:
+        name: Create a GitHub release, if on tag.
+        command: |
+          [[ -n "${CIRCLE_TAG}" ]] || exit 0
+
+          wget --quiet https://github.com/gruntwork-io/fetch/releases/download/v0.3.5/fetch_linux_amd64
+          sudo install fetch_linux_amd64 /usr/bin/fetch
+          ghr_version="v0.13.0"
+          fetch --repo="https://github.com/tcnksm/ghr" --tag="${ghr_version}" --release-asset="ghr_${ghr_version}_linux_amd64.tar.gz" .
+          tar -zxvf ghr_${ghr_version}_linux_amd64.tar.gz
+          sudo install ghr_${ghr_version}_linux_amd64/ghr /usr/bin/ghr
+          which ghr
+          ./scripts/create_github_release.sh "${CIRCLE_TAG}" ./bin
 
 workflows:
   version: 2
