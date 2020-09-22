@@ -63,7 +63,7 @@ jobs:
             ghr_version="v0.13.0"
             fetch --repo="https://github.com/tcnksm/ghr" --tag="${ghr_version}" --release-asset="ghr_${ghr_version}_linux_amd64.tar.gz" .
             tar -zxvf ghr_${ghr_version}_linux_amd64.tar.gz
-            sudo install ghr_${ghr_version}_linux_amd64 /usr/bin/ghr
+            sudo install ghr_${ghr_version}_linux_amd64/ghr /usr/bin/ghr
             which ghr
             ./scripts/create_github_release.sh "${CIRCLE_TAG}" ./bin
           fi
