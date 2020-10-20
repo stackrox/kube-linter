@@ -38,7 +38,7 @@ const (
 
 **Supported Objects**: {{ join "," .SupportedObjectKinds.ObjectKinds }}
 
-Parameters:
+**Parameters**:
 {{ backtick }}{{ backtick }}{{ backtick }} 
 {{ getParametersJSON .Parameters }}
 {{ backtick }}{{ backtick }}{{ backtick }} 
@@ -78,14 +78,14 @@ func renderParameters(numTabs int, params []check.ParameterDesc, out io.Writer) 
 		}
 		if len(param.SubParameters) > 0 {
 			fmt.Fprintf(out, "%s\tSub-parameters:\n", tabs)
-			renderParameters(numTabs + 1, param.SubParameters, out)
+			renderParameters(numTabs+1, param.SubParameters, out)
 		}
 	}
 }
 
 func renderPlain(templates []check.Template, out io.Writer) error { //nolint:unparam // The function signature is required to match formatToRenderFuncs
 	for i, template := range templates {
-		fmt.Fprintf(out, "Key: %s\nDescription: %s\nSupported Objects: %v\n", template.Key, template.Description, template.SupportedObjectKinds.ObjectKinds)
+		fmt.Fprintf(out, "Name: %s\nKey: %s\nDescription: %s\nSupported Objects: %v\n", template.HumanName, template.Key, template.Description, template.SupportedObjectKinds.ObjectKinds)
 		if len(template.Parameters) == 0 {
 			fmt.Fprintln(out, "Parameters: none")
 		} else {
@@ -97,11 +97,6 @@ func renderPlain(templates []check.Template, out io.Writer) error { //nolint:unp
 		}
 	}
 	return nil
-}
-
-type templateObj struct {
-	HumanName string
-	Key string
 }
 
 func renderMarkdown(templates []check.Template, out io.Writer) error {

@@ -35,7 +35,7 @@ func effectiveRunAsUser(podSC *v1.PodSecurityContext, containerSC *v1.SecurityCo
 
 func init() {
 	templates.Register(check.Template{
-		HumanName: "Run as non-root user",
+		HumanName:   "Run as non-root user",
 		Key:         "run-as-non-root",
 		Description: "Flag containers set to run as a root user",
 		SupportedObjectKinds: check.ObjectKindsDesc{

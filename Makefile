@@ -82,7 +82,6 @@ generated-docs: go-generated-srcs build
 .PHONY: generated-srcs
 generated-srcs: go-generated-srcs generated-docs
 
-
 .PHONY: packr
 packr: $(PACKR_BIN)
 	packr

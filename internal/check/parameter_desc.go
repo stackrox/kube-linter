@@ -44,10 +44,10 @@ type ParameterDesc struct {
 // HumanReadableFields returns a human-friendly representation of this ParameterDesc
 func (p *ParameterDesc) HumanReadableFields() map[string]interface{} {
 	m := map[string]interface{}{
-		"name": p.Name,
-		"type": p.Type,
+		"name":        p.Name,
+		"type":        p.Type,
 		"description": p.Description,
-		"required": p.Required,
+		"required":    p.Required,
 	}
 
 	if len(p.Examples) > 0 {
