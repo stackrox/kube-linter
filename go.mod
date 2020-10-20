@@ -8,6 +8,7 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/gobuffalo/packr v1.30.1
 	github.com/golangci/golangci-lint v1.30.0
+	github.com/mitchellh/mapstructure v1.1.2
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.0.0
 	github.com/stretchr/objx v0.2.0 // indirect
@@ -18,4 +19,5 @@ require (
 	k8s.io/api v0.19.1
 	k8s.io/apimachinery v0.19.1
 	k8s.io/client-go v0.19.0
+	k8s.io/gengo v0.0.0-20200728071708-7794989d0000
 )

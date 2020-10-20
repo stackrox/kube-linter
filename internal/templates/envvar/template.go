@@ -11,30 +11,25 @@ import (
 	"golang.stackrox.io/kube-linter/internal/matcher"
 	"golang.stackrox.io/kube-linter/internal/objectkinds"
 	"golang.stackrox.io/kube-linter/internal/templates"
-)
-
-const (
-	nameParamName  = "name"
-	valueParamName = "value"
+	"golang.stackrox.io/kube-linter/internal/templates/envvar/internal/params"
 )
 
 func init() {
 	templates.Register(check.Template{
-		Name:        "env-var",
+		HumanName:   "Environment Variables",
+		Key:         "env-var",
 		Description: "Flag environment variables that match the provided patterns",
 		SupportedObjectKinds: check.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
-		Parameters: []check.ParameterDesc{
-			{ParamName: nameParamName, Required: true, Description: "A regex for the env var name"},
-			{ParamName: valueParamName, Description: "A regex for the env var value"},
-		},
-		Instantiate: func(params map[string]string) (check.Func, error) {
-			nameMatcher, err := matcher.ForString(params[nameParamName])
+		Parameters:             params.ParamDescs,
+		ParseAndValidateParams: params.ParseAndValidate,
+		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
+			nameMatcher, err := matcher.ForString(p.Name)
 			if err != nil {
-				return nil, errors.Wrap(err, "invalid key")
+				return nil, errors.Wrap(err, "invalid name")
 			}
-			valueMatcher, err := matcher.ForString(params[valueParamName])
+			valueMatcher, err := matcher.ForString(p.Value)
 			if err != nil {
 				return nil, errors.Wrap(err, "invalid value")
 			}
@@ -56,6 +51,6 @@ func init() {
 				}
 				return results
 			}, nil
-		},
+		}),
 	})
 }

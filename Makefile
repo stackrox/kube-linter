@@ -70,10 +70,18 @@ lint: golangci-lint staticcheck
 ## Code generation #
 ####################
 
+.PHONY: go-generated-srcs
+go-generated-srcs: deps
+	go generate ./...
+
 .PHONY: generated-docs
-generated-docs: build
+generated-docs: go-generated-srcs build
 	kube-linter templates list --format markdown > docs/generated/templates.md
 	kube-linter checks list --format markdown > docs/generated/checks.md
+
+.PHONY: generated-srcs
+generated-srcs: go-generated-srcs generated-docs
+
 
 .PHONY: packr
 packr: $(PACKR_BIN)

@@ -5,7 +5,6 @@ import (
 	"golang.stackrox.io/kube-linter/internal/check"
 	"golang.stackrox.io/kube-linter/internal/errorhelpers"
 	"golang.stackrox.io/kube-linter/internal/objectkinds"
-	"golang.stackrox.io/kube-linter/internal/set"
 	"golang.stackrox.io/kube-linter/internal/templates"
 )
 
@@ -30,20 +29,11 @@ func ValidateAndInstantiate(c *check.Check) (*InstantiatedCheck, error) {
 		return nil, validationErrs.ToError()
 	}
 
-	supportedParams := set.NewStringSet()
-	for _, param := range template.Parameters {
-		if param.Required {
-			if _, found := c.Params[param.ParamName]; !found {
-				validationErrs.AddStringf("required param %q not specified", param.ParamName)
-			}
-		}
-		supportedParams.Add(param.ParamName)
+	params, err := template.ParseAndValidateParams(c.Params)
+	if err != nil {
+		return nil, errors.Wrap(err, "validating and instantiating params")
 	}
-	for passedParam := range c.Params {
-		if !supportedParams.Contains(passedParam) {
-			validationErrs.AddStringf("unknown param %q passed", passedParam)
-		}
-	}
+
 	if err := validationErrs.ToError(); err != nil {
 		return nil, err
 	}
@@ -60,7 +50,7 @@ func ValidateAndInstantiate(c *check.Check) (*InstantiatedCheck, error) {
 		return nil, err
 	}
 	i.Matcher = matcher
-	checkFunc, err := template.Instantiate(c.Params)
+	checkFunc, err := template.Instantiate(params)
 	if err != nil {
 		return nil, errors.Wrap(err, "instantiating check")
 	}

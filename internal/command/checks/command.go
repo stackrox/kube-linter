@@ -26,7 +26,7 @@ var (
 
 func renderPlain(checks []check.Check, out io.Writer) error { //nolint:unparam // The function signature is required to match formatToRenderFuncs
 	for i, chk := range checks {
-		fmt.Fprintf(out, "Name: %s\nDescription: %s\nTemplate: %s\nParameters: %v\nEnabled by default: %v\n",
+		fmt.Fprintf(out, "Key: %s\nDescription: %s\nTemplate: %s\nParameters: %v\nEnabled by default: %v\n",
 			chk.Name, chk.Description, chk.Template, chk.Params, defaultchecks.List.Contains(chk.Name))
 		if i != len(checks)-1 {
 			fmt.Fprintf(out, "\n%s\n\n", dashes)
@@ -50,7 +50,7 @@ const (
 )
 
 var (
-	markDownTemplate = common.MustInstantiateTemplate(markDownTemplateStr)
+	markDownTemplate = common.MustInstantiateTemplate(markDownTemplateStr, nil)
 )
 
 func renderMarkdown(checks []check.Check, out io.Writer) error {

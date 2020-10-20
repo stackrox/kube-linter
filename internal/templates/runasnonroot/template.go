@@ -9,6 +9,7 @@ import (
 	"golang.stackrox.io/kube-linter/internal/lintcontext"
 	"golang.stackrox.io/kube-linter/internal/objectkinds"
 	"golang.stackrox.io/kube-linter/internal/templates"
+	"golang.stackrox.io/kube-linter/internal/templates/runasnonroot/internal/params"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -34,13 +35,15 @@ func effectiveRunAsUser(podSC *v1.PodSecurityContext, containerSC *v1.SecurityCo
 
 func init() {
 	templates.Register(check.Template{
-		Name:        "run-as-non-root",
+		HumanName: "Run as non-root user",
+		Key:         "run-as-non-root",
 		Description: "Flag containers set to run as a root user",
 		SupportedObjectKinds: check.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
-		Parameters: nil,
-		Instantiate: func(_ map[string]string) (check.Func, error) {
+		Parameters:             params.ParamDescs,
+		ParseAndValidateParams: params.ParseAndValidate,
+		Instantiate: params.WrapInstantiateFunc(func(_ params.Params) (check.Func, error) {
 			return func(_ *lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				podSpec, found := extract.PodSpec(object.K8sObject)
 				if !found {
@@ -67,6 +70,6 @@ func init() {
 				}
 				return results
 			}, nil
-		},
+		}),
 	})
 }
