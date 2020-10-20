@@ -40,11 +40,7 @@ const (
 
 | Name | Enabled by default | Description | Template | Parameters |
 | ---- | ------------------ | ----------- | -------- | ---------- |
-{{ range . }} | {{ .Check.Name}} | {{ if .Default }}Yes{{ else }}No{{ end }} | {{.Check.Description}} | {{.Check.Template}} | 
-{{- range $key, $value := .Check.Params -}}
-- {{backtick}}{{$key}}{{backtick}}: {{backtick}}{{$value}}{{backtick}} <br />
-{{- else }} none {{ end -}}
-|
+{{ range . }} | {{ .Check.Name}} | {{ if .Default }}Yes{{ else }}No{{ end }} | {{.Check.Description}} | {{.Check.Template}} | {{ backtick }}{{ mustToJson (default (dict) .Check.Params ) }}{{ backtick }} |
 {{ end -}}
 `
 )
