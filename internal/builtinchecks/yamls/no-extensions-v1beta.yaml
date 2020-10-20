@@ -1,0 +1,9 @@
+name: "no-extensions-v1beta"
+description: "Alert on objects using deprecated API versions under extensions v1beta"
+scope:
+  objectKinds:
+    - Any
+template: "disallowed-api-obj"
+params:
+  group: "extensions"
+  version: "v1beta.+"

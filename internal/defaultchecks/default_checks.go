@@ -11,5 +11,6 @@ var (
 		"env-var-secret",
 		"no-read-only-root-fs",
 		"run-as-non-root",
+		"no-extensions-v1beta",
 	)
 )
