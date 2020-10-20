@@ -1,5 +1,9 @@
 package check
 
+import (
+	"golang.stackrox.io/kube-linter/internal/pointers"
+)
+
 // ParameterType represents the expected type of a particular parameter.
 type ParameterType string
 
@@ -41,30 +45,41 @@ type ParameterDesc struct {
 	XXXStructFieldName string
 }
 
-// HumanReadableFields returns a human-friendly representation of this ParameterDesc
-func (p *ParameterDesc) HumanReadableFields() map[string]interface{} {
-	m := map[string]interface{}{
-		"name":        p.Name,
-		"type":        p.Type,
-		"description": p.Description,
-		"required":    p.Required,
-	}
+// HumanReadableParamDesc is a human-friendly representation of a ParameterDesc.
+// It is intended only for API documentation/JSON marshaling, and must NOT be used for
+// any business logic.
+type HumanReadableParamDesc struct {
+	Name            string                   `json:"name"`
+	Type            ParameterType            `json:"type"`
+	Description     string                   `json:"description"`
+	Required        bool                     `json:"required"`
+	Examples        []string                 `json:"examples,omitempty"`
+	RegexAllowed    *bool                    `json:"regexAllowed,omitempty"`
+	NegationAllowed *bool                    `json:"negationAllowed,omitempty"`
+	SubParameters   []HumanReadableParamDesc `json:"subParameters,omitempty"`
+}
 
-	if len(p.Examples) > 0 {
-		m["examples"] = p.Examples
+// HumanReadableFields returns a human-friendly representation of this ParameterDesc.
+func (p *ParameterDesc) HumanReadableFields() HumanReadableParamDesc {
+	out := HumanReadableParamDesc{
+		Name:        p.Name,
+		Type:        p.Type,
+		Description: p.Description,
+		Required:    p.Required,
+		Examples:    p.Examples,
 	}
 
 	if p.Type == StringType {
-		m["regexAllowed"] = !p.NoRegex
-		m["negationAllowed"] = !p.NotNegatable
+		out.RegexAllowed = pointers.Bool(!p.NoRegex)
+		out.NegationAllowed = pointers.Bool(!p.NotNegatable)
 	}
 
 	if len(p.SubParameters) > 0 {
-		subParamFields := make([]map[string]interface{}, 0, len(p.SubParameters))
+		subParamFields := make([]HumanReadableParamDesc, 0, len(p.SubParameters))
 		for _, subParam := range p.SubParameters {
 			subParamFields = append(subParamFields, subParam.HumanReadableFields())
 		}
-		m["subParameters"] = subParamFields
+		out.SubParameters = subParamFields
 	}
-	return m
+	return out
 }

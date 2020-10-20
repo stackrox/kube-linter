@@ -8,43 +8,43 @@ This page lists supported check templates.
 
 **Supported Objects**: Any
 
-Parameters:
+**Parameters**:
 ``` 
 [
 	{
+		"name": "group",
+		"type": "string",
 		"description": "The disallowed object group.",
+		"required": false,
 		"examples": [
 			"apps"
 		],
-		"name": "group",
-		"negationAllowed": true,
 		"regexAllowed": true,
-		"required": false,
-		"type": "string"
+		"negationAllowed": true
 	},
 	{
+		"name": "version",
+		"type": "string",
 		"description": "The disallowed object API version.",
+		"required": false,
 		"examples": [
 			"v1",
 			"v1beta1"
 		],
-		"name": "version",
-		"negationAllowed": true,
 		"regexAllowed": true,
-		"required": false,
-		"type": "string"
+		"negationAllowed": true
 	},
 	{
+		"name": "kind",
+		"type": "string",
 		"description": "The disallowed kind.",
+		"required": false,
 		"examples": [
 			"Deployment",
 			"DaemonSet"
 		],
-		"name": "kind",
-		"negationAllowed": true,
 		"regexAllowed": true,
-		"required": false,
-		"type": "string"
+		"negationAllowed": true
 	}
 ]
 
@@ -58,24 +58,24 @@ Parameters:
 
 **Supported Objects**: DeploymentLike
 
-Parameters:
+**Parameters**:
 ``` 
 [
 	{
-		"description": "The name of the environment variable.",
 		"name": "name",
-		"negationAllowed": true,
-		"regexAllowed": true,
+		"type": "string",
+		"description": "The name of the environment variable.",
 		"required": true,
-		"type": "string"
+		"regexAllowed": true,
+		"negationAllowed": true
 	},
 	{
-		"description": "The value of the environment variable.",
 		"name": "value",
-		"negationAllowed": true,
-		"regexAllowed": true,
+		"type": "string",
+		"description": "The value of the environment variable.",
 		"required": false,
-		"type": "string"
+		"regexAllowed": true,
+		"negationAllowed": true
 	}
 ]
 
@@ -89,7 +89,7 @@ Parameters:
 
 **Supported Objects**: DeploymentLike
 
-Parameters:
+**Parameters**:
 ``` 
 []
 
@@ -103,7 +103,7 @@ Parameters:
 
 **Supported Objects**: DeploymentLike
 
-Parameters:
+**Parameters**:
 ``` 
 []
 
@@ -117,24 +117,24 @@ Parameters:
 
 **Supported Objects**: Any
 
-Parameters:
+**Parameters**:
 ``` 
 [
 	{
-		"description": "Key of the required label.",
 		"name": "key",
-		"negationAllowed": true,
-		"regexAllowed": true,
+		"type": "string",
+		"description": "Key of the required label.",
 		"required": true,
-		"type": "string"
+		"regexAllowed": true,
+		"negationAllowed": true
 	},
 	{
-		"description": "Value of the required label.",
 		"name": "value",
-		"negationAllowed": true,
-		"regexAllowed": true,
+		"type": "string",
+		"description": "Value of the required label.",
 		"required": false,
-		"type": "string"
+		"regexAllowed": true,
+		"negationAllowed": true
 	}
 ]
 
@@ -148,7 +148,7 @@ Parameters:
 
 **Supported Objects**: DeploymentLike
 
-Parameters:
+**Parameters**:
 ``` 
 []
 

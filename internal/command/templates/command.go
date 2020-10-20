@@ -50,7 +50,7 @@ const (
 var (
 	markDownTemplate = common.MustInstantiateTemplate(markDownTemplateStr, template.FuncMap{
 		"getParametersJSON": func(params []check.ParameterDesc) (string, error) {
-			out := make([]map[string]interface{}, 0, len(params))
+			out := make([]check.HumanReadableParamDesc, 0, len(params))
 			for _, param := range params {
 				out = append(out, param.HumanReadableFields())
 			}
