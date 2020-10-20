@@ -11,10 +11,10 @@ type ParameterType string
 // These type names are chosen to be aligned with OpenAPI/JSON schema.
 const (
 	StringType  ParameterType = "string"
-	IntegerType               = "integer"
-	BooleanType               = "boolean"
-	NumberType                = "number"
-	ObjectType                = "object"
+	IntegerType ParameterType = "integer"
+	BooleanType ParameterType = "boolean"
+	NumberType  ParameterType = "number"
+	ObjectType  ParameterType = "object"
 )
 
 // ParameterDesc describes a parameter.
