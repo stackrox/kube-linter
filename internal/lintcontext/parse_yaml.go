@@ -31,43 +31,6 @@ var (
 	decoder      = serializer.NewCodecFactory(clientSchema).UniversalDeserializer()
 )
 
-// LoadObjectsFromPath loads the objects in the file or directory given by `path`
-// into the lint context.
-func (l *LintContext) LoadObjectsFromPath(path string) error {
-	info, err := os.Stat(path)
-	if err != nil {
-		return err
-	}
-	if !info.IsDir() {
-		return l.loadObjectsFromYAMLFile(path, info)
-	}
-	err = filepath.Walk(path, func(currentPath string, info os.FileInfo, walkErr error) error {
-		if walkErr != nil {
-			return walkErr
-		}
-		if isHelm, _ := chartutil.IsChartDir(currentPath); isHelm {
-			if err := l.loadObjectsFromHelmChart(currentPath); err != nil {
-				return err
-			}
-			return filepath.SkipDir
-		}
-		if info.IsDir() {
-			return nil
-		}
-		if !knownYAMLExtensions.Contains(strings.ToLower(filepath.Ext(currentPath))) {
-			return nil
-		}
-		if err := l.loadObjectsFromYAMLFile(currentPath, info); err != nil {
-			return err
-		}
-		return nil
-	})
-	if err != nil {
-		return errors.Wrapf(err, "loading from directory %s", path)
-	}
-	return nil
-}
-
 func parseObject(data []byte) (k8sutil.Object, error) {
 	obj, _, err := decoder.Decode(data, nil, nil)
 	if err != nil {
