@@ -9,7 +9,7 @@ This page lists supported check templates.
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-``` 
+```
 [
 	{
 		"name": "requirementsType",
@@ -33,7 +33,7 @@ This page lists supported check templates.
 	}
 ]
 
-``` 
+```
 
 ## Dangling Services
 
@@ -44,10 +44,24 @@ This page lists supported check templates.
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-``` 
+```
 []
 
-``` 
+```
+
+## Deprecated Service Account Field
+
+**Key**: `deprecated-service-account-field`
+
+**Description**: Flag uses of the deprecated serviceAccount field, which should be migrated to serviceAccountName
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+```
+[]
+
+```
 
 ## Disallowed API Objects
 
@@ -58,7 +72,7 @@ This page lists supported check templates.
 **Supported Objects**: Any
 
 **Parameters**:
-``` 
+```
 [
 	{
 		"name": "group",
@@ -97,7 +111,7 @@ This page lists supported check templates.
 	}
 ]
 
-``` 
+```
 
 ## Environment Variables
 
@@ -108,7 +122,7 @@ This page lists supported check templates.
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-``` 
+```
 [
 	{
 		"name": "name",
@@ -128,7 +142,21 @@ This page lists supported check templates.
 	}
 ]
 
-``` 
+```
+
+## Liveness Probe Not Specified
+
+**Key**: `liveness-probe`
+
+**Description**: Flag containers that don't specify a liveness probe
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+```
+[]
+
+```
 
 ## Memory Requirements
 
@@ -139,7 +167,7 @@ This page lists supported check templates.
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-``` 
+```
 [
 	{
 		"name": "requirementsType",
@@ -163,7 +191,21 @@ This page lists supported check templates.
 	}
 ]
 
-``` 
+```
+
+## Non-Existent Service Account
+
+**Key**: `non-existent-service-account`
+
+**Description**: Flag cases where a pod references a non-existent service account
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+```
+[]
+
+```
 
 ## Privileged Containers
 
@@ -174,10 +216,10 @@ This page lists supported check templates.
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-``` 
+```
 []
 
-``` 
+```
 
 ## Read-only Root Filesystems
 
@@ -188,21 +230,35 @@ This page lists supported check templates.
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-``` 
+```
 []
 
-``` 
+```
 
-## Required Label
+## Readiness Probe Not Specified
 
-**Key**: `required-label`
+**Key**: `readiness-probe`
 
-**Description**: Flag objects not carrying at least one label matching the provided patterns
+**Description**: Flag containers that don't specify a readiness probe
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+```
+[]
+
+```
+
+## Required Annotation
+
+**Key**: `required-annotation`
+
+**Description**: Flag objects not carrying at least one annotation matching the provided patterns
 
 **Supported Objects**: Any
 
 **Parameters**:
-``` 
+```
 [
 	{
 		"name": "key",
@@ -222,7 +278,38 @@ This page lists supported check templates.
 	}
 ]
 
-``` 
+```
+
+## Required Label
+
+**Key**: `required-label`
+
+**Description**: Flag objects not carrying at least one label matching the provided patterns
+
+**Supported Objects**: Any
+
+**Parameters**:
+```
+[
+	{
+		"name": "key",
+		"type": "string",
+		"description": "Key of the required label.",
+		"required": true,
+		"regexAllowed": true,
+		"negationAllowed": true
+	},
+	{
+		"name": "value",
+		"type": "string",
+		"description": "Value of the required label.",
+		"required": false,
+		"regexAllowed": true,
+		"negationAllowed": true
+	}
+]
+
+```
 
 ## Run as non-root user
 
@@ -233,8 +320,45 @@ This page lists supported check templates.
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-``` 
+```
 []
 
-``` 
+```
+
+## Service Account
+
+**Key**: `service-account`
+
+**Description**: Flag containers which use a matching service account
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+```
+[
+	{
+		"name": "serviceAccount",
+		"type": "string",
+		"description": "A regex specifying the required service account to match.",
+		"required": true,
+		"regexAllowed": true,
+		"negationAllowed": true
+	}
+]
+
+```
+
+## Writable Host Mounts
+
+**Key**: `writable-host-mount`
+
+**Description**: Flag containers that have mounted a directory on the host as writable
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+```
+[]
+
+```
 
