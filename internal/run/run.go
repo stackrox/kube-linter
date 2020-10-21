@@ -4,6 +4,7 @@ import (
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/checkregistry"
 	"golang.stackrox.io/kube-linter/internal/diagnostic"
+	"golang.stackrox.io/kube-linter/internal/ignore"
 	"golang.stackrox.io/kube-linter/internal/instantiatedcheck"
 	"golang.stackrox.io/kube-linter/internal/lintcontext"
 )
@@ -15,7 +16,6 @@ type Result struct {
 
 // Run runs the linter on the given context, with the given config.
 func Run(lintCtxs []*lintcontext.LintContext, registry checkregistry.CheckRegistry, checks []string) (Result, error) {
-
 	instantiatedChecks := make([]*instantiatedcheck.InstantiatedCheck, 0, len(checks))
 	for _, checkName := range checks {
 		instantiatedCheck := registry.Load(checkName)
@@ -30,6 +30,9 @@ func Run(lintCtxs []*lintcontext.LintContext, registry checkregistry.CheckRegist
 		for _, obj := range lintCtx.Objects() {
 			for _, check := range instantiatedChecks {
 				if !check.Matcher.Matches(obj.K8sObject.GetObjectKind().GroupVersionKind()) {
+					continue
+				}
+				if ignore.ObjectForCheck(obj.K8sObject.GetAnnotations(), check.Name) {
 					continue
 				}
 				diagnostics := check.Func(lintCtx, obj)

@@ -3,6 +3,7 @@ package lintcontext
 import (
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -71,11 +72,15 @@ func CreateContexts(filesOrDirs ...string) ([]*LintContext, error) {
 		if err != nil {
 			return nil, errors.Wrapf(err, "loading from path %q", fileOrDir)
 		}
-
 	}
+	dirs := make([]string, 0, len(contextsByDir))
+	for dir := range contextsByDir {
+		dirs = append(dirs, dir)
+	}
+	sort.Strings(dirs)
 	var contexts []*LintContext
-	for _, context := range contextsByDir {
-		contexts = append(contexts, context)
+	for _, dir := range dirs {
+		contexts = append(contexts, contextsByDir[dir])
 	}
 	return contexts, nil
 }

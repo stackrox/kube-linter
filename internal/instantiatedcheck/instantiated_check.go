@@ -1,9 +1,12 @@
 package instantiatedcheck
 
 import (
+	"regexp"
+
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/check"
 	"golang.stackrox.io/kube-linter/internal/errorhelpers"
+	"golang.stackrox.io/kube-linter/internal/ignore"
 	"golang.stackrox.io/kube-linter/internal/objectkinds"
 	"golang.stackrox.io/kube-linter/internal/templates"
 )
@@ -16,12 +19,22 @@ type InstantiatedCheck struct {
 	Matcher objectkinds.Matcher
 }
 
+var (
+	validCheckNameRegex = regexp.MustCompile(`^[a-zA-Z0-9-_]+$`)
+)
+
 // ValidateAndInstantiate validates the check, and creates an instantiated check if the check
 // is valid.
 func ValidateAndInstantiate(c *check.Check) (*InstantiatedCheck, error) {
 	validationErrs := errorhelpers.NewErrorList("validating check")
 	if c.Name == "" {
 		validationErrs.AddString("no name specified")
+	}
+	if !validCheckNameRegex.MatchString(c.Name) {
+		validationErrs.AddStringf("invalid name %s, must match regex %s", c.Name, validCheckNameRegex.String())
+	}
+	if c.Name == ignore.All {
+		validationErrs.AddStringf("%s is reserved, and cannot be used as a check name", ignore.All)
 	}
 	template, found := templates.Get(c.Template)
 	if !found {
