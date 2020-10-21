@@ -1,0 +1,6 @@
+name: "writable-host-mount"
+description: "Alert on containers that mount a host path as writable"
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "writable-host-mount"

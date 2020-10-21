@@ -1,6 +1,7 @@
 package configresolver
 
 import (
+	"golang.stackrox.io/kube-linter/internal/builtinchecks"
 	"golang.stackrox.io/kube-linter/internal/checkregistry"
 	"golang.stackrox.io/kube-linter/internal/config"
 	"golang.stackrox.io/kube-linter/internal/defaultchecks"
@@ -25,6 +26,15 @@ func GetEnabledChecksAndValidate(cfg *config.Config, checkRegistry checkregistry
 	enabledChecks := set.NewStringSet()
 	if !cfg.Checks.DoNotAutoAddDefaults {
 		enabledChecks.AddAll(defaultchecks.List.AsSlice()...)
+	}
+	if cfg.Checks.AddAllBuiltIn {
+		builtInChecks, err := builtinchecks.List()
+		if err != nil {
+			return nil, err
+		}
+		for _, check := range builtInChecks {
+			enabledChecks.Add(check.Name)
+		}
 	}
 	for _, check := range cfg.CustomChecks {
 		enabledChecks.Add(check.Name)

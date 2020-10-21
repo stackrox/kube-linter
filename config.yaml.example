@@ -8,6 +8,11 @@ checks:
   # if doNotAutoAddDefaults is true, default checks are not automatically added.
   doNotAutoAddDefaults: false
 
+  # addAllBuiltIn, if set, adds all built-in checks. This allows users to
+  # explicitly opt-out of checks that are not relevant using Exclude.
+  # Takes precedence over doNotAutoAddDefaults, if both are set.
+  addAllBuiltIn: false
+
   # include explicitly adds checks, by name. You can reference any of the built-in checks.
   # Note that customChecks defined above are included automatically.
   include:

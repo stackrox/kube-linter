@@ -1,0 +1,9 @@
+name: "required-annotation-email"
+description: "Alert on objects without an 'email' annotation with a valid email"
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "required-annotation"
+params:
+  key: "email"
+  value: '[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'
