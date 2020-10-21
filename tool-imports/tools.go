@@ -9,4 +9,5 @@ package toolimports
 import (
 	_ "github.com/golangci/golangci-lint/cmd/golangci-lint"
 	_ "honnef.co/go/tools/cmd/staticcheck"
+	_ "k8s.io/cli-runtime/pkg/resource"
 )
