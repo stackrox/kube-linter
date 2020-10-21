@@ -8,7 +8,7 @@ import (
 	coreV1 "k8s.io/api/core/v1"
 )
 
-// PodSpec extracts a pod template spec from the given object, if available.
+// PodTemplateSpec extracts a pod template spec from the given object, if available.
 func PodTemplateSpec(obj k8sutil.Object) (coreV1.PodTemplateSpec, bool) {
 	switch obj := obj.(type) {
 	case *coreV1.Pod:
