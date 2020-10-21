@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/Masterminds/sprig/v3 v3.1.0
+	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/fatih/color v1.9.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/gobuffalo/packr v1.30.1

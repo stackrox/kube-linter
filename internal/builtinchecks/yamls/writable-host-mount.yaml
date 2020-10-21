@@ -1,5 +1,6 @@
 name: "writable-host-mount"
 description: "Alert on containers that mount a host path as writable"
+remediation: "If you need to access files on the host, mount them as readOnly."
 scope:
   objectKinds:
     - DeploymentLike

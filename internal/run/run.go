@@ -32,14 +32,15 @@ func Run(lintCtxs []*lintcontext.LintContext, registry checkregistry.CheckRegist
 				if !check.Matcher.Matches(obj.K8sObject.GetObjectKind().GroupVersionKind()) {
 					continue
 				}
-				if ignore.ObjectForCheck(obj.K8sObject.GetAnnotations(), check.Name) {
+				if ignore.ObjectForCheck(obj.K8sObject.GetAnnotations(), check.Spec.Name) {
 					continue
 				}
 				diagnostics := check.Func(lintCtx, obj)
 				for _, d := range diagnostics {
 					result.Reports = append(result.Reports, diagnostic.WithContext{
 						Diagnostic: d,
-						Check:      check.Name,
+						Check:      check.Spec.Name,
+						Remediation: check.Spec.Remediation,
 						Object:     obj,
 					})
 				}

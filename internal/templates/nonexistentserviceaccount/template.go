@@ -36,7 +36,8 @@ func init() {
 					return nil
 				}
 				sa := stringutils.OrDefault(podSpec.ServiceAccountName, podSpec.DeprecatedServiceAccount)
-				if sa == "" {
+				// Default service account always exists.
+				if sa == "" || sa == "default" {
 					return nil
 				}
 				ns := object.K8sObject.GetNamespace()

@@ -22,10 +22,10 @@ func (cr checkRegistry) Register(checks ...*check.Check) error {
 		if err != nil {
 			return errors.Wrapf(err, "invalid check %s", c.Name)
 		}
-		if _, ok := cr[instantiated.Name]; ok {
-			return errors.Errorf("duplicate check name: %s", instantiated.Name)
+		if _, ok := cr[instantiated.Spec.Name]; ok {
+			return errors.Errorf("duplicate check name: %s", instantiated.Spec.Name)
 		}
-		cr[instantiated.Name] = instantiated
+		cr[instantiated.Spec.Name] = instantiated
 	}
 	return nil
 }

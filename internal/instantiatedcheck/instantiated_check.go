@@ -13,9 +13,10 @@ import (
 // An InstantiatedCheck is the runtime instantiation of a check, which fuses the metadata in a check
 // spec with the runtime information from a template.
 type InstantiatedCheck struct {
-	Name    string
 	Func    check.Func
 	Matcher objectkinds.Matcher
+
+	Spec check.Check
 }
 
 var (
@@ -47,7 +48,7 @@ func ValidateAndInstantiate(c *check.Check) (*InstantiatedCheck, error) {
 		return nil, err
 	}
 
-	i := &InstantiatedCheck{Name: c.Name}
+	i := &InstantiatedCheck{Spec: *c}
 	var objectKinds check.ObjectKindsDesc
 	if c.Scope != nil {
 		objectKinds = *c.Scope
