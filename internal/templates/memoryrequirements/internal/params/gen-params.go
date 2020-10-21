@@ -17,46 +17,80 @@ var (
 	_ = util.MustParseParameterDesc
 	_ = fmt.Sprintf
 
-	nameParamDesc = util.MustParseParameterDesc(`{
-	"Name": "name",
+	requirementsTypeParamDesc = util.MustParseParameterDesc(`{
+	"Name": "requirementsType",
 	"Type": "string",
-	"Description": "The name of the environment variable.",
+	"Description": "The type of requirement. Use any to apply to both requests and limits.",
 	"Examples": null,
-	"Enum": null,
+	"Enum": [
+		"request",
+		"limit",
+		"any"
+	],
 	"SubParameters": null,
 	"Required": true,
 	"NoRegex": false,
 	"NotNegatable": false,
-	"XXXStructFieldName": "Name",
+	"XXXStructFieldName": "RequirementsType",
 	"XXXIsPointer": false
 }
 `)
 
-	valueParamDesc = util.MustParseParameterDesc(`{
-	"Name": "value",
-	"Type": "string",
-	"Description": "The value of the environment variable.",
+	lowerBoundMBParamDesc = util.MustParseParameterDesc(`{
+	"Name": "lowerBoundMB",
+	"Type": "integer",
+	"Description": "The lower bound of the requirement (inclusive), specified as a number of MB.",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
 	"Required": false,
 	"NoRegex": false,
 	"NotNegatable": false,
-	"XXXStructFieldName": "Value",
+	"XXXStructFieldName": "LowerBoundMB",
 	"XXXIsPointer": false
 }
 `)
 
+	upperBoundMBParamDesc = util.MustParseParameterDesc(`{
+	"Name": "upperBoundMB",
+	"Type": "integer",
+	"Description": "The upper bound of the requirement (inclusive), specified as a number of MB. If not specified, it is treated as \"no upper bound\".",
+	"Examples": null,
+	"Enum": null,
+	"SubParameters": null,
+	"Required": false,
+	"NoRegex": false,
+	"NotNegatable": false,
+	"XXXStructFieldName": "UpperBoundMB",
+	"XXXIsPointer": true
+}
+`)
+
 	ParamDescs = []check.ParameterDesc{
-		nameParamDesc,
-		valueParamDesc,
+		requirementsTypeParamDesc,
+		lowerBoundMBParamDesc,
+		upperBoundMBParamDesc,
 	}
 )
 
 func (p *Params) Validate() error {
 	var validationErrors []string
-	if p.Name == "" {
-		validationErrors = append(validationErrors, "required param name not found")
+	if p.RequirementsType == "" {
+		validationErrors = append(validationErrors, "required param requirementsType not found")
+	}
+	var found bool
+	for _, allowedValue := range []string{
+		"request",
+		"limit",
+		"any",
+	}{
+		if p.RequirementsType == allowedValue {
+			found = true
+			break
+		}
+	}
+	if !found {
+		validationErrors = append(validationErrors, fmt.Sprintf("param requirementsType has invalid value %q, must be one of [request limit any]", p.RequirementsType))
 	}
 	if len(validationErrors) > 0 {
 		return errors.Errorf("invalid parameters: %s", strings.Join(validationErrors, ", "))

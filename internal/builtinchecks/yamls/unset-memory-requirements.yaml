@@ -1,0 +1,10 @@
+name: "unset-memory-requirements"
+description: "Alert on containers without memory requests and limits set"
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "memory-requirements"
+params:
+  requirementsType: "any"
+  lowerBoundMB: 0
+  upperBoundMB: 0

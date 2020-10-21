@@ -7,10 +7,13 @@ import (
 var (
 	// List is the list of built-in checks that are enabled by default.
 	List = set.NewFrozenStringSet(
-		"privileged-container",
+		"dangling-service",
 		"env-var-secret",
-		"no-read-only-root-fs",
-		"run-as-non-root",
 		"no-extensions-v1beta",
+		"no-read-only-root-fs",
+		"privileged-container",
+		"run-as-non-root",
+		"unset-cpu-requirements",
+		"unset-memory-requirements",
 	)
 )

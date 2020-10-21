@@ -128,13 +128,3 @@ func (l *LintContext) loadObjectsFromYAMLFile(filePath string, info os.FileInfo)
 		}
 	}
 }
-
-// Objects returns the (valid) objects loaded from this LintContext.
-func (l *LintContext) Objects() []Object {
-	return l.objects
-}
-
-// InvalidObjects returns any objects that we attempted to load, but which were invalid.
-func (l *LintContext) InvalidObjects() []InvalidObject {
-	return l.invalidObjects
-}

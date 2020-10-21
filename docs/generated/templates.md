@@ -1,5 +1,54 @@
 This page lists supported check templates.
 
+## CPU Requirements
+
+**Key**: `cpu-requirements`
+
+**Description**: Flag containers with CPU requirements in the given range
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+``` 
+[
+	{
+		"name": "requirementsType",
+		"type": "string",
+		"description": "The type of requirement. Use any to apply to both requests and limits.",
+		"required": true,
+		"regexAllowed": true,
+		"negationAllowed": true
+	},
+	{
+		"name": "lowerBoundMillis",
+		"type": "integer",
+		"description": "The lower bound of the requirement (inclusive), specified as a number of milli-cores. If not specified, it is treated as a lower bound of zero.",
+		"required": false
+	},
+	{
+		"name": "upperBoundMillis",
+		"type": "integer",
+		"description": "The upper bound of the requirement (inclusive), specified as a number of milli-cores. If not specified, it is treated as \"no upper bound\".",
+		"required": false
+	}
+]
+
+``` 
+
+## Dangling Services
+
+**Key**: `dangling-service`
+
+**Description**: Flag services which do not match any application
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+``` 
+[]
+
+``` 
+
 ## Disallowed API Objects
 
 **Key**: `disallowed-api-obj`
@@ -76,6 +125,41 @@ This page lists supported check templates.
 		"required": false,
 		"regexAllowed": true,
 		"negationAllowed": true
+	}
+]
+
+``` 
+
+## Memory Requirements
+
+**Key**: `memory-requirements`
+
+**Description**: Flag containers with memory requirements in the given range
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+``` 
+[
+	{
+		"name": "requirementsType",
+		"type": "string",
+		"description": "The type of requirement. Use any to apply to both requests and limits.",
+		"required": true,
+		"regexAllowed": true,
+		"negationAllowed": true
+	},
+	{
+		"name": "lowerBoundMB",
+		"type": "integer",
+		"description": "The lower bound of the requirement (inclusive), specified as a number of MB.",
+		"required": false
+	},
+	{
+		"name": "upperBoundMB",
+		"type": "integer",
+		"description": "The upper bound of the requirement (inclusive), specified as a number of MB. If not specified, it is treated as \"no upper bound\".",
+		"required": false
 	}
 ]
 
