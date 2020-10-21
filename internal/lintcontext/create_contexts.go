@@ -22,13 +22,13 @@ var (
 func CreateContexts(filesOrDirs ...string) ([]*LintContext, error) {
 	contextsByDir := make(map[string]*LintContext)
 	for _, fileOrDir := range filesOrDirs {
-		// STDIN
+		// Stdin
 		if fileOrDir == "-" {
 			if _, alreadyExists := contextsByDir["-"]; alreadyExists {
 				continue
 			}
 			ctx := New()
-			if err := ctx.loadObjectsFromReader("-", os.Stdin); err != nil {
+			if err := ctx.loadObjectsFromReader("<standard input>", os.Stdin); err != nil {
 				return nil, err
 			}
 			contextsByDir["-"] = ctx
