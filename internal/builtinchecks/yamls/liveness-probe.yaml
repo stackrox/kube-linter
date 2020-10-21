@@ -1,0 +1,6 @@
+name: "no-readiness-probe"
+description: "Alert on containers which don't specify a readiness probe"
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "readiness-probe"

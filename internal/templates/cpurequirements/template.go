@@ -5,12 +5,11 @@ import (
 
 	"golang.stackrox.io/kube-linter/internal/check"
 	"golang.stackrox.io/kube-linter/internal/diagnostic"
-	"golang.stackrox.io/kube-linter/internal/extract"
-	"golang.stackrox.io/kube-linter/internal/lintcontext"
 	"golang.stackrox.io/kube-linter/internal/objectkinds"
 	"golang.stackrox.io/kube-linter/internal/templates"
 	"golang.stackrox.io/kube-linter/internal/templates/cpurequirements/internal/params"
 	"golang.stackrox.io/kube-linter/internal/templates/util"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 )
 
@@ -34,23 +33,16 @@ func init() {
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,
 		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
-			return func(_ *lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
-				podSpec, found := extract.PodSpec(object.K8sObject)
-				if !found {
-					return nil
-				}
-
+			return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
 				var results []diagnostic.Diagnostic
-				for _, container := range podSpec.Containers {
-					if p.RequirementsType == "request" || p.RequirementsType == "any" {
-						process(&results, container.Name, "request", container.Resources.Requests.Cpu(), p.LowerBoundMillis, p.UpperBoundMillis)
-					}
-					if p.RequirementsType == "limit" || p.RequirementsType == "any" {
-						process(&results, container.Name, "limit", container.Resources.Limits.Cpu(), p.LowerBoundMillis, p.UpperBoundMillis)
-					}
+				if p.RequirementsType == "request" || p.RequirementsType == "any" {
+					process(&results, container.Name, "request", container.Resources.Requests.Cpu(), p.LowerBoundMillis, p.UpperBoundMillis)
+				}
+				if p.RequirementsType == "limit" || p.RequirementsType == "any" {
+					process(&results, container.Name, "limit", container.Resources.Limits.Cpu(), p.LowerBoundMillis, p.UpperBoundMillis)
 				}
 				return results
-			}, nil
+			}), nil
 		}),
 	})
 }
