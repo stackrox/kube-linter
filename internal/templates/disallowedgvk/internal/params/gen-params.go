@@ -14,7 +14,7 @@ var (
 	_ = util.MustParseParameterDesc
 
 
-	groupparamDesc = util.MustParseParameterDesc(`{
+	groupParamDesc = util.MustParseParameterDesc(`{
 	"Name": "group",
 	"Type": "string",
 	"Description": "The disallowed object group.",
@@ -28,7 +28,7 @@ var (
 	"XXXStructFieldName": "Group"
 }
 `)
-	versionparamDesc = util.MustParseParameterDesc(`{
+	versionParamDesc = util.MustParseParameterDesc(`{
 	"Name": "version",
 	"Type": "string",
 	"Description": "The disallowed object API version.",
@@ -43,7 +43,7 @@ var (
 	"XXXStructFieldName": "Version"
 }
 `)
-	kindparamDesc = util.MustParseParameterDesc(`{
+	kindParamDesc = util.MustParseParameterDesc(`{
 	"Name": "kind",
 	"Type": "string",
 	"Description": "The disallowed kind.",
@@ -60,9 +60,9 @@ var (
 `)
 
 	ParamDescs = []check.ParameterDesc{
-		groupparamDesc,
-		versionparamDesc,
-		kindparamDesc,
+		groupParamDesc,
+		versionParamDesc,
+		kindParamDesc,
 	}
 )
 

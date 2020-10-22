@@ -53,14 +53,14 @@ var (
 	_ = util.MustParseParameterDesc
 
 {{ range . }}
-	{{ .ParamDesc.Name}}paramDesc = util.MustParseParameterDesc({{backtick}}
+	{{ .ParamDesc.Name}}ParamDesc = util.MustParseParameterDesc({{backtick}}
 {{- .ParamJSON -}}
 {{backtick}})
 {{- end }}
 
 	ParamDescs = []check.ParameterDesc{
 		{{- range . }}
-		{{ .ParamDesc.Name}}paramDesc,
+		{{ .ParamDesc.Name}}ParamDesc,
 		{{- end }}
 	}
 )

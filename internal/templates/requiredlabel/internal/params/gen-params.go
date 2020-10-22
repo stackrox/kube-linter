@@ -14,7 +14,7 @@ var (
 	_ = util.MustParseParameterDesc
 
 
-	keyparamDesc = util.MustParseParameterDesc(`{
+	keyParamDesc = util.MustParseParameterDesc(`{
 	"Name": "key",
 	"Type": "string",
 	"Description": "Key of the required label.",
@@ -26,7 +26,7 @@ var (
 	"XXXStructFieldName": "Key"
 }
 `)
-	valueparamDesc = util.MustParseParameterDesc(`{
+	valueParamDesc = util.MustParseParameterDesc(`{
 	"Name": "value",
 	"Type": "string",
 	"Description": "Value of the required label.",
@@ -40,8 +40,8 @@ var (
 `)
 
 	ParamDescs = []check.ParameterDesc{
-		keyparamDesc,
-		valueparamDesc,
+		keyParamDesc,
+		valueParamDesc,
 	}
 )
 

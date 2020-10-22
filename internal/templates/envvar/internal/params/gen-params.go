@@ -14,7 +14,7 @@ var (
 	_ = util.MustParseParameterDesc
 
 
-	nameparamDesc = util.MustParseParameterDesc(`{
+	nameParamDesc = util.MustParseParameterDesc(`{
 	"Name": "name",
 	"Type": "string",
 	"Description": "The name of the environment variable.",
@@ -26,7 +26,7 @@ var (
 	"XXXStructFieldName": "Name"
 }
 `)
-	valueparamDesc = util.MustParseParameterDesc(`{
+	valueParamDesc = util.MustParseParameterDesc(`{
 	"Name": "value",
 	"Type": "string",
 	"Description": "The value of the environment variable.",
@@ -40,8 +40,8 @@ var (
 `)
 
 	ParamDescs = []check.ParameterDesc{
-		nameparamDesc,
-		valueparamDesc,
+		nameParamDesc,
+		valueParamDesc,
 	}
 )
 
