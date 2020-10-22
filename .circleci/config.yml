@@ -22,9 +22,9 @@ jobs:
           make lint
 
     - run:
-        name: Ensure generated docs are up-to-date
+        name: Ensure generated files are up-to-date
         command: |
-          make generated-docs
+          make generated-srcs
           git diff --exit-code HEAD
 
   test:

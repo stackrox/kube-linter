@@ -9,14 +9,14 @@ import (
 
 // MustInstantiateTemplate instanties the given go template with a common list of
 // functions. It panics if there is an error.
-func MustInstantiateTemplate(templateStr string) *template.Template {
+func MustInstantiateTemplate(templateStr string, customFuncMap template.FuncMap) *template.Template {
 	tpl, err := template.New("").Funcs(sprig.TxtFuncMap()).Funcs(
 		template.FuncMap{
 			"backtick": func() string {
 				return "`"
 			},
 		},
-	).Parse(templateStr)
+	).Funcs(customFuncMap).Parse(templateStr)
 	utils.Must(err)
 	return tpl
 

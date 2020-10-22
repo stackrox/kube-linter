@@ -14,10 +14,10 @@ var (
 // Register registers a template with the given name.
 // Intended to be called at program init time.
 func Register(t check.Template) {
-	if _, ok := allTemplates[t.Name]; ok {
-		panic(fmt.Sprintf("duplicate template: %v", t.Name))
+	if _, ok := allTemplates[t.Key]; ok {
+		panic(fmt.Sprintf("duplicate template: %v", t.Key))
 	}
-	allTemplates[t.Name] = t
+	allTemplates[t.Key] = t
 }
 
 // Get gets a template by name, returning a boolean indicating whether it was found.
@@ -33,7 +33,7 @@ func List() []check.Template {
 		out = append(out, t)
 	}
 	sort.Slice(out, func(i, j int) bool {
-		return out[i].Name < out[j].Name
+		return out[i].Key < out[j].Key
 	})
 	return out
 }

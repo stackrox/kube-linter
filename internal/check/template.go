@@ -10,13 +10,6 @@ import (
 // object passed in the second argument.
 type Func func(lintCtx *lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic
 
-// A ParameterDesc describes a parameter to a check template.
-type ParameterDesc struct {
-	ParamName   string
-	Required    bool
-	Description string
-}
-
 // ObjectKindsDesc describes a list of supported object kinds for a check template.
 type ObjectKindsDesc struct {
 	ObjectKinds []string `json:"objectKinds"`
@@ -24,9 +17,15 @@ type ObjectKindsDesc struct {
 
 // A Template is a template for a check.
 type Template struct {
-	Name                 string
+	// HumanName is a human-friendly name for the template.
+	// It is to be used ONLY for documentation, and has no
+	// semantic relevance.
+	HumanName            string
+	Key                  string
 	Description          string
 	SupportedObjectKinds ObjectKindsDesc
-	Parameters           []ParameterDesc
-	Instantiate          func(params map[string]string) (Func, error)
+
+	Parameters             []ParameterDesc
+	ParseAndValidateParams func(params map[string]interface{}) (interface{}, error)
+	Instantiate            func(parsedParams interface{}) (Func, error)
 }
