@@ -47,22 +47,29 @@ func Command() *cobra.Command {
 				fmt.Fprintln(os.Stderr, "Warning: no checks enabled.")
 				return nil
 			}
-			lintCtx := lintcontext.New()
-			for _, dir := range args {
-				if err := lintCtx.LoadObjectsFromPath(dir); err != nil {
-					return err
-				}
+			lintCtxs, err := lintcontext.CreateContexts(args...)
+			if err != nil {
+				return err
 			}
 			if verbose {
-				for _, invalidObj := range lintCtx.InvalidObjects() {
-					fmt.Fprintf(os.Stderr, "Warning: failed to load object from %s: %v\n", invalidObj.Metadata.FilePath, invalidObj.LoadErr)
+				for _, lintCtx := range lintCtxs {
+					for _, invalidObj := range lintCtx.InvalidObjects() {
+						fmt.Fprintf(os.Stderr, "Warning: failed to load object from %s: %v\n", invalidObj.Metadata.FilePath, invalidObj.LoadErr)
+					}
 				}
 			}
-			if len(lintCtx.Objects()) == 0 {
+			var atLeastOneObjectFound bool
+			for _, lintCtx := range lintCtxs {
+				if len(lintCtx.Objects()) > 0 {
+					atLeastOneObjectFound = true
+					break
+				}
+			}
+			if !atLeastOneObjectFound {
 				fmt.Fprintln(os.Stderr, "Warning: no valid objects found.")
 				return nil
 			}
-			result, err := run.Run(lintCtx, checkRegistry, enabledChecks)
+			result, err := run.Run(lintCtxs, checkRegistry, enabledChecks)
 			if err != nil {
 				return err
 			}
