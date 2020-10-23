@@ -38,10 +38,10 @@ func Run(lintCtxs []*lintcontext.LintContext, registry checkregistry.CheckRegist
 				diagnostics := check.Func(lintCtx, obj)
 				for _, d := range diagnostics {
 					result.Reports = append(result.Reports, diagnostic.WithContext{
-						Diagnostic: d,
-						Check:      check.Spec.Name,
+						Diagnostic:  d,
+						Check:       check.Spec.Name,
 						Remediation: check.Spec.Remediation,
-						Object:     obj,
+						Object:      obj,
 					})
 				}
 			}

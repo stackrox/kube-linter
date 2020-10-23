@@ -22,10 +22,10 @@ type Diagnostic struct {
 // WithContext puts a diagnostic in the context of which check emitted it,
 // and which object it applied to.
 type WithContext struct {
-	Diagnostic Diagnostic
-	Check      string
+	Diagnostic  Diagnostic
+	Check       string
 	Remediation string
-	Object     lintcontext.Object
+	Object      lintcontext.Object
 }
 
 var (
