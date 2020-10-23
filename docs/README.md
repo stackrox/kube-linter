@@ -40,8 +40,8 @@ are configured, and add them to the config file. The built-in checks are specifi
 ### Ignoring violations for specific cases
 
 To ignore violations for specific objects, users can add an annotation with the key
-`kube-linter.io/ignore-<check-name>`. We strongly encourage adding an explanation as the value for the annotation.
-For example, to ignore the check "privileged" for a specific deployment, you can add an annotation like:
-`kube-linter.io/ignore-privileged: "This deployment needs to run as privileged because it needs kernel access"`.
+`kube-linter.io/ignore/<check-name>`. We strongly encourage adding an explanation as the value for the annotation.
+For example, to ignore a check named "privileged" for a specific deployment, you can add an annotation like:
+`kube-linter.io/ignore/privileged: "This deployment needs to run as privileged because it needs kernel access"`.
 
 To ignore _all_ checks for a specific object, you can use the special annotation key `kube-linter.io/ignore-all`.
