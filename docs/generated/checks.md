@@ -1,20 +1,20 @@
 The following table enumerates built-in checks:
 
-| Name | Enabled by default | Description | Template | Parameters |
-| ---- | ------------------ | ----------- | -------- | ---------- |
- | dangling-service | Yes | Alert on services that don't have any matching deployments | dangling-service | `{}` |
- | default-service-account | No | Alert on pods that use the default service account | service-account | `{"serviceAccount":"^(|default)$"}` |
- | deprecated-service-account-field | Yes | Alert on deployments that use the deprecated serviceAccount field | deprecated-service-account-field | `{}` |
- | env-var-secret | Yes | Alert on objects using a secret in an environment variable | env-var | `{"name":".*secret.*"}` |
- | no-extensions-v1beta | Yes | Alert on objects using deprecated API versions under extensions v1beta | disallowed-api-obj | `{"group":"extensions","version":"v1beta.+"}` |
- | no-liveness-probe | No | Alert on containers which don't specify a liveness probe | liveness-probe | `{}` |
- | no-read-only-root-fs | Yes | Alert on containers not running with a read-only root filesystem | read-only-root-fs | `{}` |
- | no-readiness-probe | No | Alert on containers which don't specify a readiness probe | readiness-probe | `{}` |
- | non-existent-service-account | Yes | Alert on pods referencing a service account that isn't found | non-existent-service-account | `{}` |
- | privileged-container | Yes | Alert on deployments with containers running in privileged mode | privileged | `{}` |
- | required-annotation-email | No | Alert on objects without an 'email' annotation with a valid email | required-annotation | `{"key":"email","value":"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+"}` |
- | required-label-owner | No | Alert on objects without the 'owner' label | required-label | `{"key":"owner"}` |
- | run-as-non-root | Yes | Alert on containers not set to runAsNonRoot | run-as-non-root | `{}` |
- | unset-cpu-requirements | Yes | Alert on containers without CPU requests and limits set | cpu-requirements | `{"lowerBoundMillis":0,"requirementsType":"any","upperBoundMillis":0}` |
- | unset-memory-requirements | Yes | Alert on containers without memory requests and limits set | memory-requirements | `{"lowerBoundMB":0,"requirementsType":"any","upperBoundMB":0}` |
- | writable-host-mount | No | Alert on containers that mount a host path as writable | writable-host-mount | `{}` |
+| Name | Enabled by default | Description | Remediation | Template | Parameters |
+| ---- | ------------------ | ----------- | ----------- | -------- | ---------- |
+ | dangling-service | Yes | Alert on services that don't have any matching deployments | Make sure your service's selector correctly matches the labels on one of your deployments. | dangling-service | `{}` |
+ | default-service-account | No | Alert on pods that use the default service account | Create a dedicated service account for your pod. See https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/ for more details. | service-account | `{"serviceAccount":"^(|default)$"}` |
+ | deprecated-service-account-field | Yes | Alert on deployments that use the deprecated serviceAccount field | Use the serviceAccoutName field instead of the serviceAccount field. | deprecated-service-account-field | `{}` |
+ | env-var-secret | Yes | Alert on objects using a secret in an environment variable | Don't use raw secrets in an environment variable. Instead, either mount the secret as a file or use a secretKeyRef. See https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets for more details. | env-var | `{"name":"(?i).*secret.*"}` |
+ | no-extensions-v1beta | Yes | Alert on objects using deprecated API versions under extensions v1beta | Migrate to using the apps/v1 API versions for these objects. See https://kubernetes.io/blog/2019/07/18/api-deprecations-in-1-16/ for more details. | disallowed-api-obj | `{"group":"extensions","version":"v1beta.+"}` |
+ | no-liveness-probe | No | Alert on containers which don't specify a liveness probe | Specify a liveness probe in your container. See https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/ for more details. | liveness-probe | `{}` |
+ | no-read-only-root-fs | Yes | Alert on containers not running with a read-only root filesystem | Set readOnlyRootFilesystem to true in your container's securityContext. | read-only-root-fs | `{}` |
+ | no-readiness-probe | No | Alert on containers which don't specify a readiness probe | Specify a readiness probe in your container. See https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/ for more details. | readiness-probe | `{}` |
+ | non-existent-service-account | Yes | Alert on pods referencing a service account that isn't found | Make sure to create the service account, or to refer to an existing service account. | non-existent-service-account | `{}` |
+ | privileged-container | Yes | Alert on deployments with containers running in privileged mode | Don't run your container as privileged unless required. | privileged | `{}` |
+ | required-annotation-email | No | Alert on objects without an 'email' annotation with a valid email | Add an email annotation to your object with the contact information of the object's owner. | required-annotation | `{"key":"email","value":"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+"}` |
+ | required-label-owner | No | Alert on objects without the 'owner' label | Add an email annotation to your object with information about the object's owner. | required-label | `{"key":"owner"}` |
+ | run-as-non-root | Yes | Alert on containers not set to runAsNonRoot | Set runAsUser to a non-zero number, and runAsNonRoot to true, in your pod or container securityContext. See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for more details. | run-as-non-root | `{}` |
+ | unset-cpu-requirements | Yes | Alert on containers without CPU requests and limits set | Set your container's CPU requests and limits depending on its requirements. See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for more details. | cpu-requirements | `{"lowerBoundMillis":0,"requirementsType":"any","upperBoundMillis":0}` |
+ | unset-memory-requirements | Yes | Alert on containers without memory requests and limits set | Set your container's memory requests and limits depending on its requirements. See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for more details. | memory-requirements | `{"lowerBoundMB":0,"requirementsType":"any","upperBoundMB":0}` |
+ | writable-host-mount | No | Alert on containers that mount a host path as writable | If you need to access files on the host, mount them as readOnly. | writable-host-mount | `{}` |

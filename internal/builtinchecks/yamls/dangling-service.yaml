@@ -1,5 +1,6 @@
 name: "dangling-service"
 description: "Alert on services that don't have any matching deployments"
+remediation: "Make sure your service's selector correctly matches the labels on one of your deployments."
 scope:
   objectKinds:
     - Service

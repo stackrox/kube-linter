@@ -1,0 +1,9 @@
+name: "no-liveness-probe"
+description: "Alert on containers which don't specify a liveness probe"
+remediation: >-
+  Specify a liveness probe in your container.
+  See https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/ for more details.
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "liveness-probe"

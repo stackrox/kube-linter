@@ -1,5 +1,6 @@
 name: "required-label-owner"
 description: "Alert on objects without the 'owner' label"
+remediation: "Add an email annotation to your object with information about the object's owner."
 scope:
   objectKinds:
     - DeploymentLike

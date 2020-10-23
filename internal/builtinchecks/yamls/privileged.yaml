@@ -1,5 +1,6 @@
 name: "privileged-container"
 description: "Alert on deployments with containers running in privileged mode"
+remediation: "Don't run your container as privileged unless required."
 scope:
   objectKinds:
     - DeploymentLike

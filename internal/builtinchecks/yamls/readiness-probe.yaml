@@ -1,6 +1,0 @@
-name: "no-liveness-probe"
-description: "Alert on containers which don't specify a liveness probe"
-scope:
-  objectKinds:
-    - DeploymentLike
-template: "liveness-probe"

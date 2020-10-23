@@ -26,8 +26,8 @@ var (
 
 func renderPlain(checks []check.Check, out io.Writer) error { //nolint:unparam // The function signature is required to match formatToRenderFuncs
 	for i, chk := range checks {
-		fmt.Fprintf(out, "Name: %s\nDescription: %s\nTemplate: %s\nParameters: %v\nEnabled by default: %v\n",
-			chk.Name, chk.Description, chk.Template, chk.Params, defaultchecks.List.Contains(chk.Name))
+		fmt.Fprintf(out, "Name: %s\nDescription: %s\nRemediation: %s\nTemplate: %s\nParameters: %v\nEnabled by default: %v\n",
+			chk.Name, chk.Description, chk.Remediation, chk.Template, chk.Params, defaultchecks.List.Contains(chk.Name))
 		if i != len(checks)-1 {
 			fmt.Fprintf(out, "\n%s\n\n", dashes)
 		}
@@ -38,9 +38,9 @@ func renderPlain(checks []check.Check, out io.Writer) error { //nolint:unparam /
 const (
 	markDownTemplateStr = `The following table enumerates built-in checks:
 
-| Name | Enabled by default | Description | Template | Parameters |
-| ---- | ------------------ | ----------- | -------- | ---------- |
-{{ range . }} | {{ .Check.Name}} | {{ if .Default }}Yes{{ else }}No{{ end }} | {{.Check.Description}} | {{.Check.Template}} | {{ backtick }}{{ mustToJson (default (dict) .Check.Params ) }}{{ backtick }} |
+| Name | Enabled by default | Description | Remediation | Template | Parameters |
+| ---- | ------------------ | ----------- | ----------- | -------- | ---------- |
+{{ range . }} | {{ .Check.Name}} | {{ if .Default }}Yes{{ else }}No{{ end }} | {{.Check.Description}} | {{.Check.Remediation}} | {{.Check.Template}} | {{ backtick }}{{ mustToJson (default (dict) .Check.Params ) }}{{ backtick }} |
 {{ end -}}
 `
 )
