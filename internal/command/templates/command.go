@@ -39,9 +39,9 @@ const (
 **Supported Objects**: {{ join "," .SupportedObjectKinds.ObjectKinds }}
 
 **Parameters**:
-{{ backtick }}{{ backtick }}{{ backtick }} 
+{{ backtick }}{{ backtick }}{{ backtick }}
 {{ getParametersJSON .Parameters }}
-{{ backtick }}{{ backtick }}{{ backtick }} 
+{{ backtick }}{{ backtick }}{{ backtick }}
 
 {{ end -}}
 `

@@ -28,6 +28,16 @@ type LintContext struct {
 	invalidObjects []InvalidObject
 }
 
+// Objects returns the (valid) objects loaded from this LintContext.
+func (l *LintContext) Objects() []Object {
+	return l.objects
+}
+
+// InvalidObjects returns any objects that we attempted to load, but which were invalid.
+func (l *LintContext) InvalidObjects() []InvalidObject {
+	return l.invalidObjects
+}
+
 // New returns a ready-to-use, empty, lint context.
 func New() *LintContext {
 	return &LintContext{}

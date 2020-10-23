@@ -4,15 +4,18 @@
 package params
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/check"
 	"golang.stackrox.io/kube-linter/internal/templates/util"
 )
 
 var (
-	// Use this in case it doesn't get used otherwise.
+	// Use some imports in case they don't get used otherwise.
 	_ = util.MustParseParameterDesc
-
+	_ = fmt.Sprintf
 
 	groupParamDesc = util.MustParseParameterDesc(`{
 	"Name": "group",
@@ -21,13 +24,16 @@ var (
 	"Examples": [
 		"apps"
 	],
+	"Enum": null,
 	"SubParameters": null,
 	"Required": false,
 	"NoRegex": false,
 	"NotNegatable": false,
-	"XXXStructFieldName": "Group"
+	"XXXStructFieldName": "Group",
+	"XXXIsPointer": false
 }
 `)
+
 	versionParamDesc = util.MustParseParameterDesc(`{
 	"Name": "version",
 	"Type": "string",
@@ -36,13 +42,16 @@ var (
 		"v1",
 		"v1beta1"
 	],
+	"Enum": null,
 	"SubParameters": null,
 	"Required": false,
 	"NoRegex": false,
 	"NotNegatable": false,
-	"XXXStructFieldName": "Version"
+	"XXXStructFieldName": "Version",
+	"XXXIsPointer": false
 }
 `)
+
 	kindParamDesc = util.MustParseParameterDesc(`{
 	"Name": "kind",
 	"Type": "string",
@@ -51,11 +60,13 @@ var (
 		"Deployment",
 		"DaemonSet"
 	],
+	"Enum": null,
 	"SubParameters": null,
 	"Required": false,
 	"NoRegex": false,
 	"NotNegatable": false,
-	"XXXStructFieldName": "Kind"
+	"XXXStructFieldName": "Kind",
+	"XXXIsPointer": false
 }
 `)
 
@@ -67,9 +78,9 @@ var (
 )
 
 func (p *Params) Validate() error {
-	var missingRequiredParams []string
-	if len(missingRequiredParams) > 0 {
-		return errors.Errorf("required params %v not found", missingRequiredParams)
+	var validationErrors []string
+	if len(validationErrors) > 0 {
+		return errors.Errorf("invalid parameters: %s", strings.Join(validationErrors, ", "))
     }
 	return nil
 }

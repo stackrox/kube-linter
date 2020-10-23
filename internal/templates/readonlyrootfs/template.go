@@ -5,11 +5,11 @@ import (
 
 	"golang.stackrox.io/kube-linter/internal/check"
 	"golang.stackrox.io/kube-linter/internal/diagnostic"
-	"golang.stackrox.io/kube-linter/internal/extract"
-	"golang.stackrox.io/kube-linter/internal/lintcontext"
 	"golang.stackrox.io/kube-linter/internal/objectkinds"
 	"golang.stackrox.io/kube-linter/internal/templates"
 	"golang.stackrox.io/kube-linter/internal/templates/readonlyrootfs/internal/params"
+	"golang.stackrox.io/kube-linter/internal/templates/util"
+	v1 "k8s.io/api/core/v1"
 )
 
 func init() {
@@ -23,20 +23,13 @@ func init() {
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,
 		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
-			return func(_ *lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
-				podSpec, found := extract.PodSpec(object.K8sObject)
-				if !found {
-					return nil
+			return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
+				sc := container.SecurityContext
+				if sc == nil || sc.ReadOnlyRootFilesystem == nil || !*sc.ReadOnlyRootFilesystem {
+					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q does not have a read-only root file system", container.Name)}}
 				}
-				var results []diagnostic.Diagnostic
-				for _, container := range podSpec.Containers {
-					sc := container.SecurityContext
-					if sc == nil || sc.ReadOnlyRootFilesystem == nil || !*sc.ReadOnlyRootFilesystem {
-						results = append(results, diagnostic.Diagnostic{Message: fmt.Sprintf("container %q does not have a read-only root file system", container.Name)})
-					}
-				}
-				return results
-			}, nil
+				return nil
+			}), nil
 		}),
 	})
 }

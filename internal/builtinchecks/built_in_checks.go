@@ -1,6 +1,8 @@
 package builtinchecks
 
 import (
+	"sync"
+
 	"github.com/ghodss/yaml"
 	"github.com/gobuffalo/packr"
 	"github.com/pkg/errors"
@@ -10,6 +12,10 @@ import (
 
 var (
 	box = packr.NewBox("./yamls")
+
+	loadOnce sync.Once
+	list     []check.Check
+	loadErr  error
 )
 
 // LoadInto loads built-in checks into the registry.
@@ -28,17 +34,20 @@ func LoadInto(registry checkregistry.CheckRegistry) error {
 
 // List lists built-in checks.
 func List() ([]check.Check, error) {
-	var out []check.Check
-	for _, fileName := range box.List() {
-		contents, err := box.Find(fileName)
-		if err != nil {
-			return nil, errors.Wrapf(err, "loading default check from %s", fileName)
+	loadOnce.Do(func() {
+		for _, fileName := range box.List() {
+			contents, err := box.Find(fileName)
+			if err != nil {
+				loadErr = errors.Wrapf(err, "loading default check from %s", fileName)
+				return
+			}
+			var chk check.Check
+			if err := yaml.Unmarshal(contents, &chk); err != nil {
+				loadErr = errors.Wrapf(err, "unmarshaling default check from %s", fileName)
+				return
+			}
+			list = append(list, chk)
 		}
-		var chk check.Check
-		if err := yaml.Unmarshal(contents, &chk); err != nil {
-			return nil, errors.Wrapf(err, "unmarshaling default check from %s", fileName)
-		}
-		out = append(out, chk)
-	}
-	return out, nil
+	})
+	return list, loadErr
 }

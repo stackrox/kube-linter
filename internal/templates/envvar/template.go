@@ -6,12 +6,12 @@ import (
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/check"
 	"golang.stackrox.io/kube-linter/internal/diagnostic"
-	"golang.stackrox.io/kube-linter/internal/extract"
-	"golang.stackrox.io/kube-linter/internal/lintcontext"
 	"golang.stackrox.io/kube-linter/internal/matcher"
 	"golang.stackrox.io/kube-linter/internal/objectkinds"
 	"golang.stackrox.io/kube-linter/internal/templates"
 	"golang.stackrox.io/kube-linter/internal/templates/envvar/internal/params"
+	"golang.stackrox.io/kube-linter/internal/templates/util"
+	v1 "k8s.io/api/core/v1"
 )
 
 func init() {
@@ -33,24 +33,17 @@ func init() {
 			if err != nil {
 				return nil, errors.Wrap(err, "invalid value")
 			}
-			return func(_ *lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
-				podSpec, found := extract.PodSpec(object.K8sObject)
-				if !found {
-					return nil
-				}
+			return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
 				var results []diagnostic.Diagnostic
-				for i := range podSpec.Containers {
-					container := &podSpec.Containers[i]
-					for _, envVar := range container.Env {
-						if nameMatcher(envVar.Name) && valueMatcher(envVar.Value) {
-							results = append(results, diagnostic.Diagnostic{
-								Message: fmt.Sprintf("environment variable %s in container %q found", envVar.Name, container.Name),
-							})
-						}
+				for _, envVar := range container.Env {
+					if nameMatcher(envVar.Name) && valueMatcher(envVar.Value) {
+						results = append(results, diagnostic.Diagnostic{
+							Message: fmt.Sprintf("environment variable %s in container %q found", envVar.Name, container.Name),
+						})
 					}
 				}
 				return results
-			}, nil
+			}), nil
 		}),
 	})
 }

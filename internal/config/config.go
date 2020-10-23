@@ -10,6 +10,9 @@ import (
 
 // ChecksConfig is the config that determines which checks to run.
 type ChecksConfig struct {
+	// AddAllBuiltIn, if set, adds all built-in checks. This allows users to
+	// explicitly opt-out of checks that are not relevant using Exclude.
+	AddAllBuiltIn bool `json:"addAllBuiltIn"`
 	// DoNotAutoAddDefaults, if set, prevents the automatic addition of default checks.
 	DoNotAutoAddDefaults bool `json:"doNotAutoAddDefaults"`
 	// Exclude is a list of check names to exclude.

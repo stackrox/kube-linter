@@ -1,0 +1,10 @@
+name: "unset-cpu-requirements"
+description: "Alert on containers without CPU requests and limits set"
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "cpu-requirements"
+params:
+  requirementsType: "any"
+  lowerBoundMillis: 0
+  upperBoundMillis: 0

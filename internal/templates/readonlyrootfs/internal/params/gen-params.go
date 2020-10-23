@@ -4,25 +4,27 @@
 package params
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/check"
 	"golang.stackrox.io/kube-linter/internal/templates/util"
 )
 
 var (
-	// Use this in case it doesn't get used otherwise.
+	// Use some imports in case they don't get used otherwise.
 	_ = util.MustParseParameterDesc
-
-
+	_ = fmt.Sprintf
 
 	ParamDescs = []check.ParameterDesc{
 	}
 )
 
 func (p *Params) Validate() error {
-	var missingRequiredParams []string
-	if len(missingRequiredParams) > 0 {
-		return errors.Errorf("required params %v not found", missingRequiredParams)
+	var validationErrors []string
+	if len(validationErrors) > 0 {
+		return errors.Errorf("invalid parameters: %s", strings.Join(validationErrors, ", "))
     }
 	return nil
 }

@@ -43,16 +43,21 @@ const (
 package params
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/check"
 	"golang.stackrox.io/kube-linter/internal/templates/util"
 )
 
 var (
-	// Use this in case it doesn't get used otherwise.
+	// Use some imports in case they don't get used otherwise.
 	_ = util.MustParseParameterDesc
+	_ = fmt.Sprintf
 
-{{ range . }}
+{{- range . }}
+
 	{{ .ParamDesc.Name}}ParamDesc = util.MustParseParameterDesc({{backtick}}
 {{- .ParamJSON -}}
 {{backtick}})
@@ -66,7 +71,7 @@ var (
 )
 
 func (p *Params) Validate() error {
-	var missingRequiredParams []string
+	var validationErrors []string
 	{{- range . }}
 	{{- if eq .ParamDesc.Type "object" }} 
 	return errors.Errorf("parameter validation not yet supported for object type \"{{ .ParamDesc.Key }}\"")
@@ -76,12 +81,28 @@ func (p *Params) Validate() error {
 	return errors.Errorf("required parameter validation is currently only supported for strings, but {{ .ParamDesc.Key }} is not")
 	{{- end }}
 	if p.{{ .ParamDesc.XXXStructFieldName }} == "" {
-		missingRequiredParams = append(missingRequiredParams, "{{.ParamDesc.Name}}")
+		validationErrors = append(validationErrors, "required param {{.ParamDesc.Name}} not found")
+	}
+	{{- end }}
+	{{- if .ParamDesc.Enum }}
+	var found bool
+	for _, allowedValue := range []string{
+		{{- range .ParamDesc.Enum }}
+		"{{ . }}",
+		{{- end }}
+	}{
+		if p.{{ .ParamDesc.XXXStructFieldName }} == allowedValue {
+			found = true
+			break
+		}
+	}
+	if !found {
+		validationErrors = append(validationErrors, fmt.Sprintf("param {{ .ParamDesc.Name }} has invalid value %q, must be one of {{ .ParamDesc.Enum }}", p.{{ .ParamDesc.XXXStructFieldName }}))
 	}
 	{{- end }}
 	{{- end }}
-	if len(missingRequiredParams) > 0 {
-		return errors.Errorf("required params %v not found", missingRequiredParams)
+	if len(validationErrors) > 0 {
+		return errors.Errorf("invalid parameters: %s", strings.Join(validationErrors, ", "))
     }
 	return nil
 }
@@ -165,9 +186,14 @@ func constructParameterDescsFromStruct(typeSpec *types.Type) ([]check.ParameterD
 			Description:        getDescription(member),
 			XXXStructFieldName: member.Name,
 		}
-		switch kind := member.Type.Kind; kind {
+		relevantTyp := member.Type
+		if relevantTyp.Kind == types.Pointer {
+			desc.XXXIsPointer = true
+			relevantTyp = relevantTyp.Elem
+		}
+		switch kind := relevantTyp.Kind; kind {
 		case types.Builtin:
-			switch member.Type {
+			switch relevantTyp {
 			case types.String:
 				desc.Type = check.StringType
 			case types.Int:
@@ -186,10 +212,13 @@ func constructParameterDescsFromStruct(typeSpec *types.Type) ([]check.ParameterD
 				return nil, errors.Wrapf(err, "handling field %v", member.Name)
 			}
 			desc.SubParameters = subParams
+		default:
+			return nil, errors.Errorf("currently unsupported type %v", member.Type)
 		}
 
 		extractedTags := types.ExtractCommentTags(metadataMarker, member.CommentLines)
 		desc.Examples = extractedTags["example"]
+		desc.Enum = extractedTags["enum"]
 		if err := setBoolBasedOnPresenceOfTag(&desc.Required, "required", extractedTags); err != nil {
 			return nil, err
 		}

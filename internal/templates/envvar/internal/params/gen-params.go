@@ -4,38 +4,46 @@
 package params
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/check"
 	"golang.stackrox.io/kube-linter/internal/templates/util"
 )
 
 var (
-	// Use this in case it doesn't get used otherwise.
+	// Use some imports in case they don't get used otherwise.
 	_ = util.MustParseParameterDesc
-
+	_ = fmt.Sprintf
 
 	nameParamDesc = util.MustParseParameterDesc(`{
 	"Name": "name",
 	"Type": "string",
 	"Description": "The name of the environment variable.",
 	"Examples": null,
+	"Enum": null,
 	"SubParameters": null,
 	"Required": true,
 	"NoRegex": false,
 	"NotNegatable": false,
-	"XXXStructFieldName": "Name"
+	"XXXStructFieldName": "Name",
+	"XXXIsPointer": false
 }
 `)
+
 	valueParamDesc = util.MustParseParameterDesc(`{
 	"Name": "value",
 	"Type": "string",
 	"Description": "The value of the environment variable.",
 	"Examples": null,
+	"Enum": null,
 	"SubParameters": null,
 	"Required": false,
 	"NoRegex": false,
 	"NotNegatable": false,
-	"XXXStructFieldName": "Value"
+	"XXXStructFieldName": "Value",
+	"XXXIsPointer": false
 }
 `)
 
@@ -46,12 +54,12 @@ var (
 )
 
 func (p *Params) Validate() error {
-	var missingRequiredParams []string
+	var validationErrors []string
 	if p.Name == "" {
-		missingRequiredParams = append(missingRequiredParams, "name")
+		validationErrors = append(validationErrors, "required param name not found")
 	}
-	if len(missingRequiredParams) > 0 {
-		return errors.Errorf("required params %v not found", missingRequiredParams)
+	if len(validationErrors) > 0 {
+		return errors.Errorf("invalid parameters: %s", strings.Join(validationErrors, ", "))
     }
 	return nil
 }

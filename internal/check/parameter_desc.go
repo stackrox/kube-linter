@@ -25,6 +25,10 @@ type ParameterDesc struct {
 
 	Examples []string
 
+	// Enum is set if the object is always going to be one of a specified set of values.
+	// Only relevant if Type is "string"
+	Enum []string
+
 	// SubParameters are the child parameters of the given parameter.
 	// Only relevant if Type is "object".
 	SubParameters []ParameterDesc
@@ -43,6 +47,7 @@ type ParameterDesc struct {
 	// Fields below are for internal use only.
 
 	XXXStructFieldName string
+	XXXIsPointer       bool
 }
 
 // HumanReadableParamDesc is a human-friendly representation of a ParameterDesc.

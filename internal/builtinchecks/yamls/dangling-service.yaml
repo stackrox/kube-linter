@@ -1,0 +1,6 @@
+name: "dangling-service"
+description: "Alert on services that don't have any matching deployments"
+scope:
+  objectKinds:
+    - Service
+template: "dangling-service"
