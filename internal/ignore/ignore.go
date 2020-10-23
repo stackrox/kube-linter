@@ -6,20 +6,21 @@ import (
 
 const (
 	// AnnotationKeyPrefix is the prefix for annotations for kube-linter check ignores.
-	AnnotationKeyPrefix = "kube-linter.io/ignore-"
+	AnnotationKeyPrefix = "kube-linter.io/ignore/"
 
-	// All is a special term used to indicate that _all_ checks are to be ignored for the given object.
-	All = "all"
+	// AllAnnotationKey is used to ignore all checks for a given object.
+	AllAnnotationKey = "kube-linter.io/ignore-all"
 )
 
 // ObjectForCheck returns whether to ignore the given object for the passed check name.
 func ObjectForCheck(annotations map[string]string, checkName string) bool {
 	for k := range annotations {
+		if k == AllAnnotationKey {
+			return true
+		}
 		key := k
-		if stringutils.ConsumePrefix(&key, AnnotationKeyPrefix) {
-			if key == All || key == checkName {
-				return true
-			}
+		if stringutils.ConsumePrefix(&key, AnnotationKeyPrefix) && key == checkName {
+			return true
 		}
 	}
 	return false

@@ -24,7 +24,7 @@ func TestObjectForCheck(t *testing.T) {
 		{
 			annotations: map[string]string{
 				"random-unrelated":                 "blah",
-				"kube-linter.io/ignore-some-check": "Not applicable",
+				"kube-linter.io/ignore/some-check": "Not applicable",
 			},
 			checkName:    "some-check",
 			shouldIgnore: true,
@@ -32,22 +32,22 @@ func TestObjectForCheck(t *testing.T) {
 		{
 			annotations: map[string]string{
 				"random-unrelated":                 "blah",
-				"kube-linter.io/ignore-some-check": "Not applicable",
+				"kube-linter.io/ignore/some-check": "Not applicable",
 			},
 			checkName: "some-check-2",
 		},
 		{
 			annotations: map[string]string{
 				"random-unrelated":                 "blah",
-				"kube-linter.io/ignore-some-check": "Not applicable",
+				"kube-linter.io/ignore/some-check": "Not applicable",
 			},
 			checkName: "other-check",
 		},
 		{
 			annotations: map[string]string{
 				"random-unrelated":                  "blah",
-				"kube-linter.io/ignore-some-check":  "Not applicable",
-				"kube-linter.io/ignore-other-check": "Not applicable",
+				"kube-linter.io/ignore/some-check":  "Not applicable",
+				"kube-linter.io/ignore/other-check": "Not applicable",
 			},
 			checkName:    "other-check",
 			shouldIgnore: true,

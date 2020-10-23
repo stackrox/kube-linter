@@ -6,7 +6,6 @@ import (
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/check"
 	"golang.stackrox.io/kube-linter/internal/errorhelpers"
-	"golang.stackrox.io/kube-linter/internal/ignore"
 	"golang.stackrox.io/kube-linter/internal/objectkinds"
 	"golang.stackrox.io/kube-linter/internal/templates"
 )
@@ -32,9 +31,6 @@ func ValidateAndInstantiate(c *check.Check) (*InstantiatedCheck, error) {
 	}
 	if !validCheckNameRegex.MatchString(c.Name) {
 		validationErrs.AddStringf("invalid name %s, must match regex %s", c.Name, validCheckNameRegex.String())
-	}
-	if c.Name == ignore.All {
-		validationErrs.AddStringf("%s is reserved, and cannot be used as a check name", ignore.All)
 	}
 	template, found := templates.Get(c.Template)
 	if !found {
