@@ -1,7 +1,7 @@
-# kube-linter
+# KubeLinter
 
-kube-linter is a static analysis tool that checks Kubernetes YAML files to ensure the applications represented in them
-adhere to best practices.
+KubeLinter is a static analysis tool that checks Kubernetes YAML files and Helm charts
+to ensure the applications represented in them adhere to best practices.
 
 In detail, `kube-linter` is a binary that takes in paths to YAML files, and runs a list of checks
 against them. If any lint errors are found, they are printed to standard error, and `kube-linter` returns a non-zero 
