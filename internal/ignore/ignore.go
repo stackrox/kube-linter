@@ -6,7 +6,7 @@ import (
 
 const (
 	// AnnotationKeyPrefix is the prefix for annotations for kube-linter check ignores.
-	AnnotationKeyPrefix = "kube-linter.io/ignore/"
+	AnnotationKeyPrefix = "ignore-check.kube-linter.io/"
 
 	// AllAnnotationKey is used to ignore all checks for a given object.
 	AllAnnotationKey = "kube-linter.io/ignore-all"
