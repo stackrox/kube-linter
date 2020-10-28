@@ -1,7 +1,6 @@
 # KubeLinter
 
-KubeLinter is a static analysis tool that checks Kubernetes YAML files and Helm charts	KubeLinter is a static analysis tool for identifying problematic patterns in
-to ensure the applications represented in them adhere to best practices.
+KubeLinter is a static analysis tool that checks Kubernetes YAML files and Helm charts to ensure the applications represented in them adhere to best practices.
 
 KubeLinter accepts YAML files as input and runs a series of checks on them.
 If it finds any issues, it reports them and returns a non-zero exit
