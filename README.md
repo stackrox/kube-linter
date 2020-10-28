@@ -10,7 +10,7 @@ code.
 KubeLinter is:
 - **Configurable**: includes multiple built-in checks which you can enable or
   disable.
-- **Extensible**: you can define and configure custom templates and checks.
+- **Extensible**: you can define and configure custom checks.
 
 ## Installation
 
