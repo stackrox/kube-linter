@@ -66,7 +66,7 @@ To build KubeLinter from source, follow these instructions:
        securityContext:
          allowPrivilegeEscalation: false
    ```
-1. To lint this file with KubeLinter, run the follwoing command:
+1. To lint this file with KubeLinter, run the following command:
    ```bash
    kube-linter lint pod.yaml
    ```
