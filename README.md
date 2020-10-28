@@ -1,21 +1,20 @@
 # KubeLinter
 
-KubeLinter is a static analysis tool for identifying problematic patterns in
-Kubernetes configuration files and Helm charts. It enables you to make sure that
-the applications represented by those files adhere to best practices.
+KubeLinter is a static analysis tool that checks Kubernetes YAML files and Helm charts	KubeLinter is a static analysis tool for identifying problematic patterns in
+to ensure the applications represented in them adhere to best practices.
 
-The KubeLinter accepts YAML files as input and runs a series of checks on them.
-When it finds any issues, it reports those issues and returns a non-zero exit
+KubeLinter accepts YAML files as input and runs a series of checks on them.
+If it finds any issues, it reports them and returns a non-zero exit
 code.
 
 KubeLinter is:
-- **Configurable**: include multiple built-in checks which you can enable or
+- **Configurable**: includes multiple built-in checks which you can enable or
   disable.
 - **Extensible**: you can define and configure custom templates and checks.
 
 ## Installation
 
-If you have installed [Go](https://golang.org/), run the following command:
+If you have [Go](https://golang.org/) installed, run the following command:
 
 ```bash
 go get golang.stackrox.io/kube-linter/cmd/kube-linter
@@ -36,7 +35,7 @@ To build KubeLinter from source, follow these instructions:
    git clone git@github.com:stackrox/kube-linter.git
    ```
 1. Run the `make build` command. This command compiles the source code and
-   creates a `kube-linter` binary file in the `kube-linter/bin/` folder.
+   creates `kube-linter` binary files for each platform in the `.gobin` folder.
 
 ## Usage
 
@@ -72,7 +71,7 @@ To build KubeLinter from source, follow these instructions:
    ```bash
    kube-linter lint pod.yaml
    ```
-1. KubeLinter runs the built-in checks and report errors.
+1. KubeLinter runs the default checks and reports errors.
    ```
    pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" does not have a read-only root file system (check: no-read-only-root-fs, remediation: Set readOnlyRootFilesystem to true in your container's securityContext.)
 
@@ -93,6 +92,6 @@ the future to the command usage, flags, and configuration file formats. However,
 we encourage you to use KubeLinter to test your environment YAML files, see what
 breaks, and [contribute](./CONTRIBUTING.md).
 
-# LICENCE 
+# LICENSE 
 
-KubeLinter is licensed under [Apache License 2.0](./LICENSE).
+KubeLinter is licensed under the [Apache License 2.0](./LICENSE).
