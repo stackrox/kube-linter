@@ -30,7 +30,7 @@ func init() {
 				}
 				if sa := podSpec.DeprecatedServiceAccount; sa != "" {
 					return []diagnostic.Diagnostic{{Message: fmt.Sprintf(
-						"serviceAccount is specified (%s), but this field is deprecated; use serviceAccoutName instead", sa)}}
+						"serviceAccount is specified (%s), but this field is deprecated; use serviceAccountName instead", sa)}}
 				}
 				return nil
 			}, nil
