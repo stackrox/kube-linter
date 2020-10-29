@@ -19,11 +19,12 @@ endif
 
 GOBIN := $(CURDIR)/.gobin
 PATH := $(GOBIN):$(PATH)
-# Makefile on Mac doesn't pass this updated PATH to the shell
-# and so without the following line, the shell does not end up
+
+# Makefile on Mac doesn't pass the updated PATH and GOBIN to the shell
+# and so, without the following line, the shell does not end up
 # trying commands in $(GOBIN) first.
 # See https://stackoverflow.com/a/36226784/3690207
-SHELL := env PATH=$(PATH) /bin/bash
+SHELL := env GOBIN=$(GOBIN) PATH=$(PATH) /bin/bash
 
 ########################################
 ###### Binaries we depend on ###########
@@ -37,12 +38,12 @@ $(GOLANGCILINT_BIN): deps
 STATICCHECK_BIN := $(GOBIN)/staticcheck
 $(STATICCHECK_BIN): deps
 	@echo "+ $@"
-	@go install honnef.co/go/tools/cmd/staticcheck
+	go install honnef.co/go/tools/cmd/staticcheck
 
 PACKR_BIN := $(GOBIN)/packr
 $(PACKR_BIN): deps
 	@echo "+ $@"
-	@go install github.com/gobuffalo/packr/packr
+	go install github.com/gobuffalo/packr/packr
 
 ###########
 ## Lint ##
