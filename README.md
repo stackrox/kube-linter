@@ -16,7 +16,7 @@ KubeLinter is:
 If you have [Go](https://golang.org/) installed, run the following command:
 
 ```bash
-go get golang.stackrox.io/kube-linter/cmd/kube-linter
+GO111MODULE=on go get golang.stackrox.io/kube-linter/cmd/kube-linter
 ```
 Otherwise, download the latest binary from
 [Releases](https://github.com/stackrox/kube-linter/releases) and add it to your
