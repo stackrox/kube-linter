@@ -15,6 +15,7 @@ import (
 	"helm.sh/helm/v3/pkg/chartutil"
 	"helm.sh/helm/v3/pkg/cli/values"
 	"helm.sh/helm/v3/pkg/engine"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -31,17 +32,32 @@ var (
 	decoder      = serializer.NewCodecFactory(clientSchema).UniversalDeserializer()
 )
 
-func parseObject(data []byte) (k8sutil.Object, error) {
+func parseObjects(data []byte) ([]k8sutil.Object, error) {
 	obj, _, err := decoder.Decode(data, nil, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to decode")
+	}
+	if list, ok := obj.(*v1.List); ok {
+		objs := make([]k8sutil.Object, 0, len(list.Items))
+		for i, item := range list.Items {
+			obj, _, err := decoder.Decode(item.Raw, nil, nil)
+			if err != nil {
+				return nil, errors.Wrapf(err, "decoding item %d in the list", i)
+			}
+			asK8sObj, _ := obj.(k8sutil.Object)
+			if asK8sObj == nil {
+				return nil, errors.Errorf("object was not a k8s object: %v", obj)
+			}
+			objs = append(objs, asK8sObj)
+		}
+		return objs, nil
 	}
 	asK8sObj, _ := obj.(k8sutil.Object)
 	if asK8sObj == nil {
 		return nil, errors.Errorf("object was not a k8s object: %v", obj)
 	}
 	// TODO: validate
-	return asK8sObj, nil
+	return []k8sutil.Object{asK8sObj}, nil
 }
 
 type nopWriter struct{}
@@ -112,13 +128,15 @@ func (l *LintContext) loadObjectFromYAMLReader(filePath string, r *yaml.YAMLRead
 		Raw:      doc,
 	}
 
-	obj, err := parseObject(doc)
+	objs, err := parseObjects(doc)
 	if err != nil {
 		l.invalidObjects = append(l.invalidObjects, InvalidObject{
 			Metadata: metadata,
 			LoadErr:  err,
 		})
-	} else {
+		return nil
+	}
+	for _, obj := range objs {
 		l.objects = append(l.objects, Object{
 			Metadata:  metadata,
 			K8sObject: obj,
