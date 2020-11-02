@@ -10,6 +10,7 @@ var (
 		"dangling-service",
 		"deprecated-service-account-field",
 		"env-var-secret",
+		"mismatching-selector",
 		"no-extensions-v1beta",
 		"no-read-only-root-fs",
 		"non-existent-service-account",

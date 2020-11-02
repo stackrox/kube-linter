@@ -6,6 +6,7 @@ import (
 	"golang.stackrox.io/kube-linter/internal/k8sutil"
 	batchV1Beta1 "k8s.io/api/batch/v1beta1"
 	coreV1 "k8s.io/api/core/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // PodTemplateSpec extracts a pod template spec from the given object, if available.
@@ -46,4 +47,28 @@ func PodSpec(obj k8sutil.Object) (coreV1.PodSpec, bool) {
 		return coreV1.PodSpec{}, false
 	}
 	return podTemplateSpec.Spec, true
+}
+
+// Selector extracts a selector from the given object, if available.
+func Selector(obj k8sutil.Object) (*metaV1.LabelSelector, bool) {
+	switch obj := obj.(type) {
+	case *batchV1Beta1.CronJob:
+		selector := obj.Spec.JobTemplate.Spec.Selector
+		return selector, true
+	default:
+		objValue := reflect.Indirect(reflect.ValueOf(obj))
+		spec := objValue.FieldByName("Spec")
+		if !spec.IsValid() {
+			return nil, false
+		}
+		selector := spec.FieldByName("Selector")
+		if !selector.IsValid() {
+			return nil, false
+		}
+		labelSelector, ok := selector.Interface().(*metaV1.LabelSelector)
+		if ok {
+			return labelSelector, true
+		}
+	}
+	return nil, false
 }

@@ -9,6 +9,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/internal/templates/envvar"
 	_ "golang.stackrox.io/kube-linter/internal/templates/livenessprobe"
 	_ "golang.stackrox.io/kube-linter/internal/templates/memoryrequirements"
+	_ "golang.stackrox.io/kube-linter/internal/templates/mismatchingselector"
 	_ "golang.stackrox.io/kube-linter/internal/templates/nonexistentserviceaccount"
 	_ "golang.stackrox.io/kube-linter/internal/templates/privileged"
 	_ "golang.stackrox.io/kube-linter/internal/templates/readinessprobe"
