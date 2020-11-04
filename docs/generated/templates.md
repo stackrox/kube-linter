@@ -193,6 +193,20 @@ This page lists supported check templates.
 
 ```
 
+## Mismatching Selector
+
+**Key**: `mismatching-selector`
+
+**Description**: Flag deployments where the selector doesn't match the labels in the pod template spec
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+```
+[]
+
+```
+
 ## Non-Existent Service Account
 
 **Key**: `non-existent-service-account`
