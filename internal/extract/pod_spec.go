@@ -72,3 +72,25 @@ func Selector(obj k8sutil.Object) (*metaV1.LabelSelector, bool) {
 	}
 	return nil, false
 }
+
+// Replicas extracts replicas from the given object, if available.
+func Replicas(obj k8sutil.Object) (int32, bool) {
+	objValue := reflect.Indirect(reflect.ValueOf(obj))
+	spec := objValue.FieldByName("Spec")
+	if !spec.IsValid() {
+		return 0, false
+	}
+	replicas := spec.FieldByName("Replicas")
+	if !replicas.IsValid() {
+		return 0, false
+	}
+	numReplicas, ok := replicas.Interface().(*int32)
+	if ok {
+		if numReplicas != nil {
+			return *numReplicas, true
+		}
+		// If numReplicas is a `nil` pointer, then it defaults to 1.
+		return 1, true
+	}
+	return 0, false
+}

@@ -43,7 +43,7 @@ func List() ([]check.Check, error) {
 			}
 			var chk check.Check
 			if err := yaml.Unmarshal(contents, &chk); err != nil {
-				loadErr = errors.Wrapf(err, "unmarshaling default check from %s", fileName)
+				loadErr = errors.Wrapf(err, "unmarshalling default check from %s", fileName)
 				return
 			}
 			list = append(list, chk)
