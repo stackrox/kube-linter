@@ -11,7 +11,7 @@ import (
 	"golang.stackrox.io/kube-linter/internal/templates"
 	"golang.stackrox.io/kube-linter/internal/templates/danglingservice/internal/params"
 	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 )
 
@@ -41,7 +41,7 @@ func init() {
 						Message: "service has no selector specified",
 					}}
 				}
-				labelSelector, err := metav1.LabelSelectorAsSelector(&metav1.LabelSelector{MatchLabels: selector})
+				labelSelector, err := metaV1.LabelSelectorAsSelector(&metaV1.LabelSelector{MatchLabels: selector})
 				if err != nil {
 					return []diagnostic.Diagnostic{{
 						Message: fmt.Sprintf("service has invalid label selector: %v", err),
