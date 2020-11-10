@@ -22,6 +22,12 @@ Otherwise, download the latest binary from
 [Releases](https://github.com/stackrox/kube-linter/releases) and add it to your
 PATH.
 
+### Via Homebrew for macOS or LinuxBrew for Linux
+
+```bash
+brew install kube-linter
+```
+
 ### Building from source
 
 > **NOTE**: Before you build, make sure that you have [installed
