@@ -18,9 +18,17 @@ If you have [Go](https://golang.org/) installed, run the following command:
 ```bash
 GO111MODULE=on go get golang.stackrox.io/kube-linter/cmd/kube-linter
 ```
-Otherwise, download the latest binary from
+
+Download the latest binary from
 [Releases](https://github.com/stackrox/kube-linter/releases) and add it to your
 PATH.
+
+### homebrew
+
+```
+brew cask install kube-linter
+```
+
 
 ### Building from source
 
