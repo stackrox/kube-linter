@@ -23,7 +23,7 @@ func Command() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "lint",
 		Args:  cobra.MinimumNArgs(1),
-		Short: "Lint Kubernetes YAML files",
+		Short: "Lint Kubernetes YAML files and Helm charts",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			checkRegistry := checkregistry.New()
 			if err := builtinchecks.LoadInto(checkRegistry); err != nil {
