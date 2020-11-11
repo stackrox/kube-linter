@@ -11,7 +11,7 @@ import (
 func Command() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "version",
-		Short: "print version and exit",
+		Short: "Print version and exit",
 		Args:  cobra.NoArgs,
 		Run: func(cmd *cobra.Command, _ []string) {
 			fmt.Println(version.Get())

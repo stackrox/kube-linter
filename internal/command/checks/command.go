@@ -65,7 +65,7 @@ func listCommand() *cobra.Command {
 	format := common.FormatWrapper{Format: common.PlainFormat}
 	c := &cobra.Command{
 		Use:   "list",
-		Short: "list built-in checks",
+		Short: "List built-in checks",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			checks, err := builtinchecks.List()
@@ -90,6 +90,7 @@ func listCommand() *cobra.Command {
 func Command() *cobra.Command {
 	c := &cobra.Command{
 		Use: "checks",
+		Short: "View more information on lint checks",
 	}
 	c.AddCommand(listCommand())
 	return c
