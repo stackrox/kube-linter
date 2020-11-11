@@ -125,7 +125,7 @@ func listCommand() *cobra.Command {
 // Command defines the root of the templates command.
 func Command() *cobra.Command {
 	c := &cobra.Command{
-		Use: "templates",
+		Use:   "templates",
 		Short: "View more information on check templates",
 	}
 	c.AddCommand(listCommand())

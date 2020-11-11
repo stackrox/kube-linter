@@ -89,7 +89,7 @@ func listCommand() *cobra.Command {
 // Command defines the root of the checks command.
 func Command() *cobra.Command {
 	c := &cobra.Command{
-		Use: "checks",
+		Use:   "checks",
 		Short: "View more information on lint checks",
 	}
 	c.AddCommand(listCommand())
