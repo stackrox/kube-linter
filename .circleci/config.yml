@@ -91,6 +91,9 @@ jobs:
           which ghr
           ./scripts/create_github_release.sh "${CIRCLE_TAG}" ./bin
 
+    - store_artifacts:
+        path: bin
+
 workflows:
   version: 2
   build:
