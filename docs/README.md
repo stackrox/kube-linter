@@ -116,7 +116,7 @@ Consider the following sample pod specification file `pod.yaml`. This file has t
    ```bash
    kube-linter lint pod.yaml
    ```
-1. KubeLinter runs its default checks and reports reccomendations. Below is the output from our previous command.
+1. KubeLinter runs its default checks and reports recommendations. Below is the output from our previous command.
 
    ```
    pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" does not have a read-only root file system (check: no-read-only-root-fs, remediation: Set readOnlyRootFilesystem to true in your container's securityContext.)
