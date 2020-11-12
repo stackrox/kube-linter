@@ -107,7 +107,7 @@ func listCommand() *cobra.Command {
 	format := common.FormatWrapper{Format: common.PlainFormat}
 	c := &cobra.Command{
 		Use:   "list",
-		Short: "list check templates",
+		Short: "List check templates",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			knownTemplates := templates.List()
@@ -125,7 +125,8 @@ func listCommand() *cobra.Command {
 // Command defines the root of the templates command.
 func Command() *cobra.Command {
 	c := &cobra.Command{
-		Use: "templates",
+		Use:   "templates",
+		Short: "View more information on check templates",
 	}
 	c.AddCommand(listCommand())
 	return c

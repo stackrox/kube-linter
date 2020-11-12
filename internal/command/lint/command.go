@@ -21,8 +21,9 @@ func Command() *cobra.Command {
 	var verbose bool
 
 	c := &cobra.Command{
-		Use:  "lint",
-		Args: cobra.MinimumNArgs(1),
+		Use:   "lint",
+		Args:  cobra.MinimumNArgs(1),
+		Short: "Lint Kubernetes YAML files and Helm charts",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			checkRegistry := checkregistry.New()
 			if err := builtinchecks.LoadInto(checkRegistry); err != nil {
@@ -88,7 +89,7 @@ func Command() *cobra.Command {
 			return errors.Errorf("found %d lint errors", len(result.Reports))
 		},
 	}
-	c.Flags().StringVar(&configPath, "config", "", "path to config file")
-	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "whether to enable verbose logs")
+	c.Flags().StringVar(&configPath, "config", "", "Path to config file")
+	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 	return c
 }
