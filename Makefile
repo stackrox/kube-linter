@@ -16,6 +16,7 @@ ifeq ($(UNAME_S),Darwin)
     HOST_OS := darwin
 endif
 
+TAG := $(shell ./get-tag)
 
 GOBIN := $(CURDIR)/.gobin
 PATH := $(GOBIN):$(PATH)
@@ -101,6 +102,10 @@ build: packr
 	@cp "bin/$(HOST_OS)/kube-linter" "$(GOBIN)/kube-linter"
 	@chmod u+w "$(GOBIN)/kube-linter"
 
+.PHONY: image
+image: build
+	@cp bin/linux/kube-linter image/bin
+	@docker build -t "stackrox/kube-linter:$(TAG)" image/
 ##########
 ## Test ##
 ##########

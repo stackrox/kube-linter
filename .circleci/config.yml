@@ -40,19 +40,42 @@ jobs:
     executor: custom
     steps:
     - checkout
+    - setup_remote_docker
 
     - run:
-        name: Build binaries
+        name: Build binaries and image
         command: |
-          make build
+          make build image
 
     - run:
         name: Ensure `kube-linter version` returns the expected value.
         command: |
-          version="$(.gobin/kube-linter version)"
           expected_version="$(./get-tag)"
-          echo "Version from kube-linter: ${version}. Expected version: ${expected_version}"
-          [[ "${version}" == "${expected_version}" ]]
+          version_from_binary="$(.gobin/kube-linter version)"
+          version_from_image="$(docker run "stackrox/kube-linter:${expected_version}" version)"
+          echo "Version from kube-linter binary: ${version_from_binary}. From image: ${version_from_image}. Expected version: ${expected_version}"
+          [[ "${version_from_binary}" == "${expected_version}" ]]
+          [[ "${version_from_image}" == "${expected_version}" ]]
+
+    - run:
+        name: Push image to DockerHub, if applicable.
+        command: |
+          if [[ -z "${DOCKER_IO_PUSH_USERNAME}" && -z "${DOCKER_IO_PUSH_PASSWORD}" ]]; then
+            if [[ "${CIRCLE_BRANCH}" == "main" || -n "${CIRCLE_TAG}" ]]; then
+              echo "DockerHub creds not found. This is unexpected if the push is to main or if a tag has been pushed."
+              exit 1
+            fi
+            echo "DockerHub creds not found, not pushing."
+            exit 0
+          fi
+          docker login -u "$DOCKER_IO_PULL_USERNAME" -p "$DOCKER_IO_PULL_PASSWORD"
+          img="stackrox/kube-linter:$(./get-tag)"
+          docker push "${img}"
+
+          if [[ -n "${CIRCLE_TAG}" ]]; then
+            docker tag "${img}" stackrox/kube-linter:latest
+            docker push stackrox/kube-linter:latest
+          fi
 
     - run:
         name: Create a GitHub release, if on tag.
@@ -78,3 +101,4 @@ workflows:
         <<: *runOnAllTags
     - build:
         <<: *runOnAllTags
+        context: docker-io-push
