@@ -65,7 +65,7 @@ Installing KubeLinter from source is as simple as following these steps:
 
 Running KubeLinter to Lint your YAML files only requires two steps in its most basic form.
 
-1. Locate your the YAML file you'd like to test for security and production readiness best practices.
+1. Locate the YAML file you'd like to test for security and production readiness best practices:
 1. Run the following command:
 
    ```bash
