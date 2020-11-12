@@ -95,3 +95,4 @@ workflows:
         <<: *runOnAllTags
     - build:
         <<: *runOnAllTags
+        context: docker-io-push
