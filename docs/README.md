@@ -81,7 +81,7 @@ Consider the following sample pod specification file `pod.yaml`. This file has t
 
 **Production readiness:**
 1. The container's CPU requests and limits are not set, which could allow it to consume excessive CPU.
-1. The container's memory requests and limits, which could allow it to consume excessive memory
+1. The container's memory requests and limits are not set, which could allow it to consume excessive memory
 
    ```yaml
    apiVersion: v1
