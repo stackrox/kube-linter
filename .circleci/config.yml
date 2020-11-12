@@ -69,7 +69,13 @@ jobs:
             exit 0
           fi
           docker login -u "$DOCKER_IO_PULL_USERNAME" -p "$DOCKER_IO_PULL_PASSWORD"
-          docker push "stackrox/kube-linter:$(./get-tag)"
+          img="stackrox/kube-linter:$(./get-tag)"
+          docker push "${img}"
+
+          if [[ -n "${CIRCLE_TAG}" ]]; then
+            docker tag "${img}" stackrox/kube-linter:latest
+            docker push stackrox/kube-linter:latest
+          fi
 
     - run:
         name: Create a GitHub release, if on tag.
