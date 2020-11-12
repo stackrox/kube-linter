@@ -1,28 +1,32 @@
-# KubeLinter
+<p align="center"><img src="images/logo/KubeLinter-horizontal.svg" width="360"></p>
+<p align="center"><b>Static analysis for Kubernetes</b></p>
 
-KubeLinter is a static analysis tool that checks Kubernetes YAML files and Helm charts to ensure the applications represented in them adhere to best practices.
+# What is KubeLinter?
 
-KubeLinter accepts YAML files as input and runs a series of checks on them.
-If it finds any issues, it reports them and returns a non-zero exit
-code.
+KubeLinter analyzes Kubernetes YAML files and Helm charts, and checks them against a variety of best practices, with a focus on production readiness and security. 
 
-KubeLinter is:
-- **Configurable**: includes multiple built-in checks which you can enable or
-  disable.
-- **Extensible**: you can define and configure custom checks.
+KubeLinter runs sensible default checks, designed to give you useful information about your Kubernetes YAML files and Helm charts. This is to help teams check early and often for security misconfigurations and DevOps best practices. Some common examples of these include running containers as a non-root user, enforcing least privilege, and storing sensitive information only in secrets.
 
-## Installation
+KubeLinter is configurable, so you can enable and disable checks, as well as create your own custom checks, depending on the policies you want to follow within your organization. 
 
-If you have [Go](https://golang.org/) installed, run the following command:
+When a lint check fails, KubeLinter reports recommendations for how to resolve any potential issues and returns a non-zero exit code.
+
+
+## Installing KubeLinter
+
+### Using Go
+
+To install using [Go](https://golang.org/), run the following command:
 
 ```bash
 GO111MODULE=on go get golang.stackrox.io/kube-linter/cmd/kube-linter
 ```
-Otherwise, download the latest binary from
-[Releases](https://github.com/stackrox/kube-linter/releases) and add it to your
+Otherwise, download the latest binary from [Releases](https://github.com/stackrox/kube-linter/releases) and add it to your
 PATH.
 
-### Via Homebrew for macOS or LinuxBrew for Linux
+### Using Homebrew for macOS or LinuxBrew for Linux
+
+To install using Homebrew or LinuxBrew, run the following command:
 
 ```bash
 brew install kube-linter
@@ -30,21 +34,55 @@ brew install kube-linter
 
 ### Building from source
 
-> **NOTE**: Before you build, make sure that you have [installed
-> Go](https://golang.org/doc/install).
+### Prerequisites
+- Make sure that you have [installed Go](https://golang.org/doc/install) prior to building from source.
 
-To build KubeLinter from source, follow these instructions:
+### Building KubeLinter
 
-1. Clone the KubeLinter repository.
+Installing KubeLinter from source is as simple as following these steps:
+
+1. First, clone the KubeLinter repository.
+
    ```bash
    git clone git@github.com:stackrox/kube-linter.git
    ```
-1. Run the `make build` command. This command compiles the source code and
-   creates `kube-linter` binary files for each platform in the `.gobin` folder.
+   
+1. Then, complile the source code. This will create the kube-linter binary files for each platform and places them in the `.gobin` folder.
+   
+   ```bash
+   make build
+   ```
+   
+1. Finally, you are ready to start using KubeLinter. Verify your version to ensure you've successfully installed KubeLinter.
 
-## Usage
+   ```bash
+   .gobin/kube-linter version
+   ```
 
-1. Consider the following sample pod specification file `pod.yaml`:
+## Using KubeLinter
+
+### Local YAML Linting
+
+Running KubeLinter to Lint your YAML files only requires two steps in its most basic form.
+
+1. Locate the YAML file you'd like to test for security and production readiness best practices:
+1. Run the following command:
+
+   ```bash
+   kube-linter lint /path/to/your/yaml.yaml
+   ```
+
+### Example
+
+Consider the following sample pod specification file `pod.yaml`. This file has two production readiness issues and one security issue:
+
+**Security Issue:**
+1. The container in this pod is not running as a read only file system, which could allow it to write to the root filesystem.
+
+**Production readiness:**
+1. The container's CPU requests and limits are not set, which could allow it to consume excessive CPU.
+1. The container's memory requests and limits are not set, which could allow it to consume excessive memory
+
    ```yaml
    apiVersion: v1
    kind: Pod
@@ -72,23 +110,24 @@ To build KubeLinter from source, follow these instructions:
        securityContext:
          allowPrivilegeEscalation: false
    ```
-1. To lint this file with KubeLinter, run the following command:
+  
+1. Copy the YAML above to pod.yaml and lint this file by running the following command:
+
    ```bash
    kube-linter lint pod.yaml
    ```
-1. KubeLinter runs the default checks and reports errors.
+1. KubeLinter runs its default checks and reports recommendations. Below is the output from our previous command.
+
    ```
    pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" does not have a read-only root file system (check: no-read-only-root-fs, remediation: Set readOnlyRootFilesystem to true in your container's securityContext.)
 
-   pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container    "sec-ctx-demo" has cpu limit 0 (check: unset-cpu-requirements, remediation: Set    your container's CPU requests and limits depending on its requirements. See    https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/   #requests-and-limits for more details.)
+   pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" has cpu limit 0 (check: unset-cpu-requirements, remediation: Set    your container's CPU requests and limits depending on its requirements. See    https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/   #requests-and-limits for more details.)
    
-   pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container    "sec-ctx-demo" has memory limit 0 (check: unset-memory-requirements, remediation:    Set your container's memory requests and limits depending on its requirements.    See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/   #requests-and-limits for more details.)
+   pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" has memory limit 0 (check: unset-memory-requirements, remediation:    Set your container's memory requests and limits depending on its requirements.    See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/   #requests-and-limits for more details.)
    
    Error: found 3 lint errors
    ```
-
-For more details about using and configuring KubeLinter, see the
-[documentation](./docs) page.
+To learn more about using and configuring KubeLinter, visit the [documentation](./docs) page.
 
 # WARNING: Alpha release
 
