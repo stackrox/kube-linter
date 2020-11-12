@@ -68,7 +68,7 @@ jobs:
             echo "DockerHub creds not found, not pushing."
             exit 0
           fi
-          docker login -u "$DOCKER_IO_PULL_USERNAME" -p "$DOCKER_IO_PULL_PASSWORD"
+          docker login -u "$DOCKER_IO_PUSH_USERNAME" -p "$DOCKER_IO_PUSH_PASSWORD"
           img="stackrox/kube-linter:$(./get-tag)"
           docker push "${img}"
 
