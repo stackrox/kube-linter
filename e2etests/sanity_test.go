@@ -35,7 +35,7 @@ func TestKubeLinterWithBuiltInChecksDoesntCrashOnHelmChartsRepo(t *testing.T) {
 	gitCloneOut, err := exec.Command("git", "clone", "git@github.com:helm/charts.git", chartsDir).CombinedOutput()
 	require.NoError(t, err, "Git clone failed. output: %s", string(gitCloneOut))
 
-	kubeLinterOut, err := exec.Command(kubeLinterBin, "lint", chartsDir).CombinedOutput()
+	kubeLinterOut, err := exec.Command(kubeLinterBin, "lint", chartsDir, "--config", "testdata/all-built-in-config.yaml").CombinedOutput()
 	// Something will fail for sure, so kube-linter will not return a success code.
 	require.Error(t, err)
 	exitErr, ok := err.(*exec.ExitError)
