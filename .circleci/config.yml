@@ -2,6 +2,7 @@ executors:
   custom:
     docker:
       - image: cimg/go:1.15
+    working_directory: /home/circleci/kube-linter
 
 runOnAllTags: &runOnAllTags
   filters:
@@ -94,6 +95,23 @@ jobs:
     - store_artifacts:
         path: bin
 
+    - persist_to_workspace:
+        root: /home/circleci/kube-linter
+        paths:
+          - .gobin/kube-linter
+
+  e2e-test:
+    executor: custom
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/kube-linter
+
+      - run:
+          name: Run E2E tests
+          command: |
+            make e2e-test
+
 workflows:
   version: 2
   build:
@@ -105,3 +123,7 @@ workflows:
     - build:
         <<: *runOnAllTags
         context: docker-io-push
+    - e2e-test:
+        <<: *runOnAllTags
+        requires:
+          - build

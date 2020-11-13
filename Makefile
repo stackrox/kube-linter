@@ -27,6 +27,8 @@ PATH := $(GOBIN):$(PATH)
 # See https://stackoverflow.com/a/36226784/3690207
 SHELL := env GOBIN=$(GOBIN) PATH=$(PATH) /bin/bash
 
+KUBE_LINTER_BIN := $(GOBIN)/kube-linter
+
 ########################################
 ###### Binaries we depend on ###########
 ########################################
@@ -102,6 +104,9 @@ build: packr
 	@cp "bin/$(HOST_OS)/kube-linter" "$(GOBIN)/kube-linter"
 	@chmod u+w "$(GOBIN)/kube-linter"
 
+$(KUBE_LINTER_BIN):
+	@$(MAKE) build
+
 .PHONY: image
 image: build
 	@cp bin/linux/kube-linter image/bin
@@ -113,4 +118,8 @@ image: build
 .PHONY: test
 test: packr
 	go test ./...
+
+.PHONY: e2e-test
+e2e-test: $(KUBE_LINTER_BIN)
+	KUBE_LINTER_BIN="$(KUBE_LINTER_BIN)" go test -tags e2e -count=1 ./e2etests/...
 
