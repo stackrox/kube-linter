@@ -10,8 +10,6 @@ import (
 	"golang.stackrox.io/kube-linter/internal/objectkinds"
 	"golang.stackrox.io/kube-linter/internal/templates"
 	"golang.stackrox.io/kube-linter/internal/templates/mismatchingselector/internal/params"
-	v1 "k8s.io/api/batch/v1"
-	"k8s.io/api/batch/v1beta1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 )
@@ -29,15 +27,11 @@ func init() {
 		Instantiate: params.WrapInstantiateFunc(func(_ params.Params) (check.Func, error) {
 			return func(_ *lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				selector, found := extract.Selector(object.K8sObject)
+
 				if !found {
 					return nil
 				}
-				if selector == nil || (len(selector.MatchLabels) == 0 && len(selector.MatchExpressions) == 0) {
-					switch object.K8sObject.(type) {
-					// It's okay for CronJobs and Jobs not to have selectors.
-					case *v1beta1.CronJob, *v1.Job:
-						return nil
-					}
+				if len(selector.MatchLabels) == 0 && len(selector.MatchExpressions) == 0 {
 					return []diagnostic.Diagnostic{{
 						Message: "object has no selector specified",
 					}}
