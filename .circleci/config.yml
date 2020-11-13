@@ -2,7 +2,7 @@ executors:
   custom:
     docker:
       - image: cimg/go:1.15
-    working_directory: /kube-linter
+    working_directory: /home/circleci/kube-linter
 
 runOnAllTags: &runOnAllTags
   filters:
@@ -96,7 +96,7 @@ jobs:
         path: bin
 
     - persist_to_workspace:
-        root: /kube-linter
+        root: /home/circleci/kube-linter
         paths:
           - .gobin/kube-linter
 
@@ -105,7 +105,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: /kube-linter
+          at: /home/circleci/kube-linter
 
       - run:
           name: Run E2E tests
