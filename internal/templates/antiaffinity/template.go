@@ -3,9 +3,6 @@ package antiaffinity
 import (
 	"fmt"
 
-	coreV1 "k8s.io/api/core/v1"
-	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"golang.stackrox.io/kube-linter/internal/check"
 	"golang.stackrox.io/kube-linter/internal/diagnostic"
 	"golang.stackrox.io/kube-linter/internal/extract"
@@ -13,6 +10,8 @@ import (
 	"golang.stackrox.io/kube-linter/internal/objectkinds"
 	"golang.stackrox.io/kube-linter/internal/templates"
 	"golang.stackrox.io/kube-linter/internal/templates/antiaffinity/internal/params"
+	coreV1 "k8s.io/api/core/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 )
 
@@ -43,12 +42,12 @@ func init() {
 					preferredAffinity := affinity.PodAntiAffinity.PreferredDuringSchedulingIgnoredDuringExecution
 					requiredAffinity := affinity.PodAntiAffinity.RequiredDuringSchedulingIgnoredDuringExecution
 					for _, preferred := range preferredAffinity {
-						if affinityTermMatchesLabelsAgainstNodes(preferred.PodAffinityTerm, podTemplateSpec.Labels) {
+						if affinityTermMatchesLabelsAgainstNodes(preferred.PodAffinityTerm, podTemplateSpec.Namespace, podTemplateSpec.Labels) {
 							return nil
 						}
 					}
 					for _, required := range requiredAffinity {
-						if affinityTermMatchesLabelsAgainstNodes(required, podTemplateSpec.Labels) {
+						if affinityTermMatchesLabelsAgainstNodes(required, podTemplateSpec.Namespace, podTemplateSpec.Labels) {
 							return nil
 						}
 					}
@@ -59,7 +58,20 @@ func init() {
 	})
 }
 
-func affinityTermMatchesLabelsAgainstNodes(affinityTerm coreV1.PodAffinityTerm, podLabels map[string]string) bool {
+func affinityTermMatchesLabelsAgainstNodes(affinityTerm coreV1.PodAffinityTerm, podNamespace string, podLabels map[string]string) bool {
+	// If namespaces is not specified in the affinity term, that means the affinity term implicitly applies to the pod's namespace.
+	if len(affinityTerm.Namespaces) > 0 {
+		var matchingNSFound bool
+		for _, ns := range affinityTerm.Namespaces {
+			if ns == podNamespace {
+				matchingNSFound = true
+				break
+			}
+		}
+		if !matchingNSFound {
+			return false
+		}
+	}
 	labelSelector, err := metaV1.LabelSelectorAsSelector(affinityTerm.LabelSelector)
 	if err != nil {
 		return false
