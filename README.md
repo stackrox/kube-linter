@@ -11,7 +11,6 @@ KubeLinter is configurable, so you can enable and disable checks, as well as cre
 
 When a lint check fails, KubeLinter reports recommendations for how to resolve any potential issues and returns a non-zero exit code.
 
-
 ## Installing KubeLinter
 
 ### Using Go
@@ -129,13 +128,21 @@ Consider the following sample pod specification file `pod.yaml`. This file has t
    ```
 To learn more about using and configuring KubeLinter, visit the [documentation](./docs) page.
 
-# WARNING: Alpha release
+## Community
+
+If you would like to engage with the KubeLinter community, including maintainers and other users, you can join the Slack workspace [here](https://join.slack.com/t/kube-linter/shared_invite/zt-icv44kde-gfpmAtrT6toeqYYd7JOVTA).
+
+To contribute, check out our [contributing guide](./CONTRIBUTING.MD).
+
+As a reminder, all participation in the KubeLinter community is governed by our [code of conduct](./CODE_OF_CONDUCT.MD).
+
+## WARNING: Alpha release
 
 KubeLinter is at an early stage of development. There may be breaking changes in
 the future to the command usage, flags, and configuration file formats. However,
 we encourage you to use KubeLinter to test your environment YAML files, see what
 breaks, and [contribute](./CONTRIBUTING.md).
 
-# LICENSE 
+## LICENSE 
 
 KubeLinter is licensed under the [Apache License 2.0](./LICENSE).
