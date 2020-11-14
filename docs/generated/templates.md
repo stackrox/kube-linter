@@ -1,5 +1,26 @@
 This page lists supported check templates.
 
+## Anti affinity not specified
+
+**Key**: `anti-affinity`
+
+**Description**: Flag objects with multiple replicas but inter-pod anti affinity not specified in the pod template spec
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+```
+[
+	{
+		"name": "minReplicas",
+		"type": "integer",
+		"description": "The minimum number of replicas a deployment must have before anti-affinity is enforced on it",
+		"required": false
+	}
+]
+
+```
+
 ## CPU Requirements
 
 **Key**: `cpu-requirements`

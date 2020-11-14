@@ -11,6 +11,7 @@ var (
 		"deprecated-service-account-field",
 		"env-var-secret",
 		"mismatching-selector",
+		"no-anti-affinity",
 		"no-extensions-v1beta",
 		"no-read-only-root-fs",
 		"non-existent-service-account",
