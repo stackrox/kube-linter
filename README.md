@@ -146,3 +146,10 @@ breaks, and [contribute](./CONTRIBUTING.md).
 ## LICENSE 
 
 KubeLinter is licensed under the [Apache License 2.0](./LICENSE).
+
+## StackRox
+
+KubeLinter is made with ❤️ by [StackRox](https://stackrox.com/).
+
+If you're interested in KubeLinter, or in any of the other cool things we do, please know that we're hiring!
+Check out our [open positions](https://www.stackrox.com/job-board/). We'd love to hear from you!
