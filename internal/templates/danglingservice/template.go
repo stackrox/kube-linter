@@ -52,7 +52,7 @@ func init() {
 					if !hasPods {
 						continue
 					}
-					if service.Namespace != podTemplateSpec.Namespace {
+					if service.Namespace != obj.K8sObject.GetNamespace() {
 						continue
 					}
 					if labelSelector.Matches(labels.Set(podTemplateSpec.Labels)) {
