@@ -127,7 +127,7 @@ commands:
           command: |
             set +e
             if [[ "${CIRCLE_BRANCH}" == "master" || -n "${CIRCLE_TAG}" ]]; then
-              echo "On master or tag, running the step"
+              echo "On main or tag, running the step"
             else
               .circleci/pr_has_label.sh "<< parameters.label >>"
               if [[ $? -eq 1 ]]; then
