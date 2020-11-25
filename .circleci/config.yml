@@ -103,12 +103,8 @@ jobs:
         name: Push image to DockerHub, if applicable.
         command: |
           if [[ -z "${DOCKER_IO_PUSH_USERNAME}" && -z "${DOCKER_IO_PUSH_PASSWORD}" ]]; then
-            if [[ "${CIRCLE_BRANCH}" == "main" || -n "${CIRCLE_TAG}" ]]; then
-              echo "DockerHub creds not found. This is unexpected if the push is to main or if a tag has been pushed."
-              exit 1
-            fi
-            echo "DockerHub creds not found, not pushing."
-            exit 0
+            echo "DockerHub creds not found. This is unexpected and hence not pushing."
+            exit 1
           fi
           docker login -u "$DOCKER_IO_PUSH_USERNAME" -p "$DOCKER_IO_PUSH_PASSWORD"
           img="stackrox/kube-linter:$(./get-tag)"
