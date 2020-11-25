@@ -47,6 +47,8 @@ jobs:
         command: |
           make build
 
+    - check-binary-version-match
+
     - run:
         name: Ensure `kube-linter version` returns the expected value.
         command: |
@@ -104,6 +106,9 @@ jobs:
         command: |
           make image
 
+    - check-binary-version-match
+    - check-image-version-match
+
     - run:
         name: Push image to DockerHub, if applicable.
         command: |
@@ -144,6 +149,28 @@ commands:
                 circleci step halt
               fi
             fi
+
+  check-binary-version-match:
+    description: Check the built binary matches with the expected version
+    steps:
+      - run:
+          name: Verifies the binary version
+          command: |
+            expected_version="$(./get-tag)"
+            version_from_binary="$(.gobin/kube-linter version)"
+            echo "Version from kube-linter binary: ${version_from_binary}. Expected version: ${expected_version}"
+            [[ "${version_from_binary}" == "${expected_version}" ]]
+  
+  check-image-version-match:
+    description: Check the built image matches with the expected version
+    steps:
+      - run:
+          name: Verifies the image version
+          command: |
+            expected_version="$(./get-tag)"
+            version_from_image="$(docker run "stackrox/kube-linter:${expected_version}" version)"
+            echo "Version from image: ${version_from_image}. Expected version: ${expected_version}"
+            [[ "${version_from_image}" == "${expected_version}" ]]
 
 workflows:
   version: 2
