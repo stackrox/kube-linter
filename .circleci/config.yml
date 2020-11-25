@@ -41,12 +41,11 @@ jobs:
     executor: custom
     steps:
     - checkout
-    - setup_remote_docker
 
     - run:
-        name: Build binaries and image
+        name: Build binaries
         command: |
-          make build image
+          make build
 
     - run:
         name: Ensure `kube-linter version` returns the expected value.
@@ -57,26 +56,6 @@ jobs:
           echo "Version from kube-linter binary: ${version_from_binary}. From image: ${version_from_image}. Expected version: ${expected_version}"
           [[ "${version_from_binary}" == "${expected_version}" ]]
           [[ "${version_from_image}" == "${expected_version}" ]]
-
-    - run:
-        name: Push image to DockerHub, if applicable.
-        command: |
-          if [[ -z "${DOCKER_IO_PUSH_USERNAME}" && -z "${DOCKER_IO_PUSH_PASSWORD}" ]]; then
-            if [[ "${CIRCLE_BRANCH}" == "main" || -n "${CIRCLE_TAG}" ]]; then
-              echo "DockerHub creds not found. This is unexpected if the push is to main or if a tag has been pushed."
-              exit 1
-            fi
-            echo "DockerHub creds not found, not pushing."
-            exit 0
-          fi
-          docker login -u "$DOCKER_IO_PUSH_USERNAME" -p "$DOCKER_IO_PUSH_PASSWORD"
-          img="stackrox/kube-linter:$(./get-tag)"
-          docker push "${img}"
-
-          if [[ -n "${CIRCLE_TAG}" ]]; then
-            docker tag "${img}" stackrox/kube-linter:latest
-            docker push stackrox/kube-linter:latest
-          fi
 
     - run:
         name: Create a GitHub release, if on tag.
@@ -111,6 +90,60 @@ jobs:
           name: Run E2E tests
           command: |
             make e2e-test
+  
+  image:
+    executor: custom
+    steps:
+    - check-label-to-run:
+        label: push-docker-image 
+    - checkout
+    - setup_remote_docker
+    
+    - run:
+        name: Build image
+        command: |
+          make image
+
+    - run:
+        name: Push image to DockerHub, if applicable.
+        command: |
+          if [[ -z "${DOCKER_IO_PUSH_USERNAME}" && -z "${DOCKER_IO_PUSH_PASSWORD}" ]]; then
+            if [[ "${CIRCLE_BRANCH}" == "main" || -n "${CIRCLE_TAG}" ]]; then
+              echo "DockerHub creds not found. This is unexpected if the push is to main or if a tag has been pushed."
+              exit 1
+            fi
+            echo "DockerHub creds not found, not pushing."
+            exit 0
+          fi
+          docker login -u "$DOCKER_IO_PUSH_USERNAME" -p "$DOCKER_IO_PUSH_PASSWORD"
+          img="stackrox/kube-linter:$(./get-tag)"
+          docker push "${img}"
+
+          if [[ -n "${CIRCLE_TAG}" ]]; then
+            docker tag "${img}" stackrox/kube-linter:latest
+            docker push stackrox/kube-linter:latest
+          fi
+
+commands:
+  check-label-to-run:
+    description: Run on master or tags, but skip on PRs unless the given label is provided
+    parameters:
+      label:
+        type: string
+    steps:
+      - run:
+          name: Determine whether to run step
+          command: |
+            set +e
+            if [[ "${CIRCLE_BRANCH}" == "master" || -n "${CIRCLE_TAG}" ]]; then
+              echo "On master or tag, running the step"
+            else
+              .circleci/pr_has_label.sh "<< parameters.label >>"
+              if [[ $? -eq 1 ]]; then
+                echo "Skipping step because we're on a PR. Apply the << parameters.label >> label to your PR if you want to run them."
+                circleci step halt
+              fi
+            fi
 
 workflows:
   version: 2
