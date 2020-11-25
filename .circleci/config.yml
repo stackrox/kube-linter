@@ -50,16 +50,6 @@ jobs:
     - check-binary-version-match
 
     - run:
-        name: Ensure `kube-linter version` returns the expected value.
-        command: |
-          expected_version="$(./get-tag)"
-          version_from_binary="$(.gobin/kube-linter version)"
-          version_from_image="$(docker run "stackrox/kube-linter:${expected_version}" version)"
-          echo "Version from kube-linter binary: ${version_from_binary}. From image: ${version_from_image}. Expected version: ${expected_version}"
-          [[ "${version_from_binary}" == "${expected_version}" ]]
-          [[ "${version_from_image}" == "${expected_version}" ]]
-
-    - run:
         name: Create a GitHub release, if on tag.
         command: |
           [[ -n "${CIRCLE_TAG}" ]] || exit 0
