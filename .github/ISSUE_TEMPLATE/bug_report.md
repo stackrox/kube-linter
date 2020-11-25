@@ -15,10 +15,6 @@ A clear and concise description of the bug.
 
 **To Reproduce**
 Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
 
 **Sample YAML input**
 If applicable, sample YAML input which reproduces the issue.
