@@ -117,7 +117,7 @@ jobs:
 
 commands:
   check-label-to-run:
-    description: Run on master or tags, but skip on PRs unless the given label is provided
+    description: Run on main or tags, but skip on PRs unless the given label is provided
     parameters:
       label:
         type: string
