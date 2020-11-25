@@ -155,8 +155,10 @@ workflows:
         <<: *runOnAllTags
     - build:
         <<: *runOnAllTags
-        context: docker-io-push
     - e2e-test:
         <<: *runOnAllTags
         requires:
           - build
+    - image:
+        <<: *runOnAllTags
+        context: docker-io-push
