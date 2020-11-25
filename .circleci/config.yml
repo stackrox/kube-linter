@@ -151,7 +151,7 @@ commands:
     description: Check the built image matches with the expected version
     steps:
       - run:
-          name: Verifies the image version
+          name: Verify the image version
           command: |
             expected_version="$(./get-tag)"
             version_from_image="$(docker run "stackrox/kube-linter:${expected_version}" version)"
