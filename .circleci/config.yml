@@ -140,7 +140,7 @@ commands:
     description: Check the built binary matches with the expected version
     steps:
       - run:
-          name: Verifies the binary version
+          name: Verify the binary version
           command: |
             expected_version="$(./get-tag)"
             version_from_binary="$(.gobin/kube-linter version)"
