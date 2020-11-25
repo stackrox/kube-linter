@@ -242,6 +242,35 @@ This page lists supported check templates.
 
 ```
 
+## Ports
+
+**Key**: `ports`
+
+**Description**: Flag containers exposing ports under protocols that match the supplied parameters
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+```
+[
+	{
+		"name": "port",
+		"type": "integer",
+		"description": "The port",
+		"required": false
+	},
+	{
+		"name": "protocol",
+		"type": "string",
+		"description": "The protocol",
+		"required": false,
+		"regexAllowed": true,
+		"negationAllowed": true
+	}
+]
+
+```
+
 ## Privileged Containers
 
 **Key**: `privileged`
