@@ -86,9 +86,9 @@ jobs:
   image:
     executor: custom
     steps:
+    - checkout
     - check-label-to-run:
         label: push-docker-image 
-    - checkout
     - setup_remote_docker
     
     - run:
