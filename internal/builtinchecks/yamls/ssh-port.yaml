@@ -4,7 +4,7 @@ remediation: "Ensure that non-SSH services are not using port 22. Ensure that an
 scope:
   objectKinds:
     - DeploymentLike
-template: "port"
+template: "ports"
 params:
   port: 22
   protocol: "TCP"

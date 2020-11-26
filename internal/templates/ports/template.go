@@ -1,4 +1,4 @@
-package port
+package ports
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"golang.stackrox.io/kube-linter/internal/diagnostic"
 	"golang.stackrox.io/kube-linter/internal/objectkinds"
 	"golang.stackrox.io/kube-linter/internal/templates"
-	"golang.stackrox.io/kube-linter/internal/templates/port/internal/params"
+	"golang.stackrox.io/kube-linter/internal/templates/ports/internal/params"
 	"golang.stackrox.io/kube-linter/internal/templates/util"
 	v1 "k8s.io/api/core/v1"
 )
