@@ -51,10 +51,12 @@ brew install kube-linter
    ```bash
    docker pull stackrox/kube-linter
    ```
-1. Add current directory with your `yaml` file as a read only volume for the
+   > [!NOTE] We recommend that you alway use the latest image unless you are
+   > testing a specific version of KubeLinter.
+1. Add path to a directory containing your `yaml` files:
    `docker run` command:
    ```bash
-   docker run -v ${PWD}:/tmp:ro --rm -i stackrox/kube-linter lint /tmp/pod.yaml
+   docker run -v /path/to/files/you/want/to/lint:/dir -v /path/to/config.yaml:/etc/config.yaml stackrox/kube-linter lint /dir --config /etc/config.yaml
    ```
 
 ## Building from source
@@ -71,11 +73,15 @@ To build KubeLinter from source:
    ```bash
    make build
    ```
-   This command compiles the source code and creates `kube-linter` binary files
-   for each platform in the `.gobin` folder.
+   This command compiles the source code and creates a `kube-linter` binary file
+   for your platform in the `.gobin` folder.
 1. Verify that the compiled binary is working:
    ```bash
    .gobin/kube-linter version
+   ```
+1. (Optional) Add the generated binary to you path:
+   ```bash
+   export PATH='"${PATH}:'"$(pwd)/.gobin"'"'
    ```
 
 ## Usage
@@ -133,9 +139,9 @@ To build KubeLinter from source:
    ```
    pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" does not have a read-only root file system (check: no-read-only-root-fs, remediation: Set readOnlyRootFilesystem to true in your container's securityContext.)
 
-   pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container    "sec-ctx-demo" has cpu limit 0 (check: unset-cpu-requirements, remediation: Set    your container's CPU requests and limits depending on its requirements. See    https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/   #requests-and-limits for more details.)
+   pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" has cpu limit 0 (check: unset-cpu-requirements, remediation: Set your container's CPU requests and limits depending on its requirements. See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for more details.)
    
-   pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container    "sec-ctx-demo" has memory limit 0 (check: unset-memory-requirements, remediation:    Set your container's memory requests and limits depending on its requirements.    See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/   #requests-and-limits for more details.)
+   pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" has memory limit 0 (check: unset-memory-requirements, remediation: Set your container's memory requests and limits depending on its requirements.    See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for more details.)
    
    Error: found 3 lint errors
    ```
@@ -173,12 +179,12 @@ chart:
 
 
 For more details about using and configuring KubeLinter, see the
-[Using KubeLinter](/using-kubelinter) topic.
+[Using KubeLinter](using-kubelinter) topic.
 
 # Community
 
 To engage with the KubeLinter community, including maintainers and other
-  users, join [KubeLinter on Slack](https://kube-linter.slack.com/join/shared_invite/zt-icv44kde-gfpmAtrT6toeqYYd7JOVTA#/).
+  users, join [KubeLinter on Slack <span class="iconify" data-icon="logos:slack-icon"></span>](https://kube-linter.slack.com/join/shared_invite/zt-icv44kde-gfpmAtrT6toeqYYd7JOVTA#/).
 
 To contribute, see the [contributing guide](https://github.com/stackrox/kube-linter/blob/main/CONTRIBUTING.md).
 
@@ -187,4 +193,4 @@ To contribute, see the [contributing guide](https://github.com/stackrox/kube-lin
 
 # License 
 
-KubeLinter is licensed under the [Apache License 2.0](./LICENSE).
+KubeLinter is licensed under the [Apache License 2.0](https://github.com/stackrox/kube-linter/blob/main/LICENSE).

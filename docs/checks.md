@@ -2,8 +2,6 @@
 
 KubeLinte includes the following built-in checks:
 
-The following table enumerates built-in checks:
-
 | Name | Enabled by default | Description | Remediation | Template | Parameters |
 | ---- | ------------------ | ----------- | ----------- | -------- | ---------- |
 | dangling-service | Yes | Alert on services that don't have any matching deployments | Make sure your service's selector correctly matches the labels on one of your deployments. | dangling-service | `{}` |
