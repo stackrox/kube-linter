@@ -1,4 +1,6 @@
-The following table enumerates built-in checks:
+# KubeLinter checks
+
+KubeLinter includes the following built-in checks:
 
 | Name | Enabled by default | Description | Remediation | Template | Parameters |
 | ---- | ------------------ | ----------- | ----------- | -------- | ---------- |

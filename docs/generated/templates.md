@@ -1,4 +1,6 @@
-This page lists supported check templates.
+# KubeLinter templates
+	
+KubeLinter supports the following templates:
 
 ## Anti affinity not specified
 
