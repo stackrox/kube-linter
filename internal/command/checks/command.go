@@ -36,7 +36,9 @@ func renderPlain(checks []check.Check, out io.Writer) error { //nolint:unparam /
 }
 
 const (
-	markDownTemplateStr = `The following table enumerates built-in checks:
+	markDownTemplateStr = `# KubeLinter checks
+
+KubeLinter includes the following built-in checks:
 
 | Name | Enabled by default | Description | Remediation | Template | Parameters |
 | ---- | ------------------ | ----------- | ----------- | -------- | ---------- |
