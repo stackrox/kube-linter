@@ -7,7 +7,7 @@ import (
 // ObjectMetadata is metadata about an object.
 type ObjectMetadata struct {
 	FilePath string
-	Raw      []byte
+	Raw      []byte `json:"-"`
 }
 
 // An Object references an object that is loaded from a YAML file.

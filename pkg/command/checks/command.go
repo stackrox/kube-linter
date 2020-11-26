@@ -64,7 +64,7 @@ func renderMarkdown(checks []check.Check, out io.Writer) error {
 }
 
 func listCommand() *cobra.Command {
-	format := common.FormatWrapper{Format: common.PlainFormat}
+	format := common.FormatValueFactory(common.PlainFormat)
 	c := &cobra.Command{
 		Use:   "list",
 		Short: "List built-in checks",
@@ -77,14 +77,14 @@ func listCommand() *cobra.Command {
 			sort.Slice(checks, func(i, j int) bool {
 				return checks[i].Name < checks[j].Name
 			})
-			renderFunc := formatsToRenderFuncs[format.Format]
+			renderFunc := formatsToRenderFuncs[format.String()]
 			if renderFunc == nil {
-				return errors.Errorf("unknown format: %q", format.Format)
+				return errors.Errorf("unknown format: %q", format.String())
 			}
 			return renderFunc(checks, os.Stdout)
 		},
 	}
-	c.Flags().Var(&format, "format", "output format")
+	c.Flags().Var(format, "format", format.Usage())
 	return c
 }
 
