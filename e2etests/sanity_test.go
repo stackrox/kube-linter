@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,6 +16,10 @@ import (
 
 const (
 	kubeLinterBinEnv = "KUBE_LINTER_BIN"
+)
+
+var (
+	expectedOutRegex = regexp.MustCompile(`found \d+ lint errors`)
 )
 
 func TestKubeLinterWithBuiltInChecksDoesntCrashOnHelmChartsRepo(t *testing.T) {
@@ -35,10 +40,12 @@ func TestKubeLinterWithBuiltInChecksDoesntCrashOnHelmChartsRepo(t *testing.T) {
 	gitCloneOut, err := exec.Command("git", "clone", "git@github.com:helm/charts.git", chartsDir).CombinedOutput()
 	require.NoError(t, err, "Git clone failed. output: %s", string(gitCloneOut))
 
-	kubeLinterOut, err := exec.Command(kubeLinterBin, "lint", chartsDir, "--config", "testdata/all-built-in-config.yaml").CombinedOutput()
+	kubeLinterOut, err := exec.Command(kubeLinterBin, "lint", "../temp_test_yamls", "--config", "testdata/all-built-in-config.yaml").CombinedOutput()
 	// Something will fail for sure, so kube-linter will not return a success code.
 	require.Error(t, err)
 	exitErr, ok := err.(*exec.ExitError)
 	require.True(t, ok)
-	assert.Equal(t, 1, exitErr.ExitCode(), "unexpected exit code: %d; output from kube-linter: %v", exitErr.ExitCode(), string(kubeLinterOut))
+	outAsStr := string(kubeLinterOut)
+	assert.Equal(t, 1, exitErr.ExitCode(), "unexpected exit code: %d; output from kube-linter: %v", exitErr.ExitCode(), outAsStr)
+	assert.True(t, expectedOutRegex.MatchString(outAsStr))
 }
