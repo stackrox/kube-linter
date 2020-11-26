@@ -47,5 +47,5 @@ func TestKubeLinterWithBuiltInChecksDoesntCrashOnHelmChartsRepo(t *testing.T) {
 	require.True(t, ok)
 	outAsStr := string(kubeLinterOut)
 	assert.Equal(t, 1, exitErr.ExitCode(), "unexpected exit code: %d; output from kube-linter: %v", exitErr.ExitCode(), outAsStr)
-	assert.True(t, expectedOutRegex.MatchString(outAsStr))
+	assert.True(t, expectedOutRegex.MatchString(outAsStr), outAsStr)
 }
