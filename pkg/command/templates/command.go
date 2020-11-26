@@ -92,7 +92,7 @@ func renderPlain(templates []check.Template, out io.Writer) error { //nolint:unp
 		if len(template.Parameters) == 0 {
 			fmt.Fprintln(out, "Parameters: none")
 		} else {
-			fmt.Fprintf(out, "Parameters:\n")
+			fmt.Fprint(out, "Parameters:\n")
 			renderParameters(1, template.Parameters, out)
 		}
 		if i != len(templates)-1 {
@@ -107,21 +107,21 @@ func renderMarkdown(templates []check.Template, out io.Writer) error {
 }
 
 func listCommand() *cobra.Command {
-	format := common.FormatWrapper{Format: common.PlainFormat}
+	format := common.FormatValueFactory(common.PlainFormat)
 	c := &cobra.Command{
 		Use:   "list",
 		Short: "List check templates",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			knownTemplates := templates.List()
-			renderFunc := formatsToRenderFuncs[format.Format]
+			renderFunc := formatsToRenderFuncs[format.String()]
 			if renderFunc == nil {
-				return errors.Errorf("unknown format: %q", format.Format)
+				return errors.Errorf("unknown format: %q", format.String())
 			}
 			return renderFunc(knownTemplates, os.Stdout)
 		},
 	}
-	c.Flags().Var(&format, "format", "output format")
+	c.Flags().Var(format, "format", format.Usage())
 	return c
 }
 

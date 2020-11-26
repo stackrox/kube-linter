@@ -13,5 +13,5 @@ func TestAllFormatsSupported(t *testing.T) {
 	for format := range formatsToRenderFuncs {
 		supportedFormats.Add(format)
 	}
-	assert.ElementsMatch(t, supportedFormats.AsSlice(), common.AllSupportedFormats.AsSlice())
+	assert.ElementsMatch(t, supportedFormats.AsSlice(), common.AllSupportedFormats)
 }

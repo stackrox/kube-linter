@@ -1,6 +1,7 @@
 package lint
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -21,6 +22,7 @@ import (
 func Command() *cobra.Command {
 	var configPath string
 	var verbose bool
+	format := formatValueFactory(plainOutputFormat)
 
 	v := viper.New()
 
@@ -77,17 +79,25 @@ func Command() *cobra.Command {
 			if err != nil {
 				return err
 			}
+
+			switch format.String() {
+			case jsonOutputFormat:
+				if err := json.NewEncoder(os.Stdout).Encode(result); err != nil {
+					return errors.Wrap(err, "json encoding failed")
+				}
+			case plainOutputFormat:
+				stderrIsTerminal := terminal.IsTerminal(int(os.Stdout.Fd()))
+				for _, report := range result.Reports {
+					if stderrIsTerminal {
+						report.FormatToTerminal(os.Stdout)
+					} else {
+						report.FormatPlain(os.Stdout)
+					}
+				}
+			}
 			if len(result.Reports) == 0 {
 				fmt.Fprintln(os.Stderr, "No lint errors found!")
 				return nil
-			}
-			stderrIsTerminal := terminal.IsTerminal(int(os.Stderr.Fd()))
-			for _, report := range result.Reports {
-				if stderrIsTerminal {
-					report.FormatToTerminal(os.Stderr)
-				} else {
-					report.FormatPlain(os.Stderr)
-				}
 			}
 			return errors.Errorf("found %d lint errors", len(result.Reports))
 		},
@@ -95,6 +105,7 @@ func Command() *cobra.Command {
 
 	c.Flags().StringVar(&configPath, "config", "", "Path to config file")
 	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
+	c.Flags().VarP(format, "output-format", "o", format.Usage())
 
 	config.AddFlags(c, v)
 	return c
