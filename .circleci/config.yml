@@ -134,6 +134,7 @@ commands:
                 echo "Skipping step because we're on a PR. Apply the << parameters.label >> label to your PR if you want to run them."
                 circleci step halt
               fi
+              [[ $? -eq 0 ]]
             fi
 
   check-binary-version-match:
