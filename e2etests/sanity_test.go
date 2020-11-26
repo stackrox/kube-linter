@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,6 +16,10 @@ import (
 
 const (
 	kubeLinterBinEnv = "KUBE_LINTER_BIN"
+)
+
+var (
+	expectedOutRegex = regexp.MustCompile(`found \d+ lint errors`)
 )
 
 func TestKubeLinterWithBuiltInChecksDoesntCrashOnHelmChartsRepo(t *testing.T) {
@@ -40,5 +45,7 @@ func TestKubeLinterWithBuiltInChecksDoesntCrashOnHelmChartsRepo(t *testing.T) {
 	require.Error(t, err)
 	exitErr, ok := err.(*exec.ExitError)
 	require.True(t, ok)
-	assert.Equal(t, 1, exitErr.ExitCode(), "unexpected exit code: %d; output from kube-linter: %v", exitErr.ExitCode(), string(kubeLinterOut))
+	outAsStr := string(kubeLinterOut)
+	assert.Equal(t, 1, exitErr.ExitCode(), "unexpected exit code: %d; output from kube-linter: %v", exitErr.ExitCode(), outAsStr)
+	assert.True(t, expectedOutRegex.MatchString(outAsStr), "unexpected output: %s", outAsStr)
 }
