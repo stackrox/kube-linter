@@ -51,11 +51,11 @@ brew install kube-linter
    ```bash
    docker pull stackrox/kube-linter:0.1.4
    ```
-   > [!NOTE] You should avoid using the `:latest` tag as it is harder to track
-   > which version of the image is running and more difficult to roll back
-   > properly. See the
-   > [Releases](https://github.com/stackrox/kube-linter/releases) page to view
-   > availble tags.
+   > [!NOTE] While we provide the `:latest` tag for convenience and ease of experimentation,
+   > we recommend using a tag corresponding to a specific release
+   > when incorporating KubeLinter into your workflows to avoid unexpected breakages.
+   > See the [Releases](https://github.com/stackrox/kube-linter/releases) page to view
+   > available tags.
 1. Add path to a directory containing your `yaml` files:
    `docker run` command:
    ```bash
@@ -82,8 +82,8 @@ To build KubeLinter from source:
    ```bash
    .gobin/kube-linter version
    ```
-1. (Optional) Add the generated binary to you path. Run the following commad and
-   add the outupt to your shell profile (`~/.bash_profile`,
+1. (Optional) Add the generated binary to your path. Run the following command and
+   add the output to your shell profile (`~/.bash_profile`,
    `~/.bashrc` or `~/.zshenv`):
    ```bash
    echo export PATH='"${PATH}:'"$(pwd)/.gobin"'"'

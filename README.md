@@ -12,7 +12,7 @@ KubeLinter is configurable, so you can enable and disable checks, as well as cre
 When a lint check fails, KubeLinter reports recommendations for how to resolve any potential issues and returns a non-zero exit code.
 
 ## Documentation
-Visit docs.kubelinter.io
+Visit https://docs.kubelinter.io
 
 ## Installing KubeLinter
 
