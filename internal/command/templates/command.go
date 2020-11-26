@@ -27,7 +27,9 @@ var (
 )
 
 const (
-	markDownTemplateStr = `This page lists supported check templates.
+	markDownTemplateStr = `# KubeLinter templates
+	
+KubeLinter supports the following templates:
 
 {{ range . -}}
 ## {{ .HumanName }}
