@@ -184,7 +184,7 @@ chart:
 
 
 For more details about using and configuring KubeLinter, see the
-[Using KubeLinter](using-kubelinter) topic.
+[Using KubeLinter](using-kubelinter.md) topic.
 
 # Community
 
