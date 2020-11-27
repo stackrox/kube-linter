@@ -13,7 +13,7 @@ The configuration file has two sections:
 1. `customChecks` for configuring custom checks, and
 2. `checks` for configuring default checks.
 
-To view a list of all built-in checks, see [KubeLinter checks](checks.md).
+To view a list of all built-in checks, see [KubeLinter checks](generated/checks.md).
 
 ## Disable all default checks
 
