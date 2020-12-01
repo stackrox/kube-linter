@@ -17,10 +17,9 @@ usage() {
 expected_label=$1
 [ -n "${expected_label}" ] || usage
 
-[ -n "${GITHUB_TOKEN}" ] || { echo "No GitHub token found"; exit 2; }
 [ -n "${CIRCLE_PROJECT_USERNAME}" ] || { echo "CIRCLE_PROJECT_USERNAME not found" ; exit 2; }
 [ -n "${CIRCLE_PROJECT_REPONAME}" ] || { echo "CIRCLE_PROJECT_REPONAME not found" ; exit 2; }
 
 pull_request_number="${CIRCLE_PULL_REQUEST##*/}"
 url="https://api.github.com/repos/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/pulls/${pull_request_number}"
-curl -sS -H "Authorization: token ${GITHUB_TOKEN}" "${url}" | jq '([.labels | .[].name]  // []) | .[]' -r | grep -qx "${expected_label}"
+curl -sS "${url}" | jq '([.labels | .[].name]  // []) | .[]' -r | grep -qx "${expected_label}"
