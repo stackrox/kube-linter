@@ -62,6 +62,22 @@ brew install kube-linter
    docker run -v /path/to/files/you/want/to/lint:/dir -v /path/to/config.yaml:/etc/config.yaml stackrox/kube-linter lint /dir --config /etc/config.yaml
    ```
 
+## Using a GitHub Action
+
+You can use KubeLinter from a GitHub Action by using `stackrox/kube-linter-action@v0.0.2`:
+
+```
+      - name: Scan yamls
+        id: kube-lint-scan
+        uses: stackrox/kube-linter-action@v0.0.2
+        with:
+          directory: yamls
+          config: .kube-linter/config.yaml
+```
+
+* `directory` is mandatory -- this is the directory of deployment files to scan.  
+* `config` is optional -- this is the path to a [configuration file](https://github.com/stackrox/kube-linter/blob/main/config.yaml.example) if you wish to use a non-default configuration.
+
 ## Building from source
 
 > [!NOTE] Before you build, make sure that you have [installed Go](https://golang.org/doc/install).
