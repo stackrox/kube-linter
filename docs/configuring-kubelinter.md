@@ -44,19 +44,19 @@ example,
   use `doNotAutoAddDefaults` along with `include`.
   ```yaml
   checks:
-  doNotAutoAddDefaults: true
-  include:
-  - "privileged-container"
-  - "run-as-non-root"
+    doNotAutoAddDefaults: true
+    include:
+    - "privileged-container"
+    - "run-as-non-root"
   ```
 - To run majority of checks and only exclude few specific checks,
   use `addAllBuiltIn` along with `exclude`.
   ```yaml
   checks:
-  addAllBuiltIn: true
-  exclude:
-  - "unset-cpu-requirements"
-  - "unset-memory-requirements"
+    addAllBuiltIn: true
+    exclude:
+    - "unset-cpu-requirements"
+    - "unset-memory-requirements"
   ```
 
 > [!TIP]
