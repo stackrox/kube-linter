@@ -135,9 +135,9 @@ To learn more about using and configuring KubeLinter, visit the [documentation](
 
 If you would like to engage with the KubeLinter community, including maintainers and other users, you can join the Slack workspace [here](https://join.slack.com/t/kube-linter/shared_invite/zt-icv44kde-gfpmAtrT6toeqYYd7JOVTA).
 
-To contribute, check out our [contributing guide](./CONTRIBUTING.MD).
+To contribute, check out our [contributing guide](./CONTRIBUTING.md).
 
-As a reminder, all participation in the KubeLinter community is governed by our [code of conduct](./CODE_OF_CONDUCT.MD).
+As a reminder, all participation in the KubeLinter community is governed by our [code of conduct](./CODE_OF_CONDUCT.md).
 
 ## WARNING: Alpha release
 
