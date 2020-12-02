@@ -62,7 +62,7 @@ brew install kube-linter
    docker run -v /path/to/files/you/want/to/lint:/dir -v /path/to/config.yaml:/etc/config.yaml stackrox/kube-linter lint /dir --config /etc/config.yaml
    ```
 
-## Using a GitHub Action
+### Using a GitHub Action
 
 You can use KubeLinter from a GitHub Action by using `stackrox/kube-linter-action@v0.0.2`:
 
