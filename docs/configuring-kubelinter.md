@@ -65,7 +65,7 @@ example,
 
 ## Run custom checks
 
-You can write custom checks based on existing [templates](generated/templates.md). All `params` can be taken from the respective templates.
+You can write custom checks based on existing [templates](generated/templates.md). Every template description includes details about the parameters (`params`) you can use along with that template.
 
 For example,
 - To make sure that an annotation exists, you can use the [`required-annotation`](generated/templates?id=required-annotation) template:
