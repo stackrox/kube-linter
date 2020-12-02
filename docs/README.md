@@ -64,12 +64,12 @@ brew install kube-linter
 
 ### Using a GitHub Action
 
-You can use KubeLinter from a GitHub Action by using `stackrox/kube-linter-action@v0.0.2`:
+You can use KubeLinter from a GitHub Action by using `stackrox/kube-linter-action@v1`:
 
 ```
       - name: Scan yamls
         id: kube-lint-scan
-        uses: stackrox/kube-linter-action@v0.0.2
+        uses: stackrox/kube-linter-action@v1
         with:
           directory: yamls
           config: .kube-linter/config.yaml
