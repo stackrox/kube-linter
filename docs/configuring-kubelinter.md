@@ -31,15 +31,15 @@ checks:
   addAllBuiltIn: true
 ```
 
-> [!NOTE] 
-> 
+> [!NOTE]
+>
 > - If you set both `doNotAutoAddDefaults` and `addAllBuiltIn` to `true`,
 >   `addAllBuiltIn` takes precedence.
 
 ## Run specific checks
 
 You can use the `include` and `exclue` keys to run only specific checks. For
-example, 
+example,
 - To disable majority of checks and only run few specific checks,
   use `doNotAutoAddDefaults` along with `include`.
   ```yaml
@@ -62,3 +62,55 @@ example,
 > [!TIP]
 > `exclude` always takes precedence, if you include and exclude the same check,
 > KubeLinter always skips the check.
+
+## Run custom checks
+
+You can write custom checks based on existing [templates](generated/templates.md). Every template description includes details about the parameters (`params`) you can use along with that template.
+
+For example,
+- To make sure that an annotation exists, you can use the [`required-annotation`](generated/templates?id=required-annotation) template:
+  ```yaml
+  customChecks:
+    - name: required-annotation-responsible
+      template: required-annotation
+      params:
+        key: company.io/responsible
+  ```
+
+- To make sure that a specific label exists, you can use the [`required-label`](generated/templates?id=required-label) template:
+  ```yaml
+  customChecks:
+    - name: required-label-release
+      template: required-label
+      params:
+        key: company.io/release
+  ```
+
+### Extend custom checks
+
+With custom checks, you can control the checks to run only on specific Kubernetes object types (such as services or deployments). You can also modify the remediation message you get when your custom check fails.
+
+For example,
+- To make sure that a specific annotation exists on all deployments, you can use the [`required-label`](generated/templates?id=required-label) template and specify a `scope`
+  ```yaml
+  customChecks:
+    - name: required-annotation-responsible
+      template: required-annotation
+      params:
+        key: company.io/responsible
+      scope:
+        objectKinds:
+          - DeploymentLike
+  ```
+
+  For details about `objectKinds` that KubeLinter support, see https://github.com/stackrox/kube-linter/tree/main/internal/objectkinds
+
+- Use `remediation` to include a remediation message that users get when your custom check fails:
+  ```yaml
+  customChecks:
+    - name: required-annotation-responsible
+      template: required-annotation
+      params:
+        key: company.io/responsible
+      remediation: Please set the annotation 'company.io/responsible'. This will be parsed by xy to generate some docs.
+  ```
