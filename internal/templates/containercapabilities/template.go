@@ -14,69 +14,55 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-type capabilityCheckFunc func(capMatcher func(string) bool, scCap v1.Capability) bool
-
-// Takes in a user provided checkFunc to determine if this function should return or not.
-//   - If checkFunc returns false, this function returns immediately with value false
-//   - If checkFunc returns true, this function keeps on looping until it hits a false,
-//     or it finishes traversing all capabilities and returns true to indicate check has passed
-func checkCapabilities(caps []string, scCaps []v1.Capability, checkFunc capabilityCheckFunc) (bool, error) {
-	for _, cap := range caps {
-		capMatcher, err := matcher.ForString(cap)
+func checkForbiddenAdds(containerName string, paramCaps []string, scCaps []v1.Capability) (*diagnostic.Diagnostic, error) {
+	for _, forbiddenCap := range paramCaps {
+		forbiddenCapMatcher, err := matcher.ForString(forbiddenCap)
 		if err != nil {
-			return false, errors.Wrapf(err, "invalid capability: %s", cap)
+			return nil, err
 		}
 		for _, scCap := range scCaps {
-			if !checkFunc(capMatcher, scCap) {
-				return false, nil
+			if forbiddenCapMatcher(string(scCap)) {
+				// If any scCap exist in paramCaps, flag the container
+				return &diagnostic.Diagnostic{
+					Message: fmt.Sprintf("container %q has ADD capabilities: %q, which violates"+
+						" the forbidden ADD capabilities for containers: %q",
+						containerName,
+						scCaps,
+						paramCaps),
+				}, nil
 			}
 		}
 	}
-	// Traversed through all of caps, return true to indicate check has passed
-	return true, nil
-}
 
-func checkForbiddenAdds(containerName string, paramCaps []string, scCaps []v1.Capability) (*diagnostic.Diagnostic, error) {
-	passed, err :=
-		checkCapabilities(paramCaps, scCaps, func(capMatcher func(string) bool, scCap v1.Capability) bool {
-			// If any matches, then the check should fail
-			//Otherwise keep checking
-			return !capMatcher(string(scCap))
-		})
-	if err != nil {
-		return nil, err
-	}
-	if !passed {
-		return &diagnostic.Diagnostic{
-			Message: fmt.Sprintf("container %q has ADD capabilities: %q, which violates"+
-				" the forbidden ADD capabilities for containers: %q",
-				containerName,
-				scCaps,
-				paramCaps),
-		}, nil
-	}
 	return nil, nil
 }
 
 func checkRequiredDrops(containerName string, paramCaps []string, scCaps []v1.Capability) (*diagnostic.Diagnostic, error) {
-	passed, err :=
-		checkCapabilities(paramCaps, scCaps, func(capMatcher func(string) bool, scCap v1.Capability) bool {
-			// If any mismatches, then the check should fail
-			// Otherwise keep checking
-			return capMatcher(string(scCap))
-		})
-	if err != nil {
-		return nil, err
+	for _, requiredCap := range paramCaps {
+		requiredCapMatcher, err := matcher.ForString(requiredCap)
+		if err != nil {
+			return nil, err
+		}
+		found := false
+		for _, scCap := range scCaps {
+			if requiredCapMatcher(string(scCap)) {
+				// Found this required cap, go check the next one
+				found = true
+				break
+			}
+		}
+		if !found {
+			// If any required drops do not exist in scCaps, flag the container
+			return &diagnostic.Diagnostic{
+				Message: fmt.Sprintf("container %q has DROP capabilities: %q, which does not "+
+					"satisfy the required DROP capabilities for containers: %q",
+					containerName,
+					scCaps,
+					paramCaps),
+			}, nil
+		}
 	}
-	if !passed {
-		return &diagnostic.Diagnostic{
-			Message: fmt.Sprintf("container %q has DROP capabilities: %q, which does not "+
-				"satisfy the required DROP capabilities for containers: %q",
-				containerName,
-				scCaps,
-				paramCaps),
-		}, nil
-	}
+
 	return nil, nil
 }
 
