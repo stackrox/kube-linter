@@ -414,6 +414,37 @@ KubeLinter supports the following templates:
 
 ```
 
+## Verify container capabilities
+
+**Key**: `verify-container-capabilities`
+
+**Description**: Flag containers that do not match capabilities requirements
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+```
+[
+	{
+		"name": "requiredDrops",
+		"type": "string",
+		"description": "Comma (ex: \"NET_ADMIN,SYS_TIME\") separated list of capabilities that are required to be dropped by containers.",
+		"required": false,
+		"regexAllowed": true,
+		"negationAllowed": true
+	},
+	{
+		"name": "forbiddenAdds",
+		"type": "string",
+		"description": "Comma (ex: \"NET_ADMIN,SYS_TIME\") separated list of capabilities that are forbidden to be added to containers.",
+		"required": false,
+		"regexAllowed": true,
+		"negationAllowed": true
+	}
+]
+
+```
+
 ## Writable Host Mounts
 
 **Key**: `writable-host-mount`

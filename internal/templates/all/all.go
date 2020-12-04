@@ -3,6 +3,7 @@ package all
 import (
 	// Import all check templates.
 	_ "golang.stackrox.io/kube-linter/internal/templates/antiaffinity"
+	_ "golang.stackrox.io/kube-linter/internal/templates/containercapabilities"
 	_ "golang.stackrox.io/kube-linter/internal/templates/cpurequirements"
 	_ "golang.stackrox.io/kube-linter/internal/templates/danglingservice"
 	_ "golang.stackrox.io/kube-linter/internal/templates/deprecatedserviceaccount"
