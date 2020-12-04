@@ -19,14 +19,14 @@ var (
 
 	requiredDropsParamDesc = util.MustParseParameterDesc(`{
 	"Name": "requiredDrops",
-	"Type": "string",
-	"Description": "Comma (ex: \"NET_ADMIN,SYS_TIME\") separated list of capabilities that are required to be dropped by containers.",
+	"Type": "array",
+	"Description": "List of capabilities that are required to be dropped by containers.",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
 	"Required": false,
-	"NoRegex": false,
-	"NotNegatable": false,
+	"NoRegex": true,
+	"NotNegatable": true,
 	"XXXStructFieldName": "RequiredDrops",
 	"XXXIsPointer": false
 }
@@ -34,14 +34,14 @@ var (
 
 	forbiddenAddsParamDesc = util.MustParseParameterDesc(`{
 	"Name": "forbiddenAdds",
-	"Type": "string",
-	"Description": "Comma (ex: \"NET_ADMIN,SYS_TIME\") separated list of capabilities that are forbidden to be added to containers.",
+	"Type": "array",
+	"Description": "List of capabilities that are forbidden to be added to containers.",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
 	"Required": false,
-	"NoRegex": false,
-	"NotNegatable": false,
+	"NoRegex": true,
+	"NotNegatable": true,
 	"XXXStructFieldName": "ForbiddenAdds",
 	"XXXIsPointer": false
 }
@@ -57,7 +57,7 @@ func (p *Params) Validate() error {
 	var validationErrors []string
 	if len(validationErrors) > 0 {
 		return errors.Errorf("invalid parameters: %s", strings.Join(validationErrors, ", "))
-	}
+    }
 	return nil
 }
 
@@ -77,7 +77,7 @@ func ParseAndValidate(m map[string]interface{}) (interface{}, error) {
 
 // WrapInstantiateFunc is a convenience wrapper that wraps an untyped instantiate function
 // into a typed one.
-func WrapInstantiateFunc(f func(p Params) (check.Func, error)) func(interface{}) (check.Func, error) {
+func WrapInstantiateFunc(f func(p Params) (check.Func, error)) func (interface{}) (check.Func, error) {
 	return func(paramsInt interface{}) (check.Func, error) {
 		return f(paramsInt.(Params))
 	}

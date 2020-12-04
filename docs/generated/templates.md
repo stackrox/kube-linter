@@ -427,19 +427,15 @@ KubeLinter supports the following templates:
 [
 	{
 		"name": "requiredDrops",
-		"type": "string",
-		"description": "Comma (ex: \"NET_ADMIN,SYS_TIME\") separated list of capabilities that are required to be dropped by containers.",
-		"required": false,
-		"regexAllowed": true,
-		"negationAllowed": true
+		"type": "array",
+		"description": "List of capabilities that are required to be dropped by containers.",
+		"required": false
 	},
 	{
 		"name": "forbiddenAdds",
-		"type": "string",
-		"description": "Comma (ex: \"NET_ADMIN,SYS_TIME\") separated list of capabilities that are forbidden to be added to containers.",
-		"required": false,
-		"regexAllowed": true,
-		"negationAllowed": true
+		"type": "array",
+		"description": "List of capabilities that are forbidden to be added to containers.",
+		"required": false
 	}
 ]
 
