@@ -2,7 +2,6 @@ package containercapabilities
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/check"
@@ -14,8 +13,6 @@ import (
 	"golang.stackrox.io/kube-linter/internal/templates/util"
 	v1 "k8s.io/api/core/v1"
 )
-
-const containerCapabilitiesDelim = ","
 
 type capabilityCheckFunc func(capMatcher func(string) bool, scCap v1.Capability) bool
 
@@ -94,15 +91,13 @@ func init() {
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,
 		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
-			allForbiddenAdds := strings.Split(p.ForbiddenAdds, containerCapabilitiesDelim)
-			allRequiredDrops := strings.Split(p.RequiredDrops, containerCapabilitiesDelim)
 			var returnedErr error
 			return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
 				// 2 = 1 for forbiddenAdds + 1 for allRequiredDrops
 				result := make([]diagnostic.Diagnostic, 0, 2)
 				sc := container.SecurityContext
 				if sc != nil && sc.Capabilities != nil {
-					diagnostic, err := checkForbiddenAdds(container.Name, allForbiddenAdds, sc.Capabilities.Add)
+					diagnostic, err := checkForbiddenAdds(container.Name, p.ForbiddenAdds, sc.Capabilities.Add)
 					if err != nil {
 						returnedErr = errors.Wrap(err, "checking forbidden ADD capabilities")
 						return nil
@@ -110,7 +105,7 @@ func init() {
 					if diagnostic != nil {
 						result = append(result, *diagnostic)
 					}
-					diagnostic, err = checkRequiredDrops(container.Name, allRequiredDrops, sc.Capabilities.Drop)
+					diagnostic, err = checkRequiredDrops(container.Name, p.RequiredDrops, sc.Capabilities.Drop)
 					if err != nil {
 						returnedErr = errors.Wrap(err, "checking required DROP capabilities")
 						return nil
