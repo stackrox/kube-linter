@@ -62,22 +62,23 @@ brew install kube-linter
    docker run -v /path/to/files/you/want/to/lint:/dir -v /path/to/config.yaml:/etc/config.yaml stackrox/kube-linter lint /dir --config /etc/config.yaml
    ```
 
-### Using a GitHub Action
+### KubeLinter Github Action
 
-You can use KubeLinter from a GitHub Action by using `stackrox/kube-linter-action@v1`:
-
+You can also run KubeLinter as a GitHub Action. To use the KubeLinter Github Action, create a `kubelint.yml` file (or choose custom `*.yml` file name) in the `.github/workflows/` directory and use `stackrox/kube-linter-action@v1`.
+```yaml
+- name: Scan yamls
+  id: kube-lint-scan
+  uses: stackrox/kube-linter-action@v1
+  with:
+    directory: yamls
+    config: .kube-linter/config.yaml
 ```
-      - name: Scan yamls
-        id: kube-lint-scan
-        uses: stackrox/kube-linter-action@v1
-        with:
-          directory: yamls
-          config: .kube-linter/config.yaml
-```
+The KubeLinter Github Action accepts the following inputs:
 
-* `directory` is mandatory -- this is the directory of deployment files to scan.  
-* `config` is optional -- this is the path to a [configuration file](https://github.com/stackrox/kube-linter/blob/main/config.yaml.example) if you wish to use a non-default configuration.
-
+|Parameter|Description|
+|:--|:--|
+|`directory`|(Mandatory) A directory path that contains the Kubernetes YAML files or `Chart.yaml` file.|
+|`config`|(Optional) A path to your custom [KubeLinter configuration file](configuring-kubelinter.md).
 ## Building from source
 
 > [!NOTE] Before you build, make sure that you have [installed Go](https://golang.org/doc/install).
