@@ -41,7 +41,7 @@ func (p *Params) Validate() error {
 	var validationErrors []string
 	if len(validationErrors) > 0 {
 		return errors.Errorf("invalid parameters: %s", strings.Join(validationErrors, ", "))
-    }
+	}
 	return nil
 }
 
@@ -61,7 +61,7 @@ func ParseAndValidate(m map[string]interface{}) (interface{}, error) {
 
 // WrapInstantiateFunc is a convenience wrapper that wraps an untyped instantiate function
 // into a typed one.
-func WrapInstantiateFunc(f func(p Params) (check.Func, error)) func (interface{}) (check.Func, error) {
+func WrapInstantiateFunc(f func(p Params) (check.Func, error)) func(interface{}) (check.Func, error) {
 	return func(paramsInt interface{}) (check.Func, error) {
 		return f(paramsInt.(Params))
 	}
