@@ -205,6 +205,8 @@ func constructParameterDescsFromStruct(typeSpec *types.Type) ([]check.ParameterD
 			default:
 				return nil, errors.Errorf("currently unsupported type %v", member.Type)
 			}
+		case types.Slice:
+			desc.Type = check.ArrayType
 		case types.Struct:
 			desc.Type = check.ObjectType
 			subParams, err := constructParameterDescsFromStruct(member.Type)

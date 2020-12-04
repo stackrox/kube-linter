@@ -15,6 +15,7 @@ const (
 	BooleanType ParameterType = "boolean"
 	NumberType  ParameterType = "number"
 	ObjectType  ParameterType = "object"
+	ArrayType   ParameterType = "array"
 )
 
 // ParameterDesc describes a parameter.
