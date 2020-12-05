@@ -67,7 +67,7 @@ type HumanReadableParamDesc struct {
 	RegexAllowed    *bool                    `json:"regexAllowed,omitempty"`
 	NegationAllowed *bool                    `json:"negationAllowed,omitempty"`
 	SubParameters   []HumanReadableParamDesc `json:"subParameters,omitempty"`
-	ArrayElemType   ParameterType            `json:arrayElemType,omitempty`
+	ArrayElemType   ParameterType            `json:"arrayElemType,omitempty"`
 }
 
 // HumanReadableFields returns a human-friendly representation of this ParameterDesc.

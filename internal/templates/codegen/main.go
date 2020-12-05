@@ -234,7 +234,7 @@ func constructParameterDescsFromStruct(typeSpec *types.Type) ([]check.ParameterD
 	return paramDescs, nil
 }
 
-func getCheckTypeFromParsedBuiltinType(typeSpec * types.Type) (check.ParameterType, error) {
+func getCheckTypeFromParsedBuiltinType(typeSpec *types.Type) (check.ParameterType, error) {
 	switch typeSpec {
 	case types.String:
 		return check.StringType, nil
@@ -245,7 +245,7 @@ func getCheckTypeFromParsedBuiltinType(typeSpec * types.Type) (check.ParameterTy
 	case types.Bool:
 		return check.BooleanType, nil
 	default:
-		return "",  errors.Errorf("currently unsupported type %v", typeSpec)
+		return "", errors.Errorf("currently unsupported type %v", typeSpec)
 	}
 }
 
