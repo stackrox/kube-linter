@@ -24,8 +24,9 @@ var (
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
+	"ArrayElemType": "string",
 	"Required": false,
-	"NoRegex": true,
+	"NoRegex": false,
 	"NotNegatable": true,
 	"XXXStructFieldName": "RequiredDrops",
 	"XXXIsPointer": false
@@ -39,8 +40,9 @@ var (
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
+	"ArrayElemType": "string",
 	"Required": false,
-	"NoRegex": true,
+	"NoRegex": false,
 	"NotNegatable": true,
 	"XXXStructFieldName": "ForbiddenAdds",
 	"XXXIsPointer": false

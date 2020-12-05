@@ -429,13 +429,19 @@ KubeLinter supports the following templates:
 		"name": "requiredDrops",
 		"type": "array",
 		"description": "List of capabilities that are required to be dropped by containers.",
-		"required": false
+		"required": false,
+		"regexAllowed": true,
+		"negationAllowed": false,
+		"arrayElemType": "string"
 	},
 	{
 		"name": "forbiddenAdds",
 		"type": "array",
 		"description": "List of capabilities that are forbidden to be added to containers.",
-		"required": false
+		"required": false,
+		"regexAllowed": true,
+		"negationAllowed": false,
+		"arrayElemType": "string"
 	}
 ]
 

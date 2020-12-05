@@ -24,6 +24,7 @@ var (
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
+	"ArrayElemType": "",
 	"Required": true,
 	"NoRegex": false,
 	"NotNegatable": false,
