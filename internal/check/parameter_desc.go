@@ -34,6 +34,10 @@ type ParameterDesc struct {
 	// Only relevant if Type is "object".
 	SubParameters []ParameterDesc
 
+	// ArrayElemType is only set when the object is of type array, and it describes the type
+	// of the element of the array.
+	ArrayElemType ParameterType
+
 	// Required denotes whether the parameter is required.
 	Required bool
 
@@ -63,6 +67,7 @@ type HumanReadableParamDesc struct {
 	RegexAllowed    *bool                    `json:"regexAllowed,omitempty"`
 	NegationAllowed *bool                    `json:"negationAllowed,omitempty"`
 	SubParameters   []HumanReadableParamDesc `json:"subParameters,omitempty"`
+	ArrayElemType   ParameterType            `json:arrayElemType,omitempty`
 }
 
 // HumanReadableFields returns a human-friendly representation of this ParameterDesc.
@@ -75,9 +80,14 @@ func (p *ParameterDesc) HumanReadableFields() HumanReadableParamDesc {
 		Examples:    p.Examples,
 	}
 
-	if p.Type == StringType {
+	if p.Type == StringType ||
+		(p.Type == ArrayType && p.ArrayElemType == StringType) {
 		out.RegexAllowed = pointers.Bool(!p.NoRegex)
 		out.NegationAllowed = pointers.Bool(!p.NotNegatable)
+	}
+
+	if p.Type == ArrayType {
+		out.ArrayElemType = p.ArrayElemType
 	}
 
 	if len(p.SubParameters) > 0 {
@@ -87,5 +97,6 @@ func (p *ParameterDesc) HumanReadableFields() HumanReadableParamDesc {
 		}
 		out.SubParameters = subParamFields
 	}
+
 	return out
 }

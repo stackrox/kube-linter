@@ -193,20 +193,19 @@ func constructParameterDescsFromStruct(typeSpec *types.Type) ([]check.ParameterD
 		}
 		switch kind := relevantTyp.Kind; kind {
 		case types.Builtin:
-			switch relevantTyp {
-			case types.String:
-				desc.Type = check.StringType
-			case types.Int:
-				desc.Type = check.IntegerType
-			case types.Float32, types.Float64:
-				desc.Type = check.NumberType
-			case types.Bool:
-				desc.Type = check.BooleanType
-			default:
-				return nil, errors.Errorf("currently unsupported type %v", member.Type)
+			checkType, err := getCheckTypeFromParsedBuiltinType(relevantTyp)
+			if err != nil {
+				return nil, errors.Wrapf(err, "handling field %v", member.Name)
 			}
+			desc.Type = checkType
 		case types.Slice:
 			desc.Type = check.ArrayType
+			// For now we only support array of builtin types. No array of objects or array of arrays.
+			elemType, err := getCheckTypeFromParsedBuiltinType(member.Type.Elem)
+			if err != nil {
+				return nil, errors.Wrapf(err, "handling array elem type %v", member.Type.Elem)
+			}
+			desc.ArrayElemType = elemType
 		case types.Struct:
 			desc.Type = check.ObjectType
 			subParams, err := constructParameterDescsFromStruct(member.Type)
@@ -233,6 +232,21 @@ func constructParameterDescsFromStruct(typeSpec *types.Type) ([]check.ParameterD
 		paramDescs = append(paramDescs, desc)
 	}
 	return paramDescs, nil
+}
+
+func getCheckTypeFromParsedBuiltinType(typeSpec * types.Type) (check.ParameterType, error) {
+	switch typeSpec {
+	case types.String:
+		return check.StringType, nil
+	case types.Int:
+		return check.IntegerType, nil
+	case types.Float32, types.Float64:
+		return check.NumberType, nil
+	case types.Bool:
+		return check.BooleanType, nil
+	default:
+		return "",  errors.Errorf("currently unsupported type %v", typeSpec)
+	}
 }
 
 func processTemplate(dir string) error {
