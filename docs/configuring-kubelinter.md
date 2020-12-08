@@ -63,6 +63,15 @@ example,
 > `exclude` always takes precedence, if you include and exclude the same check,
 > KubeLinter always skips the check.
 
+## Ignoring violations for specific cases
+
+To ignore violations for specific objects, users can add an annotation with the key
+`ignore-check.kube-linter.io/<check-name>`. We strongly encourage adding an explanation as the value for the annotation.
+For example, to ignore a check named "privileged" for a specific deployment, you can add an annotation like:
+`ignore-check.kube-linter.io/privileged: "This deployment needs to run as privileged because it needs kernel access"`.
+
+To ignore _all_ checks for a specific object, you can use the special annotation key `kube-linter.io/ignore-all`.
+
 ## Run custom checks
 
 You can write custom checks based on existing [templates](generated/templates.md). Every template description includes details about the parameters (`params`) you can use along with that template.
