@@ -1,5 +1,5 @@
 # KubeLinter templates
-	
+
 KubeLinter supports the following templates:
 
 ## Anti affinity not specified
