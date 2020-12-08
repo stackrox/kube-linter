@@ -17,7 +17,7 @@ func MustInstantiateTemplate(templateStr string, customFuncMap template.FuncMap)
 				return "`" + code + "`"
 			},
 			"codeSnippetInTable": func(code string) string {
-				return "`" + strings.Replace(code, "|", "\\|", -1) + "`"
+				return "`" + strings.ReplaceAll(code, "|", `\|`) + "`"
 			},
 			"codeBlock": func(code string) string {
 				return "```\n" + code + "\n```"
