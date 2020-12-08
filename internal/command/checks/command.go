@@ -42,7 +42,7 @@ KubeLinter includes the following built-in checks:
 
 | Name | Enabled by default | Description | Remediation | Template | Parameters |
 | ---- | ------------------ | ----------- | ----------- | -------- | ---------- |
-{{ range . }} | {{ .Check.Name}} | {{ if .Default }}Yes{{ else }}No{{ end }} | {{.Check.Description}} | {{.Check.Remediation}} | {{.Check.Template}} | {{ backtick }}{{ mustToJson (default (dict) .Check.Params ) }}{{ backtick }} |
+{{ range . }} | {{ .Check.Name}} | {{ if .Default }}Yes{{ else }}No{{ end }} | {{.Check.Description}} | {{.Check.Remediation}} | {{.Check.Template}} | {{ mustToJson (default (dict) .Check.Params ) | codeSnippetInTable }} |
 {{ end -}}
 `
 )

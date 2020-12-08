@@ -28,22 +28,20 @@ var (
 
 const (
 	markDownTemplateStr = `# KubeLinter templates
-	
+
 KubeLinter supports the following templates:
 
 {{ range . -}}
 ## {{ .HumanName }}
 
-**Key**: {{ backtick }}{{ .Key }}{{ backtick }}
+**Key**: {{ .Key | codeSnippet }}
 
 **Description**: {{ .Description }}
 
 **Supported Objects**: {{ join "," .SupportedObjectKinds.ObjectKinds }}
 
 **Parameters**:
-{{ backtick }}{{ backtick }}{{ backtick }}
-{{ getParametersJSON .Parameters }}
-{{ backtick }}{{ backtick }}{{ backtick }}
+{{ getParametersJSON .Parameters | codeBlock }}
 
 {{ end -}}
 `
