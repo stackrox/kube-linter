@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"golang.stackrox.io/kube-linter/internal/command/common"
 )
 
@@ -29,8 +30,6 @@ func TestMarkdownFunctions(t *testing.T) {
 
 		tpl.Execute(&b, tt.data)
 
-		if b.String() != tt.out {
-			t.Errorf("%s = %q, want %q", tt.name, b.String(), tt.out)
-		}
+		assert.Equal(t, tt.out, b.String())
 	}
 }
