@@ -36,7 +36,7 @@ var (
 	exceptionsParamDesc = util.MustParseParameterDesc(`{
 	"Name": "exceptions",
 	"Type": "array",
-	"Description": "List of capabilities that are exception to the above list. This should only be filled when the above contains \"all\", and is used to forgive capabilities in ADD list.",
+	"Description": "List of capabilities that are exceptions to the above list. This should only be filled when the above contains \"all\", and is used to forgive capabilities in ADD list.",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
