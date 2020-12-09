@@ -1,6 +1,7 @@
 package common
 
 import (
+	"strings"
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
@@ -12,8 +13,14 @@ import (
 func MustInstantiateTemplate(templateStr string, customFuncMap template.FuncMap) *template.Template {
 	tpl, err := template.New("").Funcs(sprig.TxtFuncMap()).Funcs(
 		template.FuncMap{
-			"backtick": func() string {
-				return "`"
+			"codeSnippet": func(code string) string {
+				return "`" + code + "`"
+			},
+			"codeSnippetInTable": func(code string) string {
+				return "`" + strings.ReplaceAll(code, "|", `\|`) + "`"
+			},
+			"codeBlock": func(code string) string {
+				return "```\n" + code + "\n```"
 			},
 		},
 	).Funcs(customFuncMap).Parse(templateStr)
