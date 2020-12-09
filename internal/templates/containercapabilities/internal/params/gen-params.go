@@ -17,41 +17,41 @@ var (
 	_ = util.MustParseParameterDesc
 	_ = fmt.Sprintf
 
-	requiredDropsParamDesc = util.MustParseParameterDesc(`{
-	"Name": "requiredDrops",
+	forbiddenCapabilitiesParamDesc = util.MustParseParameterDesc(`{
+	"Name": "forbiddenCapabilities",
 	"Type": "array",
-	"Description": "List of capabilities that are required to be dropped by containers.",
+	"Description": "List of capabilities that needs to be removed from containers.",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
 	"ArrayElemType": "string",
 	"Required": false,
-	"NoRegex": false,
+	"NoRegex": true,
 	"NotNegatable": true,
-	"XXXStructFieldName": "RequiredDrops",
+	"XXXStructFieldName": "ForbiddenCapabilities",
 	"XXXIsPointer": false
 }
 `)
 
-	forbiddenAddsParamDesc = util.MustParseParameterDesc(`{
-	"Name": "forbiddenAdds",
+	exceptionsParamDesc = util.MustParseParameterDesc(`{
+	"Name": "exceptions",
 	"Type": "array",
-	"Description": "List of capabilities that are forbidden to be added to containers.",
+	"Description": "List of capabilities that are exception to the above list. This should only be filled when the above contains \"all\", and is used to forgive capabilities in ADD list.",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
 	"ArrayElemType": "string",
 	"Required": false,
-	"NoRegex": false,
+	"NoRegex": true,
 	"NotNegatable": true,
-	"XXXStructFieldName": "ForbiddenAdds",
+	"XXXStructFieldName": "Exceptions",
 	"XXXIsPointer": false
 }
 `)
 
 	ParamDescs = []check.ParameterDesc{
-		requiredDropsParamDesc,
-		forbiddenAddsParamDesc,
+		forbiddenCapabilitiesParamDesc,
+		exceptionsParamDesc,
 	}
 )
 

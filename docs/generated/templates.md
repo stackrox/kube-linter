@@ -426,20 +426,20 @@ KubeLinter supports the following templates:
 ```
 [
 	{
-		"name": "requiredDrops",
+		"name": "forbiddenCapabilities",
 		"type": "array",
-		"description": "List of capabilities that are required to be dropped by containers.",
+		"description": "List of capabilities that needs to be removed from containers.",
 		"required": false,
-		"regexAllowed": true,
+		"regexAllowed": false,
 		"negationAllowed": false,
 		"arrayElemType": "string"
 	},
 	{
-		"name": "forbiddenAdds",
+		"name": "exceptions",
 		"type": "array",
-		"description": "List of capabilities that are forbidden to be added to containers.",
+		"description": "List of capabilities that are exception to the above list. This should only be filled when the above contains \"all\", and is used to forgive capabilities in ADD list.",
 		"required": false,
-		"regexAllowed": true,
+		"regexAllowed": false,
 		"negationAllowed": false,
 		"arrayElemType": "string"
 	}

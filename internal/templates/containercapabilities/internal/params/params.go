@@ -3,11 +3,14 @@ package params
 // Params represents the params accepted by this template.
 type Params struct {
 
-	// List of capabilities that are required to be dropped by containers.
+	// List of capabilities that needs to be removed from containers.
+	// +noregex
 	// +notnegatable
-	RequiredDrops []string `json:"requiredDrops"`
+	ForbiddenCapabilities []string `json:"forbiddenCapabilities"`
 
-	// List of capabilities that are forbidden to be added to containers.
+	// List of capabilities that are exception to the above list. This should only be filled
+	// when the above contains "all", and is used to forgive capabilities in ADD list.
+	// +noregex
 	// +notnegatable
-	ForbiddenAdds []string `json:"forbiddenAdds"`
+	Exceptions []string `json:"exceptions"`
 }
