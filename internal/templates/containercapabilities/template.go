@@ -11,6 +11,7 @@ import (
 	"golang.stackrox.io/kube-linter/internal/templates"
 	"golang.stackrox.io/kube-linter/internal/templates/containercapabilities/internal/params"
 	"golang.stackrox.io/kube-linter/internal/templates/util"
+	"golang.stackrox.io/kube-linter/internal/utils"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -20,7 +21,11 @@ const (
 )
 
 var (
-	literalReservedCapabilitiesAllMatcher func(string) bool
+	literalReservedCapabilitiesAllMatcher = func() func(string) bool {
+		m, err := matcher.ForString(matchLiteralReservedCapabilitiesAll)
+		utils.Must(err)
+		return m
+	}()
 )
 
 func checkCapabilityDropList(
@@ -28,22 +33,26 @@ func checkCapabilityDropList(
 	paramCapMatchers map[string]func(string) bool,
 	scCaps *v1.Capabilities,
 	forbidAll bool,
-) *diagnostic.Diagnostic {
+	result *[]diagnostic.Diagnostic,
+) {
 	if forbidAll {
 		// Specified to drop all. Instead of trying to find a match to this paramCap, we should
 		// make sure the special ReservedCapabilitiesAll is found in the DROP list as well
 		for _, scCap := range scCaps.Drop {
 			if literalReservedCapabilitiesAllMatcher(string(scCap)) {
 				// Found "all" in drop list as well
-				return nil
+				return
 			}
 		}
-		return &diagnostic.Diagnostic{
-			Message: fmt.Sprintf(
-				"container %q has DROP capabilities: %q, but in fact all capabilities are required to be dropeed",
-				containerName,
-				scCaps.Drop),
-		}
+		*result =
+			append(
+				*result,
+				diagnostic.Diagnostic{
+					Message: fmt.Sprintf(
+						"container %q has DROP capabilities: %q, but in fact all capabilities are required to be dropeed",
+						containerName,
+						scCaps.Drop),
+				})
 	}
 
 	// Every forbidden capability specified by param should be found in the DROP list
@@ -58,16 +67,18 @@ func checkCapabilityDropList(
 			}
 		}
 		if !found {
-			return &diagnostic.Diagnostic{
-				Message: fmt.Sprintf("container %q has DROP capabilities: %q, but does not drop "+
-					"capability %q which is required",
-					containerName,
-					scCaps.Drop,
-					paramCap),
-			}
+			*result =
+				append(
+					*result,
+					diagnostic.Diagnostic{
+						Message: fmt.Sprintf("container %q has DROP capabilities: %q, but does not drop "+
+							"capability %q which is required",
+							containerName,
+							scCaps.Drop,
+							paramCap),
+					})
 		}
 	}
-	return nil
 }
 
 func checkCapabilityAddList(
@@ -76,7 +87,8 @@ func checkCapabilityAddList(
 	scCaps *v1.Capabilities,
 	forbidAll bool,
 	exceptionCapMatchers map[string]func(string) bool,
-) *diagnostic.Diagnostic {
+	result *[]diagnostic.Diagnostic,
+) {
 	if forbidAll {
 		// User has forbidden all capabilities
 		for _, scCap := range scCaps.Add {
@@ -89,17 +101,20 @@ func checkCapabilityAddList(
 				}
 			}
 			if !excluded {
-				return &diagnostic.Diagnostic{
-					Message: fmt.Sprintf(
-						"container %q has ADD capability: %q, but no capabilities should be added at all and"+
-							" this capabilty is not included in the exceptions list",
-						containerName,
-						scCap),
-				}
+				*result =
+					append(
+						*result,
+						diagnostic.Diagnostic{
+							Message: fmt.Sprintf(
+								"container %q has ADD capability: %q, but no capabilities should be added at all and"+
+									" this capabilty is not included in the exceptions list",
+								containerName,
+								scCap),
+						})
 			}
 		}
 		// No violations
-		return nil
+		return
 	}
 
 	// Any capability from scCaps should not match with any from paramCaps
@@ -108,28 +123,47 @@ func checkCapabilityAddList(
 			// User can specify to add "all" under containers as well.
 			if paramCapMatcher(string(scCap)) || literalReservedCapabilitiesAllMatcher(string(scCap)) {
 				// A capability from ADD list matched with a cap from forbidden capabilities list.
-				return &diagnostic.Diagnostic{
-					Message: fmt.Sprintf("container %q has ADD capability: %q, which matched with "+
-						"the forbidden capability for containers",
-						containerName,
-						scCap),
-				}
+				*result =
+					append(
+						*result,
+						diagnostic.Diagnostic{
+							Message: fmt.Sprintf(
+								"container %q has ADD capability: %q, which matched with the forbidden capability for containers",
+								containerName,
+								scCap),
+						})
 			}
 		}
 	}
-	return nil
 }
 
-func checkForbidAll(paramCaps []string) bool {
+func checkForbidAll(paramCaps []string) (bool, error) {
+	var found bool
 	for _, paramCap := range paramCaps {
 		if literalReservedCapabilitiesAllMatcher(paramCap) {
-			return true
+			found = true
 		}
 	}
-	return false
+
+	if found {
+		if len(paramCaps) == 1 {
+			// Only contains "all"
+			return true, nil
+		}
+		// When the list contains "all", it should not contain any other element
+		return false, errors.Errorf(
+			"forbidden capabilities specified contains %q,"+
+				" but it also contains other capabilities: %q. please make sure that it only contains %q",
+			reservedCapabilitiesAll,
+			paramCaps,
+			reservedCapabilitiesAll)
+	}
+
+	// "all" not found
+	return false, nil
 }
 
-func verifyExceptionsList(forbidAll bool, exceptions []string) error {
+func validateExceptionsList(forbidAll bool, exceptions []string) error {
 	// Check if forbidAll is set
 	if !forbidAll && len(exceptions) != 0 {
 		return errors.Errorf("for verifying container capabilities, \"Exceptions\" list should only"+
@@ -155,15 +189,12 @@ func init() {
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,
 		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
-			var err error
-			literalReservedCapabilitiesAllMatcher, err = matcher.ForString(matchLiteralReservedCapabilitiesAll)
+			// Check for "all" in case user does not want any capability in containers.
+			forbidAll, err := checkForbidAll(p.ForbiddenCapabilities)
 			if err != nil {
 				return nil, err
 			}
-
-			// Check for "all" in case user does not want any capability in containers.
-			forbidAll := checkForbidAll(p.ForbiddenCapabilities)
-			err = verifyExceptionsList(forbidAll, p.Exceptions)
+			err = validateExceptionsList(forbidAll, p.Exceptions)
 			if err != nil {
 				return nil, err
 			}
@@ -189,27 +220,19 @@ func init() {
 			}
 
 			return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
-				// 2 = 1 for forbiddenAdds + 1 for allRequiredDrops
-				result := make([]diagnostic.Diagnostic, 0, 2)
+				var result []diagnostic.Diagnostic
 				sc := container.SecurityContext
 				if sc != nil && sc.Capabilities != nil {
 					// Check none of the forbidden capabilities exists in ADDs
-					diagnostic :=
-						checkCapabilityAddList(
-							container.Name,
-							paramCapMatchers,
-							sc.Capabilities,
-							forbidAll,
-							exceptionCapMatchers)
-					if diagnostic != nil {
-						result = append(result, *diagnostic)
-					}
+					checkCapabilityAddList(
+						container.Name,
+						paramCapMatchers,
+						sc.Capabilities,
+						forbidAll,
+						exceptionCapMatchers,
+						&result)
 					// Check every forbidden capabilities should exist in DROPs
-					diagnostic =
-						checkCapabilityDropList(container.Name, paramCapMatchers, sc.Capabilities, forbidAll)
-					if diagnostic != nil {
-						result = append(result, *diagnostic)
-					}
+					checkCapabilityDropList(container.Name, paramCapMatchers, sc.Capabilities, forbidAll, &result)
 				}
 				return result
 			}), nil
