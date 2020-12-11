@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/spf13/viper"
+
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh/terminal"
@@ -17,8 +19,9 @@ import (
 
 // Command is the command for the lint command.
 func Command() *cobra.Command {
-	var configPath string
 	var verbose bool
+
+	v := viper.New()
 
 	c := &cobra.Command{
 		Use:   "lint",
@@ -29,14 +32,13 @@ func Command() *cobra.Command {
 			if err := builtinchecks.LoadInto(checkRegistry); err != nil {
 				return err
 			}
-			var cfg config.Config
-			if configPath != "" {
-				var err error
-				cfg, err = config.Load(configPath)
-				if err != nil {
-					return errors.Wrap(err, "failed to load config")
-				}
+
+			// Load Configuration
+			cfg, err := config.Load(v)
+			if err != nil {
+				return errors.Wrap(err, "failed to load config")
 			}
+
 			if err := configresolver.LoadCustomChecksInto(&cfg, checkRegistry); err != nil {
 				return err
 			}
@@ -89,7 +91,19 @@ func Command() *cobra.Command {
 			return errors.Errorf("found %d lint errors", len(result.Reports))
 		},
 	}
-	c.Flags().StringVar(&configPath, "config", "", "Path to config file")
+
+	c.Flags().String("config", "", "Path to config file")
 	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
+	c.Flags().StringSlice("exclude", nil, "Exclude checks")
+	c.Flags().StringSlice("include", nil, "Include provided checks")
+	c.Flags().Bool("add-all-built-in", false, "Add All BuildIn checks")
+	c.Flags().Bool("no-defaults", false, "Don't add Default checks")
+
+	v.BindPFlag("config", c.Flags().Lookup("config"))
+	v.BindPFlag("checks.exclude", c.Flags().Lookup("exclude"))
+	v.BindPFlag("checks.include", c.Flag("include"))
+	v.BindPFlag("checks.addAllBuiltIn", c.Flag("add-all-built-in"))
+	v.BindPFlag("checks.doNotAutoAddDefaults", c.Flag("no-defaults"))
+
 	return c
 }

@@ -1,10 +1,11 @@
 package config
 
 import (
-	"io/ioutil"
+	"path/filepath"
+	"strings"
 
-	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 	"golang.stackrox.io/kube-linter/internal/check"
 )
 
@@ -29,14 +30,26 @@ type Config struct {
 }
 
 // Load loads the config from the given path.
-func Load(path string) (Config, error) {
-	contents, err := ioutil.ReadFile(path)
+func Load(v *viper.Viper) (Config, error) {
+	configFile := v.GetString("config")
+
+	if configFile != "" {
+		filename := filepath.Base(configFile)
+		ext := filepath.Ext(configFile)
+		configPath := filepath.Dir(configFile)
+
+		v.SetConfigType(strings.TrimPrefix(ext, "."))
+		v.SetConfigName(strings.TrimSuffix(filename, ext))
+		v.AddConfigPath(configPath)
+		if err := v.ReadInConfig(); err != nil {
+			return Config{}, errors.Wrap(err, "reading file")
+		}
+	}
+
+	var conf Config
+	err := v.Unmarshal(&conf)
 	if err != nil {
-		return Config{}, errors.Wrap(err, "reading file")
+		return Config{}, errors.Wrap(err, "unmarshalling config YAML")
 	}
-	var c Config
-	if err := yaml.Unmarshal(contents, &c); err != nil {
-		return Config{}, errors.Wrap(err, "unmarshaling config YAML")
-	}
-	return c, nil
+	return conf, nil
 }
