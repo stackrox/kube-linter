@@ -17,49 +17,46 @@ var (
 	_ = util.MustParseParameterDesc
 	_ = fmt.Sprintf
 
-	nameParamDesc = util.MustParseParameterDesc(`{
-	"Name": "name",
-	"Type": "string",
-	"Description": "The name of the environment variable.",
+	forbiddenCapabilitiesParamDesc = util.MustParseParameterDesc(`{
+	"Name": "forbiddenCapabilities",
+	"Type": "array",
+	"Description": "List of capabilities that needs to be removed from containers.",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
-	"ArrayElemType": "",
-	"Required": true,
-	"NoRegex": false,
-	"NotNegatable": false,
-	"XXXStructFieldName": "Name",
+	"ArrayElemType": "string",
+	"Required": false,
+	"NoRegex": true,
+	"NotNegatable": true,
+	"XXXStructFieldName": "ForbiddenCapabilities",
 	"XXXIsPointer": false
 }
 `)
 
-	valueParamDesc = util.MustParseParameterDesc(`{
-	"Name": "value",
-	"Type": "string",
-	"Description": "The value of the environment variable.",
+	exceptionsParamDesc = util.MustParseParameterDesc(`{
+	"Name": "exceptions",
+	"Type": "array",
+	"Description": "List of capabilities that are exceptions to the above list. This should only be filled when the above contains \"all\", and is used to forgive capabilities in ADD list.",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
-	"ArrayElemType": "",
+	"ArrayElemType": "string",
 	"Required": false,
-	"NoRegex": false,
-	"NotNegatable": false,
-	"XXXStructFieldName": "Value",
+	"NoRegex": true,
+	"NotNegatable": true,
+	"XXXStructFieldName": "Exceptions",
 	"XXXIsPointer": false
 }
 `)
 
 	ParamDescs = []check.ParameterDesc{
-		nameParamDesc,
-		valueParamDesc,
+		forbiddenCapabilitiesParamDesc,
+		exceptionsParamDesc,
 	}
 )
 
 func (p *Params) Validate() error {
 	var validationErrors []string
-	if p.Name == "" {
-		validationErrors = append(validationErrors, "required param name not found")
-	}
 	if len(validationErrors) > 0 {
 		return errors.Errorf("invalid parameters: %s", strings.Join(validationErrors, ", "))
     }

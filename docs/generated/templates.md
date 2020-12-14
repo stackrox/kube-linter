@@ -414,6 +414,39 @@ KubeLinter supports the following templates:
 
 ```
 
+## Verify container capabilities
+
+**Key**: `verify-container-capabilities`
+
+**Description**: Flag containers that do not match capabilities requirements
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+```
+[
+	{
+		"name": "forbiddenCapabilities",
+		"type": "array",
+		"description": "List of capabilities that needs to be removed from containers.",
+		"required": false,
+		"regexAllowed": false,
+		"negationAllowed": false,
+		"arrayElemType": "string"
+	},
+	{
+		"name": "exceptions",
+		"type": "array",
+		"description": "List of capabilities that are exceptions to the above list. This should only be filled when the above contains \"all\", and is used to forgive capabilities in ADD list.",
+		"required": false,
+		"regexAllowed": false,
+		"negationAllowed": false,
+		"arrayElemType": "string"
+	}
+]
+
+```
+
 ## Writable Host Mounts
 
 **Key**: `writable-host-mount`

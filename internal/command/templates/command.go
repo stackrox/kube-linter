@@ -80,6 +80,9 @@ func renderParameters(numTabs int, params []check.ParameterDesc, out io.Writer) 
 			fmt.Fprintf(out, "%s\tSub-parameters:\n", tabs)
 			renderParameters(numTabs+1, param.SubParameters, out)
 		}
+		if param.Type == check.ArrayType {
+			fmt.Fprintf(out, "%s\tElem type:%s\n", tabs, param.ArrayElemType)
+		}
 	}
 }
 

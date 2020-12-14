@@ -9,6 +9,7 @@ var (
 	List = set.NewFrozenStringSet(
 		"dangling-service",
 		"deprecated-service-account-field",
+		"drop-net-raw-capability",
 		"env-var-secret",
 		"mismatching-selector",
 		"no-anti-affinity",
