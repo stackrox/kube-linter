@@ -82,8 +82,8 @@ Consider the following sample pod specification file `pod.yaml`. This file has t
 1. The container in this pod is not running as a read only file system, which could allow it to write to the root filesystem.
 
 **Production readiness:**
-1. The container's CPU requests and limits are not set, which could allow it to consume excessive CPU.
-1. The container's memory requests and limits are not set, which could allow it to consume excessive memory
+1. The container's CPU limits are not set, which could allow it to consume excessive CPU.
+1. The container's memory limits are not set, which could allow it to consume excessive memory
 
    ```yaml
    apiVersion: v1
