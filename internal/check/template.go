@@ -8,7 +8,7 @@ import (
 // A Func is a specific lint-check, which runs on a specific objects, and emits diagnostics if problems are found.
 // Checks have access to the entire LintContext, with all the objects in it, but must only report problems for the
 // object passed in the second argument.
-type Func func(lintCtx *lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic
+type Func func(lintCtx lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic
 
 // ObjectKindsDesc describes a list of supported object kinds for a check template.
 type ObjectKindsDesc struct {

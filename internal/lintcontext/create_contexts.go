@@ -20,8 +20,8 @@ var (
 // Currently, each directory of Kube YAML files (or Helm charts) are treated as a separate context.
 // TODO: Figure out if it's useful to allow people to specify that files spanning different directories
 // should be treated as being in the same context.
-func CreateContexts(filesOrDirs ...string) ([]*LintContext, error) {
-	contextsByDir := make(map[string]*LintContext)
+func CreateContexts(filesOrDirs ...string) ([]LintContext, error) {
+	contextsByDir := make(map[string]*lintContextImpl)
 	for _, fileOrDir := range filesOrDirs {
 		// Stdin
 		if fileOrDir == "-" {
@@ -78,7 +78,7 @@ func CreateContexts(filesOrDirs ...string) ([]*LintContext, error) {
 		dirs = append(dirs, dir)
 	}
 	sort.Strings(dirs)
-	var contexts []*LintContext
+	var contexts []LintContext
 	for _, dir := range dirs {
 		contexts = append(contexts, contextsByDir[dir])
 	}

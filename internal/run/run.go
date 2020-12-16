@@ -15,7 +15,7 @@ type Result struct {
 }
 
 // Run runs the linter on the given context, with the given config.
-func Run(lintCtxs []*lintcontext.LintContext, registry checkregistry.CheckRegistry, checks []string) (Result, error) {
+func Run(lintCtxs []lintcontext.LintContext, registry checkregistry.CheckRegistry, checks []string) (Result, error) {
 	instantiatedChecks := make([]*instantiatedcheck.InstantiatedCheck, 0, len(checks))
 	for _, checkName := range checks {
 		instantiatedCheck := registry.Load(checkName)
@@ -27,7 +27,7 @@ func Run(lintCtxs []*lintcontext.LintContext, registry checkregistry.CheckRegist
 
 	var result Result
 	for _, lintCtx := range lintCtxs {
-		for _, obj := range lintCtx.Objects() {
+		for _, obj := range lintCtx.GetObjects() {
 			for _, check := range instantiatedChecks {
 				if !check.Matcher.Matches(obj.K8sObject.GetObjectKind().GroupVersionKind()) {
 					continue

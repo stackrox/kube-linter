@@ -12,7 +12,7 @@ import (
 // that applies to containers. The given function is passed each container, and is allowed to return
 // diagnostics if an error is found.
 func PerContainerCheck(matchFunc func(container *v1.Container) []diagnostic.Diagnostic) check.Func {
-	return func(_ *lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
+	return func(_ lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 		podSpec, found := extract.PodSpec(object.K8sObject)
 		if !found {
 			return nil
