@@ -148,10 +148,10 @@ To build KubeLinter from source:
    >   allowing it to write to the root filesystem.
    > 
    > **Production readiness issue**
-   > - The configuration doesn't specify the container's CPU requests and
-   >   limits, allowing it to consume excessive CPU. 
-   > - The configuration doesn't specify the container's memory requests and
-   >   limits, allowing it to consume excessive memory.
+   > - The configuration doesn't specify the container's CPU limits,
+   >   allowing it to consume excessive CPU. 
+   > - The configuration doesn't specify the container's memory limits,
+   >   allowing it to consume excessive memory.
 
 1. To lint this file with KubeLinter, run the following command:
    ```bash
