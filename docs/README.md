@@ -148,10 +148,10 @@ To build KubeLinter from source:
    >   allowing it to write to the root filesystem.
    > 
    > **Production readiness issue**
-   > - The configuration doesn't specify the container's CPU requests and
-   >   limits, allowing it to consume excessive CPU. 
-   > - The configuration doesn't specify the container's memory requests and
-   >   limits, allowing it to consume excessive memory.
+   > - The configuration doesn't specify the container's CPU limits,
+   >   allowing it to consume excessive CPU. 
+   > - The configuration doesn't specify the container's memory limits,
+   >   allowing it to consume excessive memory.
 
 1. To lint this file with KubeLinter, run the following command:
    ```bash
@@ -161,7 +161,8 @@ To build KubeLinter from source:
    ```
    pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" does not have a read-only root file system (check: no-read-only-root-fs, remediation: Set readOnlyRootFilesystem to true in your container's securityContext.)
 
-   pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" has cpu limit 0 (check: unset-cpu-requirements, remediation: Set your container's CPU requests and limits depending on its requirements. See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for more details.)
+   pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" has cpu limit 0 (check: unset-cpu-requirements, remediation: Set your container's CPU 
+   s and limits depending on its requirements. See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for more details.)
    
    pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" has memory limit 0 (check: unset-memory-requirements, remediation: Set your container's memory requests and limits depending on its requirements.    See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for more details.)
    
