@@ -27,7 +27,7 @@ func Run(lintCtxs []lintcontext.LintContext, registry checkregistry.CheckRegistr
 
 	var result Result
 	for _, lintCtx := range lintCtxs {
-		for _, obj := range lintCtx.GetObjects() {
+		for _, obj := range lintCtx.Objects() {
 			for _, check := range instantiatedChecks {
 				if !check.Matcher.Matches(obj.K8sObject.GetObjectKind().GroupVersionKind()) {
 					continue

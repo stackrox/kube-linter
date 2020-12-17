@@ -10,8 +10,8 @@ type MockLintContext struct {
 	pods map[string]*v1.Pod
 }
 
-// GetObjects returns all the objects under this MockLintContext
-func (l *MockLintContext) GetObjects() []lintcontext.Object {
+// Objects returns all the objects under this MockLintContext
+func (l *MockLintContext) Objects() []lintcontext.Object {
 	result := make([]lintcontext.Object, 0, len(l.pods))
 	for _, p := range l.pods {
 		result = append(result, lintcontext.Object{Metadata: lintcontext.ObjectMetadata{}, K8sObject: p})
@@ -19,8 +19,8 @@ func (l *MockLintContext) GetObjects() []lintcontext.Object {
 	return result
 }
 
-// GetInvalidObjects is not implemented. For now we don't care about invalid objects for mock context.
-func (l *MockLintContext) GetInvalidObjects() []lintcontext.InvalidObject {
+// InvalidObjects is not implemented. For now we don't care about invalid objects for mock context.
+func (l *MockLintContext) InvalidObjects() []lintcontext.InvalidObject {
 	return nil
 }
 

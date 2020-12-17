@@ -47,7 +47,7 @@ func init() {
 						Message: fmt.Sprintf("service has invalid label selector: %v", err),
 					}}
 				}
-				for _, obj := range lintCtx.GetObjects() {
+				for _, obj := range lintCtx.Objects() {
 					podTemplateSpec, hasPods := extract.PodTemplateSpec(obj.K8sObject)
 					if !hasPods {
 						continue

@@ -48,7 +48,7 @@ func (s *ContainerCapabilitiesTestSuite) TestForbiddenCapabilities() {
 				{Message: fmt.Sprintf(addListDiagMsgFmt, containerName, "FORBIDDEN_CAP")},
 				{Message: fmt.Sprintf(dropListDiagMsgFmt, containerName, dropCaps, "FORBIDDEN_CAP")},
 			},
-			ExpectError: false,
+			ExpectInstantiationError: false,
 		},
 	})
 }
@@ -72,7 +72,7 @@ func (s *ContainerCapabilitiesTestSuite) TestForbiddenCapabilitiesWithAll() {
 				{Message: fmt.Sprintf(addListWithAllDiagMsgFmt, containerName, "CAP_3")},
 				{Message: fmt.Sprintf(dropListWithAllDiagMsgFmt, containerName, dropCaps)},
 			},
-			ExpectError: false,
+			ExpectInstantiationError: false,
 		},
 		// Case 2: with some forgiven capabilities
 		{
@@ -85,7 +85,7 @@ func (s *ContainerCapabilitiesTestSuite) TestForbiddenCapabilitiesWithAll() {
 				{Message: fmt.Sprintf(addListWithAllDiagMsgFmt, containerName, "CAP_3")},
 				{Message: fmt.Sprintf(dropListWithAllDiagMsgFmt, containerName, dropCaps)},
 			},
-			ExpectError: false,
+			ExpectInstantiationError: false,
 		},
 	})
 }
@@ -106,7 +106,7 @@ func (s *ContainerCapabilitiesTestSuite) TestAddListHasAll() {
 				{Message: fmt.Sprintf(addListDiagMsgFmt, containerName, "all")},
 				{Message: fmt.Sprintf(dropListDiagMsgFmt, containerName, dropCaps, "CAP_1")},
 			},
-			ExpectError: false,
+			ExpectInstantiationError: false,
 		},
 	})
 }
@@ -124,8 +124,8 @@ func (s *ContainerCapabilitiesTestSuite) TestDropListHasAll() {
 				ForbiddenCapabilities: []string{"CAP_1", "CAP_2"},
 				Exceptions:            nil,
 			},
-			Diagnostics: []diagnostic.Diagnostic{},
-			ExpectError: false,
+			Diagnostics:              []diagnostic.Diagnostic{},
+			ExpectInstantiationError: false,
 		},
 		// Case 2: forbidden caps include "all"
 		{
@@ -136,7 +136,7 @@ func (s *ContainerCapabilitiesTestSuite) TestDropListHasAll() {
 			Diagnostics: []diagnostic.Diagnostic{
 				{Message: fmt.Sprintf(addListWithAllDiagMsgFmt, containerName, "FORGIVEN_CAP")},
 			},
-			ExpectError: false,
+			ExpectInstantiationError: false,
 		},
 		// Case 3: now we forgive the FORGIVEN_CAP. Should see no error
 		{
@@ -144,8 +144,8 @@ func (s *ContainerCapabilitiesTestSuite) TestDropListHasAll() {
 				ForbiddenCapabilities: []string{"all"},
 				Exceptions:            []string{"FORGIVEN_CAP"},
 			},
-			Diagnostics: []diagnostic.Diagnostic{},
-			ExpectError: false,
+			Diagnostics:              []diagnostic.Diagnostic{},
+			ExpectInstantiationError: false,
 		},
 	})
 }
@@ -162,8 +162,8 @@ func (s *ContainerCapabilitiesTestSuite) TestInvalidParams() {
 				ForbiddenCapabilities: []string{"THIS_IS_NOT_All_CAP"},
 				Exceptions:            []string{"BUT_WE_SPECIFY_EXCEPTIONS"},
 			},
-			Diagnostics: []diagnostic.Diagnostic{},
-			ExpectError: true,
+			Diagnostics:              []diagnostic.Diagnostic{},
+			ExpectInstantiationError: true,
 		},
 	})
 }

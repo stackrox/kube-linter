@@ -42,7 +42,7 @@ func init() {
 				}
 				ns := object.K8sObject.GetNamespace()
 				serviceAccountsInCtx := set.NewStringSet()
-				for _, otherObj := range lintCtx.GetObjects() {
+				for _, otherObj := range lintCtx.Objects() {
 					k8sObj := otherObj.K8sObject
 					if k8sObj.GetObjectKind().GroupVersionKind() == serviceAccountGVK && k8sObj.GetNamespace() == ns {
 						serviceAccountsInCtx.Add(k8sObj.GetName())

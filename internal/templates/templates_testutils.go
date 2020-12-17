@@ -1,8 +1,6 @@
 package templates
 
 import (
-	"sort"
-
 	"github.com/stretchr/testify/suite"
 	"golang.stackrox.io/kube-linter/internal/check"
 	"golang.stackrox.io/kube-linter/internal/diagnostic"
@@ -19,9 +17,9 @@ type TemplateTestSuite struct {
 
 // TestCase represents a single test case which can be verified under a LintContext
 type TestCase struct {
-	Param       interface{}
-	Diagnostics []diagnostic.Diagnostic
-	ExpectError bool
+	Param                    interface{}
+	Diagnostics              []diagnostic.Diagnostic
+	ExpectInstantiationError bool
 }
 
 // Init initializes the test suite with a template
@@ -38,34 +36,24 @@ func (s *TemplateTestSuite) Validate(
 ) {
 	for _, c := range cases {
 		checkFunc, err := s.Template.Instantiate(c.Param)
-		if c.ExpectError {
+		if c.ExpectInstantiationError {
 			s.Error(err, "param should have caused error but did not raise one")
 			continue
 		}
-		for _, obj := range ctx.GetObjects() {
+		for _, obj := range ctx.Objects() {
 			diagnostics := checkFunc(ctx, obj)
-			passed := s.compareDiagnostics(c.Diagnostics, diagnostics)
-			s.True(passed, "expected diagnostics: %q. actual: %q", c.Diagnostics, diagnostics)
+			s.compareDiagnostics(c.Diagnostics, diagnostics)
 		}
 	}
 }
 
-func (s *TemplateTestSuite) compareDiagnostics(expected, actual []diagnostic.Diagnostic) bool {
-	if len(expected) != len(actual) {
-		return false
+func (s *TemplateTestSuite) compareDiagnostics(expected, actual []diagnostic.Diagnostic) {
+	expectedMessages, actualMessages := make([]string, 0, len(expected)), make([]string, 0, len(actual))
+	for _, diag := range expected {
+		expectedMessages = append(expectedMessages, diag.Message)
 	}
-	sort.Slice(expected, func(i, j int) bool {
-		return expected[i].Message < expected[j].Message
-	})
-	sort.Slice(actual, func(i, j int) bool {
-		return actual[i].Message < actual[j].Message
-	})
-
-	for i := 0; i < len(expected); i++ {
-		if expected[i].Message != actual[i].Message {
-			return false
-		}
+	for _, diag := range actual {
+		actualMessages = append(actualMessages, diag.Message)
 	}
-
-	return true
+	s.ElementsMatch(expectedMessages, actualMessages, "expected diagnostics and actual diagnostics do not match")
 }

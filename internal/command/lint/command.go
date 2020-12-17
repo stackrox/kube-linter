@@ -54,14 +54,14 @@ func Command() *cobra.Command {
 			}
 			if verbose {
 				for _, lintCtx := range lintCtxs {
-					for _, invalidObj := range lintCtx.GetInvalidObjects() {
+					for _, invalidObj := range lintCtx.InvalidObjects() {
 						fmt.Fprintf(os.Stderr, "Warning: failed to load object from %s: %v\n", invalidObj.Metadata.FilePath, invalidObj.LoadErr)
 					}
 				}
 			}
 			var atLeastOneObjectFound bool
 			for _, lintCtx := range lintCtxs {
-				if len(lintCtx.GetObjects()) > 0 {
+				if len(lintCtx.Objects()) > 0 {
 					atLeastOneObjectFound = true
 					break
 				}
