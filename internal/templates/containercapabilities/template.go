@@ -16,8 +16,9 @@ import (
 )
 
 const (
+	templateKey                         = "verify-container-capabilities"
 	reservedCapabilitiesAll             = "all"
-	matchLiteralReservedCapabilitiesAll = "(?i)" + reservedCapabilitiesAll
+	matchLiteralReservedCapabilitiesAll = "^(?i)" + reservedCapabilitiesAll + "$"
 )
 
 var (
@@ -186,7 +187,7 @@ func validateExceptionsList(forbidAll bool, exceptions []string) error {
 func init() {
 	templates.Register(check.Template{
 		HumanName:   "Verify container capabilities",
-		Key:         "verify-container-capabilities",
+		Key:         templateKey,
 		Description: "Flag containers that do not match capabilities requirements",
 		SupportedObjectKinds: check.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},

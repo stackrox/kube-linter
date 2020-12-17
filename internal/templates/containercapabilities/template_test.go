@@ -28,33 +28,40 @@ type ContainerCapabilitiesTestSuite struct {
 }
 
 func (s *ContainerCapabilitiesTestSuite) SetupTest() {
-	s.Init("verify-container-capabilities")
+	s.Init(templateKey)
 	s.ctx = mocks.NewMockContext()
 }
 
 func (s *ContainerCapabilitiesTestSuite) TestForbiddenCapabilities() {
-	forbiddenCap := "NET_ADMIN"
+	forbiddenCap := "SOME_CAP"
+	addCaps := []v1.Capability{v1.Capability(forbiddenCap), "ALLOWED_CAP"}
+	dropCaps := []v1.Capability{"DROPPED_CAP"}
+
 	s.addPod()
 	s.ctx.AddContainerToPod(podName, containerName, "", nil, nil, &v1.SecurityContext{
 		Capabilities: &v1.Capabilities{
-			Add:  []v1.Capability{v1.Capability(forbiddenCap)},
-			Drop: nil,
+			Add:  addCaps,
+			Drop: dropCaps,
 		},
 	})
 
 	s.Validate(s.ctx, []templates.TestCase{
 		{
 			Param: params.Params{
-				ForbiddenCapabilities: []string{forbiddenCap},
+				ForbiddenCapabilities: []string{forbiddenCap, "DROPPED_CAP"},
 				Exceptions:            nil,
 			},
 			Diagnostics: []diagnostic.Diagnostic{
 				{Message: fmt.Sprintf(addListDiagMsgFmt, containerName, forbiddenCap)},
-				{Message: fmt.Sprintf(dropListDiagMsgFmt, containerName, []string{}, forbiddenCap)},
+				{Message: fmt.Sprintf(dropListDiagMsgFmt, containerName, dropCaps, forbiddenCap)},
 			},
 			ExpectError: false,
 		},
 	})
+}
+
+func (s *ContainerCapabilitiesTestSuite) TestForbiddenCapabilitiesWithAll() {
+
 }
 
 func (s *ContainerCapabilitiesTestSuite) addPod() {
