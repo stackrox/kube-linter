@@ -26,6 +26,12 @@ var (
 		utils.Must(err)
 		return m
 	}()
+
+	addListDiagMsgFmt        = "container %q has ADD capability: %q, which matched with the forbidden capability for containers"
+	addListWithAllDiagMsgFmt = "container %q has ADD capability: %q, but no capabilities " +
+		"should be added at all and this capability is not included in the exceptions list"
+	dropListDiagMsgFmt        = "container %q has DROP capabilities: %q, but does not drop capability %q which is required"
+	dropListWithAllDiagMsgFmt = "container %q has DROP capabilities: %q, but in fact all capabilities are required to be dropped"
 )
 
 func checkCapabilityDropList(
@@ -49,7 +55,7 @@ func checkCapabilityDropList(
 				*result,
 				diagnostic.Diagnostic{
 					Message: fmt.Sprintf(
-						"container %q has DROP capabilities: %q, but in fact all capabilities are required to be dropeed",
+						dropListWithAllDiagMsgFmt,
 						containerName,
 						scCaps.Drop),
 				})
@@ -71,8 +77,8 @@ func checkCapabilityDropList(
 				append(
 					*result,
 					diagnostic.Diagnostic{
-						Message: fmt.Sprintf("container %q has DROP capabilities: %q, but does not drop "+
-							"capability %q which is required",
+						Message: fmt.Sprintf(
+							dropListDiagMsgFmt,
 							containerName,
 							scCaps.Drop,
 							paramCap),
@@ -106,8 +112,7 @@ func checkCapabilityAddList(
 						*result,
 						diagnostic.Diagnostic{
 							Message: fmt.Sprintf(
-								"container %q has ADD capability: %q, but no capabilities should be added at all and"+
-									" this capabilty is not included in the exceptions list",
+								addListWithAllDiagMsgFmt,
 								containerName,
 								scCap),
 						})
@@ -128,7 +133,7 @@ func checkCapabilityAddList(
 						*result,
 						diagnostic.Diagnostic{
 							Message: fmt.Sprintf(
-								"container %q has ADD capability: %q, which matched with the forbidden capability for containers",
+								addListDiagMsgFmt,
 								containerName,
 								scCap),
 						})
