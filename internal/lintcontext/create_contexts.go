@@ -28,7 +28,7 @@ func CreateContexts(filesOrDirs ...string) ([]LintContext, error) {
 			if _, alreadyExists := contextsByDir["-"]; alreadyExists {
 				continue
 			}
-			ctx := New()
+			ctx := new()
 			if err := ctx.loadObjectsFromReader("<standard input>", os.Stdin); err != nil {
 				return nil, err
 			}
@@ -46,7 +46,7 @@ func CreateContexts(filesOrDirs ...string) ([]LintContext, error) {
 				if knownYAMLExtensions.Contains(strings.ToLower(filepath.Ext(currentPath))) || fileOrDir == currentPath {
 					ctx := contextsByDir[dirName]
 					if ctx == nil {
-						ctx = New()
+						ctx = new()
 						contextsByDir[dirName] = ctx
 					}
 					if err := ctx.loadObjectsFromYAMLFile(currentPath, info); err != nil {
@@ -60,7 +60,7 @@ func CreateContexts(filesOrDirs ...string) ([]LintContext, error) {
 				if _, alreadyExists := contextsByDir[currentPath]; alreadyExists {
 					return nil
 				}
-				ctx := New()
+				ctx := new()
 				contextsByDir[currentPath] = ctx
 				if err := ctx.loadObjectsFromHelmChart(currentPath); err != nil {
 					return err

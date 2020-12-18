@@ -53,7 +53,7 @@ func (l *lintContextImpl) addInvalidObjects(objs ...InvalidObject) {
 	l.invalidObjects = append(l.invalidObjects, objs...)
 }
 
-// New returns a ready-to-use, empty, lint context.
-func New() *lintContextImpl {
+// new returns a ready-to-use, empty, lintContextImpl.
+func new() *lintContextImpl {
 	return &lintContextImpl{}
 }
