@@ -20,15 +20,15 @@ var (
 // Currently, each directory of Kube YAML files (or Helm charts) are treated as a separate context.
 // TODO: Figure out if it's useful to allow people to specify that files spanning different directories
 // should be treated as being in the same context.
-func CreateContexts(filesOrDirs ...string) ([]*LintContext, error) {
-	contextsByDir := make(map[string]*LintContext)
+func CreateContexts(filesOrDirs ...string) ([]LintContext, error) {
+	contextsByDir := make(map[string]*lintContextImpl)
 	for _, fileOrDir := range filesOrDirs {
 		// Stdin
 		if fileOrDir == "-" {
 			if _, alreadyExists := contextsByDir["-"]; alreadyExists {
 				continue
 			}
-			ctx := New()
+			ctx := new()
 			if err := ctx.loadObjectsFromReader("<standard input>", os.Stdin); err != nil {
 				return nil, err
 			}
@@ -46,7 +46,7 @@ func CreateContexts(filesOrDirs ...string) ([]*LintContext, error) {
 				if knownYAMLExtensions.Contains(strings.ToLower(filepath.Ext(currentPath))) || fileOrDir == currentPath {
 					ctx := contextsByDir[dirName]
 					if ctx == nil {
-						ctx = New()
+						ctx = new()
 						contextsByDir[dirName] = ctx
 					}
 					if err := ctx.loadObjectsFromYAMLFile(currentPath, info); err != nil {
@@ -60,7 +60,7 @@ func CreateContexts(filesOrDirs ...string) ([]*LintContext, error) {
 				if _, alreadyExists := contextsByDir[currentPath]; alreadyExists {
 					return nil
 				}
-				ctx := New()
+				ctx := new()
 				contextsByDir[currentPath] = ctx
 				if err := ctx.loadObjectsFromHelmChart(currentPath); err != nil {
 					return err
@@ -78,7 +78,7 @@ func CreateContexts(filesOrDirs ...string) ([]*LintContext, error) {
 		dirs = append(dirs, dir)
 	}
 	sort.Strings(dirs)
-	var contexts []*LintContext
+	var contexts []LintContext
 	for _, dir := range dirs {
 		contexts = append(contexts, contextsByDir[dir])
 	}

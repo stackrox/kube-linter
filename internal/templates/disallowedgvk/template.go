@@ -37,7 +37,7 @@ func init() {
 			if err != nil {
 				return nil, errors.Wrap(err, "invalid kind")
 			}
-			return func(_ *lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
+			return func(_ lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				gvk := extract.GVK(object.K8sObject)
 				if groupMatcher(gvk.Group) && versionMatcher(gvk.Version) && kindMatcher(gvk.Kind) {
 					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("disallowed API object found: %s", gvk)}}

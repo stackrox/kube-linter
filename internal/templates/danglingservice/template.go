@@ -26,7 +26,7 @@ func init() {
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,
 		Instantiate: params.WrapInstantiateFunc(func(_ params.Params) (check.Func, error) {
-			return func(lintCtx *lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
+			return func(lintCtx lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				service, ok := object.K8sObject.(*v1.Service)
 				if !ok {
 					return nil

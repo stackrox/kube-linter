@@ -34,7 +34,7 @@ func ConstructRequiredMapMatcher(key, value, fieldType string) (check.Func, erro
 		return nil, errors.Errorf("unknown fieldType %q", fieldType)
 	}
 
-	return func(_ *lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
+	return func(_ lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 		fields := extractFunc(object.K8sObject)
 		for k, v := range fields {
 			if keyMatcher(k) && valueMatcher(v) {

@@ -66,7 +66,7 @@ func (w nopWriter) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-func (l *LintContext) renderHelmChart(dir string) (map[string]string, error) {
+func (l *lintContextImpl) renderHelmChart(dir string) (map[string]string, error) {
 	// Helm doesn't have great logging behaviour, and can spam stderr, so silence their logging.
 	// TODO: capture these logs.
 	log.SetOutput(nopWriter{})
@@ -95,11 +95,11 @@ func (l *LintContext) renderHelmChart(dir string) (map[string]string, error) {
 	return rendered, nil
 }
 
-func (l *LintContext) loadObjectsFromHelmChart(dir string) error {
+func (l *lintContextImpl) loadObjectsFromHelmChart(dir string) error {
 	metadata := ObjectMetadata{FilePath: dir}
 	renderedFiles, err := l.renderHelmChart(dir)
 	if err != nil {
-		l.invalidObjects = append(l.invalidObjects, InvalidObject{Metadata: metadata, LoadErr: err})
+		l.addInvalidObjects(InvalidObject{Metadata: metadata, LoadErr: err})
 		return nil
 	}
 	for path, contents := range renderedFiles {
@@ -113,7 +113,7 @@ func (l *LintContext) loadObjectsFromHelmChart(dir string) error {
 	return nil
 }
 
-func (l *LintContext) loadObjectFromYAMLReader(filePath string, r *yaml.YAMLReader) error {
+func (l *lintContextImpl) loadObjectFromYAMLReader(filePath string, r *yaml.YAMLReader) error {
 	doc, err := r.Read()
 	if err != nil {
 		return err
@@ -130,14 +130,14 @@ func (l *LintContext) loadObjectFromYAMLReader(filePath string, r *yaml.YAMLRead
 
 	objs, err := parseObjects(doc)
 	if err != nil {
-		l.invalidObjects = append(l.invalidObjects, InvalidObject{
+		l.addInvalidObjects(InvalidObject{
 			Metadata: metadata,
 			LoadErr:  err,
 		})
 		return nil
 	}
 	for _, obj := range objs {
-		l.objects = append(l.objects, Object{
+		l.addObjects(Object{
 			Metadata:  metadata,
 			K8sObject: obj,
 		})
@@ -145,7 +145,7 @@ func (l *LintContext) loadObjectFromYAMLReader(filePath string, r *yaml.YAMLRead
 	return nil
 }
 
-func (l *LintContext) loadObjectsFromYAMLFile(filePath string, info os.FileInfo) error {
+func (l *lintContextImpl) loadObjectsFromYAMLFile(filePath string, info os.FileInfo) error {
 	if info.Size() > maxFileSizeBytes {
 		return nil
 	}
@@ -160,7 +160,7 @@ func (l *LintContext) loadObjectsFromYAMLFile(filePath string, info os.FileInfo)
 	return l.loadObjectsFromReader(filePath, file)
 }
 
-func (l *LintContext) loadObjectsFromReader(filePath string, reader io.Reader) error {
+func (l *lintContextImpl) loadObjectsFromReader(filePath string, reader io.Reader) error {
 	yamlReader := yaml.NewYAMLReader(bufio.NewReader(reader))
 	for {
 		if err := l.loadObjectFromYAMLReader(filePath, yamlReader); err != nil {

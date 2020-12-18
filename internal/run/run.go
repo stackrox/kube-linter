@@ -15,7 +15,7 @@ type Result struct {
 }
 
 // Run runs the linter on the given context, with the given config.
-func Run(lintCtxs []*lintcontext.LintContext, registry checkregistry.CheckRegistry, checks []string) (Result, error) {
+func Run(lintCtxs []lintcontext.LintContext, registry checkregistry.CheckRegistry, checks []string) (Result, error) {
 	instantiatedChecks := make([]*instantiatedcheck.InstantiatedCheck, 0, len(checks))
 	for _, checkName := range checks {
 		instantiatedCheck := registry.Load(checkName)

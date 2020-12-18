@@ -27,7 +27,7 @@ func init() {
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,
 		Instantiate: params.WrapInstantiateFunc(func(_ params.Params) (check.Func, error) {
-			return func(_ *lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
+			return func(_ lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				selector, found := extract.Selector(object.K8sObject)
 				if !found {
 					return nil
