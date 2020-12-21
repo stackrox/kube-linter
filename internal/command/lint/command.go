@@ -19,6 +19,7 @@ import (
 
 // Command is the command for the lint command.
 func Command() *cobra.Command {
+	var configPath string
 	var verbose bool
 
 	v := viper.New()
@@ -34,7 +35,7 @@ func Command() *cobra.Command {
 			}
 
 			// Load Configuration
-			cfg, err := config.Load(v)
+			cfg, err := config.Load(v, configPath)
 			if err != nil {
 				return errors.Wrap(err, "failed to load config")
 			}
@@ -92,18 +93,9 @@ func Command() *cobra.Command {
 		},
 	}
 
-	c.Flags().String("config", "", "Path to config file")
+	c.Flags().StringVar(&configPath, "config", "", "Path to config file")
 	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
-	c.Flags().StringSlice("exclude", nil, "Exclude checks")
-	c.Flags().StringSlice("include", nil, "Include provided checks")
-	c.Flags().Bool("add-all-built-in", false, "Add All BuildIn checks")
-	c.Flags().Bool("no-defaults", false, "Don't add Default checks")
 
-	v.BindPFlag("config", c.Flags().Lookup("config"))
-	v.BindPFlag("checks.exclude", c.Flags().Lookup("exclude"))
-	v.BindPFlag("checks.include", c.Flag("include"))
-	v.BindPFlag("checks.addAllBuiltIn", c.Flag("add-all-built-in"))
-	v.BindPFlag("checks.doNotAutoAddDefaults", c.Flag("no-defaults"))
-
+	config.AddFlags(c, v)
 	return c
 }
