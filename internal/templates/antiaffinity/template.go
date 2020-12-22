@@ -7,6 +7,7 @@ import (
 	"golang.stackrox.io/kube-linter/internal/diagnostic"
 	"golang.stackrox.io/kube-linter/internal/extract"
 	"golang.stackrox.io/kube-linter/internal/lintcontext"
+	"golang.stackrox.io/kube-linter/internal/matcher"
 	"golang.stackrox.io/kube-linter/internal/objectkinds"
 	"golang.stackrox.io/kube-linter/internal/templates"
 	"golang.stackrox.io/kube-linter/internal/templates/antiaffinity/internal/params"
@@ -14,6 +15,10 @@ import (
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 )
+
+func defaultTopologyKeyMatcher(topologyKey string) bool {
+	return topologyKey == "kubernetes.io/hostname"
+}
 
 func init() {
 	templates.Register(check.Template{
@@ -26,6 +31,16 @@ func init() {
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,
 		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
+			var topologyKeyMatcher func(string) bool
+			if p.TopologyKey == "" {
+				topologyKeyMatcher = defaultTopologyKeyMatcher
+			} else {
+				var err error
+				topologyKeyMatcher, err = matcher.ForString(p.TopologyKey)
+				if err != nil {
+					return nil, err
+				}
+			}
 			return func(_ lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				replicas, found := extract.Replicas(object.K8sObject)
 				if !found {
@@ -42,12 +57,12 @@ func init() {
 					preferredAffinity := affinity.PodAntiAffinity.PreferredDuringSchedulingIgnoredDuringExecution
 					requiredAffinity := affinity.PodAntiAffinity.RequiredDuringSchedulingIgnoredDuringExecution
 					for _, preferred := range preferredAffinity {
-						if affinityTermMatchesLabelsAgainstNodes(preferred.PodAffinityTerm, podTemplateSpec.Namespace, podTemplateSpec.Labels) {
+						if affinityTermMatchesLabelsAgainstNodes(preferred.PodAffinityTerm, podTemplateSpec.Namespace, podTemplateSpec.Labels, topologyKeyMatcher) {
 							return nil
 						}
 					}
 					for _, required := range requiredAffinity {
-						if affinityTermMatchesLabelsAgainstNodes(required, podTemplateSpec.Namespace, podTemplateSpec.Labels) {
+						if affinityTermMatchesLabelsAgainstNodes(required, podTemplateSpec.Namespace, podTemplateSpec.Labels, topologyKeyMatcher) {
 							return nil
 						}
 					}
@@ -58,7 +73,7 @@ func init() {
 	})
 }
 
-func affinityTermMatchesLabelsAgainstNodes(affinityTerm coreV1.PodAffinityTerm, podNamespace string, podLabels map[string]string) bool {
+func affinityTermMatchesLabelsAgainstNodes(affinityTerm coreV1.PodAffinityTerm, podNamespace string, podLabels map[string]string, topologyKeyMatcher func(string) bool) bool {
 	// If namespaces is not specified in the affinity term, that means the affinity term implicitly applies to the pod's namespace.
 	if len(affinityTerm.Namespaces) > 0 {
 		var matchingNSFound bool
@@ -76,7 +91,7 @@ func affinityTermMatchesLabelsAgainstNodes(affinityTerm coreV1.PodAffinityTerm, 
 	if err != nil {
 		return false
 	}
-	if affinityTerm.TopologyKey == "kubernetes.io/hostname" && labelSelector.Matches(labels.Set(podLabels)) {
+	if topologyKeyMatcher(affinityTerm.TopologyKey) && labelSelector.Matches(labels.Set(podLabels)) {
 		return true
 	}
 	return false
