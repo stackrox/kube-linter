@@ -10,13 +10,13 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/iancoleman/strcase"
+	"golang.stackrox.io/kube-linter/internal/stringutils"
+	"golang.stackrox.io/kube-linter/internal/utils"
 
 	"github.com/Masterminds/sprig/v3"
 	"github.com/forestgiant/sliceutil"
+	"github.com/iancoleman/strcase"
 	"github.com/pkg/errors"
-	"golang.stackrox.io/kube-linter/internal/stringutils"
-	"golang.stackrox.io/kube-linter/internal/utils"
 	"k8s.io/gengo/parser"
 	"k8s.io/gengo/types"
 )
@@ -34,25 +34,34 @@ const (
 package config
 
 import (
-	"github.com/spf13/viper"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // AddFlags, walks through config.Check struct and bind its Member to Cobra command 
 // and add respective Viper flag 
 func AddFlags(c *cobra.Command, v *viper.Viper) {
 	{{- range . }}
-		
-	{{- if eq .FlagDesc.AddFlag true }}
-		{{- if eq .FlagDesc.Type "stringSlice" }}		
-		c.Flags().StringSlice("{{ .FlagDesc.Name }}", nil, "{{ .FlagDesc.Description }}")
-		{{- else if eq .FlagDesc.Type "boolean" }}
-		c.Flags().Bool("{{ .FlagDesc.Name }}", false, "{{ .FlagDesc.Description }}")
-		{{- end }}
-		{{- if ne .FlagDesc.Parent "" }}
-		v.BindPFlag("{{ .FlagDesc.Parent }}.{{ .FlagDesc.Name }}", c.Flags().Lookup("{{ .FlagDesc.Name }}"))
-		{{- end }}
 
+	{{- if .FlagDesc.AddFlag }}
+	{{- if eq .FlagDesc.Type "stringSlice" }}		
+	c.Flags().StringSlice("{{ .FlagDesc.Name }}", nil, "{{ .FlagDesc.Description }}")
+	{{- else if eq .FlagDesc.Type "string" }}
+	c.Flags().String("{{ .FlagDesc.Name }}", "", "{{ .FlagDesc.Description }}")
+	{{- else if eq .FlagDesc.Type "boolean" }}
+	c.Flags().Bool("{{ .FlagDesc.Name }}", false, "{{ .FlagDesc.Description }}")
+	{{- else if eq .FlagDesc.Type "float32" }}
+	c.Flags().Float32("{{ .FlagDesc.Name }}", 0, "{{ .FlagDesc.Description }}")
+	{{- else if eq .FlagDesc.Type "float64" }}
+	c.Flags().Float64("{{ .FlagDesc.Name }}", 0, "{{ .FlagDesc.Description }}")
+	{{- else if eq .FlagDesc.Type "integer" }}
+	c.Flags().Int("{{ .FlagDesc.Name }}", 0, "{{ .FlagDesc.Description }}")
+	{{- end }}
+	{{- if ne .FlagDesc.Parent "" }}
+	v.BindPFlag("{{ .FlagDesc.Parent }}.{{ .FlagDesc.Name }}", c.Flags().Lookup("{{ .FlagDesc.Name }}"))
+	{{- else }}
+	v.BindPFlag("{{ .FlagDesc.Name }}", c.Flags().Lookup("{{ .FlagDesc.Name }}"))
+	{{- end }}
 	{{- end }}
 
 	{{- end }}
@@ -61,20 +70,18 @@ func AddFlags(c *cobra.Command, v *viper.Viper) {
 )
 
 var (
-	fileTemplate = template.Must(template.New("gen").Funcs(sprig.TxtFuncMap()).Funcs(template.FuncMap{
-		"backtick": func() string {
-			return "`"
-		},
-	}).Parse(fileTemplateStr))
+	fileTemplate = template.Must(template.New("gen").Funcs(sprig.TxtFuncMap()).Parse(fileTemplateStr))
 )
 
 type flagType string
 
+// This types are used in template to add appropriate Cobra flags
 const (
 	stringType      flagType = "string"
 	integerType     flagType = "integer"
 	booleanType     flagType = "boolean"
-	floatType       flagType = "float"
+	float32Type     flagType = "float32"
+	float64Type     flagType = "float64"
 	stringSliceType flagType = "stringSlice"
 	objectType      flagType = "object"
 )
@@ -88,8 +95,7 @@ type flagDesc struct {
 }
 
 type templateElem struct {
-	FlagDesc  flagDesc
-	ParamJSON string
+	FlagDesc flagDesc
 }
 
 func getName(member types.Member) string {
@@ -144,8 +150,10 @@ func constructFlagDescFromStruct(typeSpec *types.Type) ([]flagDesc, error) {
 				desc.Type = stringType
 			case types.Int:
 				desc.Type = integerType
-			case types.Float32, types.Float64:
-				desc.Type = floatType
+			case types.Float32:
+				desc.Type = float32Type
+			case types.Float64:
+				desc.Type = float64Type
 			case types.Bool:
 				desc.Type = booleanType
 			default:
@@ -162,16 +170,17 @@ func constructFlagDescFromStruct(typeSpec *types.Type) ([]flagDesc, error) {
 			}
 
 			if err != nil {
-				return nil, errors.Wrapf(err, "handling field %v", member.Name)
+				return nil, errors.Wrapf(err, "handling field %s", member.Name)
 			}
+
 			flagDescs = append(flagDescs, subDesc...)
 		case types.Slice:
-			desc.Type = stringSliceType
-			subDesc, err := constructFlagDescFromStruct(member.Type)
-			if err != nil {
-				return nil, errors.Wrapf(err, "handling field %v", member.Name)
+			switch sliceType := relevantTyp.Elem.String(); sliceType {
+			case "string":
+				desc.Type = stringSliceType
+			default:
+				return nil, errors.Errorf("currently unsupported Slice of type %s", sliceType)
 			}
-			flagDescs = append(flagDescs, subDesc...)
 		default:
 			return nil, errors.Errorf("currently unsupported type %v", member.Type)
 		}
@@ -187,7 +196,7 @@ func mainCmd() error {
 	// This avoids parsing generated files in the package (since we add +build !flagcodegen to them,
 	// which makes the parsing much quicker since the parser doesn't have to load any imported packages).
 	b.AddBuildTags("flagcodegen")
-	if err := b.AddDir("./internal/config"); err != nil {
+	if err := b.AddDir("../config"); err != nil {
 		return err
 	}
 	typeUniverse, err := b.FindTypes()
@@ -219,12 +228,11 @@ func mainCmd() error {
 		}
 
 		templateObj = append(templateObj, templateElem{
-			FlagDesc:  flagDesc,
-			ParamJSON: buf.String(),
+			FlagDesc: flagDesc,
 		})
 	}
 
-	outFileName := filepath.Join(".", "internal", "config", "flags.go")
+	outFileName := filepath.Join("..", "config", "flags.go")
 	outF, err := os.Create(outFileName)
 	if err != nil {
 		return errors.Wrap(err, "creating output file")
