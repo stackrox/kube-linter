@@ -38,7 +38,6 @@ func Load(v *viper.Viper, configPath string) (Config, error) {
 		ext := filepath.Ext(configPath)
 		path := filepath.Dir(configPath)
 
-		v.SetConfigType(strings.TrimPrefix(ext, "."))
 		v.SetConfigName(strings.TrimSuffix(filename, ext))
 		v.AddConfigPath(path)
 		if err := v.ReadInConfig(); err != nil {

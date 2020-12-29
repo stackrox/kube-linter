@@ -4,10 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/spf13/viper"
-
-	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh/terminal"
 	"golang.stackrox.io/kube-linter/internal/builtinchecks"
 	"golang.stackrox.io/kube-linter/internal/checkregistry"
@@ -15,6 +11,10 @@ import (
 	"golang.stackrox.io/kube-linter/internal/configresolver"
 	"golang.stackrox.io/kube-linter/internal/lintcontext"
 	"golang.stackrox.io/kube-linter/internal/run"
+
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // Command is the command for the lint command.
