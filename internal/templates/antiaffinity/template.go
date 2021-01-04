@@ -16,14 +16,20 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 )
 
+const (
+	templateKey = "anti-affinity"
+)
+
+
 func defaultTopologyKeyMatcher(topologyKey string) bool {
 	return topologyKey == "kubernetes.io/hostname"
 }
 
+
 func init() {
 	templates.Register(check.Template{
 		HumanName:   "Anti affinity not specified",
-		Key:         "anti-affinity",
+		Key:         templateKey,
 		Description: "Flag objects with multiple replicas but inter-pod anti affinity not specified in the pod template spec",
 		SupportedObjectKinds: check.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},

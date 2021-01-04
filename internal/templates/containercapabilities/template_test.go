@@ -169,11 +169,11 @@ func (s *ContainerCapabilitiesTestSuite) TestInvalidParams() {
 }
 
 func (s *ContainerCapabilitiesTestSuite) addPodAndAddContainerWithCaps(addCaps, dropCaps []v1.Capability) {
-	s.ctx.AddMockPod(podName, "", "", nil, nil)
-	s.ctx.AddContainerToPod(podName, containerName, "", nil, nil, &v1.SecurityContext{
+	s.ctx.AddMockPod(podName,  "", nil, nil)
+	s.ctx.AddContainerToPod(s.T(), podName, v1.Container{Name: containerName, SecurityContext: &v1.SecurityContext{
 		Capabilities: &v1.Capabilities{
 			Add:  addCaps,
 			Drop: dropCaps,
 		},
-	})
+	}})
 }
