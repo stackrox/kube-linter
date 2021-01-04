@@ -108,11 +108,15 @@ jobs:
           fi
           docker login -u "$DOCKER_IO_PUSH_USERNAME" -p "$DOCKER_IO_PUSH_PASSWORD"
           img="stackrox/kube-linter:$(./get-tag)"
+          alpine_img="${img}-alpine"
           docker push "${img}"
+          docker push "${alpine_img}"
 
           if [[ -n "${CIRCLE_TAG}" ]]; then
             docker tag "${img}" stackrox/kube-linter:latest
             docker push stackrox/kube-linter:latest
+            docker tag "${alpine_img}" stackrox/kube-linter:latest-alpine
+            docker push stackrox/kube-linter:latest-alpine
           fi
 
 commands:

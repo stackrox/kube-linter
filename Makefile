@@ -110,7 +110,8 @@ $(KUBE_LINTER_BIN):
 .PHONY: image
 image: build
 	@cp bin/linux/kube-linter image/bin
-	@docker build -t "stackrox/kube-linter:$(TAG)" image/
+	@docker build -t "stackrox/kube-linter:$(TAG)" -f image/Dockerfile image/
+	@docker build -t "stackrox/kube-linter:$(TAG)-alpine" -f image/Dockerfile_alpine image/
 ##########
 ## Test ##
 ##########
