@@ -3,6 +3,8 @@
 
 # What is KubeLinter?
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/stackrox/kube-linter)](https://goreportcard.com/report/github.com/stackrox/kube-linter)
+
 KubeLinter analyzes Kubernetes YAML files and Helm charts, and checks them against a variety of best practices, with a focus on production readiness and security. 
 
 KubeLinter runs sensible default checks, designed to give you useful information about your Kubernetes YAML files and Helm charts. This is to help teams check early and often for security misconfigurations and DevOps best practices. Some common examples of these include running containers as a non-root user, enforcing least privilege, and storing sensitive information only in secrets.
