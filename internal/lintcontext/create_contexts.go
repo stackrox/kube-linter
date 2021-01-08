@@ -21,6 +21,10 @@ var (
 // TODO: Figure out if it's useful to allow people to specify that files spanning different directories
 // should be treated as being in the same context.
 func CreateContexts(filesOrDirs ...string) ([]LintContext, error) {
+	if len(filesOrDirs) == 1 && strings.HasSuffix(filesOrDirs[0], ".tgz") {
+		return CreateContextsFromTgz(filesOrDirs[0])
+	}
+
 	contextsByDir := make(map[string]*lintContextImpl)
 	for _, fileOrDir := range filesOrDirs {
 		// Stdin
@@ -82,5 +86,18 @@ func CreateContexts(filesOrDirs ...string) ([]LintContext, error) {
 	for _, dir := range dirs {
 		contexts = append(contexts, contextsByDir[dir])
 	}
+	return contexts, nil
+}
+
+// CreateContextsFromTgz creates a context from TGZ Helm Chart file
+func CreateContextsFromTgz(tgzFile string) ([]LintContext, error) {
+	ctx := new()
+	if err := ctx.loadObjectsFromTgzHelmChart(tgzFile); err != nil {
+		return nil, err
+	}
+
+	var contexts []LintContext
+	contexts = append(contexts, ctx)
+
 	return contexts, nil
 }
