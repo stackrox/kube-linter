@@ -1,9 +1,9 @@
 <p align="center"><img src="images/logo/KubeLinter-horizontal.svg" width="360"></p>
 <p align="center"><b>Static analysis for Kubernetes</b></p>
 
-# What is KubeLinter?
-
 [![Go Report Card](https://goreportcard.com/badge/github.com/stackrox/kube-linter)](https://goreportcard.com/report/github.com/stackrox/kube-linter)
+
+# What is KubeLinter?
 
 KubeLinter analyzes Kubernetes YAML files and Helm charts, and checks them against a variety of best practices, with a focus on production readiness and security. 
 
