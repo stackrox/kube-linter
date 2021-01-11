@@ -12,6 +12,7 @@ import (
 	y "github.com/ghodss/yaml"
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/k8sutil"
+	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/chartutil"
 	"helm.sh/helm/v3/pkg/cli/values"
@@ -84,15 +85,21 @@ func (l *lintContextImpl) renderHelmChart(dir string) (map[string]string, error)
 	if err != nil {
 		return nil, errors.Wrap(err, "loading values.yaml file")
 	}
+	return l.renderValues(chrt, values)
+}
+
+func (l *lintContextImpl) renderValues(chrt *chart.Chart, values map[string]interface{}) (map[string]string, error) {
 	valuesToRender, err := chartutil.ToRenderValues(chrt, values, chartutil.ReleaseOptions{Name: "test-release", Namespace: "default"}, nil)
 	if err != nil {
 		return nil, err
 	}
+
 	e := engine.Engine{LintMode: true}
 	rendered, err := e.Render(chrt, valuesToRender)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to render")
 	}
+
 	return rendered, nil
 }
 
@@ -133,8 +140,6 @@ func (l *lintContextImpl) loadObjectsFromTgzHelmChart(tgzFile string) error {
 }
 
 func (l *lintContextImpl) renderTgzHelmChart(tgzFile string) (map[string]string, error) {
-	// Helm doesn't have great logging behaviour, and can spam stderr, so silence their logging.
-	// TODO: capture these logs.
 	log.SetOutput(nopWriter{})
 	defer log.SetOutput(os.Stderr)
 	chrt, err := loader.LoadFile(tgzFile)
@@ -164,17 +169,7 @@ func (l *lintContextImpl) renderTgzHelmChart(tgzFile string) (map[string]string,
 		return nil, errors.Wrap(err, "loading values.yaml file")
 	}
 
-	valuesToRender, err := chartutil.ToRenderValues(chrt, values, chartutil.ReleaseOptions{Name: "test-release", Namespace: "default"}, nil)
-	if err != nil {
-		return nil, err
-	}
-	e := engine.Engine{LintMode: true}
-	rendered, err := e.Render(chrt, valuesToRender)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to render")
-	}
-
-	return rendered, nil
+	return l.renderValues(chrt, values)
 }
 
 func (l *lintContextImpl) parseValues(filePath string, bytes []byte) (map[string]interface{}, error) {

@@ -2,10 +2,7 @@ package lint
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
-
-	"encoding/json"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -22,7 +19,6 @@ import (
 func Command() *cobra.Command {
 	var configPath string
 	var verbose bool
-	var jsonPath string
 
 	c := &cobra.Command{
 		Use:   "lint",
@@ -90,22 +86,10 @@ func Command() *cobra.Command {
 					report.FormatPlain(os.Stderr)
 				}
 			}
-			if jsonPath != "" {
-				report := result.GenerateReport()
-				jsonReport, err := json.Marshal(report)
-				if err != nil {
-					return err
-				}
-				err = ioutil.WriteFile(jsonPath, jsonReport, 0644)
-				if err != nil {
-					return err
-				}
-			}
 			return errors.Errorf("found %d lint errors", len(result.Reports))
 		},
 	}
 	c.Flags().StringVar(&configPath, "config", "", "Path to config file")
 	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
-	c.Flags().StringVar(&jsonPath, "json", "", "Path to output JSON report file")
 	return c
 }
