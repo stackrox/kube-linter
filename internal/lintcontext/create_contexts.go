@@ -37,21 +37,21 @@ func CreateContexts(filesOrDirs ...string) ([]LintContext, error) {
 			continue
 		}
 
-		if strings.HasSuffix(strings.ToLower(fileOrDir), ".tgz") {
-			ctx := new()
-			if err := ctx.loadObjectsFromTgzHelmChart(fileOrDir); err != nil {
-				return nil, err
-			}
-
-			contextsByDir[fileOrDir] = ctx
-			continue
-		}
-
 		err := filepath.Walk(fileOrDir, func(currentPath string, info os.FileInfo, walkErr error) error {
 			if walkErr != nil {
 				return walkErr
 			}
 			if !info.IsDir() {
+				if strings.HasSuffix(strings.ToLower(currentPath), ".tgz") {
+					ctx := new()
+					if err := ctx.loadObjectsFromTgzHelmChart(currentPath); err != nil {
+						return err
+					}
+
+					contextsByDir[currentPath] = ctx
+					return nil
+				}
+
 				dirName := filepath.Dir(currentPath)
 				// Load a file only if it ends in .yaml, OR it was explicitly passed by the user.
 				if knownYAMLExtensions.Contains(strings.ToLower(filepath.Ext(currentPath))) || fileOrDir == currentPath {
