@@ -23,6 +23,8 @@ checks:
   doNotAutoAddDefaults: true
 ```
 
+> Equivalent CLI flag is `--do-not-auto-add-defaults`
+
 ## Run all default checks
 
 To run all built-in checks, set `addAllBuiltIn` to `true`.
@@ -30,6 +32,8 @@ To run all built-in checks, set `addAllBuiltIn` to `true`.
 checks:
   addAllBuiltIn: true
 ```
+
+> Equivalent CLI flag is `--add-all-built-in`
 
 > [!NOTE]
 >
@@ -58,6 +62,8 @@ example,
     - "unset-cpu-requirements"
     - "unset-memory-requirements"
   ```
+
+> Equivalent CLI flags are `--include` and `--exclude` respectively
 
 > [!TIP]
 > `exclude` always takes precedence, if you include and exclude the same check,

@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh/terminal"
 	"golang.stackrox.io/kube-linter/internal/builtinchecks"
 	"golang.stackrox.io/kube-linter/internal/checkregistry"
@@ -13,12 +11,18 @@ import (
 	"golang.stackrox.io/kube-linter/internal/configresolver"
 	"golang.stackrox.io/kube-linter/internal/lintcontext"
 	"golang.stackrox.io/kube-linter/internal/run"
+
+	"github.com/pkg/errors"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // Command is the command for the lint command.
 func Command() *cobra.Command {
 	var configPath string
 	var verbose bool
+
+	v := viper.New()
 
 	c := &cobra.Command{
 		Use:   "lint",
@@ -29,14 +33,13 @@ func Command() *cobra.Command {
 			if err := builtinchecks.LoadInto(checkRegistry); err != nil {
 				return err
 			}
-			var cfg config.Config
-			if configPath != "" {
-				var err error
-				cfg, err = config.Load(configPath)
-				if err != nil {
-					return errors.Wrap(err, "failed to load config")
-				}
+
+			// Load Configuration
+			cfg, err := config.Load(v, configPath)
+			if err != nil {
+				return errors.Wrap(err, "failed to load config")
 			}
+
 			if err := configresolver.LoadCustomChecksInto(&cfg, checkRegistry); err != nil {
 				return err
 			}
@@ -89,7 +92,10 @@ func Command() *cobra.Command {
 			return errors.Errorf("found %d lint errors", len(result.Reports))
 		},
 	}
+
 	c.Flags().StringVar(&configPath, "config", "", "Path to config file")
 	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
+
+	config.AddFlags(c, v)
 	return c
 }
