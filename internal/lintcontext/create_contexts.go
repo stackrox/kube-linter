@@ -21,6 +21,7 @@ var (
 // TODO: Figure out if it's useful to allow people to specify that files spanning different directories
 // should be treated as being in the same context.
 func CreateContexts(filesOrDirs ...string) ([]LintContext, error) {
+
 	contextsByDir := make(map[string]*lintContextImpl)
 	for _, fileOrDir := range filesOrDirs {
 		// Stdin
@@ -40,7 +41,22 @@ func CreateContexts(filesOrDirs ...string) ([]LintContext, error) {
 			if walkErr != nil {
 				return walkErr
 			}
+
+			if _, exists := contextsByDir[currentPath]; exists {
+				return nil
+			}
+
 			if !info.IsDir() {
+				if strings.HasSuffix(strings.ToLower(currentPath), ".tgz") {
+					ctx := new()
+					if err := ctx.loadObjectsFromTgzHelmChart(currentPath); err != nil {
+						return err
+					}
+
+					contextsByDir[currentPath] = ctx
+					return nil
+				}
+
 				dirName := filepath.Dir(currentPath)
 				// Load a file only if it ends in .yaml, OR it was explicitly passed by the user.
 				if knownYAMLExtensions.Contains(strings.ToLower(filepath.Ext(currentPath))) || fileOrDir == currentPath {

@@ -9,8 +9,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	y "github.com/ghodss/yaml"
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/k8sutil"
+	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/chartutil"
 	"helm.sh/helm/v3/pkg/cli/values"
@@ -83,15 +85,21 @@ func (l *lintContextImpl) renderHelmChart(dir string) (map[string]string, error)
 	if err != nil {
 		return nil, errors.Wrap(err, "loading values.yaml file")
 	}
+	return l.renderValues(chrt, values)
+}
+
+func (l *lintContextImpl) renderValues(chrt *chart.Chart, values map[string]interface{}) (map[string]string, error) {
 	valuesToRender, err := chartutil.ToRenderValues(chrt, values, chartutil.ReleaseOptions{Name: "test-release", Namespace: "default"}, nil)
 	if err != nil {
 		return nil, err
 	}
+
 	e := engine.Engine{LintMode: true}
 	rendered, err := e.Render(chrt, valuesToRender)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to render")
 	}
+
 	return rendered, nil
 }
 
@@ -111,6 +119,67 @@ func (l *lintContextImpl) loadObjectsFromHelmChart(dir string) error {
 		}
 	}
 	return nil
+}
+
+func (l *lintContextImpl) loadObjectsFromTgzHelmChart(tgzFile string) error {
+	metadata := ObjectMetadata{FilePath: tgzFile}
+	renderedFiles, err := l.renderTgzHelmChart(tgzFile)
+	if err != nil {
+		l.invalidObjects = append(l.invalidObjects, InvalidObject{Metadata: metadata, LoadErr: err})
+		return nil
+	}
+	for path, contents := range renderedFiles {
+		// The first element of path will be the same as the last element of tgzFile, because
+		// Helm duplicates it.
+		pathToTemplate := filepath.Join(filepath.Dir(tgzFile), path)
+		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
+			return errors.Wrapf(err, "loading objects from rendered helm chart %s/%s", tgzFile, pathToTemplate)
+		}
+	}
+	return nil
+}
+
+func (l *lintContextImpl) renderTgzHelmChart(tgzFile string) (map[string]string, error) {
+	log.SetOutput(nopWriter{})
+	defer log.SetOutput(os.Stderr)
+	chrt, err := loader.LoadFile(tgzFile)
+
+	if err != nil {
+		return nil, err
+	}
+	if err := chrt.Validate(); err != nil {
+		return nil, err
+	}
+
+	valuesIndex := -1
+	for i, f := range chrt.Raw {
+		if f.Name == "values.yaml" {
+			valuesIndex = i
+			break
+		}
+	}
+
+	indexName := filepath.Join(tgzFile, "values.yaml")
+	if valuesIndex == -1 {
+		return nil, errors.Errorf("%s not found", indexName)
+	}
+
+	values, err := l.parseValues(indexName, chrt.Raw[valuesIndex].Data)
+	if err != nil {
+		return nil, errors.Wrap(err, "loading values.yaml file")
+	}
+
+	return l.renderValues(chrt, values)
+}
+
+func (l *lintContextImpl) parseValues(filePath string, bytes []byte) (map[string]interface{}, error) {
+	currentMap := map[string]interface{}{}
+
+	if err := y.Unmarshal(bytes, &currentMap); err != nil {
+		return nil, errors.Wrapf(err, "failed to parse %s", filePath)
+	}
+
+	return currentMap, nil
 }
 
 func (l *lintContextImpl) loadObjectFromYAMLReader(filePath string, r *yaml.YAMLReader) error {
