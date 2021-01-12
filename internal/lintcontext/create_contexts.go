@@ -41,6 +41,11 @@ func CreateContexts(filesOrDirs ...string) ([]LintContext, error) {
 			if walkErr != nil {
 				return walkErr
 			}
+
+			if _, exists := contextsByDir[currentPath]; exists {
+				return nil
+			}
+
 			if !info.IsDir() {
 				if strings.HasSuffix(strings.ToLower(currentPath), ".tgz") {
 					ctx := new()
