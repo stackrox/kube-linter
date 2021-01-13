@@ -17,12 +17,12 @@ func (l *MockLintContext) AddMockDeployment(t *testing.T, name string) {
 	}
 }
 
+// ModifyDeployment modifies a given deployment in the context via the passed function.
 func (l *MockLintContext) ModifyDeployment(t *testing.T, name string, f func(deployment *appsV1.Deployment)) {
 	dep, ok := l.objects[name].(*appsV1.Deployment)
 	require.True(t, ok)
 	f(dep)
 }
-
 
 // AddSecurityContextToDeployment adds a security context to the deployment specified by name
 func (l *MockLintContext) AddSecurityContextToDeployment(t *testing.T, deploymentName string,
