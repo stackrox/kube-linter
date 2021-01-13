@@ -135,7 +135,7 @@ To learn more about using and configuring KubeLinter, visit the [documentation](
 
 ## Mentions/Tutorials
 
-The following are tutorials on KubeLinter written by users. If you have one that would like to add to this list, please send a PR!
+The following are tutorials on KubeLinter written by users. If you have one that you would like to add to this list, please send a PR!
 
 * [Ensuring YAML best practices using KubeLinter](https://www.civo.com/learn/yaml-best-practices-using-kubelinter) at civo.com by Saiyam Pathak.
 * [Analyze Kubernetes files for errors with KubeLinter](https://opensource.com/article/21/1/kubelinter) at opensource.com by Jessica Cherry.
