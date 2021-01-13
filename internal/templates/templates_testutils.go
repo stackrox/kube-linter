@@ -1,6 +1,8 @@
 package templates
 
 import (
+	"fmt"
+
 	"github.com/stretchr/testify/suite"
 	"golang.stackrox.io/kube-linter/internal/check"
 	"golang.stackrox.io/kube-linter/internal/diagnostic"
@@ -18,7 +20,7 @@ type TemplateTestSuite struct {
 // TestCase represents a single test case which can be verified under a LintContext
 type TestCase struct {
 	Param                    interface{}
-	Diagnostics              []diagnostic.Diagnostic
+	Diagnostics              map[string][]diagnostic.Diagnostic
 	ExpectInstantiationError bool
 }
 
@@ -35,15 +37,18 @@ func (s *TemplateTestSuite) Validate(
 	cases []TestCase,
 ) {
 	for _, c := range cases {
-		checkFunc, err := s.Template.Instantiate(c.Param)
-		if c.ExpectInstantiationError {
-			s.Error(err, "param should have caused error but did not raise one")
-			continue
-		}
-		for _, obj := range ctx.Objects() {
-			diagnostics := checkFunc(ctx, obj)
-			s.compareDiagnostics(c.Diagnostics, diagnostics)
-		}
+		s.Run(fmt.Sprintf("%+v", c.Param), func() {
+			checkFunc, err := s.Template.Instantiate(c.Param)
+			if c.ExpectInstantiationError {
+				s.Error(err, "param should have caused error but did not raise one")
+				return
+			}
+			s.Require().NoError(err)
+			for _, obj := range ctx.Objects() {
+				diagnostics := checkFunc(ctx, obj)
+				s.compareDiagnostics(c.Diagnostics[obj.K8sObject.GetName()], diagnostics)
+			}
+		})
 	}
 }
 

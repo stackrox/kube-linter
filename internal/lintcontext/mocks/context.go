@@ -1,19 +1,19 @@
 package mocks
 
 import (
+	"golang.stackrox.io/kube-linter/internal/k8sutil"
 	"golang.stackrox.io/kube-linter/internal/lintcontext"
-	v1 "k8s.io/api/core/v1"
 )
 
 // MockLintContext is mock implementation of the LintContext used in unit tests
 type MockLintContext struct {
-	pods map[string]*v1.Pod
+	objects map[string]k8sutil.Object
 }
 
 // Objects returns all the objects under this MockLintContext
 func (l *MockLintContext) Objects() []lintcontext.Object {
-	result := make([]lintcontext.Object, 0, len(l.pods))
-	for _, p := range l.pods {
+	result := make([]lintcontext.Object, 0, len(l.objects))
+	for _, p := range l.objects {
 		result = append(result, lintcontext.Object{Metadata: lintcontext.ObjectMetadata{}, K8sObject: p})
 	}
 	return result
@@ -26,5 +26,5 @@ func (l *MockLintContext) InvalidObjects() []lintcontext.InvalidObject {
 
 // NewMockContext returns an empty mockLintContext
 func NewMockContext() *MockLintContext {
-	return &MockLintContext{pods: make(map[string]*v1.Pod)}
+	return &MockLintContext{objects: make(map[string]k8sutil.Object)}
 }

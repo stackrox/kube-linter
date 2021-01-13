@@ -9,6 +9,7 @@ import (
 	"golang.stackrox.io/kube-linter/internal/lintcontext"
 	"golang.stackrox.io/kube-linter/internal/matcher"
 	"golang.stackrox.io/kube-linter/internal/objectkinds"
+	"golang.stackrox.io/kube-linter/internal/stringutils"
 	"golang.stackrox.io/kube-linter/internal/templates"
 	"golang.stackrox.io/kube-linter/internal/templates/antiaffinity/internal/params"
 	coreV1 "k8s.io/api/core/v1"
@@ -20,11 +21,9 @@ const (
 	templateKey = "anti-affinity"
 )
 
-
 func defaultTopologyKeyMatcher(topologyKey string) bool {
 	return topologyKey == "kubernetes.io/hostname"
 }
-
 
 func init() {
 	templates.Register(check.Template{
@@ -73,7 +72,9 @@ func init() {
 						}
 					}
 				}
-				return []diagnostic.Diagnostic{{Message: fmt.Sprintf("object has %d replicas but does not specify inter pod anti-affinity", replicas)}}
+				return []diagnostic.Diagnostic{
+					{Message: fmt.Sprintf("object has %d %s but does not specify inter pod anti-affinity", replicas, stringutils.Ternary(replicas > 1, "replicas", "replica"))},
+				}
 			}, nil
 		}),
 	})
