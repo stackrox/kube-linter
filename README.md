@@ -133,6 +133,13 @@ Consider the following sample pod specification file `pod.yaml`. This file has t
    ```
 To learn more about using and configuring KubeLinter, visit the [documentation](./docs) page.
 
+## Mentions/Tutorials
+
+The following are tutorials on KubeLinter written by users. If you have one that would like to add to this list, please send a PR!
+
+* [Ensuring YAML best practices using KubeLinter](https://www.civo.com/learn/yaml-best-practices-using-kubelinter) at civo.com by Saiyam Pathak.
+* [Analyze Kubernetes files for errors with KubeLinter](https://opensource.com/article/21/1/kubelinter) at opensource.com by Jessica Cherry.
+
 ## Community
 
 If you would like to engage with the KubeLinter community, including maintainers and other users, you can join the Slack workspace [here](https://join.slack.com/t/kube-linter/shared_invite/zt-kla9qvyo-Tk~wynTSbr9EE3AjHcv4BQ).
