@@ -1,29 +1,17 @@
 package mocks
 
 import (
-	"github.com/pkg/errors"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+	appsV1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 )
 
-// AddContainerToPod adds a mock container to the specified pod under context
-func (l *MockLintContext) AddContainerToPod(
-	podName, containerName, image string,
-	ports []v1.ContainerPort,
-	env []v1.EnvVar,
-	sc *v1.SecurityContext,
-) error {
-	pod, ok := l.pods[podName]
-	if !ok {
-		return errors.Errorf("pod with name %q is not found", podName)
-	}
+// AddContainerToDeployment adds a mock container to the specified pod under context
+func (l *MockLintContext) AddContainerToDeployment(t *testing.T, deploymentName string, container v1.Container) {
+	deployment, ok := l.objects[deploymentName].(*appsV1.Deployment)
+	require.True(t, ok, "deployment with name %s not found", deploymentName)
 	// TODO: keep supporting other fields
-	pod.Spec.Containers = append(pod.Spec.Containers, v1.Container{
-		Name:            containerName,
-		Image:           image,
-		Ports:           ports,
-		Env:             env,
-		Resources:       v1.ResourceRequirements{},
-		SecurityContext: sc,
-	})
-	return nil
+	deployment.Spec.Template.Spec.Containers = append(deployment.Spec.Template.Spec.Containers, container)
 }

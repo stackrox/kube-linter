@@ -1,53 +1,33 @@
 package mocks
 
 import (
-	"github.com/pkg/errors"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+	appsV1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// AddMockPod adds a mock Pod to LintContext
-func (l *MockLintContext) AddMockPod(
-	podName, namespace, clusterName string,
-	labels, annotations map[string]string,
-) {
-	l.pods[podName] =
-		&v1.Pod{
-			TypeMeta: metaV1.TypeMeta{},
-			ObjectMeta: metaV1.ObjectMeta{
-				Name:        podName,
-				Namespace:   namespace,
-				Labels:      labels,
-				Annotations: annotations,
-				ClusterName: clusterName,
-			},
-			Spec:   v1.PodSpec{},
-			Status: v1.PodStatus{},
-		}
+// AddMockDeployment adds a mock Deployment to LintContext
+func (l *MockLintContext) AddMockDeployment(t *testing.T, name string) {
+	require.NotEmpty(t, name)
+	l.objects[name] = &appsV1.Deployment{
+		ObjectMeta: metaV1.ObjectMeta{Name: name},
+	}
 }
 
-// AddSecurityContextToPod adds a security context to the pod specified by name
-func (l *MockLintContext) AddSecurityContextToPod(
-	podName string,
-	runAsUser *int64,
-	runAsNonRoot *bool,
-) error {
-	pod, ok := l.pods[podName]
-	if !ok {
-		return errors.Errorf("pod with name %q is not found", podName)
-	}
-	// TODO: keep supporting other fields
-	pod.Spec.SecurityContext = &v1.PodSecurityContext{
-		SELinuxOptions:      nil,
-		WindowsOptions:      nil,
-		RunAsUser:           runAsUser,
-		RunAsGroup:          nil,
-		RunAsNonRoot:        runAsNonRoot,
-		SupplementalGroups:  nil,
-		FSGroup:             nil,
-		Sysctls:             nil,
-		FSGroupChangePolicy: nil,
-		SeccompProfile:      nil,
-	}
-	return nil
+// ModifyDeployment modifies a given deployment in the context via the passed function.
+func (l *MockLintContext) ModifyDeployment(t *testing.T, name string, f func(deployment *appsV1.Deployment)) {
+	dep, ok := l.objects[name].(*appsV1.Deployment)
+	require.True(t, ok)
+	f(dep)
+}
+
+// AddSecurityContextToDeployment adds a security context to the deployment specified by name
+func (l *MockLintContext) AddSecurityContextToDeployment(t *testing.T, deploymentName string,
+	securityContext *v1.PodSecurityContext) {
+	deployment, ok := l.objects[deploymentName].(*appsV1.Deployment)
+	require.True(t, ok, "deployment with name %s not added", deploymentName)
+	deployment.Spec.Template.Spec.SecurityContext = securityContext
 }

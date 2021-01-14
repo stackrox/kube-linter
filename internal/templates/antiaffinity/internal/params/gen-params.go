@@ -33,8 +33,25 @@ var (
 }
 `)
 
+	topologyKeyParamDesc = util.MustParseParameterDesc(`{
+	"Name": "topologyKey",
+	"Type": "string",
+	"Description": "The topology key that the anti-affinity term should use. If not specified, it defaults to \"kubernetes.io/hostname\".",
+	"Examples": null,
+	"Enum": null,
+	"SubParameters": null,
+	"ArrayElemType": "",
+	"Required": false,
+	"NoRegex": false,
+	"NotNegatable": false,
+	"XXXStructFieldName": "TopologyKey",
+	"XXXIsPointer": false
+}
+`)
+
 	ParamDescs = []check.ParameterDesc{
 		minReplicasParamDesc,
+		topologyKeyParamDesc,
 	}
 )
 

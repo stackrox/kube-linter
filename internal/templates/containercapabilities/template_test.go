@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	podName       = "test-pod"
-	containerName = "test-container"
+	deploymentName = "test-deployment"
+	containerName  = "test-container"
 )
 
 func TestContainerCapabilities(t *testing.T) {
@@ -44,9 +44,11 @@ func (s *ContainerCapabilitiesTestSuite) TestForbiddenCapabilities() {
 				ForbiddenCapabilities: []string{"FORBIDDEN_CAP", "DROPPED_CAP"},
 				Exceptions:            nil,
 			},
-			Diagnostics: []diagnostic.Diagnostic{
-				{Message: fmt.Sprintf(addListDiagMsgFmt, containerName, "FORBIDDEN_CAP")},
-				{Message: fmt.Sprintf(dropListDiagMsgFmt, containerName, dropCaps, "FORBIDDEN_CAP")},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				deploymentName: {
+					{Message: fmt.Sprintf(addListDiagMsgFmt, containerName, "FORBIDDEN_CAP")},
+					{Message: fmt.Sprintf(dropListDiagMsgFmt, containerName, dropCaps, "FORBIDDEN_CAP")},
+				},
 			},
 			ExpectInstantiationError: false,
 		},
@@ -66,11 +68,13 @@ func (s *ContainerCapabilitiesTestSuite) TestForbiddenCapabilitiesWithAll() {
 				ForbiddenCapabilities: []string{"all"},
 				Exceptions:            nil,
 			},
-			Diagnostics: []diagnostic.Diagnostic{
-				{Message: fmt.Sprintf(addListWithAllDiagMsgFmt, containerName, "CAP_1")},
-				{Message: fmt.Sprintf(addListWithAllDiagMsgFmt, containerName, "CAP_2")},
-				{Message: fmt.Sprintf(addListWithAllDiagMsgFmt, containerName, "CAP_3")},
-				{Message: fmt.Sprintf(dropListWithAllDiagMsgFmt, containerName, dropCaps)},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				deploymentName: {
+					{Message: fmt.Sprintf(addListWithAllDiagMsgFmt, containerName, "CAP_1")},
+					{Message: fmt.Sprintf(addListWithAllDiagMsgFmt, containerName, "CAP_2")},
+					{Message: fmt.Sprintf(addListWithAllDiagMsgFmt, containerName, "CAP_3")},
+					{Message: fmt.Sprintf(dropListWithAllDiagMsgFmt, containerName, dropCaps)},
+				},
 			},
 			ExpectInstantiationError: false,
 		},
@@ -81,9 +85,11 @@ func (s *ContainerCapabilitiesTestSuite) TestForbiddenCapabilitiesWithAll() {
 				ForbiddenCapabilities: []string{"AlL"},
 				Exceptions:            []string{"CAP_1", "CAP_2"},
 			},
-			Diagnostics: []diagnostic.Diagnostic{
-				{Message: fmt.Sprintf(addListWithAllDiagMsgFmt, containerName, "CAP_3")},
-				{Message: fmt.Sprintf(dropListWithAllDiagMsgFmt, containerName, dropCaps)},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				deploymentName: {
+					{Message: fmt.Sprintf(addListWithAllDiagMsgFmt, containerName, "CAP_3")},
+					{Message: fmt.Sprintf(dropListWithAllDiagMsgFmt, containerName, dropCaps)},
+				},
 			},
 			ExpectInstantiationError: false,
 		},
@@ -102,9 +108,11 @@ func (s *ContainerCapabilitiesTestSuite) TestAddListHasAll() {
 				ForbiddenCapabilities: []string{"CAP_1"},
 				Exceptions:            nil,
 			},
-			Diagnostics: []diagnostic.Diagnostic{
-				{Message: fmt.Sprintf(addListDiagMsgFmt, containerName, "all")},
-				{Message: fmt.Sprintf(dropListDiagMsgFmt, containerName, dropCaps, "CAP_1")},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				deploymentName: {
+					{Message: fmt.Sprintf(addListDiagMsgFmt, containerName, "all")},
+					{Message: fmt.Sprintf(dropListDiagMsgFmt, containerName, dropCaps, "CAP_1")},
+				},
 			},
 			ExpectInstantiationError: false,
 		},
@@ -124,7 +132,7 @@ func (s *ContainerCapabilitiesTestSuite) TestDropListHasAll() {
 				ForbiddenCapabilities: []string{"CAP_1", "CAP_2"},
 				Exceptions:            nil,
 			},
-			Diagnostics:              []diagnostic.Diagnostic{},
+			Diagnostics:              nil,
 			ExpectInstantiationError: false,
 		},
 		// Case 2: forbidden caps include "all"
@@ -133,8 +141,10 @@ func (s *ContainerCapabilitiesTestSuite) TestDropListHasAll() {
 				ForbiddenCapabilities: []string{"all"},
 				Exceptions:            nil,
 			},
-			Diagnostics: []diagnostic.Diagnostic{
-				{Message: fmt.Sprintf(addListWithAllDiagMsgFmt, containerName, "FORGIVEN_CAP")},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				deploymentName: {
+					{Message: fmt.Sprintf(addListWithAllDiagMsgFmt, containerName, "FORGIVEN_CAP")},
+				},
 			},
 			ExpectInstantiationError: false,
 		},
@@ -144,7 +154,7 @@ func (s *ContainerCapabilitiesTestSuite) TestDropListHasAll() {
 				ForbiddenCapabilities: []string{"all"},
 				Exceptions:            []string{"FORGIVEN_CAP"},
 			},
-			Diagnostics:              []diagnostic.Diagnostic{},
+			Diagnostics:              nil,
 			ExpectInstantiationError: false,
 		},
 	})
@@ -162,18 +172,18 @@ func (s *ContainerCapabilitiesTestSuite) TestInvalidParams() {
 				ForbiddenCapabilities: []string{"THIS_IS_NOT_All_CAP"},
 				Exceptions:            []string{"BUT_WE_SPECIFY_EXCEPTIONS"},
 			},
-			Diagnostics:              []diagnostic.Diagnostic{},
+			Diagnostics:              nil,
 			ExpectInstantiationError: true,
 		},
 	})
 }
 
 func (s *ContainerCapabilitiesTestSuite) addPodAndAddContainerWithCaps(addCaps, dropCaps []v1.Capability) {
-	s.ctx.AddMockPod(podName, "", "", nil, nil)
-	s.ctx.AddContainerToPod(podName, containerName, "", nil, nil, &v1.SecurityContext{
+	s.ctx.AddMockDeployment(s.T(), deploymentName)
+	s.ctx.AddContainerToDeployment(s.T(), deploymentName, v1.Container{Name: containerName, SecurityContext: &v1.SecurityContext{
 		Capabilities: &v1.Capabilities{
 			Add:  addCaps,
 			Drop: dropCaps,
 		},
-	})
+	}})
 }

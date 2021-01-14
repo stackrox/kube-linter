@@ -18,6 +18,14 @@ KubeLinter supports the following templates:
 		"type": "integer",
 		"description": "The minimum number of replicas a deployment must have before anti-affinity is enforced on it",
 		"required": false
+	},
+	{
+		"name": "topologyKey",
+		"type": "string",
+		"description": "The topology key that the anti-affinity term should use. If not specified, it defaults to \"kubernetes.io/hostname\".",
+		"required": false,
+		"regexAllowed": true,
+		"negationAllowed": true
 	}
 ]
 
