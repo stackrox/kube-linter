@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"golang.stackrox.io/kube-linter/internal/command/root"
+	"golang.stackrox.io/kube-linter/pkg/command/root"
 	// Register templates
-	_ "golang.stackrox.io/kube-linter/internal/templates/all"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/all"
 )
 
 func main() {
