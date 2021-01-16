@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.stackrox.io/kube-linter/internal/builtinchecks"
 	"golang.stackrox.io/kube-linter/internal/set"
+	"golang.stackrox.io/kube-linter/pkg/builtinchecks"
 )
 
 func TestListReferencesOnlyValidChecks(t *testing.T) {
