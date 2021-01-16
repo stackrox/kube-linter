@@ -47,8 +47,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"golang.stackrox.io/kube-linter/internal/check"
-	"golang.stackrox.io/kube-linter/internal/templates/util"
+	"golang.stackrox.io/kube-linter/pkg/check"
+	"golang.stackrox.io/kube-linter/pkg/templates/util"
 )
 
 var (
