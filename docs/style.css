@@ -54,6 +54,11 @@
   }
 }
 
+/* GitHub Stars */
+.app-nav img {
+  height: 25px;
+}
+
 /* Icons for Kubernetes and Helm tabs */
 [data-tab="kubernetes"]:before {
   content: url('https://api.iconify.design/cib:kubernetes.svg?height=16');
