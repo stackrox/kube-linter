@@ -1,0 +1,1 @@
+[![GitHub Repo stars](https://img.shields.io/github/stars/stackrox/kube-linter?label=Give%20us%20a%20star%20on%20GitHub&style=social)](https://github.com/stackrox/kube-linter)
