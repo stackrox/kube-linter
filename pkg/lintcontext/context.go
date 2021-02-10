@@ -14,7 +14,7 @@ type ObjectMetadata struct {
 // An Object references an object that is loaded from a YAML file.
 type Object struct {
 	Metadata  ObjectMetadata
-	K8sObject k8sutil.Object
+	K8sObject k8sutil.Object `json:"-"` // TODO: find a way to include sufficient information
 }
 
 // An InvalidObject represents something that couldn't be loaded from a YAML file.
