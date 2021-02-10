@@ -16,7 +16,7 @@ var (
 	AllSupportedFormats []string
 
 	// FormatValueFactory can generate format flag values.
-	FormatValueFactory = flagutil.NewEnumValueFactory("output format", AllSupportedFormats)
+	FormatValueFactory = flagutil.NewEnumValueFactory("Output format", AllSupportedFormats)
 )
 
 func newFormat(f string) string {

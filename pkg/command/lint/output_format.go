@@ -4,9 +4,11 @@ import (
 	"golang.stackrox.io/kube-linter/internal/flagutil"
 )
 
-var (
+const (
 	jsonOutputFormat  = "json"
 	plainOutputFormat = "plain"
+)
 
-	formatValueFactory = flagutil.NewEnumValueFactory("output format", []string{jsonOutputFormat, plainOutputFormat})
+var (
+	formatValueFactory = flagutil.NewEnumValueFactory("Output format", []string{jsonOutputFormat, plainOutputFormat})
 )

@@ -105,7 +105,7 @@ func Command() *cobra.Command {
 
 	c.Flags().StringVar(&configPath, "config", "", "Path to config file")
 	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
-	c.Flags().VarP(format, "output-format", "o", format.Usage())
+	c.Flags().Var(format, "format", format.Usage())
 
 	config.AddFlags(c, v)
 	return c
