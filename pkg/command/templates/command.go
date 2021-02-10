@@ -41,7 +41,8 @@ KubeLinter supports the following templates:
 **Supported Objects**: {{ join "," .SupportedObjectKinds.ObjectKinds }}
 
 **Parameters**:
-{{ getParametersJSON .Parameters | codeBlock }}
+
+{{ getParametersJSON .Parameters | codeBlock "json" }}
 
 {{ end -}}
 `

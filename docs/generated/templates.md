@@ -11,7 +11,8 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-```
+
+```json
 [
 	{
 		"name": "minReplicas",
@@ -28,7 +29,6 @@ KubeLinter supports the following templates:
 		"negationAllowed": true
 	}
 ]
-
 ```
 
 ## CPU Requirements
@@ -40,7 +40,8 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-```
+
+```json
 [
 	{
 		"name": "requirementsType",
@@ -63,7 +64,6 @@ KubeLinter supports the following templates:
 		"required": false
 	}
 ]
-
 ```
 
 ## Dangling Services
@@ -75,9 +75,9 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-```
-[]
 
+```json
+[]
 ```
 
 ## Deprecated Service Account Field
@@ -89,9 +89,9 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-```
-[]
 
+```json
+[]
 ```
 
 ## Disallowed API Objects
@@ -103,7 +103,8 @@ KubeLinter supports the following templates:
 **Supported Objects**: Any
 
 **Parameters**:
-```
+
+```json
 [
 	{
 		"name": "group",
@@ -141,7 +142,6 @@ KubeLinter supports the following templates:
 		"negationAllowed": true
 	}
 ]
-
 ```
 
 ## Environment Variables
@@ -153,7 +153,8 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-```
+
+```json
 [
 	{
 		"name": "name",
@@ -172,7 +173,6 @@ KubeLinter supports the following templates:
 		"negationAllowed": true
 	}
 ]
-
 ```
 
 ## Liveness Probe Not Specified
@@ -184,9 +184,9 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-```
-[]
 
+```json
+[]
 ```
 
 ## Memory Requirements
@@ -198,7 +198,8 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-```
+
+```json
 [
 	{
 		"name": "requirementsType",
@@ -221,7 +222,6 @@ KubeLinter supports the following templates:
 		"required": false
 	}
 ]
-
 ```
 
 ## Mismatching Selector
@@ -233,9 +233,9 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-```
-[]
 
+```json
+[]
 ```
 
 ## Non-Existent Service Account
@@ -247,9 +247,9 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-```
-[]
 
+```json
+[]
 ```
 
 ## Ports
@@ -261,7 +261,8 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-```
+
+```json
 [
 	{
 		"name": "port",
@@ -278,7 +279,6 @@ KubeLinter supports the following templates:
 		"negationAllowed": true
 	}
 ]
-
 ```
 
 ## Privileged Containers
@@ -290,9 +290,9 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-```
-[]
 
+```json
+[]
 ```
 
 ## Read-only Root Filesystems
@@ -304,9 +304,9 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-```
-[]
 
+```json
+[]
 ```
 
 ## Readiness Probe Not Specified
@@ -318,9 +318,9 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-```
-[]
 
+```json
+[]
 ```
 
 ## Required Annotation
@@ -332,7 +332,8 @@ KubeLinter supports the following templates:
 **Supported Objects**: Any
 
 **Parameters**:
-```
+
+```json
 [
 	{
 		"name": "key",
@@ -351,7 +352,6 @@ KubeLinter supports the following templates:
 		"negationAllowed": true
 	}
 ]
-
 ```
 
 ## Required Label
@@ -363,7 +363,8 @@ KubeLinter supports the following templates:
 **Supported Objects**: Any
 
 **Parameters**:
-```
+
+```json
 [
 	{
 		"name": "key",
@@ -382,7 +383,6 @@ KubeLinter supports the following templates:
 		"negationAllowed": true
 	}
 ]
-
 ```
 
 ## Run as non-root user
@@ -394,9 +394,9 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-```
-[]
 
+```json
+[]
 ```
 
 ## Service Account
@@ -408,7 +408,8 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-```
+
+```json
 [
 	{
 		"name": "serviceAccount",
@@ -419,7 +420,6 @@ KubeLinter supports the following templates:
 		"negationAllowed": true
 	}
 ]
-
 ```
 
 ## Verify container capabilities
@@ -431,7 +431,8 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-```
+
+```json
 [
 	{
 		"name": "forbiddenCapabilities",
@@ -452,7 +453,6 @@ KubeLinter supports the following templates:
 		"arrayElemType": "string"
 	}
 ]
-
 ```
 
 ## Writable Host Mounts
@@ -464,8 +464,8 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
-```
-[]
 
+```json
+[]
 ```
 
