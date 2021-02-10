@@ -22,9 +22,6 @@ import (
 )
 
 const (
-	jsonOutputFormat  = "json"
-	plainOutputFormat = "plain"
-
 	plainTemplateStr = `{{range .Reports}}
 {{- .Object.Metadata.FilePath | bold}}: (object: {{with .Object.K8sObject}}{{or .GetNamespace "<no namespace>" | bold}}/{{.GetName | bold}} {{.GetObjectKind.GroupVersionKind | bold}}{{end}}) {{.Diagnostic.Message | red}} (check: {{.Check | yellow}}, remediation: {{.Remediation | yellow}})
 
@@ -32,14 +29,14 @@ const (
 )
 
 var (
-	formatValueFactory = flagutil.NewEnumValueFactory("Output format", []string{jsonOutputFormat, plainOutputFormat})
-
-	plainTemplate = common.MustInstantiateTemplate(plainTemplateStr, nil)
+	outputFormats = flagutil.NewEnumValueFactory("Output format", []string{common.JsonFormat, common.PlainFormat})
 
 	formatters = map[string]func(result run.Result, out io.Writer) error{
-		jsonOutputFormat:  formatJson,
-		plainOutputFormat: formatPlain,
+		common.JsonFormat:  formatJson,
+		common.PlainFormat: formatPlain,
 	}
+
+	plainTemplate = common.MustInstantiateTemplate(plainTemplateStr, nil)
 )
 
 func formatJson(result run.Result, out io.Writer) error {
@@ -54,7 +51,7 @@ func formatPlain(result run.Result, out io.Writer) error {
 func Command() *cobra.Command {
 	var configPath string
 	var verbose bool
-	format := formatValueFactory(plainOutputFormat)
+	format := outputFormats(common.PlainFormat)
 
 	v := viper.New()
 
@@ -112,7 +109,11 @@ func Command() *cobra.Command {
 				return err
 			}
 
-			err = formatters[format.String()](result, os.Stdout)
+			formatter := formatters[format.String()]
+			if formatter == nil {
+				return errors.Errorf("unknown format: %q", format.String())
+			}
+			err = formatter(result, os.Stdout)
 			if err != nil {
 				return errors.Wrap(err, "output formatting failed")
 			}

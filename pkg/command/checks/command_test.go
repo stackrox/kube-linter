@@ -10,8 +10,9 @@ import (
 
 func TestAllFormatsSupported(t *testing.T) {
 	supportedFormats := set.NewStringSet()
-	for format := range formatsToRenderFuncs {
+	for format := range formatters {
 		supportedFormats.Add(format)
 	}
-	assert.ElementsMatch(t, supportedFormats.AsSlice(), common.AllSupportedFormats)
+	// TODO: refactor
+	assert.ElementsMatch(t, supportedFormats.AsSlice(), []string{common.PlainFormat, common.MarkdownFormat})
 }
