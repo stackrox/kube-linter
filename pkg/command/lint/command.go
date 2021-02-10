@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 
+	"golang.stackrox.io/kube-linter/internal/flagutil"
 	"golang.stackrox.io/kube-linter/pkg/command/common"
 
 	"golang.stackrox.io/kube-linter/pkg/builtinchecks"
@@ -20,17 +21,33 @@ import (
 	"github.com/spf13/viper"
 )
 
-const templateStr = `{{range .Reports}}
+const (
+	jsonOutputFormat  = "json"
+	plainOutputFormat = "plain"
+
+	plainTemplateStr = `{{range .Reports}}
 {{- .Object.Metadata.FilePath | bold}}: (object: {{with .Object.K8sObject}}{{or .GetNamespace "<no namespace>" | bold}}/{{.GetName | bold}} {{.GetObjectKind.GroupVersionKind | bold}}{{end}}) {{.Diagnostic.Message | red}} (check: {{.Check | yellow}}, remediation: {{.Remediation | yellow}})
 
 {{end}}`
-
-var (
-	template = common.MustInstantiateTemplate(templateStr, nil)
 )
 
+var (
+	formatValueFactory = flagutil.NewEnumValueFactory("Output format", []string{jsonOutputFormat, plainOutputFormat})
+
+	plainTemplate = common.MustInstantiateTemplate(plainTemplateStr, nil)
+
+	formatters = map[string]func(result run.Result, out io.Writer) error{
+		jsonOutputFormat:  formatJson,
+		plainOutputFormat: formatPlain,
+	}
+)
+
+func formatJson(result run.Result, out io.Writer) error {
+	return json.NewEncoder(out).Encode(result)
+}
+
 func formatPlain(result run.Result, out io.Writer) error {
-	return template.Execute(out, result)
+	return plainTemplate.Execute(out, result)
 }
 
 // Command is the command for the lint command.
@@ -95,16 +112,11 @@ func Command() *cobra.Command {
 				return err
 			}
 
-			switch format.String() {
-			case jsonOutputFormat:
-				if err := json.NewEncoder(os.Stdout).Encode(result); err != nil {
-					return errors.Wrap(err, "json encoding failed")
-				}
-			case plainOutputFormat:
-				if err := formatPlain(result, os.Stdout); err != nil {
-					return err
-				}
+			err = formatters[format.String()](result, os.Stdout)
+			if err != nil {
+				return errors.Wrap(err, "output formatting failed")
 			}
+
 			if len(result.Reports) == 0 {
 				fmt.Fprintln(os.Stderr, "No lint errors found!")
 				return nil
