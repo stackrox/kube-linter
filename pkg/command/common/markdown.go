@@ -1,11 +1,18 @@
 package common
 
 import (
+	"github.com/fatih/color"
 	"strings"
 	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
 	"golang.stackrox.io/kube-linter/internal/utils"
+)
+
+var (
+	colorRed = color.New(color.FgRed)
+	colorYellow = color.New(color.FgYellow)
+	colorBold = color.New(color.Bold)
 )
 
 // MustInstantiateTemplate instantiates the given go template with a common list of
@@ -26,9 +33,11 @@ func MustInstantiateTemplate(templateStr string, customFuncMap template.FuncMap)
 				}
 				return "```" + lang + "\n" + code + finalNewline + "```"
 			},
+			"red": colorRed.Sprint,
+			"yellow": colorYellow.Sprint,
+			"bold": colorBold.Sprint,
 		},
 	).Funcs(customFuncMap).Parse(templateStr)
 	utils.Must(err)
 	return tpl
-
 }

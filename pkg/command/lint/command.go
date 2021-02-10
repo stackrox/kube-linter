@@ -3,9 +3,11 @@ package lint
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.stackrox.io/kube-linter/pkg/command/common"
+
 	"golang.stackrox.io/kube-linter/pkg/builtinchecks"
 	"golang.stackrox.io/kube-linter/pkg/checkregistry"
 	"golang.stackrox.io/kube-linter/pkg/config"
@@ -17,6 +19,19 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
+
+const templateStr = `{{range .Reports}}
+{{- .Object.Metadata.FilePath | bold}}: (object: {{with .Object.K8sObject}}{{or .GetNamespace "<no namespace>" | bold}}/{{.GetName | bold}} {{.GetObjectKind.GroupVersionKind | bold}}{{end}}) {{.Diagnostic.Message | red}} (check: {{.Check | yellow}}, remediation: {{.Remediation | yellow}})
+
+{{end}}`
+
+var (
+	template = common.MustInstantiateTemplate(templateStr, nil)
+)
+
+func formatPlain(result run.Result, out io.Writer) error {
+	return template.Execute(out, result)
+}
 
 // Command is the command for the lint command.
 func Command() *cobra.Command {
@@ -86,13 +101,8 @@ func Command() *cobra.Command {
 					return errors.Wrap(err, "json encoding failed")
 				}
 			case plainOutputFormat:
-				stderrIsTerminal := terminal.IsTerminal(int(os.Stdout.Fd()))
-				for _, report := range result.Reports {
-					if stderrIsTerminal {
-						report.FormatToTerminal(os.Stdout)
-					} else {
-						report.FormatPlain(os.Stdout)
-					}
+				if err := formatPlain(result, os.Stdout); err != nil {
+					return err
 				}
 			}
 			if len(result.Reports) == 0 {
