@@ -2,6 +2,7 @@ package flagutil
 
 import (
 	"fmt"
+	"github.com/spf13/pflag"
 
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/set"
@@ -25,9 +26,7 @@ func (e *EnumValue) String() string {
 // Set implements pflag.Value.
 func (e *EnumValue) Set(input string) error {
 	if !e.allowedValues.Contains(input) {
-		return errors.Errorf("%q is not a valid option (valid options are %v)", input, e.allowedValues.AsSortedSlice(func(i, j string) bool {
-			return i < j
-		}))
+		return errors.Errorf("%q is not a valid option (valid options are %v)", input, e.getAllowedValuesSorted())
 	}
 	e.currentValue = input
 	return nil
@@ -38,12 +37,19 @@ func (e *EnumValue) Type() string {
 	return e.flagType
 }
 
+// Check that EnumValue implements pflag.Value interface.
+var _ pflag.Value = (*EnumValue)(nil)
+
 // Usage returns a string that can be used as help text for this flag.
 // It will include the flag type and the list of allowed values.
 func (e *EnumValue) Usage() string {
-	return fmt.Sprintf("%s (allowed values: %v)", e.flagType, e.allowedValues.AsSortedSlice(func(i, j string) bool {
+	return fmt.Sprintf("%s (allowed values: %v)", e.flagType, e.getAllowedValuesSorted())
+}
+
+func (e *EnumValue) getAllowedValuesSorted() []string {
+	return e.allowedValues.AsSortedSlice(func(i, j string) bool {
 		return i < j
-	}))
+	})
 }
 
 // NewEnumValueFactory returns a factory that can generate enum flag values with the given flag type
