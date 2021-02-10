@@ -1,7 +1,6 @@
 package lint
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -31,19 +30,15 @@ const (
 var (
 	outputFormats = flagutil.NewEnumValueFactory("Output format", []string{common.JsonFormat, common.PlainFormat})
 
-	formatters = map[string]func(result run.Result, out io.Writer) error{
-		common.JsonFormat:  formatJson,
+	formatters = map[string]func(result interface{}, out io.Writer) error{
+		common.JsonFormat:  common.FormatJson,
 		common.PlainFormat: formatPlain,
 	}
 
 	plainTemplate = common.MustInstantiateTemplate(plainTemplateStr, nil)
 )
 
-func formatJson(result run.Result, out io.Writer) error {
-	return json.NewEncoder(out).Encode(result)
-}
-
-func formatPlain(result run.Result, out io.Writer) error {
+func formatPlain(result interface{}, out io.Writer) error {
 	return plainTemplate.Execute(out, result)
 }
 

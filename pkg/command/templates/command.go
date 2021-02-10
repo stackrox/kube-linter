@@ -21,11 +21,14 @@ import (
 var (
 	dashes = stringutils.Repeat("-", 30)
 
-	outputFormats = flagutil.NewEnumValueFactory("Output format", []string{common.PlainFormat, common.MarkdownFormat})
+	outputFormats = flagutil.NewEnumValueFactory("Output format", []string{common.PlainFormat, common.MarkdownFormat, common.JsonFormat})
 
 	formatters = map[string]func([]check.Template, io.Writer) error{
 		common.PlainFormat:    renderPlain,
 		common.MarkdownFormat: renderMarkdown,
+		common.JsonFormat: func(templates []check.Template, out io.Writer) error {
+			return common.FormatJson(templates, out)
+		},
 	}
 )
 
