@@ -1,12 +1,10 @@
 package checks
 
 import (
-	"io"
 	"os"
 	"sort"
 	"text/template"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"golang.stackrox.io/kube-linter/internal/defaultchecks"
 	"golang.stackrox.io/kube-linter/internal/flagutil"
@@ -42,35 +40,24 @@ KubeLinter includes the following built-in checks:
 )
 
 var (
-	outputFormats = flagutil.NewEnumValueFactory("Output format", []string{common.PlainFormat, common.MarkdownFormat, common.JsonFormat})
-
-	formatters = map[string]func([]config.Check, io.Writer) error{
-		common.PlainFormat:    renderPlain,
-		common.MarkdownFormat: renderMarkdown,
-		common.JsonFormat: func(checks []config.Check, out io.Writer) error {
-			return common.FormatJson(out, checks)
-		},
-	}
-)
-
-var (
 	checksFuncMap = template.FuncMap{
 		"isDefault": func(check config.Check) bool {
 			return defaultchecks.List.Contains(check.Name)
 		},
 	}
-
 	plainTemplate    = common.MustInstantiateTemplate(plainTemplateStr, checksFuncMap)
 	markDownTemplate = common.MustInstantiateTemplate(markDownTemplateStr, checksFuncMap)
+
+	formatters = common.Formatters{
+		Formatters: map[common.FormatType]common.FormatFunc{
+			common.PlainFormat:    plainTemplate.Execute,
+			common.MarkdownFormat: markDownTemplate.Execute,
+			common.JsonFormat:     common.FormatJson,
+		},
+	}
+
+	outputFormats = flagutil.NewEnumValueFactory("Output format", formatters.GetEnabledFormatters())
 )
-
-func renderPlain(checks []config.Check, out io.Writer) error {
-	return plainTemplate.Execute(out, checks)
-}
-
-func renderMarkdown(checks []config.Check, out io.Writer) error {
-	return markDownTemplate.Execute(out, checks)
-}
 
 func listCommand() *cobra.Command {
 	format := outputFormats(common.PlainFormat)
@@ -86,11 +73,11 @@ func listCommand() *cobra.Command {
 			sort.Slice(checks, func(i, j int) bool {
 				return checks[i].Name < checks[j].Name
 			})
-			renderFunc := formatters[format.String()]
-			if renderFunc == nil {
-				return errors.Errorf("unknown format: %q", format.String())
+			renderFunc, err := formatters.FormatterByType(format.String())
+			if err != nil {
+				return err
 			}
-			return renderFunc(checks, os.Stdout)
+			return renderFunc(os.Stdout, checks)
 		},
 	}
 	c.Flags().Var(format, "format", format.Usage())
