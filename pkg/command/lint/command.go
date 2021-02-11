@@ -2,7 +2,6 @@ package lint
 
 import (
 	"fmt"
-	"io"
 	"os"
 
 	"golang.stackrox.io/kube-linter/internal/flagutil"
@@ -28,21 +27,17 @@ const (
 )
 
 var (
-	outputFormats = flagutil.NewEnumValueFactory("Output format", []string{common.JsonFormat, common.PlainFormat})
+	plainTemplate = common.MustInstantiateTemplate(plainTemplateStr, nil)
 
-	formatters = map[string]func(result interface{}, out io.Writer) error{
-		common.JsonFormat: func(result interface{}, out io.Writer) error {
-			return common.FormatJson(out, result)
+	formatters = common.Formatters{
+		Formatters: map[common.FormatType]common.FormatFunc{
+			common.JsonFormat:  common.FormatJson,
+			common.PlainFormat: plainTemplate.Execute,
 		},
-		common.PlainFormat: formatPlain,
 	}
 
-	plainTemplate = common.MustInstantiateTemplate(plainTemplateStr, nil)
+	outputFormats = flagutil.NewEnumValueFactory("Output format", formatters.GetEnabledFormatters())
 )
-
-func formatPlain(result interface{}, out io.Writer) error {
-	return plainTemplate.Execute(out, result)
-}
 
 // Command is the command for the lint command.
 func Command() *cobra.Command {
@@ -106,11 +101,11 @@ func Command() *cobra.Command {
 				return err
 			}
 
-			formatter := formatters[format.String()]
-			if formatter == nil {
-				return errors.Errorf("unknown format: %q", format.String())
+			formatter, err := formatters.FormatterByType(format.String())
+			if err != nil {
+				return err
 			}
-			err = formatter(result, os.Stdout)
+			err = formatter(os.Stdout, result)
 			if err != nil {
 				return errors.Wrap(err, "output formatting failed")
 			}
