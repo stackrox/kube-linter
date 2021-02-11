@@ -1,94 +1,75 @@
 package checks
 
 import (
-	"fmt"
 	"io"
 	"os"
 	"sort"
-	"strings"
+	"text/template"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"golang.stackrox.io/kube-linter/internal/defaultchecks"
 	"golang.stackrox.io/kube-linter/internal/flagutil"
-	"golang.stackrox.io/kube-linter/internal/stringutils"
 	"golang.stackrox.io/kube-linter/pkg/builtinchecks"
 	"golang.stackrox.io/kube-linter/pkg/command/common"
 	"golang.stackrox.io/kube-linter/pkg/config"
-	"golang.stackrox.io/kube-linter/pkg/templates"
 )
-
-var (
-	dashes = stringutils.Repeat("-", 30)
-
-	outputFormats = flagutil.NewEnumValueFactory("Output format", []string{common.PlainFormat, common.MarkdownFormat, common.JsonFormat})
-
-	formatters = map[string]func([]config.Check, io.Writer) error{
-		common.PlainFormat:    renderPlain,
-		common.MarkdownFormat: renderMarkdown,
-		common.JsonFormat: func(checks []check.Check, out io.Writer) error {
-			return common.FormatJson(checks, out)
-		},
-	}
-)
-
-func renderPlain(checks []config.Check, out io.Writer) error { //nolint:unparam // The function signature is required to match formatToRenderFuncs
-	for i, chk := range checks {
-		fmt.Fprintf(out, "Name: %s\nDescription: %s\nRemediation: %s\nTemplate: %s\nParameters: %v\nEnabled by default: %v\n",
-			chk.Name, chk.Description, chk.Remediation, chk.Template, chk.Params, defaultchecks.List.Contains(chk.Name))
-		if i != len(checks)-1 {
-			fmt.Fprintf(out, "\n%s\n\n", dashes)
-		}
-	}
-	return nil
-}
 
 const (
+	plainTemplateStr = `{{ range $i, $_ := . }}
+{{- if $i}}
+------------------------------
+
+{{end -}}
+Name: {{.Name}}
+Description: {{.Description}}
+Remediation: {{.Remediation}}
+Template: {{.Template}}
+Parameters: {{.Params}}
+Enabled by default: {{ isDefault . }}
+{{end -}}
+`
+
 	markDownTemplateStr = `# KubeLinter checks
 
 KubeLinter includes the following built-in checks:
 
-{{ range . -}}
-## {{ .Check.Name}}
-
-**Enabled by default**: {{ if .Default }}Yes{{ else }}No{{ end }}
-
-**Description**: {{.Check.Description}}
-
-**Remediation**: {{.Check.Remediation}}
-
-**Template**: [{{.Check.Template}}](generated/templates.md#{{.TemplateLink}})
-
-**Parameters**:
-{{ mustToJson (default (dict) .Check.Params ) | codeBlock }}
-
+| Name | Enabled by default | Description | Remediation | Template | Parameters |
+| ---- | ------------------ | ----------- | ----------- | -------- | ---------- |
+{{ range . }} | {{.Name}} | {{ if isDefault . }}Yes{{ else }}No{{ end }} | {{.Description}} | {{.Remediation}} | {{.Template}} | {{ mustToJson (default (dict) .Params ) | codeSnippetInTable }} |
 {{ end -}}
 `
 )
 
 var (
-	markDownTemplate = common.MustInstantiateTemplate(markDownTemplateStr, nil)
+	outputFormats = flagutil.NewEnumValueFactory("Output format", []string{common.PlainFormat, common.MarkdownFormat, common.JsonFormat})
+
+	formatters = map[string]func([]config.Check, io.Writer) error{
+		common.PlainFormat:    renderPlain,
+		common.MarkdownFormat: renderMarkdown,
+		common.JsonFormat: func(checks []config.Check, out io.Writer) error {
+			return common.FormatJson(checks, out)
+		},
+	}
 )
 
+var (
+	checksFuncMap = template.FuncMap{
+		"isDefault": func(check config.Check) bool {
+			return defaultchecks.List.Contains(check.Name)
+		},
+	}
+
+	plainTemplate    = common.MustInstantiateTemplate(plainTemplateStr, checksFuncMap)
+	markDownTemplate = common.MustInstantiateTemplate(markDownTemplateStr, checksFuncMap)
+)
+
+func renderPlain(checks []config.Check, out io.Writer) error {
+	return plainTemplate.Execute(out, checks)
+}
+
 func renderMarkdown(checks []config.Check, out io.Writer) error {
-	type augmentedCheck struct {
-		Check        config.Check
-		Default      bool
-		TemplateLink string
-	}
-	augmentedChecks := make([]augmentedCheck, 0, len(checks))
-	for _, chk := range checks {
-		template, found := templates.Get(chk.Template)
-		if !found {
-			return errors.Errorf("unexpected: check %v references non-existent template?", chk)
-		}
-		augmentedChecks = append(augmentedChecks, augmentedCheck{
-			Check:        chk,
-			Default:      defaultchecks.List.Contains(chk.Name),
-			TemplateLink: strings.Join(strings.Fields(strings.ToLower(template.HumanName)), "-"),
-		})
-	}
-	return markDownTemplate.Execute(out, augmentedChecks)
+	return markDownTemplate.Execute(out, checks)
 }
 
 func listCommand() *cobra.Command {

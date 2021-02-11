@@ -2,8 +2,9 @@ package flagutil
 
 import (
 	"fmt"
-	"github.com/spf13/pflag"
 	"strings"
+
+	"github.com/spf13/pflag"
 
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/set"
