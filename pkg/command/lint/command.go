@@ -35,15 +35,13 @@ var (
 			common.PlainFormat: plainTemplate.Execute,
 		},
 	}
-
-	outputFormats = flagutil.NewEnumValueFactory("Output format", formatters.GetEnabledFormatters())
 )
 
 // Command is the command for the lint command.
 func Command() *cobra.Command {
 	var configPath string
 	var verbose bool
-	format := outputFormats(common.PlainFormat)
+	format := flagutil.NewEnumFlag("Output format", formatters.GetEnabledFormatters(), common.PlainFormat)
 
 	v := viper.New()
 

@@ -55,12 +55,10 @@ var (
 			common.JsonFormat:     common.FormatJson,
 		},
 	}
-
-	outputFormats = flagutil.NewEnumValueFactory("Output format", formatters.GetEnabledFormatters())
 )
 
 func listCommand() *cobra.Command {
-	format := outputFormats(common.PlainFormat)
+	format := flagutil.NewEnumFlag("Output format", formatters.GetEnabledFormatters(), common.PlainFormat)
 	c := &cobra.Command{
 		Use:   "list",
 		Short: "List built-in checks",
