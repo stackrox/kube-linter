@@ -31,7 +31,9 @@ var (
 	outputFormats = flagutil.NewEnumValueFactory("Output format", []string{common.JsonFormat, common.PlainFormat})
 
 	formatters = map[string]func(result interface{}, out io.Writer) error{
-		common.JsonFormat:  common.FormatJson,
+		common.JsonFormat: func(result interface{}, out io.Writer) error {
+			return common.FormatJson(out, result)
+		},
 		common.PlainFormat: formatPlain,
 	}
 

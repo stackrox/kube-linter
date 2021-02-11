@@ -48,7 +48,7 @@ var (
 		common.PlainFormat:    renderPlain,
 		common.MarkdownFormat: renderMarkdown,
 		common.JsonFormat: func(checks []config.Check, out io.Writer) error {
-			return common.FormatJson(checks, out)
+			return common.FormatJson(out, checks)
 		},
 	}
 )

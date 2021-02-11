@@ -1,13 +1,10 @@
 package templates
 
 import (
-	"io"
 	"os"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"golang.stackrox.io/kube-linter/internal/flagutil"
-	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/command/common"
 	"golang.stackrox.io/kube-linter/pkg/templates"
 )
@@ -56,30 +53,19 @@ Parameters:{{ range .HumanReadableParameters }}{{ template "Param" . }}{{else}} 
 )
 
 var (
-	outputFormats = flagutil.NewEnumValueFactory("Output format", []string{common.PlainFormat, common.MarkdownFormat, common.JsonFormat})
+	markDownTemplate = common.MustInstantiateTemplate(markDownTemplateStr, nil)
+	plainTemplate    = common.MustInstantiateTemplate(plainTemplateStr, nil)
 
-	formatters = map[string]func([]check.Template, io.Writer) error{
-		common.PlainFormat:    renderPlain,
-		common.MarkdownFormat: renderMarkdown,
-		common.JsonFormat: func(templates []check.Template, out io.Writer) error {
-			return common.FormatJson(templates, out)
+	formatters = common.Formatters{
+		Formatters: map[common.FormatType]common.FormatFunc{
+			common.PlainFormat:    plainTemplate.Execute,
+			common.MarkdownFormat: markDownTemplate.Execute,
+			common.JsonFormat:     common.FormatJson,
 		},
 	}
+
+	outputFormats = flagutil.NewEnumValueFactory("Output format", formatters.GetEnabledFormatters())
 )
-
-var (
-	markDownTemplate = common.MustInstantiateTemplate(markDownTemplateStr, nil)
-
-	plainTemplate = common.MustInstantiateTemplate(plainTemplateStr, nil)
-)
-
-func renderPlain(templates []check.Template, out io.Writer) error {
-	return plainTemplate.Execute(out, templates)
-}
-
-func renderMarkdown(templates []check.Template, out io.Writer) error {
-	return markDownTemplate.Execute(out, templates)
-}
 
 func listCommand() *cobra.Command {
 	format := outputFormats(common.PlainFormat)
@@ -89,11 +75,11 @@ func listCommand() *cobra.Command {
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			knownTemplates := templates.List()
-			renderFunc := formatters[format.String()]
-			if renderFunc == nil {
-				return errors.Errorf("unknown format: %q", format.String())
+			formatFunc, err := formatters.FormatterByType(format.String())
+			if err != nil {
+				return err
 			}
-			return renderFunc(knownTemplates, os.Stdout)
+			return formatFunc(os.Stdout, knownTemplates)
 		},
 	}
 	c.Flags().Var(format, "format", format.Usage())
