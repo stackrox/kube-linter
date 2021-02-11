@@ -53,8 +53,8 @@ Parameters:{{ range .HumanReadableParameters }}{{ template "Param" . }}{{else}} 
 )
 
 var (
-	markDownTemplate = common.MustInstantiateTemplate(markDownTemplateStr, nil)
-	plainTemplate    = common.MustInstantiateTemplate(plainTemplateStr, nil)
+	markDownTemplate = common.MustInstantiateMarkdownTemplate(markDownTemplateStr, nil)
+	plainTemplate    = common.MustInstantiatePlainTemplate(plainTemplateStr, nil)
 
 	formatters = common.Formatters{
 		Formatters: map[common.FormatType]common.FormatFunc{

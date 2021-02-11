@@ -26,7 +26,7 @@ func TestMarkdownFunctions(t *testing.T) {
 	}
 
 	for _, tt := range templateTests {
-		tpl := common.MustInstantiateTemplate(tt.in, nil)
+		tpl := common.MustInstantiateMarkdownTemplate(tt.in, nil)
 
 		var b bytes.Buffer
 

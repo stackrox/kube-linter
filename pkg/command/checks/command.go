@@ -45,8 +45,8 @@ var (
 			return defaultchecks.List.Contains(check.Name)
 		},
 	}
-	plainTemplate    = common.MustInstantiateTemplate(plainTemplateStr, checksFuncMap)
-	markDownTemplate = common.MustInstantiateTemplate(markDownTemplateStr, checksFuncMap)
+	plainTemplate    = common.MustInstantiatePlainTemplate(plainTemplateStr, checksFuncMap)
+	markDownTemplate = common.MustInstantiateMarkdownTemplate(markDownTemplateStr, checksFuncMap)
 
 	formatters = common.Formatters{
 		Formatters: map[common.FormatType]common.FormatFunc{

@@ -27,7 +27,7 @@ const (
 )
 
 var (
-	plainTemplate = common.MustInstantiateTemplate(plainTemplateStr, nil)
+	plainTemplate = common.MustInstantiatePlainTemplate(plainTemplateStr, nil)
 
 	formatters = common.Formatters{
 		Formatters: map[common.FormatType]common.FormatFunc{
