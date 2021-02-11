@@ -1,7 +1,10 @@
 package run
 
 import (
+	"time"
+
 	"github.com/pkg/errors"
+	"golang.stackrox.io/kube-linter/internal/version"
 	"golang.stackrox.io/kube-linter/pkg/checkregistry"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/ignore"
@@ -9,9 +12,23 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
 )
 
+type checkStatus string
+
+const (
+	checksPassed checkStatus = "Passed"
+	checksFailed checkStatus = "Failed"
+)
+
+type Summary struct {
+	ChecksStatus      checkStatus
+	CheckTime         time.Time
+	KubeLinterVersion string
+}
+
 // Result represents the result from a run of the linter.
 type Result struct {
 	Reports []diagnostic.WithContext
+	Summary Summary
 }
 
 // Run runs the linter on the given context, with the given config.
@@ -47,5 +64,14 @@ func Run(lintCtxs []lintcontext.LintContext, registry checkregistry.CheckRegistr
 			}
 		}
 	}
+
+	if len(result.Reports) > 0 {
+		result.Summary.ChecksStatus = checksFailed
+	} else {
+		result.Summary.ChecksStatus = checksPassed
+	}
+	result.Summary.CheckTime = time.Now().UTC()
+	result.Summary.KubeLinterVersion = version.Get()
+
 	return result, nil
 }
