@@ -68,35 +68,43 @@ type HumanReadableParamDesc struct {
 	NegationAllowed *bool                    `json:"negationAllowed,omitempty"`
 	SubParameters   []HumanReadableParamDesc `json:"subParameters,omitempty"`
 	ArrayElemType   ParameterType            `json:"arrayElemType,omitempty"`
+	NestingLevel    int                      `json:"-"`
 }
 
 // HumanReadableFields returns a human-friendly representation of this ParameterDesc.
 func (p *ParameterDesc) HumanReadableFields() HumanReadableParamDesc {
-	out := HumanReadableParamDesc{
-		Name:        p.Name,
-		Type:        p.Type,
-		Description: p.Description,
-		Required:    p.Required,
-		Examples:    p.Examples,
-	}
+	var transform func(*ParameterDesc, int) HumanReadableParamDesc
 
-	if p.Type == StringType ||
-		(p.Type == ArrayType && p.ArrayElemType == StringType) {
-		out.RegexAllowed = pointers.Bool(!p.NoRegex)
-		out.NegationAllowed = pointers.Bool(!p.NotNegatable)
-	}
-
-	if p.Type == ArrayType {
-		out.ArrayElemType = p.ArrayElemType
-	}
-
-	if len(p.SubParameters) > 0 {
-		subParamFields := make([]HumanReadableParamDesc, 0, len(p.SubParameters))
-		for _, subParam := range p.SubParameters {
-			subParamFields = append(subParamFields, subParam.HumanReadableFields())
+	transform = func(p *ParameterDesc, level int) HumanReadableParamDesc {
+		out := HumanReadableParamDesc{
+			Name:         p.Name,
+			Type:         p.Type,
+			Description:  p.Description,
+			Required:     p.Required,
+			Examples:     p.Examples,
+			NestingLevel: level,
 		}
-		out.SubParameters = subParamFields
+
+		if p.Type == StringType ||
+			(p.Type == ArrayType && p.ArrayElemType == StringType) {
+			out.RegexAllowed = pointers.Bool(!p.NoRegex)
+			out.NegationAllowed = pointers.Bool(!p.NotNegatable)
+		}
+
+		if p.Type == ArrayType {
+			out.ArrayElemType = p.ArrayElemType
+		}
+
+		if len(p.SubParameters) > 0 {
+			subParamFields := make([]HumanReadableParamDesc, 0, len(p.SubParameters))
+			for _, subParam := range p.SubParameters {
+				subParamFields = append(subParamFields, transform(&subParam, level+1))
+			}
+			out.SubParameters = subParamFields
+		}
+
+		return out
 	}
 
-	return out
+	return transform(p, 0)
 }
