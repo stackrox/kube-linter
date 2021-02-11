@@ -5,10 +5,9 @@ import (
 	"os"
 
 	"golang.stackrox.io/kube-linter/internal/flagutil"
-	"golang.stackrox.io/kube-linter/pkg/command/common"
-
 	"golang.stackrox.io/kube-linter/pkg/builtinchecks"
 	"golang.stackrox.io/kube-linter/pkg/checkregistry"
+	"golang.stackrox.io/kube-linter/pkg/command/common"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/configresolver"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
@@ -23,7 +22,9 @@ const (
 	plainTemplateStr = `{{range .Reports}}
 {{- .Object.Metadata.FilePath | bold}}: (object: {{with .Object.K8sObject}}{{or .GetNamespace "<no namespace>" | bold}}/{{.GetName | bold}} {{.GetObjectKind.GroupVersionKind | bold}}{{end}}) {{.Diagnostic.Message | red}} (check: {{.Check | yellow}}, remediation: {{.Remediation | yellow}})
 
-{{end}}`
+{{else}}No lint errors found!
+{{end -}}
+`
 )
 
 var (
@@ -108,11 +109,10 @@ func Command() *cobra.Command {
 				return errors.Wrap(err, "output formatting failed")
 			}
 
-			if len(result.Reports) == 0 {
-				fmt.Fprintln(os.Stderr, "No lint errors found!")
-				return nil
+			if len(result.Reports) > 0 {
+				err = errors.Errorf("found %d lint errors", len(result.Reports))
 			}
-			return errors.Errorf("found %d lint errors", len(result.Reports))
+			return err
 		},
 	}
 
