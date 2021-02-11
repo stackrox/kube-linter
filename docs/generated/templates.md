@@ -14,20 +14,20 @@ KubeLinter supports the following templates:
 
 ```json
 [
-	{
-		"name": "minReplicas",
-		"type": "integer",
-		"description": "The minimum number of replicas a deployment must have before anti-affinity is enforced on it",
-		"required": false
-	},
-	{
-		"name": "topologyKey",
-		"type": "string",
-		"description": "The topology key that the anti-affinity term should use. If not specified, it defaults to \"kubernetes.io/hostname\".",
-		"required": false,
-		"regexAllowed": true,
-		"negationAllowed": true
-	}
+  {
+    "name": "minReplicas",
+    "type": "integer",
+    "description": "The minimum number of replicas a deployment must have before anti-affinity is enforced on it",
+    "required": false
+  },
+  {
+    "name": "topologyKey",
+    "type": "string",
+    "description": "The topology key that the anti-affinity term should use. If not specified, it defaults to \"kubernetes.io/hostname\".",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true
+  }
 ]
 ```
 
@@ -43,26 +43,26 @@ KubeLinter supports the following templates:
 
 ```json
 [
-	{
-		"name": "requirementsType",
-		"type": "string",
-		"description": "The type of requirement. Use any to apply to both requests and limits.",
-		"required": true,
-		"regexAllowed": true,
-		"negationAllowed": true
-	},
-	{
-		"name": "lowerBoundMillis",
-		"type": "integer",
-		"description": "The lower bound of the requirement (inclusive), specified as a number of milli-cores. If not specified, it is treated as a lower bound of zero.",
-		"required": false
-	},
-	{
-		"name": "upperBoundMillis",
-		"type": "integer",
-		"description": "The upper bound of the requirement (inclusive), specified as a number of milli-cores. If not specified, it is treated as \"no upper bound\".",
-		"required": false
-	}
+  {
+    "name": "requirementsType",
+    "type": "string",
+    "description": "The type of requirement. Use any to apply to both requests and limits.",
+    "required": true,
+    "regexAllowed": true,
+    "negationAllowed": true
+  },
+  {
+    "name": "lowerBoundMillis",
+    "type": "integer",
+    "description": "The lower bound of the requirement (inclusive), specified as a number of milli-cores. If not specified, it is treated as a lower bound of zero.",
+    "required": false
+  },
+  {
+    "name": "upperBoundMillis",
+    "type": "integer",
+    "description": "The upper bound of the requirement (inclusive), specified as a number of milli-cores. If not specified, it is treated as \"no upper bound\".",
+    "required": false
+  }
 ]
 ```
 
@@ -106,41 +106,41 @@ KubeLinter supports the following templates:
 
 ```json
 [
-	{
-		"name": "group",
-		"type": "string",
-		"description": "The disallowed object group.",
-		"required": false,
-		"examples": [
-			"apps"
-		],
-		"regexAllowed": true,
-		"negationAllowed": true
-	},
-	{
-		"name": "version",
-		"type": "string",
-		"description": "The disallowed object API version.",
-		"required": false,
-		"examples": [
-			"v1",
-			"v1beta1"
-		],
-		"regexAllowed": true,
-		"negationAllowed": true
-	},
-	{
-		"name": "kind",
-		"type": "string",
-		"description": "The disallowed kind.",
-		"required": false,
-		"examples": [
-			"Deployment",
-			"DaemonSet"
-		],
-		"regexAllowed": true,
-		"negationAllowed": true
-	}
+  {
+    "name": "group",
+    "type": "string",
+    "description": "The disallowed object group.",
+    "required": false,
+    "examples": [
+      "apps"
+    ],
+    "regexAllowed": true,
+    "negationAllowed": true
+  },
+  {
+    "name": "version",
+    "type": "string",
+    "description": "The disallowed object API version.",
+    "required": false,
+    "examples": [
+      "v1",
+      "v1beta1"
+    ],
+    "regexAllowed": true,
+    "negationAllowed": true
+  },
+  {
+    "name": "kind",
+    "type": "string",
+    "description": "The disallowed kind.",
+    "required": false,
+    "examples": [
+      "Deployment",
+      "DaemonSet"
+    ],
+    "regexAllowed": true,
+    "negationAllowed": true
+  }
 ]
 ```
 
@@ -156,22 +156,22 @@ KubeLinter supports the following templates:
 
 ```json
 [
-	{
-		"name": "name",
-		"type": "string",
-		"description": "The name of the environment variable.",
-		"required": true,
-		"regexAllowed": true,
-		"negationAllowed": true
-	},
-	{
-		"name": "value",
-		"type": "string",
-		"description": "The value of the environment variable.",
-		"required": false,
-		"regexAllowed": true,
-		"negationAllowed": true
-	}
+  {
+    "name": "name",
+    "type": "string",
+    "description": "The name of the environment variable.",
+    "required": true,
+    "regexAllowed": true,
+    "negationAllowed": true
+  },
+  {
+    "name": "value",
+    "type": "string",
+    "description": "The value of the environment variable.",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true
+  }
 ]
 ```
 
@@ -201,26 +201,26 @@ KubeLinter supports the following templates:
 
 ```json
 [
-	{
-		"name": "requirementsType",
-		"type": "string",
-		"description": "The type of requirement. Use any to apply to both requests and limits.",
-		"required": true,
-		"regexAllowed": true,
-		"negationAllowed": true
-	},
-	{
-		"name": "lowerBoundMB",
-		"type": "integer",
-		"description": "The lower bound of the requirement (inclusive), specified as a number of MB.",
-		"required": false
-	},
-	{
-		"name": "upperBoundMB",
-		"type": "integer",
-		"description": "The upper bound of the requirement (inclusive), specified as a number of MB. If not specified, it is treated as \"no upper bound\".",
-		"required": false
-	}
+  {
+    "name": "requirementsType",
+    "type": "string",
+    "description": "The type of requirement. Use any to apply to both requests and limits.",
+    "required": true,
+    "regexAllowed": true,
+    "negationAllowed": true
+  },
+  {
+    "name": "lowerBoundMB",
+    "type": "integer",
+    "description": "The lower bound of the requirement (inclusive), specified as a number of MB.",
+    "required": false
+  },
+  {
+    "name": "upperBoundMB",
+    "type": "integer",
+    "description": "The upper bound of the requirement (inclusive), specified as a number of MB. If not specified, it is treated as \"no upper bound\".",
+    "required": false
+  }
 ]
 ```
 
@@ -264,20 +264,20 @@ KubeLinter supports the following templates:
 
 ```json
 [
-	{
-		"name": "port",
-		"type": "integer",
-		"description": "The port",
-		"required": false
-	},
-	{
-		"name": "protocol",
-		"type": "string",
-		"description": "The protocol",
-		"required": false,
-		"regexAllowed": true,
-		"negationAllowed": true
-	}
+  {
+    "name": "port",
+    "type": "integer",
+    "description": "The port",
+    "required": false
+  },
+  {
+    "name": "protocol",
+    "type": "string",
+    "description": "The protocol",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true
+  }
 ]
 ```
 
@@ -335,22 +335,22 @@ KubeLinter supports the following templates:
 
 ```json
 [
-	{
-		"name": "key",
-		"type": "string",
-		"description": "Key of the required label.",
-		"required": true,
-		"regexAllowed": true,
-		"negationAllowed": true
-	},
-	{
-		"name": "value",
-		"type": "string",
-		"description": "Value of the required label.",
-		"required": false,
-		"regexAllowed": true,
-		"negationAllowed": true
-	}
+  {
+    "name": "key",
+    "type": "string",
+    "description": "Key of the required label.",
+    "required": true,
+    "regexAllowed": true,
+    "negationAllowed": true
+  },
+  {
+    "name": "value",
+    "type": "string",
+    "description": "Value of the required label.",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true
+  }
 ]
 ```
 
@@ -366,22 +366,22 @@ KubeLinter supports the following templates:
 
 ```json
 [
-	{
-		"name": "key",
-		"type": "string",
-		"description": "Key of the required label.",
-		"required": true,
-		"regexAllowed": true,
-		"negationAllowed": true
-	},
-	{
-		"name": "value",
-		"type": "string",
-		"description": "Value of the required label.",
-		"required": false,
-		"regexAllowed": true,
-		"negationAllowed": true
-	}
+  {
+    "name": "key",
+    "type": "string",
+    "description": "Key of the required label.",
+    "required": true,
+    "regexAllowed": true,
+    "negationAllowed": true
+  },
+  {
+    "name": "value",
+    "type": "string",
+    "description": "Value of the required label.",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true
+  }
 ]
 ```
 
@@ -411,14 +411,14 @@ KubeLinter supports the following templates:
 
 ```json
 [
-	{
-		"name": "serviceAccount",
-		"type": "string",
-		"description": "A regex specifying the required service account to match.",
-		"required": true,
-		"regexAllowed": true,
-		"negationAllowed": true
-	}
+  {
+    "name": "serviceAccount",
+    "type": "string",
+    "description": "A regex specifying the required service account to match.",
+    "required": true,
+    "regexAllowed": true,
+    "negationAllowed": true
+  }
 ]
 ```
 
@@ -434,24 +434,24 @@ KubeLinter supports the following templates:
 
 ```json
 [
-	{
-		"name": "forbiddenCapabilities",
-		"type": "array",
-		"description": "List of capabilities that needs to be removed from containers.",
-		"required": false,
-		"regexAllowed": false,
-		"negationAllowed": false,
-		"arrayElemType": "string"
-	},
-	{
-		"name": "exceptions",
-		"type": "array",
-		"description": "List of capabilities that are exceptions to the above list. This should only be filled when the above contains \"all\", and is used to forgive capabilities in ADD list.",
-		"required": false,
-		"regexAllowed": false,
-		"negationAllowed": false,
-		"arrayElemType": "string"
-	}
+  {
+    "name": "forbiddenCapabilities",
+    "type": "array",
+    "description": "List of capabilities that needs to be removed from containers.",
+    "required": false,
+    "regexAllowed": false,
+    "negationAllowed": false,
+    "arrayElemType": "string"
+  },
+  {
+    "name": "exceptions",
+    "type": "array",
+    "description": "List of capabilities that are exceptions to the above list. This should only be filled when the above contains \"all\", and is used to forgive capabilities in ADD list.",
+    "required": false,
+    "regexAllowed": false,
+    "negationAllowed": false,
+    "arrayElemType": "string"
+  }
 ]
 ```
 

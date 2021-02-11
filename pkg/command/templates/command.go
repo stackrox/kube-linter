@@ -1,11 +1,8 @@
 package templates
 
 import (
-	"bytes"
-	"encoding/json"
 	"io"
 	"os"
-	"text/template"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -13,18 +10,6 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/command/common"
 	"golang.stackrox.io/kube-linter/pkg/templates"
-)
-
-var (
-	outputFormats = flagutil.NewEnumValueFactory("Output format", []string{common.PlainFormat, common.MarkdownFormat, common.JsonFormat})
-
-	formatters = map[string]func([]check.Template, io.Writer) error{
-		common.PlainFormat:    renderPlain,
-		common.MarkdownFormat: renderMarkdown,
-		common.JsonFormat: func(templates []check.Template, out io.Writer) error {
-			return common.FormatJson(templates, out)
-		},
-	}
 )
 
 const (
@@ -43,7 +28,7 @@ KubeLinter supports the following templates:
 
 **Parameters**:
 
-{{ getParametersJSON .Parameters | codeBlock "json" }}
+{{ toPrettyJson .HumanReadableParameters | codeBlock "json" }}
 
 {{ end -}}
 `
@@ -65,27 +50,25 @@ Name: {{.HumanName}}
 Key: {{.Key}}
 Description: {{.Description}}
 Supported Objects: {{.SupportedObjectKinds.ObjectKinds}}
-Parameters:{{ range .Parameters }}{{ template "Param" .HumanReadableFields }}{{else}} none{{end}}
+Parameters:{{ range .HumanReadableParameters }}{{ template "Param" . }}{{else}} none{{end}}
 {{end -}}
 `
 )
 
 var (
-	markDownTemplate = common.MustInstantiateTemplate(markDownTemplateStr, template.FuncMap{
-		"getParametersJSON": func(params []check.ParameterDesc) (string, error) {
-			out := make([]check.HumanReadableParamDesc, 0, len(params))
-			for _, param := range params {
-				out = append(out, param.HumanReadableFields())
-			}
-			var buf bytes.Buffer
-			enc := json.NewEncoder(&buf)
-			enc.SetIndent("", "\t")
-			if err := enc.Encode(out); err != nil {
-				return "", err
-			}
-			return buf.String(), nil
+	outputFormats = flagutil.NewEnumValueFactory("Output format", []string{common.PlainFormat, common.MarkdownFormat, common.JsonFormat})
+
+	formatters = map[string]func([]check.Template, io.Writer) error{
+		common.PlainFormat:    renderPlain,
+		common.MarkdownFormat: renderMarkdown,
+		common.JsonFormat: func(templates []check.Template, out io.Writer) error {
+			return common.FormatJson(templates, out)
 		},
-	})
+	}
+)
+
+var (
+	markDownTemplate = common.MustInstantiateTemplate(markDownTemplateStr, nil)
 
 	plainTemplate = common.MustInstantiateTemplate(plainTemplateStr, nil)
 )
