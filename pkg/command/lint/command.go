@@ -34,7 +34,7 @@ var (
 
 	formatters = common.Formatters{
 		Formatters: map[common.FormatType]common.FormatFunc{
-			common.JsonFormat:  common.FormatJson,
+			common.JSONFormat:  common.FormatJSON,
 			common.PlainFormat: plainTemplate.Execute,
 		},
 	}

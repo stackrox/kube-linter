@@ -52,7 +52,7 @@ var (
 		Formatters: map[common.FormatType]common.FormatFunc{
 			common.PlainFormat:    plainTemplate.Execute,
 			common.MarkdownFormat: markDownTemplate.Execute,
-			common.JsonFormat:     common.FormatJson,
+			common.JSONFormat:     common.FormatJSON,
 		},
 	}
 )

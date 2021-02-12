@@ -54,7 +54,7 @@ func MustInstantiatePlainTemplate(templateStr string, customFuncMap template.Fun
 	return tpl
 }
 
-func instantiateTemplate(templateStr string, commonFuncMap template.FuncMap, customFuncMap template.FuncMap) (*template.Template, error) {
+func instantiateTemplate(templateStr string, commonFuncMap, customFuncMap template.FuncMap) (*template.Template, error) {
 	tpl, err := template.New("").Funcs(sprig.TxtFuncMap()).Funcs(commonFuncMap).Funcs(customFuncMap).Parse(templateStr)
 	return tpl, err
 }

@@ -19,16 +19,17 @@ const (
 	checksFailed checkStatus = "Failed"
 )
 
-type Summary struct {
-	ChecksStatus      checkStatus
-	CheckTime         time.Time
-	KubeLinterVersion string
-}
-
 // Result represents the result from a run of the linter.
 type Result struct {
 	Reports []diagnostic.WithContext
 	Summary Summary
+}
+
+// Summary holds information about the linter run overall.
+type Summary struct {
+	ChecksStatus      checkStatus
+	CheckTime         time.Time
+	KubeLinterVersion string
 }
 
 // Run runs the linter on the given context, with the given config.
