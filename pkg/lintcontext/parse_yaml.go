@@ -18,6 +18,7 @@ import (
 	"helm.sh/helm/v3/pkg/cli/values"
 	"helm.sh/helm/v3/pkg/engine"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/kubernetes/scheme"
@@ -34,15 +35,18 @@ var (
 	decoder      = serializer.NewCodecFactory(clientSchema).UniversalDeserializer()
 )
 
-func parseObjects(data []byte) ([]k8sutil.Object, error) {
-	obj, _, err := decoder.Decode(data, nil, nil)
+func parseObjects(data []byte, d runtime.Decoder) ([]k8sutil.Object, error) {
+	if d == nil {
+		d = decoder
+	}
+	obj, _, err := d.Decode(data, nil, nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to decode")
 	}
 	if list, ok := obj.(*v1.List); ok {
 		objs := make([]k8sutil.Object, 0, len(list.Items))
 		for i, item := range list.Items {
-			obj, _, err := decoder.Decode(item.Raw, nil, nil)
+			obj, _, err := d.Decode(item.Raw, nil, nil)
 			if err != nil {
 				return nil, errors.Wrapf(err, "decoding item %d in the list", i)
 			}
@@ -197,7 +201,7 @@ func (l *lintContextImpl) loadObjectFromYAMLReader(filePath string, r *yaml.YAML
 		Raw:      doc,
 	}
 
-	objs, err := parseObjects(doc)
+	objs, err := parseObjects(doc, l.customDecoder)
 	if err != nil {
 		l.addInvalidObjects(InvalidObject{
 			Metadata: metadata,

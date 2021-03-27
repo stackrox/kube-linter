@@ -2,6 +2,7 @@ package lintcontext
 
 import (
 	"golang.stackrox.io/kube-linter/internal/k8sutil"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 // ObjectMetadata is metadata about an object.
@@ -31,6 +32,8 @@ type LintContext interface {
 type lintContextImpl struct {
 	objects        []Object
 	invalidObjects []InvalidObject
+
+	customDecoder runtime.Decoder
 }
 
 // Objects returns the (valid) objects loaded from this LintContext.
