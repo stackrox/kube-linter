@@ -57,6 +57,8 @@ func (l *lintContextImpl) addInvalidObjects(objs ...InvalidObject) {
 }
 
 // new returns a ready-to-use, empty, lintContextImpl.
-func new() *lintContextImpl {
-	return &lintContextImpl{}
+func newCtx(options Options) *lintContextImpl {
+	return &lintContextImpl{
+		customDecoder: options.CustomDecoder,
+	}
 }

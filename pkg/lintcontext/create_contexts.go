@@ -41,8 +41,7 @@ func CreateContextsWithOptions(options Options, filesOrDirs ...string) ([]LintCo
 			if _, alreadyExists := contextsByDir["-"]; alreadyExists {
 				continue
 			}
-			ctx := new()
-			ctx.customDecoder = options.CustomDecoder
+			ctx := newCtx(options)
 			if err := ctx.loadObjectsFromReader("<standard input>", os.Stdin); err != nil {
 				return nil, err
 			}
@@ -61,8 +60,7 @@ func CreateContextsWithOptions(options Options, filesOrDirs ...string) ([]LintCo
 
 			if !info.IsDir() {
 				if strings.HasSuffix(strings.ToLower(currentPath), ".tgz") {
-					ctx := new()
-					ctx.customDecoder = options.CustomDecoder
+					ctx := newCtx(options)
 					if err := ctx.loadObjectsFromTgzHelmChart(currentPath); err != nil {
 						return err
 					}
@@ -76,8 +74,7 @@ func CreateContextsWithOptions(options Options, filesOrDirs ...string) ([]LintCo
 				if knownYAMLExtensions.Contains(strings.ToLower(filepath.Ext(currentPath))) || fileOrDir == currentPath {
 					ctx := contextsByDir[dirName]
 					if ctx == nil {
-						ctx = new()
-						ctx.customDecoder = options.CustomDecoder
+						ctx = newCtx(options)
 						contextsByDir[dirName] = ctx
 					}
 					if err := ctx.loadObjectsFromYAMLFile(currentPath, info); err != nil {
@@ -91,8 +88,7 @@ func CreateContextsWithOptions(options Options, filesOrDirs ...string) ([]LintCo
 				if _, alreadyExists := contextsByDir[currentPath]; alreadyExists {
 					return nil
 				}
-				ctx := new()
-				ctx.customDecoder = options.CustomDecoder
+				ctx := newCtx(options)
 				contextsByDir[currentPath] = ctx
 				if err := ctx.loadObjectsFromHelmChart(currentPath); err != nil {
 					return err
