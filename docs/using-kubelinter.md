@@ -7,6 +7,28 @@ You can run KubeLinter both locally and on your CI systems.
 After you've [installed KubeLinter](README.md#installing-kubelinter), use the
 `lint` command and provide:
 
+## Pre-commit
+
+KubeLinter supports the pre-commit framework, whose documentation can be found [here](https://pre-commit.com/).
+This allows you to automatically call kube-linter as a git pre-commit hook.
+
+An example `.pre-commit.config.yaml` file that uses kube-linter can be seen here:
+
+```yaml
+repos:
+-   repo: https://github.com/stackrox/kube-linter
+    rev: v0.1.6
+    hooks:
+    -   id: kube-linter
+```
+
+The currently supported pre-commit hooks are:
+
+1. `kube-linter` which clones and builds the kube-linter utility locally using `go get`. No additional installation required.
+2. `kube-linter-system` runs the kube-linter binary that must be on your systems path (for example installed through homebrew)
+3. `kube-linter-docker` will pull the official docker image and run the kube-linter command that way, mounting the projects directory into
+    the container. This requires docker to be installed on your machine.
+
 <!-- tabs:start -->
 
 #### ** Kubernetes **
