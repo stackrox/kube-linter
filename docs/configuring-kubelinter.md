@@ -10,7 +10,6 @@ working directory (by order of preference):
 
 1. `.kube-linter.yaml`
 1. `.kube-linter.yml`
-3. `.kube-linter`
 
 Finally, if none is found, the default config is used.
 

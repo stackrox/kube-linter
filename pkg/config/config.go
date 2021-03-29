@@ -33,13 +33,13 @@ type Config struct {
 
 // Returns a list of default config filenames to check if parameter isn't passed in
 func getDefaultConfigFilenames() []string {
-	return []string{".kube-linter.yaml", ".kube-linter.yml", ".kube-linter"}
+	return []string{".kube-linter.yaml", ".kube-linter.yml"}
 }
 
 // Get info on config file if it exists
 func fileExists(filename string) bool {
 	info, err := os.Stat(filename)
-	if os.IsNotExist(err) {
+	if err != nil {
 		return false
 	}
 	return !info.IsDir()
