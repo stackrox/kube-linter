@@ -13,7 +13,7 @@
   types: [yaml]
 
 - id: kube-linter-docker
-  name: Kube-Linter-Docker
+  name: KubeLinter Docker
   description: This hook runs kube-linter using the project's official docker image
   language: docker_image
   types: [yaml]
