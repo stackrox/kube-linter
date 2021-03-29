@@ -31,10 +31,8 @@ type Config struct {
 	Checks       ChecksConfig  `json:"checks,omitempty" mapstructure:"checks"`
 }
 
-// Returns a list of default config filenames to check if parameter isn't passed in
-func getDefaultConfigFilenames() []string {
-	return []string{".kube-linter.yaml", ".kube-linter.yml"}
-}
+// Defines the list of default config filenames to check if parameter isn't passed in
+var defaultConfigFilenames = [...]string{".kube-linter.yaml", ".kube-linter.yml"}
 
 // Get info on config file if it exists
 func fileExists(filename string) bool {
@@ -49,7 +47,7 @@ func fileExists(filename string) bool {
 func Load(v *viper.Viper, configPath string) (Config, error) {
 
 	if configPath == "" {
-		for _, p := range getDefaultConfigFilenames() {
+		for _, p := range defaultConfigFilenames {
 			if fileExists(p) {
 				configPath = p
 				break
