@@ -2,6 +2,7 @@ package requiredannotation
 
 import (
 	"golang.stackrox.io/kube-linter/pkg/check"
+	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	"golang.stackrox.io/kube-linter/pkg/templates/requiredannotation/internal/params"
@@ -13,7 +14,7 @@ func init() {
 		HumanName:   "Required Annotation",
 		Key:         "required-annotation",
 		Description: "Flag objects not carrying at least one annotation matching the provided patterns",
-		SupportedObjectKinds: check.ObjectKindsDesc{
+		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.Any},
 		},
 		Parameters:             params.ParamDescs,

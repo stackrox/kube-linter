@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/pkg/errors"
+	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/matcher"
 
 	"golang.stackrox.io/kube-linter/pkg/check"
@@ -20,7 +21,7 @@ func init() {
 		HumanName:   "Ports",
 		Key:         "ports",
 		Description: "Flag containers exposing ports under protocols that match the supplied parameters",
-		SupportedObjectKinds: check.ObjectKindsDesc{
+		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
 		Parameters:             params.ParamDescs,

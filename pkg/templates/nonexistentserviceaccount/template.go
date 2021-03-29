@@ -6,6 +6,7 @@ import (
 	"golang.stackrox.io/kube-linter/internal/set"
 	"golang.stackrox.io/kube-linter/internal/stringutils"
 	"golang.stackrox.io/kube-linter/pkg/check"
+	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/extract"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
@@ -24,7 +25,7 @@ func init() {
 		HumanName:   "Non-Existent Service Account",
 		Key:         "non-existent-service-account",
 		Description: "Flag cases where a pod references a non-existent service account",
-		SupportedObjectKinds: check.ObjectKindsDesc{
+		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
 		Parameters:             params.ParamDescs,

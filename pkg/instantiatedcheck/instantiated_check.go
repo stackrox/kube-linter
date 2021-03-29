@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/errorhelpers"
 	"golang.stackrox.io/kube-linter/pkg/check"
+	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	"golang.stackrox.io/kube-linter/pkg/templates"
 )
@@ -16,7 +17,7 @@ type InstantiatedCheck struct {
 	Func    check.Func
 	Matcher objectkinds.Matcher
 
-	Spec check.Check
+	Spec config.Check
 }
 
 var (
@@ -25,7 +26,7 @@ var (
 
 // ValidateAndInstantiate validates the check, and creates an instantiated check if the check
 // is valid.
-func ValidateAndInstantiate(c *check.Check) (*InstantiatedCheck, error) {
+func ValidateAndInstantiate(c *config.Check) (*InstantiatedCheck, error) {
 	validationErrs := errorhelpers.NewErrorList("validating check")
 	if c.Name == "" {
 		validationErrs.AddString("no name specified")
@@ -49,7 +50,7 @@ func ValidateAndInstantiate(c *check.Check) (*InstantiatedCheck, error) {
 	}
 
 	i := &InstantiatedCheck{Spec: *c}
-	var objectKinds check.ObjectKindsDesc
+	var objectKinds config.ObjectKindsDesc
 	if c.Scope != nil {
 		objectKinds = *c.Scope
 	} else {

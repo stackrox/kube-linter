@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/utils"
 	"golang.stackrox.io/kube-linter/pkg/check"
+	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/matcher"
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
@@ -189,7 +190,7 @@ func init() {
 		HumanName:   "Verify container capabilities",
 		Key:         templateKey,
 		Description: "Flag containers that do not match capabilities requirements",
-		SupportedObjectKinds: check.ObjectKindsDesc{
+		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
 		Parameters:             params.ParamDescs,

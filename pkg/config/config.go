@@ -5,30 +5,34 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
 	"github.com/spf13/viper"
-	"golang.stackrox.io/kube-linter/pkg/check"
 )
 
 // ChecksConfig is the config that determines which checks to run.
 type ChecksConfig struct {
 	// AddAllBuiltIn, if set, adds all built-in checks. This allows users to
 	// explicitly opt-out of checks that are not relevant using Exclude.
-	AddAllBuiltIn bool `json:"addAllBuiltIn" mapstructure:"add-all-built-in"`
+	// +flagName=add-all-built-in
+	AddAllBuiltIn bool `json:"addAllBuiltIn"`
 	// DoNotAutoAddDefaults, if set, prevents the automatic addition of default checks.
-	DoNotAutoAddDefaults bool `json:"doNotAutoAddDefaults" mapstructure:"do-not-auto-add-defaults"`
+	// +flagName=do-not-auto-add-defaults
+	DoNotAutoAddDefaults bool `json:"doNotAutoAddDefaults"`
 	// Exclude is a list of check names to exclude.
-	Exclude []string `json:"exclude" mapstructure:"exclude"`
+	// +flagName=exclude
+	Exclude []string `json:"exclude"`
 	// Include is a list of check names to include. If a check is in both Include and Exclude,
 	// Exclude wins.
-	Include []string `json:"include" mapstructure:"include"`
+	// +flagName=include
+	Include []string `json:"include"`
 }
 
 // Config represents the config file format.
 type Config struct {
-	// +viper=exclude
-	CustomChecks []check.Check `json:"customChecks,omitempty" mapstructure:"customChecks,omitempty"`
-	Checks       ChecksConfig  `json:"checks,omitempty" mapstructure:"checks"`
+	// +flagName=-
+	CustomChecks []Check      `json:"customChecks,omitempty"`
+	Checks       ChecksConfig `json:"checks,omitempty"`
 }
 
 // Defines the list of default config filenames to check if parameter isn't passed in
@@ -45,7 +49,6 @@ func fileExists(filename string) bool {
 
 // Load loads the config from the given path.
 func Load(v *viper.Viper, configPath string) (Config, error) {
-
 	if configPath == "" {
 		for _, p := range defaultConfigFilenames {
 			if fileExists(p) {
@@ -68,7 +71,9 @@ func Load(v *viper.Viper, configPath string) (Config, error) {
 	}
 
 	var conf Config
-	err := v.Unmarshal(&conf)
+	err := v.Unmarshal(&conf, viper.DecoderConfigOption(func(config *mapstructure.DecoderConfig) {
+		config.TagName = "json"
+	}))
 	if err != nil {
 		return Config{}, errors.Wrap(err, "unmarshalling config File")
 	}

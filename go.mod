@@ -6,10 +6,8 @@ require (
 	github.com/Masterminds/sprig/v3 v3.1.0
 	github.com/acarl005/stripansi v0.0.0-20180116102854-5a71ef0e047d
 	github.com/fatih/color v1.9.0
-	github.com/forestgiant/sliceutil v0.0.0-20160425183142-94783f95db6c
 	github.com/ghodss/yaml v1.0.0
 	github.com/golangci/golangci-lint v1.30.0
-	github.com/iancoleman/strcase v0.1.2
 	github.com/mitchellh/mapstructure v1.1.2
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.1.1

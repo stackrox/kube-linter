@@ -2,7 +2,7 @@ package checkregistry
 
 import (
 	"github.com/pkg/errors"
-	"golang.stackrox.io/kube-linter/pkg/check"
+	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/instantiatedcheck"
 )
 
@@ -10,13 +10,13 @@ import (
 // It is not thread-safe. It is anticipated that checks will all be registered ahead of time
 // before calls to Load.
 type CheckRegistry interface {
-	Register(checks ...*check.Check) error
+	Register(checks ...*config.Check) error
 	Load(name string) *instantiatedcheck.InstantiatedCheck
 }
 
 type checkRegistry map[string]*instantiatedcheck.InstantiatedCheck
 
-func (cr checkRegistry) Register(checks ...*check.Check) error {
+func (cr checkRegistry) Register(checks ...*config.Check) error {
 	for _, c := range checks {
 		instantiated, err := instantiatedcheck.ValidateAndInstantiate(c)
 		if err != nil {

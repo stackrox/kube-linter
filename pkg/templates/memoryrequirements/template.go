@@ -5,6 +5,7 @@ import (
 
 	"golang.stackrox.io/kube-linter/internal/pointers"
 	"golang.stackrox.io/kube-linter/pkg/check"
+	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	"golang.stackrox.io/kube-linter/pkg/templates"
@@ -31,7 +32,7 @@ func init() {
 		HumanName:   "Memory Requirements",
 		Key:         "memory-requirements",
 		Description: "Flag containers with memory requirements in the given range",
-		SupportedObjectKinds: check.ObjectKindsDesc{
+		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
 		Parameters:             params.ParamDescs,

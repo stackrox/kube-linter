@@ -1,6 +1,7 @@
 package check
 
 import (
+	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
 )
@@ -10,11 +11,6 @@ import (
 // object passed in the second argument.
 type Func func(lintCtx lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic
 
-// ObjectKindsDesc describes a list of supported object kinds for a check template.
-type ObjectKindsDesc struct {
-	ObjectKinds []string `json:"objectKinds"`
-}
-
 // A Template is a template for a check.
 type Template struct {
 	// HumanName is a human-friendly name for the template.
@@ -23,7 +19,7 @@ type Template struct {
 	HumanName            string
 	Key                  string
 	Description          string
-	SupportedObjectKinds ObjectKindsDesc
+	SupportedObjectKinds config.ObjectKindsDesc
 
 	Parameters             []ParameterDesc
 	ParseAndValidateParams func(params map[string]interface{}) (interface{}, error)

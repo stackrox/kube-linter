@@ -2,6 +2,7 @@ package requiredlabel
 
 import (
 	"golang.stackrox.io/kube-linter/pkg/check"
+	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	"golang.stackrox.io/kube-linter/pkg/templates/requiredlabel/internal/params"
@@ -13,7 +14,7 @@ func init() {
 		HumanName:   "Required Label",
 		Key:         "required-label",
 		Description: "Flag objects not carrying at least one label matching the provided patterns",
-		SupportedObjectKinds: check.ObjectKindsDesc{
+		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.Any},
 		},
 		Parameters:             params.ParamDescs,

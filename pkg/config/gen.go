@@ -1,3 +1,3 @@
 package config
 
-//go:generate go run ./main
+//go:generate go run ./codegen flags.go
