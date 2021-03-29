@@ -2,10 +2,23 @@
 
 To configure the checks KubeLinter runs or to run your own custom checks, you
 can use a `yaml` configuration file. When you run the `lint` command, use the
-`--config` option and provide the path to your configration file.
+`--config` option and provide the path to your configuration file.
+
+If a config file is not explicitly provided to the command,
+KubeLinter will look for a configuration file in the current
+working directory (by order of preference):
+
+1. `.kube-linter.yaml`
+1. `.kube-linter.yml`
+
+Finally, if none is found, the default config is used.
 
 ```bash
+# specific config file
 kube-linter lint pod.yaml --config kubelinter-config.yaml
+
+# will search for config based on the above order or will load defaults
+kube-linter lint pod.yaml
 ```
 
 The configuration file has two sections:

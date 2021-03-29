@@ -1,6 +1,7 @@
 package config
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -30,8 +31,29 @@ type Config struct {
 	Checks       ChecksConfig  `json:"checks,omitempty" mapstructure:"checks"`
 }
 
+// Defines the list of default config filenames to check if parameter isn't passed in
+var defaultConfigFilenames = [...]string{".kube-linter.yaml", ".kube-linter.yml"}
+
+// Get info on config file if it exists
+func fileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if err != nil {
+		return false
+	}
+	return !info.IsDir()
+}
+
 // Load loads the config from the given path.
 func Load(v *viper.Viper, configPath string) (Config, error) {
+
+	if configPath == "" {
+		for _, p := range defaultConfigFilenames {
+			if fileExists(p) {
+				configPath = p
+				break
+			}
+		}
+	}
 
 	if configPath != "" {
 		filename := filepath.Base(configPath)
