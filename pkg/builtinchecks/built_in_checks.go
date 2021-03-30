@@ -2,6 +2,7 @@ package builtinchecks
 
 import (
 	"embed"
+	"path/filepath"
 	"strings"
 	"sync"
 
@@ -47,7 +48,7 @@ func List() ([]check.Check, error) {
 				loadErr = errors.Errorf("found unexpected entry %s in yamls directory", entry.Name())
 				return
 			}
-			contents, err := yamlFiles.ReadFile(entry.Name())
+			contents, err := yamlFiles.ReadFile(filepath.Join("yamls", entry.Name()))
 			if err != nil {
 				loadErr = errors.Wrapf(err, "loading file %s", entry.Name())
 				return
@@ -60,5 +61,8 @@ func List() ([]check.Check, error) {
 			list = append(list, chk)
 		}
 	})
-	return list, loadErr
+	if loadErr != nil {
+		return nil, errors.Wrap(loadErr, "UNEXPECTED: failed to load built-in checks")
+	}
+	return list, nil
 }
