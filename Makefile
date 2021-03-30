@@ -6,8 +6,10 @@ none:
 deps: go.mod
 	@echo "+ $@"
 	@go mod tidy
-	@go mod download
-	@go mod verify
+ifdef CI
+	@git diff --exit-code -- go.mod go.sum || { echo "go.mod/go.sum files were updated after running 'go mod tidy', run this command on your local machine and commit the results." ; exit 1 ; }
+endif
+	go mod verify
 	@touch deps
 
 UNAME_S := $(shell uname -s)
@@ -42,11 +44,6 @@ STATICCHECK_BIN := $(GOBIN)/staticcheck
 $(STATICCHECK_BIN): deps
 	@echo "+ $@"
 	go install honnef.co/go/tools/cmd/staticcheck
-
-PACKR_BIN := $(GOBIN)/packr
-$(PACKR_BIN): deps
-	@echo "+ $@"
-	go install github.com/gobuffalo/packr/packr
 
 ###########
 ## Lint ##
@@ -86,17 +83,13 @@ generated-docs: go-generated-srcs build
 .PHONY: generated-srcs
 generated-srcs: go-generated-srcs generated-docs
 
-.PHONY: packr
-packr: $(PACKR_BIN)
-	packr
-
 #############
 ## Compile ##
 #############
 
 
 .PHONY: build
-build: packr
+build:
 	@CGO_ENABLED=0 GOOS=darwin scripts/go-build.sh ./cmd/kube-linter
 	@CGO_ENABLED=0 GOOS=linux scripts/go-build.sh ./cmd/kube-linter
 	@CGO_ENABLED=0 GOOS=windows scripts/go-build.sh ./cmd/kube-linter
@@ -117,7 +110,7 @@ image: build
 ##########
 
 .PHONY: test
-test: packr
+test:
 	go test ./...
 
 .PHONY: e2e-test

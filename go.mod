@@ -1,6 +1,6 @@
 module golang.stackrox.io/kube-linter
 
-go 1.14
+go 1.16
 
 require (
 	github.com/Masterminds/sprig/v3 v3.1.0
@@ -8,7 +8,6 @@ require (
 	github.com/fatih/color v1.9.0
 	github.com/forestgiant/sliceutil v0.0.0-20160425183142-94783f95db6c
 	github.com/ghodss/yaml v1.0.0
-	github.com/gobuffalo/packr v1.30.1
 	github.com/golangci/golangci-lint v1.30.0
 	github.com/iancoleman/strcase v0.1.2
 	github.com/mitchellh/mapstructure v1.1.2

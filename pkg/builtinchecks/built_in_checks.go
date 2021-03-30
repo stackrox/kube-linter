@@ -1,17 +1,19 @@
 package builtinchecks
 
 import (
+	"embed"
+	"path/filepath"
 	"sync"
 
 	"github.com/ghodss/yaml"
-	"github.com/gobuffalo/packr"
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/checkregistry"
 )
 
 var (
-	box = packr.NewBox("./yamls")
+	//go:embed yamls
+	yamlFiles embed.FS
 
 	loadOnce sync.Once
 	list     []check.Check
@@ -35,19 +37,31 @@ func LoadInto(registry checkregistry.CheckRegistry) error {
 // List lists built-in checks.
 func List() ([]check.Check, error) {
 	loadOnce.Do(func() {
-		for _, fileName := range box.List() {
-			contents, err := box.Find(fileName)
+		fileEntries, err := yamlFiles.ReadDir("yamls")
+		if err != nil {
+			loadErr = errors.Wrap(err, "reading embedded yaml files")
+			return
+		}
+		for _, entry := range fileEntries {
+			if entry.IsDir() || filepath.Ext(entry.Name()) != ".yaml" {
+				loadErr = errors.Errorf("found unexpected entry %s in yamls directory", entry.Name())
+				return
+			}
+			contents, err := yamlFiles.ReadFile(filepath.Join("yamls", entry.Name()))
 			if err != nil {
-				loadErr = errors.Wrapf(err, "loading default check from %s", fileName)
+				loadErr = errors.Wrapf(err, "loading file %s", entry.Name())
 				return
 			}
 			var chk check.Check
 			if err := yaml.Unmarshal(contents, &chk); err != nil {
-				loadErr = errors.Wrapf(err, "unmarshalling default check from %s", fileName)
+				loadErr = errors.Wrapf(err, "unmarshalling default check from %s", entry.Name())
 				return
 			}
 			list = append(list, chk)
 		}
 	})
-	return list, loadErr
+	if loadErr != nil {
+		return nil, errors.Wrap(loadErr, "UNEXPECTED: failed to load built-in checks")
+	}
+	return list, nil
 }

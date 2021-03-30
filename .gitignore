@@ -10,5 +10,3 @@
 # Empty file touched by `make deps`
 /deps
 
-# Packr generated files
-*-packr.go
