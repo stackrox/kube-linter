@@ -3,7 +3,6 @@ package builtinchecks
 import (
 	"embed"
 	"path/filepath"
-	"strings"
 	"sync"
 
 	"github.com/ghodss/yaml"
@@ -44,7 +43,7 @@ func List() ([]check.Check, error) {
 			return
 		}
 		for _, entry := range fileEntries {
-			if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".yaml") {
+			if entry.IsDir() || !(filepath.Ext(entry.Name()) == ".yaml") {
 				loadErr = errors.Errorf("found unexpected entry %s in yamls directory", entry.Name())
 				return
 			}
