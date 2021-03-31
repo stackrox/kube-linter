@@ -27,6 +27,38 @@ kube-linter lint /path/to/directory/containing/Chart.yaml-file/
 
 <!-- tabs:end -->
 
+## Using KubeLinter with the pre-commit framework
+
+If you are using the [pre-commit framework](https://pre-commit.com/) for
+managing Git pre-commit hooks, you can install and use KubeLinter as a
+pre-commit hook. To do this:
+
+1. Download the [`.pre-commit-hooks.yaml`](https://raw.githubusercontent.com/stackrox/kube-linter/main/.pre-commit-hooks.yaml)
+   file in the Git repository in which you want to install the KubeLinter
+   pre-commit hooks:
+   ```bash
+   curl -O https://raw.githubusercontent.com/stackrox/kube-linter/main/.pre-commit-hooks.yaml
+   ```
+1. Run the `pre-commit install` command:
+   ```bash
+   pre-commit install
+   ```
+1. After installation, the KubeLinter pre-commit hooks run whenever you run the
+   `git commit` command.
+
+The [`.pre-commit-hooks.yaml`](https://raw.githubusercontent.com/stackrox/kube-linter/main/.pre-commit-hooks.yaml)
+includes the following pre-commit hooks:
+
+1. `kube-linter`: Clones, builds, and installs KubeLinter locally (by using `go
+   get`).
+2. `kube-linter-system`: Runs the KubeLinter binary.
+   - You must [install KubeLinter](README.md#installing-kubelinter) and add it
+     to your path before running this pre-commit hook.
+3. `kube-linter-docker`: Pulls the KubeLinter docker image, mounts the project
+   directory in the container, and runs the `kube-linter` command.
+   - You must [install Docker](https://docs.docker.com/engine/install/) before
+     running this pre-commit hook.
+
 ## KubeLinter commands
 
 This section covers kube-linter command syntax, describes the command
