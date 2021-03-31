@@ -7,8 +7,8 @@ import (
 
 	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
-	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/checkregistry"
+	"golang.stackrox.io/kube-linter/pkg/config"
 )
 
 var (
@@ -16,7 +16,7 @@ var (
 	yamlFiles embed.FS
 
 	loadOnce sync.Once
-	list     []check.Check
+	list     []config.Check
 	loadErr  error
 )
 
@@ -35,7 +35,7 @@ func LoadInto(registry checkregistry.CheckRegistry) error {
 }
 
 // List lists built-in checks.
-func List() ([]check.Check, error) {
+func List() ([]config.Check, error) {
 	loadOnce.Do(func() {
 		fileEntries, err := yamlFiles.ReadDir("yamls")
 		if err != nil {
@@ -52,7 +52,7 @@ func List() ([]check.Check, error) {
 				loadErr = errors.Wrapf(err, "loading file %s", entry.Name())
 				return
 			}
-			var chk check.Check
+			var chk config.Check
 			if err := yaml.Unmarshal(contents, &chk); err != nil {
 				loadErr = errors.Wrapf(err, "unmarshalling default check from %s", entry.Name())
 				return

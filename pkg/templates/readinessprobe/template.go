@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"golang.stackrox.io/kube-linter/pkg/check"
+	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	"golang.stackrox.io/kube-linter/pkg/templates"
@@ -17,7 +18,7 @@ func init() {
 		HumanName:   "Readiness Probe Not Specified",
 		Key:         "readiness-probe",
 		Description: "Flag containers that don't specify a readiness probe",
-		SupportedObjectKinds: check.ObjectKindsDesc{
+		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
 		Parameters:             params.ParamDescs,

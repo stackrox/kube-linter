@@ -11,20 +11,20 @@ import (
 	"golang.stackrox.io/kube-linter/internal/defaultchecks"
 	"golang.stackrox.io/kube-linter/internal/stringutils"
 	"golang.stackrox.io/kube-linter/pkg/builtinchecks"
-	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/command/common"
+	"golang.stackrox.io/kube-linter/pkg/config"
 )
 
 var (
 	dashes = stringutils.Repeat("-", 30)
 
-	formatsToRenderFuncs = map[string]func([]check.Check, io.Writer) error{
+	formatsToRenderFuncs = map[string]func([]config.Check, io.Writer) error{
 		common.PlainFormat:    renderPlain,
 		common.MarkdownFormat: renderMarkdown,
 	}
 )
 
-func renderPlain(checks []check.Check, out io.Writer) error { //nolint:unparam // The function signature is required to match formatToRenderFuncs
+func renderPlain(checks []config.Check, out io.Writer) error { //nolint:unparam // The function signature is required to match formatToRenderFuncs
 	for i, chk := range checks {
 		fmt.Fprintf(out, "Name: %s\nDescription: %s\nRemediation: %s\nTemplate: %s\nParameters: %v\nEnabled by default: %v\n",
 			chk.Name, chk.Description, chk.Remediation, chk.Template, chk.Params, defaultchecks.List.Contains(chk.Name))
@@ -51,9 +51,9 @@ var (
 	markDownTemplate = common.MustInstantiateTemplate(markDownTemplateStr, nil)
 )
 
-func renderMarkdown(checks []check.Check, out io.Writer) error {
+func renderMarkdown(checks []config.Check, out io.Writer) error {
 	type augmentedCheck struct {
-		Check   check.Check
+		Check   config.Check
 		Default bool
 	}
 	augmentedChecks := make([]augmentedCheck, 0, len(checks))

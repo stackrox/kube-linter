@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"golang.stackrox.io/kube-linter/pkg/check"
+	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/extract"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
@@ -17,7 +18,7 @@ func init() {
 		HumanName:   "Writable Host Mounts",
 		Key:         "writable-host-mount",
 		Description: "Flag containers that have mounted a directory on the host as writable",
-		SupportedObjectKinds: check.ObjectKindsDesc{
+		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
 		Parameters:             params.ParamDescs,

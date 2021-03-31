@@ -1,4 +1,4 @@
-package check
+package config
 
 // A Check represents a single check. It is serializable.
 type Check struct {
@@ -8,4 +8,9 @@ type Check struct {
 	Scope       *ObjectKindsDesc       `json:"scope"`
 	Template    string                 `json:"template"`
 	Params      map[string]interface{} `json:"params,omitempty"`
+}
+
+// ObjectKindsDesc describes a list of supported object kinds for a check template.
+type ObjectKindsDesc struct {
+	ObjectKinds []string `json:"objectKinds"`
 }

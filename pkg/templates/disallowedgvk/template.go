@@ -5,6 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/check"
+	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/extract"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
@@ -19,7 +20,7 @@ func init() {
 		HumanName:   "Disallowed API Objects",
 		Key:         "disallowed-api-obj",
 		Description: "Flag disallowed API object kinds",
-		SupportedObjectKinds: check.ObjectKindsDesc{
+		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.Any},
 		},
 		Parameters:             params.ParamDescs,

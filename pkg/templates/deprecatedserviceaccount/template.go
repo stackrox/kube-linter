@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"golang.stackrox.io/kube-linter/pkg/check"
+	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/extract"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
@@ -17,7 +18,7 @@ func init() {
 		HumanName:   "Deprecated Service Account Field",
 		Key:         "deprecated-service-account-field",
 		Description: "Flag uses of the deprecated serviceAccount field, which should be migrated to serviceAccountName",
-		SupportedObjectKinds: check.ObjectKindsDesc{
+		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
 		Parameters:             params.ParamDescs,

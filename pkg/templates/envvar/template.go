@@ -5,6 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/check"
+	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/matcher"
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
@@ -19,7 +20,7 @@ func init() {
 		HumanName:   "Environment Variables",
 		Key:         "env-var",
 		Description: "Flag environment variables that match the provided patterns",
-		SupportedObjectKinds: check.ObjectKindsDesc{
+		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
 		Parameters:             params.ParamDescs,

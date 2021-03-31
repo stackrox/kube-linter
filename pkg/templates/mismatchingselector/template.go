@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"golang.stackrox.io/kube-linter/pkg/check"
+	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/extract"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
@@ -21,7 +22,7 @@ func init() {
 		HumanName:   "Mismatching Selector",
 		Key:         "mismatching-selector",
 		Description: "Flag deployments where the selector doesn't match the labels in the pod template spec",
-		SupportedObjectKinds: check.ObjectKindsDesc{
+		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
 		Parameters:             params.ParamDescs,
