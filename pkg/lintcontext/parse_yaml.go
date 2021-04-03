@@ -34,8 +34,9 @@ const (
 var (
 	clientSchema  = scheme.Scheme
 	SchemeBuilder = runtime.NewSchemeBuilder(ocsAppsV1.AddToScheme)
-	decoder_error = SchemeBuilder.AddToScheme(clientSchema)
-	decoder       = serializer.NewCodecFactory(clientSchema).UniversalDeserializer()
+	// Catch an error during schema build
+	decoderError = SchemeBuilder.AddToScheme(clientSchema)
+	decoder      = serializer.NewCodecFactory(clientSchema).UniversalDeserializer()
 )
 
 func parseObjects(data []byte, d runtime.Decoder) ([]k8sutil.Object, error) {
