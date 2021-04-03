@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	y "github.com/ghodss/yaml"
+	ocsAppsV1 "github.com/openshift/api/apps/v1"
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/k8sutil"
 	"helm.sh/helm/v3/pkg/chart"
@@ -31,8 +32,10 @@ const (
 )
 
 var (
-	clientSchema = scheme.Scheme
-	decoder      = serializer.NewCodecFactory(clientSchema).UniversalDeserializer()
+	clientSchema  = scheme.Scheme
+	SchemeBuilder = runtime.NewSchemeBuilder(ocsAppsV1.AddToScheme)
+	decoder_error = SchemeBuilder.AddToScheme(clientSchema)
+	decoder       = serializer.NewCodecFactory(clientSchema).UniversalDeserializer()
 )
 
 func parseObjects(data []byte, d runtime.Decoder) ([]k8sutil.Object, error) {
