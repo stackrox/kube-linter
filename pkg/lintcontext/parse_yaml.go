@@ -247,5 +247,4 @@ func (l *lintContextImpl) loadObjectsFromReader(filePath string, reader io.Reade
 			return err
 		}
 	}
-
 }
