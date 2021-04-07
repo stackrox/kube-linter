@@ -3,6 +3,7 @@ package lintcontext
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -10,6 +11,7 @@ import (
 	"strings"
 
 	y "github.com/ghodss/yaml"
+	ocsAppsV1 "github.com/openshift/api/apps/v1"
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/k8sutil"
 	"helm.sh/helm/v3/pkg/chart"
@@ -31,9 +33,19 @@ const (
 )
 
 var (
-	clientSchema = scheme.Scheme
-	decoder      = serializer.NewCodecFactory(clientSchema).UniversalDeserializer()
+	decoder runtime.Decoder
 )
+
+func init() {
+	clientScheme := scheme.Scheme
+
+	// Add OpenShift schema
+	schemeBuilder := runtime.NewSchemeBuilder(ocsAppsV1.AddToScheme)
+	if err := schemeBuilder.AddToScheme(clientScheme); err != nil {
+		panic(fmt.Sprintf("Can not add OpenShift schema %v", err))
+	}
+	decoder = serializer.NewCodecFactory(clientScheme).UniversalDeserializer()
+}
 
 func parseObjects(data []byte, d runtime.Decoder) ([]k8sutil.Object, error) {
 	if d == nil {
@@ -243,5 +255,4 @@ func (l *lintContextImpl) loadObjectsFromReader(filePath string, reader io.Reade
 			return err
 		}
 	}
-
 }

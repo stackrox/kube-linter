@@ -3,6 +3,7 @@ package objectkinds
 import (
 	"fmt"
 
+	ocsAppsV1 "github.com/openshift/api/apps/v1"
 	appsV1 "k8s.io/api/apps/v1"
 	batchV1 "k8s.io/api/batch/v1"
 	batchV1Beta1 "k8s.io/api/batch/v1beta1"
@@ -16,6 +17,7 @@ var (
 		for _, gk := range []schema.GroupKind{
 			{Group: appsV1.GroupName, Kind: "Deployment"},
 			{Group: appsV1.GroupName, Kind: "DaemonSet"},
+			{Group: ocsAppsV1.GroupName, Kind: "DeploymentConfig"},
 			{Group: appsV1.GroupName, Kind: "StatefulSet"},
 			{Group: appsV1.GroupName, Kind: "ReplicaSet"},
 			{Group: coreV1.GroupName, Kind: "Pod"},
