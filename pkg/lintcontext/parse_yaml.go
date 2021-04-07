@@ -39,7 +39,7 @@ var (
 
 func init() {
 	// Add OpenShift schema
-	var SchemeBuilder = runtime.NewSchemeBuilder(ocsAppsV1.AddToScheme)
+	SchemeBuilder := runtime.NewSchemeBuilder(ocsAppsV1.AddToScheme)
 	if err := SchemeBuilder.AddToScheme(clientSchema); err != nil {
 		panic(fmt.Sprintf("Can not add OpenShift schema %v", err))
 	}
