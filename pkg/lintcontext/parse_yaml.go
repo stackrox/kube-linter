@@ -3,6 +3,7 @@ package lintcontext
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -33,11 +34,16 @@ const (
 
 var (
 	clientSchema = scheme.Scheme
-	// SchemeBuilder to add OpenShift schema
-	SchemeBuilder = runtime.NewSchemeBuilder(ocsAppsV1.AddToScheme)
-	decoderError  = SchemeBuilder.AddToScheme(clientSchema)
-	decoder       = serializer.NewCodecFactory(clientSchema).UniversalDeserializer()
+	decoder      = serializer.NewCodecFactory(clientSchema).UniversalDeserializer()
 )
+
+func init() {
+	// Add OpenShift schema
+	var SchemeBuilder = runtime.NewSchemeBuilder(ocsAppsV1.AddToScheme)
+	if err := SchemeBuilder.AddToScheme(clientSchema); err != nil {
+		panic(fmt.Sprintf("Can not add OpenShift schema %v", err))
+	}
+}
 
 func parseObjects(data []byte, d runtime.Decoder) ([]k8sutil.Object, error) {
 	if d == nil {
