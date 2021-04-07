@@ -33,16 +33,18 @@ const (
 )
 
 var (
-	clientSchema = scheme.Scheme
-	decoder      = serializer.NewCodecFactory(clientSchema).UniversalDeserializer()
+	decoder runtime.Decoder
 )
 
 func init() {
+	clientScheme := scheme.Scheme
+
 	// Add OpenShift schema
-	SchemeBuilder := runtime.NewSchemeBuilder(ocsAppsV1.AddToScheme)
-	if err := SchemeBuilder.AddToScheme(clientSchema); err != nil {
+	schemeBuilder := runtime.NewSchemeBuilder(ocsAppsV1.AddToScheme)
+	if err := schemeBuilder.AddToScheme(clientScheme); err != nil {
 		panic(fmt.Sprintf("Can not add OpenShift schema %v", err))
 	}
+	decoder = serializer.NewCodecFactory(clientScheme).UniversalDeserializer()
 }
 
 func parseObjects(data []byte, d runtime.Decoder) ([]k8sutil.Object, error) {
