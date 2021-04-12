@@ -55,7 +55,7 @@ checks:
 
 ## Run specific checks
 
-You can use the `include` and `exclue` keys to run only specific checks. For
+You can use the `include` and `exclude` keys to run only specific checks. For
 example,
 - To disable majority of checks and only run few specific checks,
   use `doNotAutoAddDefaults` along with `include`.
