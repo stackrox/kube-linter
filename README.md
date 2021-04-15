@@ -51,7 +51,7 @@ Installing KubeLinter from source is as simple as following these steps:
    git clone git@github.com:stackrox/kube-linter.git
    ```
    
-1. Then, complile the source code. This will create the kube-linter binary files for each platform and places them in the `.gobin` folder.
+1. Then, compile the source code. This will create the kube-linter binary files for each platform and places them in the `.gobin` folder.
    
    ```bash
    make build
