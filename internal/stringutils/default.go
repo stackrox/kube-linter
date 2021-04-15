@@ -1,18 +1,18 @@
 package stringutils
 
 // OrDefault returns the string if it's not empty, or the default.
-func OrDefault(s, defaul string) string {
+func OrDefault(s, defaultValue string) string {
 	if s != "" {
 		return s
 	}
-	return defaul
+	return defaultValue
 }
 
 // PointerOrDefault returns the string if it's not nil nor empty, or the default.
-func PointerOrDefault(s *string, defaul string) string {
+func PointerOrDefault(s *string, defaultValue string) string {
 	if s == nil {
-		return defaul
+		return defaultValue
 	}
 
-	return OrDefault(*s, defaul)
+	return OrDefault(*s, defaultValue)
 }
