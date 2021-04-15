@@ -36,13 +36,24 @@ func renderPlain(checks []config.Check, out io.Writer) error { //nolint:unparam 
 }
 
 const (
-	markDownTemplateStr = `# KubeLinter checks
+	markDownTemplateStr = `# KubeLinter cheks
 
 KubeLinter includes the following built-in checks:
 
-| Name | Enabled by default | Description | Remediation | Template | Parameters |
-| ---- | ------------------ | ----------- | ----------- | -------- | ---------- |
-{{ range . }} | {{ .Check.Name}} | {{ if .Default }}Yes{{ else }}No{{ end }} | {{.Check.Description}} | {{.Check.Remediation}} | {{.Check.Template}} | {{ mustToJson (default (dict) .Check.Params ) | codeSnippetInTable }} |
+{{ range . -}}
+## {{ .Check.Name}}
+
+**Enabled by default**: {{ if .Default }}Yes{{ else }}No{{ end }}
+
+**Description**: {{.Check.Description}}
+
+**Remediation**: {{.Check.Remediation}}
+
+**Template**: [{{.Check.Template}}](generated/templates.md#{{.Check.Template}})
+
+**Parameters**:
+{{ mustToJson (default (dict) .Check.Params ) | codeBlock }}
+
 {{ end -}}
 `
 )
