@@ -1,19 +1,19 @@
 package checks
 
 import (
-	"github.com/pkg/errors"
-	"golang.stackrox.io/kube-linter/pkg/templates"
 	"os"
 	"sort"
 	"strings"
 	"text/template"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"golang.stackrox.io/kube-linter/internal/defaultchecks"
 	"golang.stackrox.io/kube-linter/internal/flagutil"
 	"golang.stackrox.io/kube-linter/pkg/builtinchecks"
 	"golang.stackrox.io/kube-linter/pkg/command/common"
 	"golang.stackrox.io/kube-linter/pkg/config"
+	"golang.stackrox.io/kube-linter/pkg/templates"
 )
 
 const (
