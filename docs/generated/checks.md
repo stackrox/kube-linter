@@ -1,4 +1,4 @@
-# KubeLinter cheks
+# KubeLinter checks
 
 KubeLinter includes the following built-in checks:
 

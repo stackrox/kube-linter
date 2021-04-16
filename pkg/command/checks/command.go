@@ -38,7 +38,7 @@ func renderPlain(checks []config.Check, out io.Writer) error { //nolint:unparam 
 }
 
 const (
-	markDownTemplateStr = `# KubeLinter cheks
+	markDownTemplateStr = `# KubeLinter checks
 
 KubeLinter includes the following built-in checks:
 
