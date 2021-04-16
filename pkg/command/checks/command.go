@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"sort"
+	"strings"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -13,6 +14,7 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/builtinchecks"
 	"golang.stackrox.io/kube-linter/pkg/command/common"
 	"golang.stackrox.io/kube-linter/pkg/config"
+	"golang.stackrox.io/kube-linter/pkg/templates"
 )
 
 var (
@@ -40,9 +42,20 @@ const (
 
 KubeLinter includes the following built-in checks:
 
-| Name | Enabled by default | Description | Remediation | Template | Parameters |
-| ---- | ------------------ | ----------- | ----------- | -------- | ---------- |
-{{ range . }} | {{ .Check.Name}} | {{ if .Default }}Yes{{ else }}No{{ end }} | {{.Check.Description}} | {{.Check.Remediation}} | {{.Check.Template}} | {{ mustToJson (default (dict) .Check.Params ) | codeSnippetInTable }} |
+{{ range . -}}
+## {{ .Check.Name}}
+
+**Enabled by default**: {{ if .Default }}Yes{{ else }}No{{ end }}
+
+**Description**: {{.Check.Description}}
+
+**Remediation**: {{.Check.Remediation}}
+
+**Template**: [{{.Check.Template}}](generated/templates.md#{{.TemplateLink}})
+
+**Parameters**:
+{{ mustToJson (default (dict) .Check.Params ) | codeBlock }}
+
 {{ end -}}
 `
 )
@@ -53,12 +66,21 @@ var (
 
 func renderMarkdown(checks []config.Check, out io.Writer) error {
 	type augmentedCheck struct {
-		Check   config.Check
-		Default bool
+		Check        config.Check
+		Default      bool
+		TemplateLink string
 	}
 	augmentedChecks := make([]augmentedCheck, 0, len(checks))
 	for _, chk := range checks {
-		augmentedChecks = append(augmentedChecks, augmentedCheck{Check: chk, Default: defaultchecks.List.Contains(chk.Name)})
+		template, found := templates.Get(chk.Template)
+		if !found {
+			return errors.Errorf("unexpected: check %v references non-existent template?", chk)
+		}
+		augmentedChecks = append(augmentedChecks, augmentedCheck{
+			Check:        chk,
+			Default:      defaultchecks.List.Contains(chk.Name),
+			TemplateLink: strings.Join(strings.Fields(strings.ToLower(template.HumanName)), "-"),
+		})
 	}
 	return markDownTemplate.Execute(out, augmentedChecks)
 }
