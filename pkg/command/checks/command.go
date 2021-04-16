@@ -1,8 +1,11 @@
 package checks
 
 import (
+	"github.com/pkg/errors"
+	"golang.stackrox.io/kube-linter/pkg/templates"
 	"os"
 	"sort"
+	"strings"
 	"text/template"
 
 	"github.com/spf13/cobra"
@@ -32,9 +35,21 @@ Enabled by default: {{ isDefault . }}
 
 KubeLinter includes the following built-in checks:
 
-| Name | Enabled by default | Description | Remediation | Template | Parameters |
-| ---- | ------------------ | ----------- | ----------- | -------- | ---------- |
-{{ range . }} | {{.Name}} | {{ if isDefault . }}Yes{{ else }}No{{ end }} | {{.Description}} | {{.Remediation}} | {{.Template}} | {{ mustToJson (default (dict) .Params ) | codeSnippetInTable }} |
+{{ range . -}}
+## {{ .Name}}
+
+**Enabled by default**: {{ if isDefault . }}Yes{{ else }}No{{ end }}
+
+**Description**: {{.Description}}
+
+**Remediation**: {{.Remediation}}
+
+**Template**: [{{.Template}}](generated/templates.md#{{ templateLink . }})
+
+**Parameters**:
+
+{{ mustToJson (default (dict) .Params ) | codeBlock "json" }}
+
 {{ end -}}
 `
 )
@@ -43,6 +58,13 @@ var (
 	checksFuncMap = template.FuncMap{
 		"isDefault": func(check config.Check) bool {
 			return defaultchecks.List.Contains(check.Name)
+		},
+		"templateLink": func(check config.Check) (string, error) {
+			template, found := templates.Get(check.Template)
+			if !found {
+				return "", errors.Errorf("unexpected: check %v references non-existent template?", check)
+			}
+			return strings.Join(strings.Fields(strings.ToLower(template.HumanName)), "-"), nil
 		},
 	}
 	plainTemplate    = common.MustInstantiatePlainTemplate(plainTemplateStr, checksFuncMap)

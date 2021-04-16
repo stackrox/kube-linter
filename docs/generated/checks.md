@@ -13,7 +13,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [dangling-service](generated/templates.md#dangling-services)
 
 **Parameters**:
-```
+
+```json
 {}
 ```
 
@@ -28,7 +29,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [service-account](generated/templates.md#service-account)
 
 **Parameters**:
-```
+
+```json
 {"serviceAccount":"^(|default)$"}
 ```
 
@@ -43,7 +45,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [deprecated-service-account-field](generated/templates.md#deprecated-service-account-field)
 
 **Parameters**:
-```
+
+```json
 {}
 ```
 
@@ -58,7 +61,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [verify-container-capabilities](generated/templates.md#verify-container-capabilities)
 
 **Parameters**:
-```
+
+```json
 {"forbiddenCapabilities":["NET_RAW"]}
 ```
 
@@ -73,7 +77,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [env-var](generated/templates.md#environment-variables)
 
 **Parameters**:
-```
+
+```json
 {"name":"(?i).*secret.*","value":".+"}
 ```
 
@@ -88,7 +93,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [mismatching-selector](generated/templates.md#mismatching-selector)
 
 **Parameters**:
-```
+
+```json
 {}
 ```
 
@@ -103,7 +109,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [anti-affinity](generated/templates.md#anti-affinity-not-specified)
 
 **Parameters**:
-```
+
+```json
 {"minReplicas":2}
 ```
 
@@ -118,7 +125,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [disallowed-api-obj](generated/templates.md#disallowed-api-objects)
 
 **Parameters**:
-```
+
+```json
 {"group":"extensions","version":"v1beta.+"}
 ```
 
@@ -133,7 +141,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [liveness-probe](generated/templates.md#liveness-probe-not-specified)
 
 **Parameters**:
-```
+
+```json
 {}
 ```
 
@@ -148,7 +157,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [read-only-root-fs](generated/templates.md#read-only-root-filesystems)
 
 **Parameters**:
-```
+
+```json
 {}
 ```
 
@@ -163,7 +173,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [readiness-probe](generated/templates.md#readiness-probe-not-specified)
 
 **Parameters**:
-```
+
+```json
 {}
 ```
 
@@ -178,7 +189,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [non-existent-service-account](generated/templates.md#non-existent-service-account)
 
 **Parameters**:
-```
+
+```json
 {}
 ```
 
@@ -193,7 +205,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [privileged](generated/templates.md#privileged-containers)
 
 **Parameters**:
-```
+
+```json
 {}
 ```
 
@@ -208,7 +221,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [required-annotation](generated/templates.md#required-annotation)
 
 **Parameters**:
-```
+
+```json
 {"key":"email","value":"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+"}
 ```
 
@@ -223,7 +237,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [required-label](generated/templates.md#required-label)
 
 **Parameters**:
-```
+
+```json
 {"key":"owner"}
 ```
 
@@ -238,7 +253,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [run-as-non-root](generated/templates.md#run-as-non-root-user)
 
 **Parameters**:
-```
+
+```json
 {}
 ```
 
@@ -253,7 +269,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [ports](generated/templates.md#ports)
 
 **Parameters**:
-```
+
+```json
 {"port":22,"protocol":"TCP"}
 ```
 
@@ -268,7 +285,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [cpu-requirements](generated/templates.md#cpu-requirements)
 
 **Parameters**:
-```
+
+```json
 {"lowerBoundMillis":0,"requirementsType":"any","upperBoundMillis":0}
 ```
 
@@ -283,7 +301,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [memory-requirements](generated/templates.md#memory-requirements)
 
 **Parameters**:
-```
+
+```json
 {"lowerBoundMB":0,"requirementsType":"any","upperBoundMB":0}
 ```
 
@@ -298,7 +317,8 @@ KubeLinter includes the following built-in checks:
 **Template**: [writable-host-mount](generated/templates.md#writable-host-mounts)
 
 **Parameters**:
-```
+
+```json
 {}
 ```
 
