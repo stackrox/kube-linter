@@ -49,10 +49,9 @@ func (e *EnumFlag) Usage() string {
 }
 
 func (e *EnumFlag) getAllowedValuesString() string {
-	sorted := e.allowedValues.AsSortedSlice(func(i, j string) bool {
+	return strings.Join(e.allowedValues.AsSortedSlice(func(i, j string) bool {
 		return i < j
-	})
-	return strings.Join(sorted, ", ")
+	}), ", ")
 }
 
 // NewEnumFlag creates and returns an enum flag value with the given description, allowedValues and defaultValue.

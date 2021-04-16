@@ -26,7 +26,7 @@ type Template struct {
 	Instantiate            func(parsedParams interface{}) (Func, error)             `json:"-"`
 }
 
-// HumanReadableParameters returns a copy of Template.Parameters where each item is transformed to HumanReadableParamDesc.
+// HumanReadableParameters helper transforms each of Template.Parameters to HumanReadableParamDesc.
 func (t *Template) HumanReadableParameters() []HumanReadableParamDesc {
 	out := make([]HumanReadableParamDesc, 0, len(t.Parameters))
 	for _, param := range t.Parameters {
