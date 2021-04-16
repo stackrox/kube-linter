@@ -10,7 +10,7 @@ KubeLinter includes the following built-in checks:
 
 **Remediation**: Make sure your service's selector correctly matches the labels on one of your deployments.
 
-**Template**: [dangling-service](generated/templates.md#dangling-service)
+**Template**: [dangling-service](generated/templates.md#dangling-services)
 
 **Parameters**:
 ```
@@ -70,7 +70,7 @@ KubeLinter includes the following built-in checks:
 
 **Remediation**: Don't use raw secrets in an environment variable. Instead, either mount the secret as a file or use a secretKeyRef. See https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets for more details.
 
-**Template**: [env-var](generated/templates.md#env-var)
+**Template**: [env-var](generated/templates.md#environment-variables)
 
 **Parameters**:
 ```
@@ -100,7 +100,7 @@ KubeLinter includes the following built-in checks:
 
 **Remediation**: Specify anti-affinity in your pod spec to ensure that the orchestrator attempts to schedule replicas on different nodes. You can do this by using podAntiAffinity, specifying a labelSelector that matches pods of this deployment, and setting the topologyKey to kubernetes.io/hostname. See https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity for more details.
 
-**Template**: [anti-affinity](generated/templates.md#anti-affinity)
+**Template**: [anti-affinity](generated/templates.md#anti-affinity-not-specified)
 
 **Parameters**:
 ```
@@ -115,7 +115,7 @@ KubeLinter includes the following built-in checks:
 
 **Remediation**: Migrate to using the apps/v1 API versions for these objects. See https://kubernetes.io/blog/2019/07/18/api-deprecations-in-1-16/ for more details.
 
-**Template**: [disallowed-api-obj](generated/templates.md#disallowed-api-obj)
+**Template**: [disallowed-api-obj](generated/templates.md#disallowed-api-objects)
 
 **Parameters**:
 ```
@@ -130,7 +130,7 @@ KubeLinter includes the following built-in checks:
 
 **Remediation**: Specify a liveness probe in your container. See https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/ for more details.
 
-**Template**: [liveness-probe](generated/templates.md#liveness-probe)
+**Template**: [liveness-probe](generated/templates.md#liveness-probe-not-specified)
 
 **Parameters**:
 ```
@@ -145,7 +145,7 @@ KubeLinter includes the following built-in checks:
 
 **Remediation**: Set readOnlyRootFilesystem to true in your container's securityContext.
 
-**Template**: [read-only-root-fs](generated/templates.md#read-only-root-fs)
+**Template**: [read-only-root-fs](generated/templates.md#read-only-root-filesystems)
 
 **Parameters**:
 ```
@@ -160,7 +160,7 @@ KubeLinter includes the following built-in checks:
 
 **Remediation**: Specify a readiness probe in your container. See https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/ for more details.
 
-**Template**: [readiness-probe](generated/templates.md#readiness-probe)
+**Template**: [readiness-probe](generated/templates.md#readiness-probe-not-specified)
 
 **Parameters**:
 ```
@@ -190,7 +190,7 @@ KubeLinter includes the following built-in checks:
 
 **Remediation**: Don't run your container as privileged unless required.
 
-**Template**: [privileged](generated/templates.md#privileged)
+**Template**: [privileged](generated/templates.md#privileged-containers)
 
 **Parameters**:
 ```
@@ -235,7 +235,7 @@ KubeLinter includes the following built-in checks:
 
 **Remediation**: Set runAsUser to a non-zero number, and runAsNonRoot to true, in your pod or container securityContext. See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for more details.
 
-**Template**: [run-as-non-root](generated/templates.md#run-as-non-root)
+**Template**: [run-as-non-root](generated/templates.md#run-as-non-root-user)
 
 **Parameters**:
 ```
@@ -295,7 +295,7 @@ KubeLinter includes the following built-in checks:
 
 **Remediation**: If you need to access files on the host, mount them as readOnly.
 
-**Template**: [writable-host-mount](generated/templates.md#writable-host-mount)
+**Template**: [writable-host-mount](generated/templates.md#writable-host-mounts)
 
 **Parameters**:
 ```
