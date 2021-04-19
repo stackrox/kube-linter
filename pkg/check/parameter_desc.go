@@ -68,7 +68,7 @@ type HumanReadableParamDesc struct {
 	NegationAllowed *bool                    `json:"negationAllowed,omitempty"`
 	SubParameters   []HumanReadableParamDesc `json:"subParameters,omitempty"`
 	ArrayElemType   ParameterType            `json:"arrayElemType,omitempty"`
-	NestingLevel    int                      `json:"-"`
+	NestingLevel    int                      `json:"-"` // NestingLevel controls output indentation for sub-params.
 }
 
 // HumanReadableFields returns a human-friendly representation of this ParameterDesc.
