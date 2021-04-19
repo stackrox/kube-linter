@@ -1,7 +1,10 @@
 package lintcontext
 
 import (
+	"encoding/json"
+
 	"golang.stackrox.io/kube-linter/internal/k8sutil"
+	"golang.stackrox.io/kube-linter/internal/stringutils"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -14,8 +17,47 @@ type ObjectMetadata struct {
 // An Object references an object that is loaded from a YAML file.
 type Object struct {
 	Metadata  ObjectMetadata
-	K8sObject k8sutil.Object `json:"-"` // TODO: find a way to include sufficient information such as entity name and namespace
+	K8sObject k8sutil.Object `json:"-"`
 }
+
+// K8sObjectInfo contains identifying information about k8s object.
+type K8sObjectInfo struct {
+	Namespace, Name, GroupVersionKind string
+}
+
+// GetK8sObjectName extracts K8sObjectInfo from Object.K8sObject.
+func (o *Object) GetK8sObjectName() K8sObjectInfo {
+	return K8sObjectInfo{
+		Namespace:        o.K8sObject.GetNamespace(),
+		Name:             o.K8sObject.GetName(),
+		GroupVersionKind: o.K8sObject.GetObjectKind().GroupVersionKind().String(),
+	}
+}
+
+// String provides plain-text representation of k8s object name.
+func (n K8sObjectInfo) String() string {
+	ns := stringutils.OrDefault(n.Namespace, "<no namespace>")
+	return ns + "/" + n.Name + " " + n.GroupVersionKind
+}
+
+// MarshalJSON provides custom serialization for Object.
+// Object.K8sObject is not serialized directly because that would be too much data. This function limits output to only
+// K8sObjectInfo returned for K8sObject.
+func (o *Object) MarshalJSON() ([]byte, error) {
+	// AliasedObject allows including all Object data without running MarshalJSON (this same function) on it in
+	// an infinite loop.
+	type AliasedObject Object
+	return json.Marshal(&struct {
+		*AliasedObject
+		K8sObject K8sObjectInfo
+	}{
+		AliasedObject: (*AliasedObject)(o),
+		K8sObject:     o.GetK8sObjectName(),
+	})
+}
+
+// Check that *Object implements json.Marshaler interface.
+var _ json.Marshaler = (*Object)(nil)
 
 // An InvalidObject represents something that couldn't be loaded from a YAML file.
 type InvalidObject struct {

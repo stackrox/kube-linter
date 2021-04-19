@@ -22,7 +22,7 @@ const (
 	plainTemplateStr = `KubeLinter {{.Summary.KubeLinterVersion}}
 
 {{range .Reports}}
-{{- .Object.Metadata.FilePath | bold}}: (object: {{with .Object.K8sObject}}{{or .GetNamespace "<no namespace>" | bold}}/{{.GetName | bold}} {{.GetObjectKind.GroupVersionKind | bold}}{{end}}) {{.Diagnostic.Message | red}} (check: {{.Check | yellow}}, remediation: {{.Remediation | yellow}})
+{{- .Object.Metadata.FilePath | bold}}: (object: {{.Object.GetK8sObjectName | bold}}) {{.Diagnostic.Message | red}} (check: {{.Check | yellow}}, remediation: {{.Remediation | yellow}})
 
 {{else}}No lint errors found!
 {{end -}}
