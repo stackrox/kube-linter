@@ -6,6 +6,7 @@ import (
 	"golang.stackrox.io/kube-linter/internal/k8sutil"
 	"golang.stackrox.io/kube-linter/internal/stringutils"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 // ObjectMetadata is metadata about an object.
@@ -22,7 +23,8 @@ type Object struct {
 
 // K8sObjectInfo contains identifying information about k8s object.
 type K8sObjectInfo struct {
-	Namespace, Name, GroupVersionKind string
+	Namespace, Name  string
+	GroupVersionKind schema.GroupVersionKind
 }
 
 // GetK8sObjectName extracts K8sObjectInfo from Object.K8sObject.
@@ -30,14 +32,14 @@ func (o *Object) GetK8sObjectName() K8sObjectInfo {
 	return K8sObjectInfo{
 		Namespace:        o.K8sObject.GetNamespace(),
 		Name:             o.K8sObject.GetName(),
-		GroupVersionKind: o.K8sObject.GetObjectKind().GroupVersionKind().String(),
+		GroupVersionKind: o.K8sObject.GetObjectKind().GroupVersionKind(),
 	}
 }
 
 // String provides plain-text representation of k8s object name.
 func (n K8sObjectInfo) String() string {
 	ns := stringutils.OrDefault(n.Namespace, "<no namespace>")
-	return ns + "/" + n.Name + " " + n.GroupVersionKind
+	return ns + "/" + n.Name + " " + n.GroupVersionKind.String()
 }
 
 // MarshalJSON provides custom serialization for Object.
