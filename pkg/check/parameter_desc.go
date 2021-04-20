@@ -68,16 +68,22 @@ type HumanReadableParamDesc struct {
 	NegationAllowed *bool                    `json:"negationAllowed,omitempty"`
 	SubParameters   []HumanReadableParamDesc `json:"subParameters,omitempty"`
 	ArrayElemType   ParameterType            `json:"arrayElemType,omitempty"`
+	NestingLevel    int                      `json:"-"` // NestingLevel controls output indentation for sub-params.
 }
 
 // HumanReadableFields returns a human-friendly representation of this ParameterDesc.
 func (p *ParameterDesc) HumanReadableFields() HumanReadableParamDesc {
+	return transform(p, 0)
+}
+
+func transform(p *ParameterDesc, nestingLevel int) HumanReadableParamDesc {
 	out := HumanReadableParamDesc{
-		Name:        p.Name,
-		Type:        p.Type,
-		Description: p.Description,
-		Required:    p.Required,
-		Examples:    p.Examples,
+		Name:         p.Name,
+		Type:         p.Type,
+		Description:  p.Description,
+		Required:     p.Required,
+		Examples:     p.Examples,
+		NestingLevel: nestingLevel,
 	}
 
 	if p.Type == StringType ||
@@ -93,7 +99,7 @@ func (p *ParameterDesc) HumanReadableFields() HumanReadableParamDesc {
 	if len(p.SubParameters) > 0 {
 		subParamFields := make([]HumanReadableParamDesc, 0, len(p.SubParameters))
 		for _, subParam := range p.SubParameters {
-			subParamFields = append(subParamFields, subParam.HumanReadableFields())
+			subParamFields = append(subParamFields, transform(&subParam, nestingLevel+1))
 		}
 		out.SubParameters = subParamFields
 	}

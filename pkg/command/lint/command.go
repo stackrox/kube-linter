@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.stackrox.io/kube-linter/internal/flagutil"
 	"golang.stackrox.io/kube-linter/pkg/builtinchecks"
 	"golang.stackrox.io/kube-linter/pkg/checkregistry"
+	"golang.stackrox.io/kube-linter/pkg/command/common"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/configresolver"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
@@ -17,10 +18,33 @@ import (
 	"github.com/spf13/viper"
 )
 
+const (
+	plainTemplateStr = `KubeLinter {{.Summary.KubeLinterVersion}}
+
+{{range .Reports}}
+{{- .Object.Metadata.FilePath | bold}}: (object: {{.Object.GetK8sObjectName | bold}}) {{.Diagnostic.Message | red}} (check: {{.Check | yellow}}, remediation: {{.Remediation | yellow}})
+
+{{else}}No lint errors found!
+{{end -}}
+`
+)
+
+var (
+	plainTemplate = common.MustInstantiatePlainTemplate(plainTemplateStr, nil)
+
+	formatters = common.Formatters{
+		Formatters: map[common.FormatType]common.FormatFunc{
+			common.JSONFormat:  common.FormatJSON,
+			common.PlainFormat: plainTemplate.Execute,
+		},
+	}
+)
+
 // Command is the command for the lint command.
 func Command() *cobra.Command {
 	var configPath string
 	var verbose bool
+	format := flagutil.NewEnumFlag("Output format", formatters.GetEnabledFormatters(), common.PlainFormat)
 
 	v := viper.New()
 
@@ -77,24 +101,26 @@ func Command() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if len(result.Reports) == 0 {
-				fmt.Fprintln(os.Stderr, "No lint errors found!")
-				return nil
+
+			formatter, err := formatters.FormatterByType(format.String())
+			if err != nil {
+				return err
 			}
-			stderrIsTerminal := terminal.IsTerminal(int(os.Stderr.Fd()))
-			for _, report := range result.Reports {
-				if stderrIsTerminal {
-					report.FormatToTerminal(os.Stderr)
-				} else {
-					report.FormatPlain(os.Stderr)
-				}
+			err = formatter(os.Stdout, result)
+			if err != nil {
+				return errors.Wrap(err, "output formatting failed")
 			}
-			return errors.Errorf("found %d lint errors", len(result.Reports))
+
+			if len(result.Reports) > 0 {
+				err = errors.Errorf("found %d lint errors", len(result.Reports))
+			}
+			return err
 		},
 	}
 
 	c.Flags().StringVar(&configPath, "config", "", "Path to config file")
 	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
+	c.Flags().Var(format, "format", format.Usage())
 
 	config.AddFlags(c, v)
 	return c

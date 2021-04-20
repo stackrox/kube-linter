@@ -21,7 +21,16 @@ type Template struct {
 	Description          string
 	SupportedObjectKinds config.ObjectKindsDesc
 
-	Parameters             []ParameterDesc
-	ParseAndValidateParams func(params map[string]interface{}) (interface{}, error)
-	Instantiate            func(parsedParams interface{}) (Func, error)
+	Parameters             []ParameterDesc                                          // TODO: use HumanReadableParamDesc for json output instead
+	ParseAndValidateParams func(params map[string]interface{}) (interface{}, error) `json:"-"`
+	Instantiate            func(parsedParams interface{}) (Func, error)             `json:"-"`
+}
+
+// HumanReadableParameters helper transforms each of Template.Parameters to HumanReadableParamDesc.
+func (t *Template) HumanReadableParameters() []HumanReadableParamDesc {
+	out := make([]HumanReadableParamDesc, 0, len(t.Parameters))
+	for _, param := range t.Parameters {
+		out = append(out, param.HumanReadableFields())
+	}
+	return out
 }

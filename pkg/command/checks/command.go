@@ -1,92 +1,86 @@
 package checks
 
 import (
-	"fmt"
-	"io"
 	"os"
 	"sort"
 	"strings"
+	"text/template"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"golang.stackrox.io/kube-linter/internal/defaultchecks"
-	"golang.stackrox.io/kube-linter/internal/stringutils"
+	"golang.stackrox.io/kube-linter/internal/flagutil"
 	"golang.stackrox.io/kube-linter/pkg/builtinchecks"
 	"golang.stackrox.io/kube-linter/pkg/command/common"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/templates"
 )
 
-var (
-	dashes = stringutils.Repeat("-", 30)
-
-	formatsToRenderFuncs = map[string]func([]config.Check, io.Writer) error{
-		common.PlainFormat:    renderPlain,
-		common.MarkdownFormat: renderMarkdown,
-	}
-)
-
-func renderPlain(checks []config.Check, out io.Writer) error { //nolint:unparam // The function signature is required to match formatToRenderFuncs
-	for i, chk := range checks {
-		fmt.Fprintf(out, "Name: %s\nDescription: %s\nRemediation: %s\nTemplate: %s\nParameters: %v\nEnabled by default: %v\n",
-			chk.Name, chk.Description, chk.Remediation, chk.Template, chk.Params, defaultchecks.List.Contains(chk.Name))
-		if i != len(checks)-1 {
-			fmt.Fprintf(out, "\n%s\n\n", dashes)
-		}
-	}
-	return nil
-}
-
 const (
+	plainTemplateStr = `{{ range $i, $_ := . }}
+{{- if $i}}
+------------------------------
+
+{{end -}}
+Name: {{.Name}}
+Description: {{.Description}}
+Remediation: {{.Remediation}}
+Template: {{.Template}}
+Parameters: {{.Params}}
+Enabled by default: {{ isDefault . }}
+{{end -}}
+`
+
 	markDownTemplateStr = `# KubeLinter checks
 
 KubeLinter includes the following built-in checks:
 
 {{ range . -}}
-## {{ .Check.Name}}
+## {{ .Name}}
 
-**Enabled by default**: {{ if .Default }}Yes{{ else }}No{{ end }}
+**Enabled by default**: {{ if isDefault . }}Yes{{ else }}No{{ end }}
 
-**Description**: {{.Check.Description}}
+**Description**: {{.Description}}
 
-**Remediation**: {{.Check.Remediation}}
+**Remediation**: {{.Remediation}}
 
-**Template**: [{{.Check.Template}}](generated/templates.md#{{.TemplateLink}})
+**Template**: [{{.Template}}](generated/templates.md#{{ templateLink . }})
 
 **Parameters**:
-{{ mustToJson (default (dict) .Check.Params ) | codeBlock }}
+
+{{ mustToJson (default (dict) .Params ) | codeBlock "json" }}
 
 {{ end -}}
 `
 )
 
 var (
-	markDownTemplate = common.MustInstantiateTemplate(markDownTemplateStr, nil)
+	checksFuncMap = template.FuncMap{
+		"isDefault": func(check config.Check) bool {
+			return defaultchecks.List.Contains(check.Name)
+		},
+		"templateLink": func(check config.Check) (string, error) {
+			template, found := templates.Get(check.Template)
+			if !found {
+				return "", errors.Errorf("unexpected: check %v references non-existent template?", check)
+			}
+			return strings.Join(strings.Fields(strings.ToLower(template.HumanName)), "-"), nil
+		},
+	}
+	plainTemplate    = common.MustInstantiatePlainTemplate(plainTemplateStr, checksFuncMap)
+	markDownTemplate = common.MustInstantiateMarkdownTemplate(markDownTemplateStr, checksFuncMap)
+
+	formatters = common.Formatters{
+		Formatters: map[common.FormatType]common.FormatFunc{
+			common.PlainFormat:    plainTemplate.Execute,
+			common.MarkdownFormat: markDownTemplate.Execute,
+			common.JSONFormat:     common.FormatJSON,
+		},
+	}
 )
 
-func renderMarkdown(checks []config.Check, out io.Writer) error {
-	type augmentedCheck struct {
-		Check        config.Check
-		Default      bool
-		TemplateLink string
-	}
-	augmentedChecks := make([]augmentedCheck, 0, len(checks))
-	for _, chk := range checks {
-		template, found := templates.Get(chk.Template)
-		if !found {
-			return errors.Errorf("unexpected: check %v references non-existent template?", chk)
-		}
-		augmentedChecks = append(augmentedChecks, augmentedCheck{
-			Check:        chk,
-			Default:      defaultchecks.List.Contains(chk.Name),
-			TemplateLink: strings.Join(strings.Fields(strings.ToLower(template.HumanName)), "-"),
-		})
-	}
-	return markDownTemplate.Execute(out, augmentedChecks)
-}
-
 func listCommand() *cobra.Command {
-	format := common.FormatWrapper{Format: common.PlainFormat}
+	format := flagutil.NewEnumFlag("Output format", formatters.GetEnabledFormatters(), common.PlainFormat)
 	c := &cobra.Command{
 		Use:   "list",
 		Short: "List built-in checks",
@@ -99,14 +93,14 @@ func listCommand() *cobra.Command {
 			sort.Slice(checks, func(i, j int) bool {
 				return checks[i].Name < checks[j].Name
 			})
-			renderFunc := formatsToRenderFuncs[format.Format]
-			if renderFunc == nil {
-				return errors.Errorf("unknown format: %q", format.Format)
+			renderFunc, err := formatters.FormatterByType(format.String())
+			if err != nil {
+				return err
 			}
-			return renderFunc(checks, os.Stdout)
+			return renderFunc(os.Stdout, checks)
 		},
 	}
-	c.Flags().Var(&format, "format", "output format")
+	c.Flags().Var(format, "format", format.Usage())
 	return c
 }
 
