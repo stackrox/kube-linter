@@ -4,9 +4,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/fatih/color"
-
 	"github.com/Masterminds/sprig/v3"
+	"github.com/fatih/color"
 	"golang.stackrox.io/kube-linter/internal/utils"
 )
 

@@ -59,13 +59,7 @@ var (
 		"isDefault": func(check config.Check) bool {
 			return defaultchecks.List.Contains(check.Name)
 		},
-		"templateLink": func(check config.Check) (string, error) {
-			template, found := templates.Get(check.Template)
-			if !found {
-				return "", errors.Errorf("unexpected: check %v references non-existent template?", check)
-			}
-			return strings.Join(strings.Fields(strings.ToLower(template.HumanName)), "-"), nil
-		},
+		"templateLink": GetTemplateLink,
 	}
 	plainTemplate    = common.MustInstantiatePlainTemplate(plainTemplateStr, checksFuncMap)
 	markDownTemplate = common.MustInstantiateMarkdownTemplate(markDownTemplateStr, checksFuncMap)
@@ -112,4 +106,15 @@ func Command() *cobra.Command {
 	}
 	c.AddCommand(listCommand())
 	return c
+}
+
+// GetTemplateLink returns html anchor string for the template corresponding to the given check so that it can be used
+// to reference the template section in a rendered markdown.
+// E.g. template name "Deprecated Service Account Field" becomes "deprecated-service-account-field" html anchor.
+func GetTemplateLink(check *config.Check) (string, error) {
+	t, found := templates.Get(check.Template)
+	if !found {
+		return "", errors.Errorf("unexpected: check %v references non-existent template?", check)
+	}
+	return strings.Join(strings.Fields(strings.ToLower(t.HumanName)), "-"), nil
 }
