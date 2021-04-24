@@ -70,6 +70,7 @@ jobs:
         root: /home/circleci/kube-linter
         paths:
           - .gobin/kube-linter
+          - bin/windows/kube-linter.exe
 
   e2e-test:
     executor: custom
@@ -82,7 +83,23 @@ jobs:
           name: Run E2E tests
           command: |
             make e2e-test
-  
+
+  e2e-test-windows:
+    executor:
+      name: win/default
+      size: "medium"
+
+    steps:
+      - checkout
+      - attach_workspace:
+          at: /home/circleci/kube-linter
+
+      - run:
+          name: Run E2E tests
+          shell: bash.exe
+          command: |
+            KUBE_LINTER_BIN=/home/circleci/kube-linter/bin/windows/kube-linter.exe go test -tags e2e -count=1 ./e2etests/...
+
   image:
     executor: custom
     steps:
@@ -174,6 +191,10 @@ workflows:
     - build:
         <<: *runOnAllTags
     - e2e-test:
+        <<: *runOnAllTags
+        requires:
+          - build
+    - e2e-test-windows:
         <<: *runOnAllTags
         requires:
           - build
