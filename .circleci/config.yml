@@ -87,9 +87,9 @@ jobs:
           command: |
             make e2e-test
 
-  e2e-test-windows:
+  sanity-test-windows:
     executor:
-      name: win/default
+      name: win/default  # references orb defined above.
       size: "medium"
 
     steps:
@@ -101,7 +101,16 @@ jobs:
           name: Run E2E tests
           shell: bash.exe
           command: |
-            KUBE_LINTER_BIN=/home/circleci/kube-linter/bin/windows/kube-linter.exe go test -tags e2e -count=1 ./e2etests/...
+            # In Windows, the workspace is attached relative to the current directory.
+            tag="$(./get-tag)"
+            cd home/circleci/kube-linter/bin/windows
+            version_from_bin="$(./kube-linter.exe version)"
+            echo "Expected tag ${tag}, got ${version_from_bin}"
+            [[ "${tag}" == "${version_from_bin}" ]]
+
+            # Make sure the lint command can run without errors.
+            # TODO: run the full suite of E2E tests on Windows.
+            ./kube-linter.exe lint .
 
   image:
     executor: custom
@@ -197,7 +206,7 @@ workflows:
         <<: *runOnAllTags
         requires:
           - build
-    - e2e-test-windows:
+    - sanity-test-windows:
         <<: *runOnAllTags
         requires:
           - build
