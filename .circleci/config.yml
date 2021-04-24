@@ -1,3 +1,6 @@
+orbs:
+  win: circleci/windows@2.4.0
+
 executors:
   custom:
     docker:
