@@ -2,6 +2,7 @@ package builtinchecks
 
 import (
 	"embed"
+	"fmt"
 	"path/filepath"
 	"sync"
 
@@ -47,7 +48,9 @@ func List() ([]config.Check, error) {
 				loadErr = errors.Errorf("found unexpected entry %s in yamls directory", entry.Name())
 				return
 			}
-			contents, err := yamlFiles.ReadFile(filepath.Join("yamls", entry.Name()))
+			// Do NOT use filepath.Join here, because embed always uses `/` as the separator,
+			// irrespective of the OS we're running.
+			contents, err := yamlFiles.ReadFile(fmt.Sprintf("yamls/%s", entry.Name()))
 			if err != nil {
 				loadErr = errors.Wrapf(err, "loading file %s", entry.Name())
 				return
