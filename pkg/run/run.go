@@ -6,34 +6,41 @@ import (
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/version"
 	"golang.stackrox.io/kube-linter/pkg/checkregistry"
+	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/ignore"
 	"golang.stackrox.io/kube-linter/pkg/instantiatedcheck"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
 )
 
-type checkStatus string
+// CheckStatus is enum type.
+type CheckStatus string
 
 const (
-	checksPassed checkStatus = "Passed"
-	checksFailed checkStatus = "Failed"
+	// ChecksPassed means no lint errors found.
+	ChecksPassed CheckStatus = "Passed"
+	// ChecksFailed means lint errors were found.
+	ChecksFailed CheckStatus = "Failed"
 )
 
 // Result represents the result from a run of the linter.
 type Result struct {
+	Checks  []config.Check
 	Reports []diagnostic.WithContext
 	Summary Summary
 }
 
 // Summary holds information about the linter run overall.
 type Summary struct {
-	ChecksStatus      checkStatus
-	CheckTime         time.Time
+	ChecksStatus      CheckStatus
+	CheckEndTime      time.Time
 	KubeLinterVersion string
 }
 
 // Run runs the linter on the given context, with the given config.
 func Run(lintCtxs []lintcontext.LintContext, registry checkregistry.CheckRegistry, checks []string) (Result, error) {
+	var result Result
+
 	instantiatedChecks := make([]*instantiatedcheck.InstantiatedCheck, 0, len(checks))
 	for _, checkName := range checks {
 		instantiatedCheck := registry.Load(checkName)
@@ -41,9 +48,9 @@ func Run(lintCtxs []lintcontext.LintContext, registry checkregistry.CheckRegistr
 			return Result{}, errors.Errorf("check %q not found", checkName)
 		}
 		instantiatedChecks = append(instantiatedChecks, instantiatedCheck)
+		result.Checks = append(result.Checks, instantiatedCheck.Spec)
 	}
 
-	var result Result
 	for _, lintCtx := range lintCtxs {
 		for _, obj := range lintCtx.Objects() {
 			for _, check := range instantiatedChecks {
@@ -67,11 +74,11 @@ func Run(lintCtxs []lintcontext.LintContext, registry checkregistry.CheckRegistr
 	}
 
 	if len(result.Reports) > 0 {
-		result.Summary.ChecksStatus = checksFailed
+		result.Summary.ChecksStatus = ChecksFailed
 	} else {
-		result.Summary.ChecksStatus = checksPassed
+		result.Summary.ChecksStatus = ChecksPassed
 	}
-	result.Summary.CheckTime = time.Now().UTC()
+	result.Summary.CheckEndTime = time.Now().UTC()
 	result.Summary.KubeLinterVersion = version.Get()
 
 	return result, nil

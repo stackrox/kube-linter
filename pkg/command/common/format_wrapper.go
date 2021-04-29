@@ -15,8 +15,11 @@ const (
 	PlainFormat = "plain"
 	// MarkdownFormat is for markdown output suitable for `*.md` files.
 	MarkdownFormat = "markdown"
-	// JSONFormat is for JSON output.
+	// JSONFormat is for JSON output with kube-linter's own data structs.
 	JSONFormat = "json"
+	// SARIFFormat is JSON-based standard for reporting lint errors.
+	// See https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=sarif
+	SARIFFormat = "sarif"
 )
 
 // FormatFunc sets contract formatter of each FormatType should follow.
