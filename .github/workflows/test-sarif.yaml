@@ -1,7 +1,16 @@
 name: Test kube-linter SARIF output
 
 on:
-  - push
+  # Important! Event type should be (or include) `pull_request` if you want to see linter checks in pull request UI.
+  #
+  # `github/codeql-action/upload-sarif@v1` action seems to use `${{ github.ref }}` context property when it submits
+  # SARIF through the API.
+  # When `github.ref` points to the branch, sarif results appear only in the security tab. When `github.ref` points to
+  # PR, results will appear also in the PR UI.
+  # See info here https://docs.github.com/en/rest/reference/code-scanning#upload-an-analysis-as-sarif-data
+  # Although not documented officially, `pull_request` event type will make `github.ref` in PR format.
+  # See https://frontside.com/blog/2020-05-26-github-actions-pull_request/#how-does-pull_request-affect-actionscheckout
+  - pull_request
 
 jobs:
   build-and-test:
