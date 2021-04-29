@@ -113,7 +113,7 @@ func getCheckTemplateURL(check *config.Check) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return fmt.Sprintf(consts.TemplateURL, anchor), nil
+	return fmt.Sprintf(consts.TemplateURLFormat, anchor), nil
 }
 
 func renderTemplate(t *template.Template, data interface{}) (string, error) {

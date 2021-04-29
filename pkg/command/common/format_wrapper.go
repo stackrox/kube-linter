@@ -15,7 +15,7 @@ const (
 	PlainFormat = "plain"
 	// MarkdownFormat is for markdown output suitable for `*.md` files.
 	MarkdownFormat = "markdown"
-	// JSONFormat is for JSON output with kube-linter own data structs.
+	// JSONFormat is for JSON output with kube-linter's own data structs.
 	JSONFormat = "json"
 	// SARIFFormat is JSON-based standard for reporting lint errors.
 	// See https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=sarif

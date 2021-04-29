@@ -34,7 +34,7 @@ jobs:
         run: .gobin/kube-linter version
 
       - name: Run kube-linter on a sample file with SARIF output
-        run: .gobin/kube-linter lint --format=sarif e2etests/testdata/inputs/splunk.yaml > results.sarif
+        run: .gobin/kube-linter lint --format=sarif tests/testdata/splunk.yaml > results.sarif
         continue-on-error: true
 
       - name: Dump output file and check it is not empty
