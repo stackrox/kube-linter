@@ -36,6 +36,8 @@ spec:
       containers:
         - name: splunk
           image: splunk/splunk:8.1.2
+          securityContext:
+            privileged: true
           ports:
             - containerPort: 8000
             - containerPort: 8088
