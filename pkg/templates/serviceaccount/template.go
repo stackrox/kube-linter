@@ -35,6 +35,9 @@ func init() {
 				if !found {
 					return nil
 				}
+				if podSpec.AutomountServiceAccountToken != nil && !*podSpec.AutomountServiceAccountToken {
+					return nil
+				}
 				sa := stringutils.OrDefault(podSpec.ServiceAccountName, podSpec.DeprecatedServiceAccount)
 				if saMatcher(sa) {
 					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("found matching serviceAccount (%q)", sa)}}
