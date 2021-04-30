@@ -1,11 +1,11 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: splunk
+  name: splunk1
   namespace: splunk-ns
 spec:
   selector:
-    app: splunk
+    app: splunk1
   ports:
   - name: http
     protocol: TCP
@@ -19,23 +19,25 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: splunk
+  name: splunk1
   namespace: splunk-ns
   labels:
-    apps: splunk
+    apps: splunk1
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: splunk
+      app: splunk1
   template:
     metadata:
       labels:
-        app: splunk
+        app: splunk1
     spec:
       containers:
         - name: splunk
           image: splunk/splunk:8.1.2
+          securityContext:
+            privileged: true
           ports:
             - containerPort: 8000
             - containerPort: 8088
