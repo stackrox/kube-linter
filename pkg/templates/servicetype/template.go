@@ -33,7 +33,7 @@ func init() {
 				}
 				var results []diagnostic.Diagnostic
 				for _, servicetype := range p.ForbiddenServiceTypes {
-					if strings.ToLower(string(service.Spec.Type)) == strings.ToLower(servicetype) {
+					if strings.EqualFold(string(service.Spec.Type), servicetype) {
 						results = append(results, diagnostic.Diagnostic{Message: fmt.Sprintf("a %s service is found in %s.", servicetype, service.Name)})
 					}
 				}
