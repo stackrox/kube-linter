@@ -1,8 +1,8 @@
 name: "drop-net-raw-capability"
-description: "Alert on containers not dropping NET_RAW capability"
+description: "Indicates when containers do not drop NET_RAW capability"
 remediation: >-
-  NET_RAW grants an application within the container the ability to craft raw packets, use raw sockets, and it also
-  allows an application to bind to any address. Please specify to drop this capability in the containers under
+  NET_RAW makes it so that an application within the container is able to craft raw packets,
+  use raw sockets, and bind to any address. Remove this capability in the containers under
   containers security contexts.
 scope:
   objectKinds:

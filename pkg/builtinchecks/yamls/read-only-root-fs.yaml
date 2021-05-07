@@ -1,6 +1,6 @@
 name: "no-read-only-root-fs"
-description: "Alert on containers not running with a read-only root filesystem"
-remediation: "Set readOnlyRootFilesystem to true in your container's securityContext."
+description: "Indicates when containers are running without a read-only root filesystem."
+remediation: "Set readOnlyRootFilesystem to true in the container securityContext."
 scope:
   objectKinds:
     - DeploymentLike

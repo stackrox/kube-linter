@@ -1,8 +1,8 @@
 name: "no-readiness-probe"
-description: "Alert on containers which don't specify a readiness probe"
+description: "Indicates when containers fail to specify a readiness probe."
 remediation: >-
   Specify a readiness probe in your container.
-  See https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/ for more details.
+  Refer to https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/ for details.
 scope:
   objectKinds:
     - DeploymentLike
