@@ -26,16 +26,8 @@ func init() {
 		Instantiate: params.WrapInstantiateFunc(func(_ params.Params) (check.Func, error) {
 			return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
 				securityContext := container.SecurityContext
-				if securityContext == nil {
-					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q has not set AllowPrivilegeEscalation to false.", container.Name)}}
-				} else {
-					if securityContext.AllowPrivilegeEscalation == nil {
-						if securityContext.Privileged != nil && *securityContext.Privileged {
-							return nil
-						} else {
-							return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q has not set AllowPrivilegeEscalation to false.", container.Name)}}
-						}
-					} else if *securityContext.AllowPrivilegeEscalation {
+				if securityContext != nil && securityContext.AllowPrivilegeEscalation != nil {
+					if *securityContext.AllowPrivilegeEscalation {
 						return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q has AllowPrivilegeEscalation set to true.", container.Name)}}
 					}
 				}
