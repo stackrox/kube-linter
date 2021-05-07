@@ -2,6 +2,22 @@
 
 KubeLinter includes the following built-in checks:
 
+## cluster-admin-role-binding
+
+**Enabled by default**: No
+
+**Description**: CIS Benchmark 5.1.1 Ensure that the cluster-admin role is only used where required
+
+**Remediation**: Create and assign a separate role that has access to specific resources/actions needed for the service account.
+
+**Template**: [cluster-admin-role-binding](generated/templates.md#cluster-admin-role-binding)
+
+**Parameters**:
+
+```json
+{}
+```
+
 ## dangling-service
 
 **Enabled by default**: Yes
@@ -50,6 +66,22 @@ KubeLinter includes the following built-in checks:
 {}
 ```
 
+## docker-sock
+
+**Enabled by default**: No
+
+**Description**: Alert on deployments with docker.sock mounted on containers
+
+**Remediation**: Ensure the Docker socket is not mounted inside any containers.
+
+**Template**: [docker-sock](generated/templates.md#docker-sock)
+
+**Parameters**:
+
+```json
+{}
+```
+
 ## drop-net-raw-capability
 
 **Enabled by default**: Yes
@@ -80,6 +112,70 @@ KubeLinter includes the following built-in checks:
 
 ```json
 {"name":"(?i).*secret.*","value":".+"}
+```
+
+## forbidden-service-types
+
+**Enabled by default**: No
+
+**Description**: Alert on services for forbidden types
+
+**Remediation**: Ensure containers are not exposed through a forbidden service type such as NodePort or LoadBalancer.
+
+**Template**: [forbidden-service-types](generated/templates.md#forbidden-service-types)
+
+**Parameters**:
+
+```json
+{"forbiddenServiceTypes":["NodePort","LoadBalancer"]}
+```
+
+## host-ipc
+
+**Enabled by default**: No
+
+**Description**: Alert on pods/deployment-likes with sharing host's IPC namespace
+
+**Remediation**: Ensure the host's IPC namespace is not shared.
+
+**Template**: [host-ipc](generated/templates.md#host-ipc)
+
+**Parameters**:
+
+```json
+{}
+```
+
+## host-network
+
+**Enabled by default**: No
+
+**Description**: Alert on pods/deployment-likes with sharing host's network namespace
+
+**Remediation**: Ensure the host's network namespace is not shared.
+
+**Template**: [host-network](generated/templates.md#host-network)
+
+**Parameters**:
+
+```json
+{}
+```
+
+## host-pid
+
+**Enabled by default**: No
+
+**Description**: Alert on pods/deployment-likes with sharing host's process namespace
+
+**Remediation**: Ensure the host's process namespace is not shared.
+
+**Template**: [host-pid](generated/templates.md#host-pid)
+
+**Parameters**:
+
+```json
+{}
 ```
 
 ## mismatching-selector
@@ -194,6 +290,22 @@ KubeLinter includes the following built-in checks:
 {}
 ```
 
+## privilege-escalation-container
+
+**Enabled by default**: No
+
+**Description**: Alert on containers with allowing privilege escalation
+
+**Remediation**: Ensure containers do not allow privilege escalation.
+
+**Template**: [privilege-escalation-container](generated/templates.md#privilege-escalation-on-containers)
+
+**Parameters**:
+
+```json
+{}
+```
+
 ## privileged-container
 
 **Enabled by default**: Yes
@@ -203,6 +315,22 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Don't run your container as privileged unless required.
 
 **Template**: [privileged](generated/templates.md#privileged-containers)
+
+**Parameters**:
+
+```json
+{}
+```
+
+## privileged-ports
+
+**Enabled by default**: No
+
+**Description**: Alert on deployments with privileged ports mapped in containers
+
+**Remediation**: Ensure privileged ports [0, 1024] are not mapped within containers.
+
+**Template**: [privileged-ports](generated/templates.md#privileged-ports)
 
 **Parameters**:
 
@@ -274,6 +402,38 @@ KubeLinter includes the following built-in checks:
 {"port":22,"protocol":"TCP"}
 ```
 
+## unsafe-proc-mount
+
+**Enabled by default**: No
+
+**Description**: Alert on deployments with unsafe /proc mount on containers
+
+**Remediation**: Ensure container does not exposes unsafe parts of /proc.
+
+**Template**: [unsafe-proc-mount](generated/templates.md#unsafe-proc-mount)
+
+**Parameters**:
+
+```json
+{}
+```
+
+## unsafe-sysctls
+
+**Enabled by default**: No
+
+**Description**: Alert on deployments with unsafe allocation of sysctls
+
+**Remediation**: Ensure containers does not allow unsafe allocation of CPU resources.
+
+**Template**: [unsafe-sysctls](generated/templates.md#unsafe-sysctls)
+
+**Parameters**:
+
+```json
+{"unsafeSysCtls":["kernel.msg","kernel.sem","kernel.shm","fs.mqueue.","net."]}
+```
+
 ## unset-cpu-requirements
 
 **Enabled by default**: Yes
@@ -304,6 +464,22 @@ KubeLinter includes the following built-in checks:
 
 ```json
 {"lowerBoundMB":0,"requirementsType":"any","upperBoundMB":0}
+```
+
+## volume-mounts
+
+**Enabled by default**: No
+
+**Description**: Alert on deployments with sensitive host system directories mounted on containers
+
+**Remediation**: Ensure sensitive host system directories are not mounted on containers.
+
+**Template**: [volume-mounts](generated/templates.md#volume-mounts)
+
+**Parameters**:
+
+```json
+{"sensitiveSysDirs":["/","/boot","/dev","/etc","/lib","/proc","/sys","/usr"]}
 ```
 
 ## writable-host-mount
