@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	// ClusterRoleBinding represents Kubernetes ClusterRoleBinding objects. Case sensitive.
+	// Clusterrolebinding represents Kubernetes ClusterRoleBinding objects. Case sensitive.
 	Clusterrolebinding = "ClusterRoleBinding"
 )
 
