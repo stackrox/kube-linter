@@ -1,0 +1,7 @@
+name: "host-pid"
+description: "Alert on pods/deployment-likes with sharing host's process namespace"
+remediation: "Ensure the host's process namespace is not shared."
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "host-pid"

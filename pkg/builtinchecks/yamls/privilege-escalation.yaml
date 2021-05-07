@@ -1,0 +1,7 @@
+name: "privilege-escalation-container"
+description: "Alert on containers with allowing privilege escalation"
+remediation: "Ensure containers do not allow privilege escalation."
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "privilege-escalation-container"

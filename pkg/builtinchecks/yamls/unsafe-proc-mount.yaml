@@ -1,0 +1,7 @@
+name: "unsafe-proc-mount"
+description: "Alert on deployments with unsafe /proc mount on containers"
+remediation: "Ensure container does not exposes unsafe parts of /proc."
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "unsafe-proc-mount"

@@ -1,0 +1,9 @@
+name: "unsafe-sysctls"
+description: "Alert on deployments with unsafe allocation of sysctls"
+remediation: "Ensure containers does not allow unsafe allocation of CPU resources."
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "unsafe-sysctls"
+params:
+  unsafeSysCtls: ["kernel.msg", "kernel.sem", "kernel.shm", "fs.mqueue.", "net."]

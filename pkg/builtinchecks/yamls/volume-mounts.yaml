@@ -1,0 +1,9 @@
+name: "volume-mounts"
+description: "Alert on deployments with sensitive host system directories mounted on containers"
+remediation: "Ensure sensitive host system directories are not mounted on containers."
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "volume-mounts"
+params:
+  sensitiveSysDirs: ["/", "/boot", "/dev", "/etc", "/lib", "/proc", "/sys", "/usr"]

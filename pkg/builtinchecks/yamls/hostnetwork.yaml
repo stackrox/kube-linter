@@ -1,0 +1,7 @@
+name: "host-network"
+description: "Alert on pods/deployment-likes with sharing host's network namespace"
+remediation: "Ensure the host's network namespace is not shared."
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "host-network"

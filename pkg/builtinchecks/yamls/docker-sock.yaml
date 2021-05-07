@@ -1,0 +1,7 @@
+name: "docker-sock"
+description: "Alert on deployments with docker.sock mounted on containers"
+remediation: "Ensure the Docker socket is not mounted inside any containers."
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "docker-sock"
