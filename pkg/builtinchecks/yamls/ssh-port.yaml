@@ -1,6 +1,6 @@
 name: "ssh-port"
-description: "Alert on deployments exposing port 22, commonly reserved for SSH access"
-remediation: "Ensure that non-SSH services are not using port 22. Ensure that any actual SSH servers have been vetted."
+description: "Indicates when deployments expose port 22, which is commonly reserved for SSH access."
+remediation: "Ensure that non-SSH services are not using port 22. Confirm that any actual SSH servers have been vetted."
 scope:
   objectKinds:
     - DeploymentLike

@@ -1,8 +1,8 @@
 name: "no-extensions-v1beta"
-description: "Alert on objects using deprecated API versions under extensions v1beta"
+description: "Indicates when objects use deprecated API versions under extensions/v1beta."
 remediation: >-
-  Migrate to using the apps/v1 API versions for these objects.
-  See https://kubernetes.io/blog/2019/07/18/api-deprecations-in-1-16/ for more details.
+  Migrate using the apps/v1 API versions for the objects.
+  Refer to https://kubernetes.io/blog/2019/07/18/api-deprecations-in-1-16/ for details.
 scope:
   objectKinds:
     - Any

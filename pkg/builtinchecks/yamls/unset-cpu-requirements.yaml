@@ -1,11 +1,11 @@
 name: "unset-cpu-requirements"
-description: "Alert on containers without CPU requests and limits set"
+description: "Indicates when containers do not have CPU requests and limits set."
 scope:
   objectKinds:
     - DeploymentLike
 remediation: >-
-  Set your container's CPU requests and limits depending on its requirements.
-  See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for more details.
+  Set CPU requests and limits for your container based on its requirements.
+  Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.
 template: "cpu-requirements"
 params:
   requirementsType: "any"

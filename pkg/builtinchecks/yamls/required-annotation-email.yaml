@@ -1,6 +1,6 @@
 name: "required-annotation-email"
-description: "Alert on objects without an 'email' annotation with a valid email"
-remediation: "Add an email annotation to your object with the contact information of the object's owner."
+description: "Indicates when objects do not have an email annotation with a valid email address."
+remediation: "Add an email annotation to your object with the email address of the object's owner."
 scope:
   objectKinds:
     - DeploymentLike

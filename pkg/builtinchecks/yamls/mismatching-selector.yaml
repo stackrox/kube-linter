@@ -1,6 +1,6 @@
 name: "mismatching-selector"
-description: "Alert on deployments where the selector doesn't match the pod template labels"
-remediation: "Make sure your deployment's selector correctly matches the labels in its pod template."
+description: "Indicates when deployment selectors fail to match the pod template labels."
+remediation: "Confirm that your deployment selector correctly matches the labels in its pod template."
 scope:
   objectKinds:
     - DeploymentLike
