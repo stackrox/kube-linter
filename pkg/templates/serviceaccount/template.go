@@ -15,10 +15,14 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/templates/serviceaccount/internal/params"
 )
 
+const (
+	templateKey = "service-account"
+)
+
 func init() {
 	templates.Register(check.Template{
 		HumanName:   "Service Account",
-		Key:         "service-account",
+		Key:         templateKey,
 		Description: "Flag containers which use a matching service account",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
@@ -33,6 +37,9 @@ func init() {
 			return func(_ lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				podSpec, found := extract.PodSpec(object.K8sObject)
 				if !found {
+					return nil
+				}
+				if podSpec.AutomountServiceAccountToken != nil && !*podSpec.AutomountServiceAccountToken {
 					return nil
 				}
 				sa := stringutils.OrDefault(podSpec.ServiceAccountName, podSpec.DeprecatedServiceAccount)
