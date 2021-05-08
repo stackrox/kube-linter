@@ -37,11 +37,20 @@ func (s *ServiceAccountTestSuite) addDeploymentWithServiceAccount(name, serviceA
 
 func (s *ServiceAccountTestSuite) TestServiceAccountName() {
 	const (
-		nonDefaultServiceAccount       = "non-default"
-		noAutoMountServiceAccountToken = "no-auto-mount-sa-token"
+		matchingSAWithAutoMountTokenNil      = "match-sa-token-mount-nil"
+		matchingSAWithAutoMountTokenTrue     = "match-sa-token-mount-true"
+		matchingSAWithAutoMountTokenFalse    = "match-sa-token-mount-false"
+		nonMatchingSAWithAutoMountTokenNil   = "non-match-sa-token-mount-nil"
+		nonMatchingSAWithAutoMountTokenTrue  = "non-match-sa-token-mount-true"
+		nonMatchingSAWithAutoMountTokenFalse = "non-match-sa-token-mount-false"
 	)
-	s.addDeploymentWithServiceAccount(nonDefaultServiceAccount, nonDefaultServiceAccount, pointers.Bool(true))
-	s.addDeploymentWithServiceAccount(noAutoMountServiceAccountToken, "", pointers.Bool(false))
+
+	s.addDeploymentWithServiceAccount(matchingSAWithAutoMountTokenNil, "non-default", nil)
+	s.addDeploymentWithServiceAccount(matchingSAWithAutoMountTokenTrue, "non-default", pointers.Bool(true))
+	s.addDeploymentWithServiceAccount(matchingSAWithAutoMountTokenFalse, "non-default", pointers.Bool(false))
+	s.addDeploymentWithServiceAccount(nonMatchingSAWithAutoMountTokenNil, "", nil)
+	s.addDeploymentWithServiceAccount(nonMatchingSAWithAutoMountTokenTrue, "", pointers.Bool(true))
+	s.addDeploymentWithServiceAccount(nonMatchingSAWithAutoMountTokenFalse, "", pointers.Bool(false))
 
 	s.Validate(s.ctx, []templates.TestCase{
 		{
@@ -49,10 +58,16 @@ func (s *ServiceAccountTestSuite) TestServiceAccountName() {
 				ServiceAccount: "non-default",
 			},
 			Diagnostics: map[string][]diagnostic.Diagnostic{
-				nonDefaultServiceAccount: {
+				matchingSAWithAutoMountTokenNil: {
 					{Message: "found matching serviceAccount (\"non-default\")"},
 				},
-				noAutoMountServiceAccountToken: {},
+				matchingSAWithAutoMountTokenTrue: {
+					{Message: "found matching serviceAccount (\"non-default\")"},
+				},
+				matchingSAWithAutoMountTokenFalse:    {},
+				nonMatchingSAWithAutoMountTokenNil:   {},
+				nonMatchingSAWithAutoMountTokenTrue:  {},
+				nonMatchingSAWithAutoMountTokenFalse: {},
 			},
 			ExpectInstantiationError: false,
 		},
