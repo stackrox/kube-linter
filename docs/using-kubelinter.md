@@ -27,6 +27,12 @@ kube-linter lint /path/to/directory/containing/Chart.yaml-file/
 
 <!-- tabs:end -->
 
+
+> [!NOTE] To get structured output, use the `--format` option.
+> For example,
+> - Use `--format=json` to get the output in JSON format.
+> - Use `--format=sarif` to get the output in the [SARIF spec](https://github.com/microsoft/sarif-tutorials).
+
 ## Using KubeLinter with the pre-commit framework
 
 If you are using the [pre-commit framework](https://pre-commit.com/) for
