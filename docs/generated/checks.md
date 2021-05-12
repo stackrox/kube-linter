@@ -440,7 +440,7 @@ KubeLinter includes the following built-in checks:
 
 **Description**: Alert on deployments specifying unsafe sysctls that may lead to severe problems like wrong behavior of containers
 
-**Remediation**: Ensure container does not allow unsafe allocation of system resources by removing unsafe sysctls configurations. For more details see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/ https://docs.docker.com/engine/reference/commandline/run/#configure-namespaced-kernel-parameters-sysctls-at-runtime
+**Remediation**: Ensure container does not allow unsafe allocation of system resources by removing unsafe sysctls configurations. For more details see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/ https://docs.docker.com/engine/reference/commandline/run/#configure-namespaced-kernel-parameters-sysctls-at-runtime.
 
 **Template**: [unsafe-sysctls](generated/templates.md#unsafe-sysctls)
 
