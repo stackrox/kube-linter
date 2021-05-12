@@ -28,7 +28,7 @@ func init() {
 			return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
 				if container.SecurityContext != nil && container.SecurityContext.ProcMount != nil {
 					if strings.EqualFold(string(*container.SecurityContext.ProcMount), "Unmasked") {
-						return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q exposes unsafe parts of /proc.", container.Name)}}
+						return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q exposes /proc unsafely (via procMount=Unmasked).", container.Name)}}
 					}
 				}
 				return nil
