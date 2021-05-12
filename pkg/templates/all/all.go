@@ -9,9 +9,9 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/danglingservice"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/deprecatedserviceaccount"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/disallowedgvk"
-	_ "golang.stackrox.io/kube-linter/pkg/templates/dockersock"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/envvar"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/hostipc"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/hostmounts"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/hostnetwork"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/hostpid"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/livenessprobe"
@@ -31,6 +31,5 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/servicetype"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/sysctl"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/unsafeprocmount"
-	_ "golang.stackrox.io/kube-linter/pkg/templates/volumemounts"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/writablehostmount"
 )
