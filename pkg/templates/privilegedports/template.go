@@ -27,7 +27,7 @@ func init() {
 			return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
 				var results []diagnostic.Diagnostic
 				for _, port := range container.Ports {
-					if int(port.ContainerPort) >= 0 && int(port.ContainerPort) <= 1024 {
+					if int(port.ContainerPort) > 0 && int(port.ContainerPort) < 1024 {
 						results = append(results, diagnostic.Diagnostic{
 							Message: fmt.Sprintf("port %d is mapped in container %q.", port.ContainerPort, container.Name),
 						})
