@@ -20,7 +20,7 @@ func init() {
 		Key:         "forbidden-service-types",
 		Description: "Flag forbidden services",
 		SupportedObjectKinds: config.ObjectKindsDesc{
-			ObjectKinds: []string{objectkinds.DeploymentLike},
+			ObjectKinds: []string{objectkinds.Service},
 		},
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,
@@ -34,7 +34,7 @@ func init() {
 				var results []diagnostic.Diagnostic
 				for _, servicetype := range p.ForbiddenServiceTypes {
 					if strings.EqualFold(string(service.Spec.Type), servicetype) {
-						results = append(results, diagnostic.Diagnostic{Message: fmt.Sprintf("a %s service is found in %s.", servicetype, service.Name)})
+						results = append(results, diagnostic.Diagnostic{Message: fmt.Sprintf("%q service type is forbidden.", servicetype)})
 					}
 				}
 				return results
