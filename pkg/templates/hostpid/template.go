@@ -30,7 +30,7 @@ func init() {
 					return nil
 				}
 				if podSpec.HostPID {
-					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("resource %s shares,  host's process namespace.", object.K8sObject.GetName())}}
+					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("object shares the host's process namespace (via hostPID=true).")}}
 				}
 				return nil
 			}, nil
