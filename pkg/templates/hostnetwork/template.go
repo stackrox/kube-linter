@@ -30,7 +30,7 @@ func init() {
 					return nil
 				}
 				if podSpec.HostNetwork {
-					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("resource %s shares host's network namespace.", object.K8sObject.GetName())}}
+					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("resource shares host's network namespace (via hostNetwork=true).")}}
 				}
 				return nil
 			}, nil
