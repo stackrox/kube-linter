@@ -29,9 +29,8 @@ func init() {
 				if !found {
 					return nil
 				}
-				object.K8sObject.GetName()
 				if podSpec.HostIPC {
-					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("resource %s shares,  host's IPC namespace.", object.K8sObject.GetName())}}
+					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("resource shares host's IPC namespace (via hostIPC=true).")}}
 				}
 				return nil
 			}, nil
