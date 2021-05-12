@@ -131,7 +131,7 @@ For example,
           - DeploymentLike
   ```
 
-  For details about `objectKinds` that KubeLinter support, see https://github.com/stackrox/kube-linter/tree/main/internal/objectkinds
+  For details about `objectKinds` that KubeLinter support, see https://github.com/stackrox/kube-linter/tree/main/pkg/objectkinds.
 
 - Use `remediation` to include a remediation message that users get when your custom check fails:
   ```yaml
