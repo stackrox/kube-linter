@@ -1,8 +1,6 @@
 package hostnetwork
 
 import (
-	"fmt"
-
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
@@ -30,7 +28,7 @@ func init() {
 					return nil
 				}
 				if podSpec.HostNetwork {
-					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("resource shares host's network namespace (via hostNetwork=true).")}}
+					return []diagnostic.Diagnostic{{Message: "resource shares host's network namespace (via hostNetwork=true)."}}
 				}
 				return nil
 			}, nil

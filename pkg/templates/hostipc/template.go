@@ -1,8 +1,6 @@
 package hostipc
 
 import (
-	"fmt"
-
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
@@ -30,7 +28,7 @@ func init() {
 					return nil
 				}
 				if podSpec.HostIPC {
-					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("resource shares host's IPC namespace (via hostIPC=true).")}}
+					return []diagnostic.Diagnostic{{Message: "resource shares host's IPC namespace (via hostIPC=true)."}}
 				}
 				return nil
 			}, nil

@@ -1,8 +1,6 @@
 package hostpid
 
 import (
-	"fmt"
-
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
@@ -30,7 +28,7 @@ func init() {
 					return nil
 				}
 				if podSpec.HostPID {
-					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("object shares the host's process namespace (via hostPID=true).")}}
+					return []diagnostic.Diagnostic{{Message: "object shares the host's process namespace (via hostPID=true)."}}
 				}
 				return nil
 			}, nil

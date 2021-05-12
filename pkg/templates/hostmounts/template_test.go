@@ -35,7 +35,7 @@ func (s *HostMountsTestSuite) SetupTest() {
 	s.ctx = mocks.NewMockContext()
 }
 
-func (s *HostMountsTestSuite) addDeploymentWithContainer(name string, containername string) {
+func (s *HostMountsTestSuite) addDeploymentWithContainer(name, containername string) {
 	s.ctx.AddMockDeployment(s.T(), name)
 	s.ctx.ModifyDeployment(s.T(), name, func(deployment *appsV1.Deployment) {
 		c := v1.Container{
@@ -71,7 +71,7 @@ func (s *HostMountsTestSuite) TestWithoutVolumes() {
 	})
 }
 
-func (s *HostMountsTestSuite) addDeploymentWithVolume(name string, vname, vpath, mpath string) {
+func (s *HostMountsTestSuite) addDeploymentWithVolume(name, vname, vpath, mpath string) {
 	s.addDeploymentWithContainer(name, container0)
 	s.ctx.ModifyDeployment(s.T(), name, func(deployment *appsV1.Deployment) {
 		deployment.Spec.Template.Labels = map[string]string{"app": name}
