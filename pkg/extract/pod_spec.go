@@ -3,7 +3,7 @@ package extract
 import (
 	"reflect"
 
-	"golang.stackrox.io/kube-linter/internal/k8sutil"
+	"golang.stackrox.io/kube-linter/pkg/k8sutil"
 	batchV1Beta1 "k8s.io/api/batch/v1beta1"
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"

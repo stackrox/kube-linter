@@ -13,7 +13,7 @@ import (
 	y "github.com/ghodss/yaml"
 	ocsAppsV1 "github.com/openshift/api/apps/v1"
 	"github.com/pkg/errors"
-	"golang.stackrox.io/kube-linter/internal/k8sutil"
+	"golang.stackrox.io/kube-linter/pkg/k8sutil"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/chartutil"
