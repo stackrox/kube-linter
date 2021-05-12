@@ -16,11 +16,11 @@ import (
 
 func init() {
 	templates.Register(check.Template{
-		HumanName:   "cluster-admin role binding",
+		HumanName:   "cluster-admin Role Binding",
 		Key:         "cluster-admin-role-binding",
-		Description: "Flag bindings of cluster-admin role to service account",
+		Description: "Flag bindings of cluster-admin role to service accounts, users, or groups",
 		SupportedObjectKinds: config.ObjectKindsDesc{
-			ObjectKinds: []string{objectkinds.Clusterrolebinding},
+			ObjectKinds: []string{objectkinds.ClusterRoleBinding},
 		},
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,

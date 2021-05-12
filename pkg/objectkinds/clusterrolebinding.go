@@ -6,20 +6,20 @@ import (
 )
 
 const (
-	// Clusterrolebinding represents Kubernetes ClusterRoleBinding objects. Case sensitive.
-	Clusterrolebinding = "ClusterRoleBinding"
+	// ClusterRoleBinding represents Kubernetes ClusterRoleBinding objects. Case sensitive.
+	ClusterRoleBinding = "ClusterRoleBinding"
 )
 
 var (
-	clusterrolebindingGVK = schema.GroupVersionKind{
+	clusterRoleBindingGVK = schema.GroupVersionKind{
 		Group:   rbacV1.GroupName,
 		Version: "v1",
-		Kind:    Clusterrolebinding,
+		Kind:    ClusterRoleBinding,
 	}
 )
 
 func init() {
-	registerObjectKind(Clusterrolebinding, matcherFunc(func(gvk schema.GroupVersionKind) bool {
-		return gvk == clusterrolebindingGVK
+	registerObjectKind(ClusterRoleBinding, matcherFunc(func(gvk schema.GroupVersionKind) bool {
+		return gvk == clusterRoleBindingGVK
 	}))
 }
