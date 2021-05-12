@@ -26,9 +26,20 @@ func init() {
 		Instantiate: params.WrapInstantiateFunc(func(_ params.Params) (check.Func, error) {
 			return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
 				securityContext := container.SecurityContext
-				if securityContext != nil && securityContext.AllowPrivilegeEscalation != nil {
-					if *securityContext.AllowPrivilegeEscalation {
-						return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q has AllowPrivilegeEscalation set to true.", container.Name)}}
+				if securityContext == nil {
+					return nil
+				}
+				if securityContext.AllowPrivilegeEscalation != nil && *securityContext.AllowPrivilegeEscalation {
+					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q has AllowPrivilegeEscalation set to true.", container.Name)}}
+				}
+				if securityContext.Privileged != nil && *securityContext.Privileged {
+					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q is Privileged and allows privilege escalation.", container.Name)}}
+				}
+				if securityContext.Capabilities != nil {
+					for _, cap := range securityContext.Capabilities.Add {
+						if cap == v1.Capability("SYS_ADMIN") {
+							return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q has SYS_ADMIN capability and allows privilege escalation.", container.Name)}}
+						}
 					}
 				}
 				return nil
