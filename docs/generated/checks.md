@@ -68,18 +68,18 @@ KubeLinter includes the following built-in checks:
 
 ## docker-sock
 
-**Enabled by default**: No
+**Enabled by default**: Yes
 
-**Description**: Alert on deployments with docker.sock mounted on containers
+**Description**: Alert on deployments with docker.sock mounted in containers. 
 
-**Remediation**: Ensure the Docker socket is not mounted inside any containers.
+**Remediation**: Ensure the Docker socket is not mounted inside any containers by removing the associated  Volume and VolumeMount in deployment yaml specification. If the Docker socket is mounted inside a container it could allow processes running within  the container to execute Docker commands which would effectively allow for full control of the host.
 
-**Template**: [docker-sock](generated/templates.md#docker-sock)
+**Template**: [host-mounts](generated/templates.md#host-mounts)
 
 **Parameters**:
 
 ```json
-{}
+{"dirs":["docker.sock$"]}
 ```
 
 ## drop-net-raw-capability
@@ -114,7 +114,7 @@ KubeLinter includes the following built-in checks:
 {"name":"(?i).*secret.*","value":".+"}
 ```
 
-## forbidden-service-types
+## exposed-services
 
 **Enabled by default**: No
 
@@ -132,7 +132,7 @@ KubeLinter includes the following built-in checks:
 
 ## host-ipc
 
-**Enabled by default**: No
+**Enabled by default**: Yes
 
 **Description**: Alert on pods/deployment-likes with sharing host's IPC namespace
 
@@ -148,7 +148,7 @@ KubeLinter includes the following built-in checks:
 
 ## host-network
 
-**Enabled by default**: No
+**Enabled by default**: Yes
 
 **Description**: Alert on pods/deployment-likes with sharing host's network namespace
 
@@ -164,7 +164,7 @@ KubeLinter includes the following built-in checks:
 
 ## host-pid
 
-**Enabled by default**: No
+**Enabled by default**: Yes
 
 **Description**: Alert on pods/deployment-likes with sharing host's process namespace
 
@@ -292,11 +292,11 @@ KubeLinter includes the following built-in checks:
 
 ## privilege-escalation-container
 
-**Enabled by default**: No
+**Enabled by default**: Yes
 
-**Description**: Alert on containers with allowing privilege escalation
+**Description**: Alert on containers of allowing privilege escalation that could gain more privileges than its parent process.
 
-**Remediation**: Ensure containers do not allow privilege escalation.
+**Remediation**: Ensure containers do not allow privilege escalation by setting allowPrivilegeEscalation=false." See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for more details.
 
 **Template**: [privilege-escalation-container](generated/templates.md#privilege-escalation-on-containers)
 
@@ -386,6 +386,22 @@ KubeLinter includes the following built-in checks:
 {}
 ```
 
+## sensitive-host-mounts
+
+**Enabled by default**: Yes
+
+**Description**: Alert on deployments with sensitive host system directories mounted in containers
+
+**Remediation**: Ensure sensitive host system directories are not mounted in containers by removing those Volumes and VolumeMounts.
+
+**Template**: [host-mounts](generated/templates.md#host-mounts)
+
+**Parameters**:
+
+```json
+{"dirs":["^/$","^/boot$","^/dev$","^/etc$","^/lib$","^/proc$","^/sys$","^/usr$"]}
+```
+
 ## ssh-port
 
 **Enabled by default**: Yes
@@ -406,9 +422,9 @@ KubeLinter includes the following built-in checks:
 
 **Enabled by default**: No
 
-**Description**: Alert on deployments with unsafe /proc mount on containers
+**Description**: Alert on deployments with unsafe /proc mount (procMount=Unmasked) that will bypass the default masking behavior of the container runtime
 
-**Remediation**: Ensure container does not exposes unsafe parts of /proc.
+**Remediation**: Ensure container does not unsafely exposes parts of /proc by setting procMount=Default.  Unmasked ProcMount bypasses the default masking behavior of the container runtime. See https://kubernetes.io/docs/concepts/security/pod-security-standards/ for more details.
 
 **Template**: [unsafe-proc-mount](generated/templates.md#unsafe-proc-mount)
 
@@ -420,11 +436,11 @@ KubeLinter includes the following built-in checks:
 
 ## unsafe-sysctls
 
-**Enabled by default**: No
+**Enabled by default**: Yes
 
-**Description**: Alert on deployments with unsafe allocation of sysctls
+**Description**: Alert on deployments specifying unsafe sysctls that may lead to severe problems like wrong behavior of containers
 
-**Remediation**: Ensure containers does not allow unsafe allocation of CPU resources.
+**Remediation**: Ensure container does not allow unsafe allocation of system resources by removing unsafe sysctls configurations. For more details see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/ https://docs.docker.com/engine/reference/commandline/run/#configure-namespaced-kernel-parameters-sysctls-at-runtime
 
 **Template**: [unsafe-sysctls](generated/templates.md#unsafe-sysctls)
 
@@ -464,22 +480,6 @@ KubeLinter includes the following built-in checks:
 
 ```json
 {"lowerBoundMB":0,"requirementsType":"any","upperBoundMB":0}
-```
-
-## volume-mounts
-
-**Enabled by default**: No
-
-**Description**: Alert on deployments with sensitive host system directories mounted on containers
-
-**Remediation**: Ensure sensitive host system directories are not mounted on containers.
-
-**Template**: [volume-mounts](generated/templates.md#volume-mounts)
-
-**Parameters**:
-
-```json
-{"sensitiveSysDirs":["/","/boot","/dev","/etc","/lib","/proc","/sys","/usr"]}
 ```
 
 ## writable-host-mount

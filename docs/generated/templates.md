@@ -31,11 +31,11 @@ KubeLinter supports the following templates:
 ]
 ```
 
-## cluster-admin role binding
+## cluster-admin Role Binding
 
 **Key**: `cluster-admin-role-binding`
 
-**Description**: Flag bindings of cluster-admin role to service account
+**Description**: Flag bindings of cluster-admin role to service accounts, users, or groups
 
 **Supported Objects**: ClusterRoleBinding
 
@@ -158,20 +158,6 @@ KubeLinter supports the following templates:
 ]
 ```
 
-## Docker Sock
-
-**Key**: `docker-sock`
-
-**Description**: Flag containers with docker sock mounted
-
-**Supported Objects**: DeploymentLike
-
-**Parameters**:
-
-```json
-[]
-```
-
 ## Environment Variables
 
 **Key**: `env-var`
@@ -209,7 +195,7 @@ KubeLinter supports the following templates:
 
 **Description**: Flag forbidden services
 
-**Supported Objects**: DeploymentLike
+**Supported Objects**: Service
 
 **Parameters**:
 
@@ -239,6 +225,30 @@ KubeLinter supports the following templates:
 
 ```json
 []
+```
+
+## Host Mounts
+
+**Key**: `host-mounts`
+
+**Description**: Flag volume mounts of sensitive system directories
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[
+  {
+    "name": "dirs",
+    "type": "array",
+    "description": "An array of regular expressions specifying system directories to be mounted on containers. e.g. ^/usr$ for /usr",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": false,
+    "arrayElemType": "string"
+  }
+]
 ```
 
 ## Host Network
@@ -607,30 +617,6 @@ KubeLinter supports the following templates:
     "name": "exceptions",
     "type": "array",
     "description": "List of capabilities that are exceptions to the above list. This should only be filled when the above contains \"all\", and is used to forgive capabilities in ADD list.",
-    "required": false,
-    "regexAllowed": false,
-    "negationAllowed": false,
-    "arrayElemType": "string"
-  }
-]
-```
-
-## Volume Mounts
-
-**Key**: `volume-mounts`
-
-**Description**: Flag volume mounts of sensitive system directories
-
-**Supported Objects**: DeploymentLike
-
-**Parameters**:
-
-```json
-[
-  {
-    "name": "sensitiveSysDirs",
-    "type": "array",
-    "description": "An array of names of sensitive system directories to be mounted on containers",
     "required": false,
     "regexAllowed": false,
     "negationAllowed": false,
