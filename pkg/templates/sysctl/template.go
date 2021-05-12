@@ -35,7 +35,7 @@ func init() {
 					for _, ctl := range podSpec.SecurityContext.Sysctls {
 						for _, unsafeCtl := range p.UnsafeSysCtls {
 							if strings.HasPrefix(ctl.Name, unsafeCtl) {
-								results = append(results, diagnostic.Diagnostic{Message: fmt.Sprintf("%s has unsafe allocation to resource %s.", object.K8sObject.GetName(), ctl.Name)})
+								results = append(results, diagnostic.Diagnostic{Message: fmt.Sprintf("resource specifies unsafe sysctl %q.", ctl.Name)})
 							}
 						}
 					}
