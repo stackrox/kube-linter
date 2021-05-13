@@ -1,7 +1,7 @@
 package mocks
 
 import (
-	"golang.stackrox.io/kube-linter/internal/k8sutil"
+	"golang.stackrox.io/kube-linter/pkg/k8sutil"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
 )
 

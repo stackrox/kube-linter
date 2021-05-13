@@ -1,7 +1,7 @@
 package extract
 
 import (
-	"golang.stackrox.io/kube-linter/internal/k8sutil"
+	"golang.stackrox.io/kube-linter/pkg/k8sutil"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 

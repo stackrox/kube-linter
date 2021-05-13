@@ -1,7 +1,7 @@
 package extract
 
 import (
-	"golang.stackrox.io/kube-linter/internal/k8sutil"
+	"golang.stackrox.io/kube-linter/pkg/k8sutil"
 )
 
 // Labels extracts labels from the given object.
