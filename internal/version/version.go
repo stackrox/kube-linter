@@ -1,7 +1,7 @@
 package version
 
 import (
-	"golang.stackrox.io/kube-linter/internal/stringutils"
+	"golang.stackrox.io/kube-linter/pkg/stringutils"
 )
 
 var (

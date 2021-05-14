@@ -14,9 +14,9 @@ import (
 	"github.com/Masterminds/sprig/v3"
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/set"
-	"golang.stackrox.io/kube-linter/internal/stringutils"
 	"golang.stackrox.io/kube-linter/internal/utils"
 	"golang.stackrox.io/kube-linter/pkg/check"
+	"golang.stackrox.io/kube-linter/pkg/stringutils"
 	"k8s.io/gengo/parser"
 	"k8s.io/gengo/types"
 )

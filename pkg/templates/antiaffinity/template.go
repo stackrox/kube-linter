@@ -3,7 +3,6 @@ package antiaffinity
 import (
 	"fmt"
 
-	"golang.stackrox.io/kube-linter/internal/stringutils"
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
@@ -11,6 +10,7 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
 	"golang.stackrox.io/kube-linter/pkg/matcher"
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
+	"golang.stackrox.io/kube-linter/pkg/stringutils"
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	"golang.stackrox.io/kube-linter/pkg/templates/antiaffinity/internal/params"
 	coreV1 "k8s.io/api/core/v1"

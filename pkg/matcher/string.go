@@ -3,7 +3,7 @@ package matcher
 import (
 	"regexp"
 
-	"golang.stackrox.io/kube-linter/internal/stringutils"
+	"golang.stackrox.io/kube-linter/pkg/stringutils"
 )
 
 const (
