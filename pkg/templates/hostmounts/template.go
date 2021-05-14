@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
+	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
@@ -29,6 +30,14 @@ func init() {
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,
 		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
+			compiledRegexes := make([]*regexp.Regexp, 0, len(p.Dirs))
+			for _, dir := range p.Dirs {
+				r, err := regexp.Compile(dir)
+				if err != nil {
+					return nil, errors.Wrapf(err, "invalid regex %s", dir)
+				}
+				compiledRegexes = append(compiledRegexes, r)
+			}
 			return func(_ lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				podSpec, found := extract.PodSpec(object.K8sObject)
 				if !found {
@@ -40,9 +49,8 @@ func init() {
 					if v.HostPath == nil {
 						continue
 					}
-					for _, dir := range p.Dirs {
-						match, _ := regexp.MatchString(dir, v.HostPath.Path)
-						if !match {
+					for _, regex := range compiledRegexes {
+						if !regex.MatchString(v.HostPath.Path) {
 							continue
 						}
 						for _, container := range containers {
