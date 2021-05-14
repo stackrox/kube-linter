@@ -12,4 +12,3 @@ scope:
 template: "host-mounts"
 params:
   dirs: ["docker.sock$"]
-  
