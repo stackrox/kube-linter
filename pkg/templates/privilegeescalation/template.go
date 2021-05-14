@@ -13,6 +13,10 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
+const (
+	sysAdminCapability = "SYS_ADMIN"
+)
+
 func init() {
 	templates.Register(check.Template{
 		HumanName:   "Privilege Escalation on Containers",
@@ -37,7 +41,7 @@ func init() {
 				}
 				if securityContext.Capabilities != nil {
 					for _, cap := range securityContext.Capabilities.Add {
-						if cap == v1.Capability("SYS_ADMIN") {
+						if cap == v1.Capability(sysAdminCapability) {
 							return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q has SYS_ADMIN capability and allows privilege escalation.", container.Name)}}
 						}
 					}
