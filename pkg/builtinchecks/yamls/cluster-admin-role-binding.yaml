@@ -1,0 +1,7 @@
+name: "cluster-admin-role-binding"
+description: "CIS Benchmark 5.1.1 Ensure that the cluster-admin role is only used where required"
+remediation: "Create and assign a separate role that has access to specific resources/actions needed for the service account."
+scope:
+  objectKinds:
+    - ClusterRoleBinding
+template: "cluster-admin-role-binding"

@@ -1,0 +1,7 @@
+name: "privileged-ports"
+description: "Alert on deployments with privileged ports mapped in containers"
+remediation: "Ensure privileged ports [0, 1024] are not mapped within containers."
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "privileged-ports"

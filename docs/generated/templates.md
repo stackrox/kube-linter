@@ -31,6 +31,20 @@ KubeLinter supports the following templates:
 ]
 ```
 
+## cluster-admin Role Binding
+
+**Key**: `cluster-admin-role-binding`
+
+**Description**: Flag bindings of cluster-admin role to service accounts, users, or groups
+
+**Supported Objects**: ClusterRoleBinding
+
+**Parameters**:
+
+```json
+[]
+```
+
 ## CPU Requirements
 
 **Key**: `cpu-requirements`
@@ -175,6 +189,96 @@ KubeLinter supports the following templates:
 ]
 ```
 
+## Forbidden Service Types
+
+**Key**: `forbidden-service-types`
+
+**Description**: Flag forbidden services
+
+**Supported Objects**: Service
+
+**Parameters**:
+
+```json
+[
+  {
+    "name": "forbiddenServiceTypes",
+    "type": "array",
+    "description": "An array of service types that should not be used",
+    "required": false,
+    "regexAllowed": false,
+    "negationAllowed": false,
+    "arrayElemType": "string"
+  }
+]
+```
+
+## Host IPC
+
+**Key**: `host-ipc`
+
+**Description**: Flag Pod sharing host's IPC namespace
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[]
+```
+
+## Host Mounts
+
+**Key**: `host-mounts`
+
+**Description**: Flag volume mounts of sensitive system directories
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[
+  {
+    "name": "dirs",
+    "type": "array",
+    "description": "An array of regular expressions specifying system directories to be mounted on containers. e.g. ^/usr$ for /usr",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": false,
+    "arrayElemType": "string"
+  }
+]
+```
+
+## Host Network
+
+**Key**: `host-network`
+
+**Description**: Flag Pod sharing host's network namespace
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[]
+```
+
+## Host PID
+
+**Key**: `host-pid`
+
+**Description**: Flag Pod sharing host's process namespace
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[]
+```
+
 ## Liveness Probe Not Specified
 
 **Key**: `liveness-probe`
@@ -281,11 +385,39 @@ KubeLinter supports the following templates:
 ]
 ```
 
+## Privilege Escalation on Containers
+
+**Key**: `privilege-escalation-container`
+
+**Description**: Flag containers of allowing privilege escalation
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[]
+```
+
 ## Privileged Containers
 
 **Key**: `privileged`
 
 **Description**: Flag privileged containers
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[]
+```
+
+## Privileged Ports
+
+**Key**: `privileged-ports`
+
+**Description**: Flag privileged ports
 
 **Supported Objects**: DeploymentLike
 
@@ -418,6 +550,44 @@ KubeLinter supports the following templates:
     "required": true,
     "regexAllowed": true,
     "negationAllowed": true
+  }
+]
+```
+
+## Unsafe Proc Mount
+
+**Key**: `unsafe-proc-mount`
+
+**Description**: Flag containers of unsafe proc mount
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[]
+```
+
+## Unsafe Sysctls
+
+**Key**: `unsafe-sysctls`
+
+**Description**: Flag unsafe sysctls
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[
+  {
+    "name": "unsafeSysCtls",
+    "type": "array",
+    "description": "An array of unsafe system controls",
+    "required": false,
+    "regexAllowed": false,
+    "negationAllowed": false,
+    "arrayElemType": "string"
   }
 ]
 ```

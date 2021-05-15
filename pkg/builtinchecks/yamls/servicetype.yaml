@@ -1,0 +1,9 @@
+name: "exposed-services"
+description: "Alert on services for forbidden types"
+remediation: "Ensure containers are not exposed through a forbidden service type such as NodePort or LoadBalancer."
+scope:
+  objectKinds:
+    - Service
+template: "forbidden-service-types"
+params:
+  forbiddenServiceTypes: ["NodePort", "LoadBalancer"]

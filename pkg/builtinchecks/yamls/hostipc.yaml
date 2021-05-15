@@ -1,0 +1,7 @@
+name: "host-ipc"
+description: "Alert on pods/deployment-likes with sharing host's IPC namespace"
+remediation: "Ensure the host's IPC namespace is not shared."
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "host-ipc"

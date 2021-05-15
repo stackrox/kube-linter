@@ -1,0 +1,14 @@
+name: "docker-sock"
+description: "Alert on deployments with docker.sock mounted in containers. "
+remediation: >- 
+  Ensure the Docker socket is not mounted inside any containers by removing the associated 
+  Volume and VolumeMount in deployment yaml specification.
+  If the Docker socket is mounted inside a container it could allow processes running within 
+  the container to execute Docker commands which would effectively allow for full control of the host.
+  
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "host-mounts"
+params:
+  dirs: ["docker.sock$"]
