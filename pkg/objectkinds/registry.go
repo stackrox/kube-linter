@@ -18,6 +18,16 @@ func registerObjectKind(name string, objectKind Matcher) {
 	allObjectKinds[name] = objectKind
 }
 
+// AllObjectKinds will return all the object kind names that are registered
+func AllObjectKinds() []string {
+	kinds := make([]string, 0, len(allObjectKinds))
+
+	for k := range allObjectKinds {
+		kinds = append(kinds, k)
+	}
+	return kinds
+}
+
 type orMatcher []Matcher
 
 func (o orMatcher) Matches(gvk schema.GroupVersionKind) bool {
