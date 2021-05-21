@@ -20,7 +20,7 @@ func registerObjectKind(name string, objectKind Matcher) {
 
 // AllObjectKinds will return all the object kind names that are registered
 func AllObjectKinds() []string {
-	var kinds []string
+	kinds := make([]string, 0, len(allObjectKinds))
 
 	for k := range allObjectKinds {
 		kinds = append(kinds, k)
