@@ -20,9 +20,9 @@ const (
 
 func init() {
 	templates.Register(check.Template{
-		HumanName:   "Minimum recommended replicas not met",
+		HumanName:   "Minimum replicas",
 		Key:         templateKey,
-		Description: "Flag applications running fewer than recommended number of replicas",
+		Description: "Flag applications running fewer than the specified number of replicas",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},

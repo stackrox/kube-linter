@@ -1,7 +1,7 @@
-name: "required-minimum-replicas"
-description: "Indicates when deployment use less that the minimum recommended number of replicas"
+name: "minimum-three-replicas"
+description: "Indicates when a deployment uses less than three replicas"
 remediation: >-
-  Increase be number of replicas in the deployment to at least the minimum to increase the fault tolerancy of the deployment.
+  Increase be number of replicas in the deployment to at least three to increase the fault tolerancy of the deployment.
 scope:
   objectKinds:
     - DeploymentLike
