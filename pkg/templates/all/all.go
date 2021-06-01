@@ -24,6 +24,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/privilegeescalation"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/readinessprobe"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/readonlyrootfs"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/replicas"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/requiredannotation"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/requiredlabel"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/runasnonroot"
