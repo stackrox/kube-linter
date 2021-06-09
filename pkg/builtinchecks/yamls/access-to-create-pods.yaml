@@ -1,0 +1,13 @@
+name: "access-to-create-pods"
+description: >-
+  Indicates when a subject (Group/User/ServiceAccount) has create access to Pods.
+  CIS Benchmark 5.1.4: The ability to create pods in a cluster opens up possibilities for privilege escalation and should be restricted, where possible.
+remediation: "Where possible, remove create access to pod objects in the cluster."
+scope:
+  objectKinds:
+    - ClusterRoleBinding
+    - RoleBinding
+template: "access-to-resources"
+params:
+  resources: ["^pods$", "^deployments$", "^statefulsets$", "^replicasets$", "^cronjob$", "^jobs$","^daemonsets$"]
+  verbs: ["^create$"]
