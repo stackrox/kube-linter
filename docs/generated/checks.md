@@ -552,7 +552,7 @@ KubeLinter includes the following built-in checks:
 
 **Description**: Indicates when a resource is deployed to the default namespace.   CIS Benchmark 5.7.1: Create administrative boundaries between resources using namespaces. CIS Benchmark 5.7.4: The default namespace should not be used.
 
-**Remediation**: Create namespaces for objects in your deployment
+**Remediation**: Create namespaces for objects in your deployment.
 
 **Template**: [use-namespace](generated/templates.md#use-namespaces-for-administrative-boundaries-between-resources)
 
