@@ -1,6 +1,8 @@
 package objectkinds
 
 import (
+	"fmt"
+
 	rbacV1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -11,15 +13,16 @@ const (
 )
 
 var (
-	clusterRoleBindingGVK = schema.GroupVersionKind{
-		Group:   rbacV1.GroupName,
-		Version: "v1",
-		Kind:    ClusterRoleBinding,
-	}
+	clusterRoleBindingGVK = rbacV1.SchemeGroupVersion.WithKind(ClusterRoleBinding)
 )
 
 func init() {
 	registerObjectKind(ClusterRoleBinding, matcherFunc(func(gvk schema.GroupVersionKind) bool {
 		return gvk == clusterRoleBindingGVK
 	}))
+}
+
+// GetClusterRoleBindingAPIVersion returns ClusterRoleBinding's APIVersion
+func GetClusterRoleBindingAPIVersion() string {
+	return fmt.Sprintf("%s/%s", clusterRoleBindingGVK.Group, clusterRoleBindingGVK.Version)
 }
