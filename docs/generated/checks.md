@@ -2,6 +2,38 @@
 
 KubeLinter includes the following built-in checks:
 
+## access-to-create-pods
+
+**Enabled by default**: No
+
+**Description**: Indicates when a subject (Group/User/ServiceAccount) has create access to Pods. CIS Benchmark 5.1.4: The ability to create pods in a cluster opens up possibilities for privilege escalation and should be restricted, where possible.
+
+**Remediation**: Where possible, remove create access to pod objects in the cluster.
+
+**Template**: [access-to-resources](generated/templates.md#access-to-resources)
+
+**Parameters**:
+
+```json
+{"resources":["^pods$","^deployments$","^statefulsets$","^replicasets$","^cronjob$","^jobs$","^daemonsets$"],"verbs":["^create$"]}
+```
+
+## access-to-secrets
+
+**Enabled by default**: No
+
+**Description**: Indicates when a subject (Group/User/ServiceAccount) has access to Secrets. CIS Benchmark 5.1.2: Access to secrets should be restricted to the smallest possible group of users to reduce the risk of privilege escalation.
+
+**Remediation**: Where possible, remove get, list and watch access to secret objects in the cluster.
+
+**Template**: [access-to-resources](generated/templates.md#access-to-resources)
+
+**Parameters**:
+
+```json
+{"resources":["^secrets$"],"verbs":["^get$","^list$","^delete$","^create$","^watch$","^*$"]}
+```
+
 ## cluster-admin-role-binding
 
 **Enabled by default**: No
@@ -338,6 +370,22 @@ KubeLinter includes the following built-in checks:
 {}
 ```
 
+## read-secret-from-env-var
+
+**Enabled by default**: No
+
+**Description**: Indicates when a deployment reads secret from environment variables. CIS Benchmark 5.4.1: "Prefer using secrets as files over secrets as environment variables. "
+
+**Remediation**: If possible, rewrite application code to read secrets from mounted secret files, rather than from environment variables. Refer to https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets for details.
+
+**Template**: [read-secret-from-env-var](generated/templates.md#read-secret-from-environment-variables)
+
+**Parameters**:
+
+```json
+{}
+```
+
 ## required-annotation-email
 
 **Enabled by default**: No
@@ -480,6 +528,38 @@ KubeLinter includes the following built-in checks:
 
 ```json
 {"lowerBoundMB":0,"requirementsType":"any","upperBoundMB":0}
+```
+
+## use-namespace
+
+**Enabled by default**: No
+
+**Description**: Indicates when a resource is deployed to the default namespace.   CIS Benchmark 5.7.1: Create administrative boundaries between resources using namespaces. CIS Benchmark 5.7.4: The default namespace should not be used.
+
+**Remediation**: Create namespaces for objects in your deployment
+
+**Template**: [use-namespace](generated/templates.md#use-namespaces-for-administrative-boundaries-between-resources)
+
+**Parameters**:
+
+```json
+{}
+```
+
+## wildcard-in-rules
+
+**Enabled by default**: No
+
+**Description**: Indicate when a wildcard is used in Role or ClusterRole rules. CIS Benchmark 5.1.3 Use of wildcards is not optimal from a security perspective as it may allow for inadvertent access to be granted when new resources are added to the Kubernetes API either as CRDs or in later versions of the product.
+
+**Remediation**: Where possible replace any use of wildcards in clusterroles and roles with specific objects or actions.
+
+**Template**: [wildcard-in-rules](generated/templates.md#wildcard-use-in-role-and-clusterrole-rules)
+
+**Parameters**:
+
+```json
+{}
 ```
 
 ## writable-host-mount
