@@ -1,0 +1,10 @@
+name: "minimum-three-replicas"
+description: "Indicates when a deployment uses less than three replicas"
+remediation: >-
+  Increase be number of replicas in the deployment to at least three to increase the fault tolerancy of the deployment.
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "minimum-replicas"
+params:
+  minReplicas: 3

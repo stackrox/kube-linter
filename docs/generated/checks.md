@@ -210,6 +210,22 @@ KubeLinter includes the following built-in checks:
 {}
 ```
 
+## minimum-three-replicas
+
+**Enabled by default**: No
+
+**Description**: Indicates when a deployment uses less than three replicas
+
+**Remediation**: Increase be number of replicas in the deployment to at least three to increase the fault tolerancy of the deployment.
+
+**Template**: [minimum-replicas](generated/templates.md#minimum-replicas)
+
+**Parameters**:
+
+```json
+{"minReplicas":3}
+```
+
 ## mismatching-selector
 
 **Enabled by default**: Yes

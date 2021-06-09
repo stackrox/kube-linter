@@ -367,6 +367,27 @@ KubeLinter supports the following templates:
 ]
 ```
 
+## Minimum replicas
+
+**Key**: `minimum-replicas`
+
+**Description**: Flag applications running fewer than the specified number of replicas
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[
+  {
+    "name": "minReplicas",
+    "type": "integer",
+    "description": "The minimum number of replicas a deployment should have",
+    "required": false
+  }
+]
+```
+
 ## Mismatching Selector
 
 **Key**: `mismatching-selector`
