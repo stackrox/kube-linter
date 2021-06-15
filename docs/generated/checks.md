@@ -546,6 +546,22 @@ KubeLinter includes the following built-in checks:
 {"lowerBoundMB":0,"requirementsType":"any","upperBoundMB":0}
 ```
 
+## upgrade-strategy
+
+**Enabled by default**: No
+
+**Description**: Indicates when a deployment doesn't meet safe upgrade parameters
+
+**Remediation**: Correct the update strategy to perform safe upgrades.
+
+**Template**: [upgrade-configuration](generated/templates.md#upgrade-configuration)
+
+**Parameters**:
+
+```json
+{"StrategyTypeRegex":"^(RollingUpdate|Rolling)$"}
+```
+
 ## use-namespace
 
 **Enabled by default**: No

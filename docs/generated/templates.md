@@ -666,6 +666,61 @@ KubeLinter supports the following templates:
 ]
 ```
 
+## Upgrade configuration
+
+**Key**: `upgrade-configuration`
+
+**Description**: Flag configurations that do not meet the specified upgrade configuration
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[
+  {
+    "name": "strategyTypeRegex",
+    "type": "string",
+    "description": "",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true
+  },
+  {
+    "name": "maxPodsUnavailable",
+    "type": "string",
+    "description": "",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true
+  },
+  {
+    "name": "minPodsUnavailable",
+    "type": "string",
+    "description": "",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true
+  },
+  {
+    "name": "maxSurge",
+    "type": "string",
+    "description": "",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true
+  },
+  {
+    "name": "minSurge",
+    "type": "string",
+    "description": "",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true
+  }
+]
+```
+
 ## Use Namespaces for Administrative Boundaries between Resources
 
 **Key**: `use-namespace`

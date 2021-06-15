@@ -1,0 +1,10 @@
+name: "upgrade-strategy"
+description: "Indicates when a deployment doesn't meet safe upgrade parameters"
+remediation: >-
+  Correct the update strategy to perform safe upgrades.
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "upgrade-configuration"
+params:
+  StrategyTypeRegex: "^(RollingUpdate|Rolling)$"
