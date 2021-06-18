@@ -63,22 +63,14 @@ func init() {
 				verbRegexes = append(verbRegexes, v)
 			}
 			return func(lintCtx lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
-				bindingGVK := extract.GVK(object.K8sObject)
-				if bindingGVK == roleBindingGVK {
-					binding, ok := object.K8sObject.(*rbacV1.RoleBinding)
-					if !ok {
-						return nil
-					}
-					namespace := stringutils.OrDefault(binding.Namespace, "default")
-					return findRole(binding.RoleRef.Name, namespace, lintCtx, resourceRegexes, verbRegexes, p.FlagRolesNotFound)
+				rbinding, ok := object.K8sObject.(*rbacV1.RoleBinding)
+				if ok {
+					namespace := stringutils.OrDefault(rbinding.Namespace, "default")
+					return findRole(rbinding.RoleRef.Name, namespace, lintCtx, resourceRegexes, verbRegexes, p.FlagRolesNotFound)
 				}
-
-				if bindingGVK == clusterRoleBindingGVK {
-					binding, ok := object.K8sObject.(*rbacV1.ClusterRoleBinding)
-					if !ok {
-						return nil
-					}
-					return findClusterRole(binding.RoleRef.Name, lintCtx, resourceRegexes, verbRegexes, p.FlagRolesNotFound)
+				crbinding, ok := object.K8sObject.(*rbacV1.ClusterRoleBinding)
+				if ok {
+					return findClusterRole(crbinding.RoleRef.Name, lintCtx, resourceRegexes, verbRegexes, p.FlagRolesNotFound)
 				}
 				return nil
 			}, nil
@@ -88,13 +80,9 @@ func init() {
 
 // find clusterrole by name, and check if it has access to the specified resource kinds and verbs
 func findClusterRole(name string, lintCtx lintcontext.LintContext, resourceRegexes, verbRegexes []*regexp.Regexp, flag bool) []diagnostic.Diagnostic {
-	results := []diagnostic.Diagnostic{}
-	clusterroles := []*rbacV1.ClusterRole{}
+	var results []diagnostic.Diagnostic
+	var clusterroles []*rbacV1.ClusterRole
 	for _, object := range lintCtx.Objects() {
-		gvk := extract.GVK(object.K8sObject)
-		if gvk != clusterRoleGVK {
-			continue
-		}
 		r, ok := object.K8sObject.(*rbacV1.ClusterRole)
 		if !ok {
 			continue
@@ -102,7 +90,7 @@ func findClusterRole(name string, lintCtx lintcontext.LintContext, resourceRegex
 		clusterroles = append(clusterroles, r)
 	}
 
-	roleExists := false
+	var roleExists bool
 	for _, r := range clusterroles {
 		if r.Name == name && !strings.EqualFold(r.Name, "cluster_admin") {
 			roleExists = true
@@ -124,7 +112,7 @@ func findClusterRole(name string, lintCtx lintcontext.LintContext, resourceRegex
 
 // find clusterroles by label selectors, and check if they have access to the specified resources and verbs
 func findAggregatedAccesses(clusterroles []*rbacV1.ClusterRole, selectors []metaV1.LabelSelector, resourceRegexes, verbRegexes []*regexp.Regexp) []diagnostic.Diagnostic {
-	results := []diagnostic.Diagnostic{}
+	var results []diagnostic.Diagnostic
 	for _, s := range selectors {
 		labelSelector, err := metaV1.LabelSelectorAsSelector(&metaV1.LabelSelector{MatchLabels: s.MatchLabels})
 		if err != nil {
@@ -172,25 +160,27 @@ func findRole(name, namespace string, lintCtx lintcontext.LintContext, resources
 
 // find access verbs to a given resource kind
 func checkAccess(rules []rbacV1.PolicyRule, resourceRegex, verbRegex []*regexp.Regexp) []string {
-	var accesses, resources, verbs []string
+	var accesses []string
 	for _, rule := range rules {
-		resources = []string{}
+		var resources []string
 		for _, res := range rule.Resources {
-			if isInList(resourceRegex, res) || res == "*" {
+			if isInList(resourceRegex, res) {
 				resources = append(resources, res)
 			}
 		}
-		if len(resources) > 0 {
-			verbs = []string{}
-			for _, verb := range rule.Verbs {
-				if isInList(verbRegex, verb) || verb == "*" {
-					verbs = append(verbs, verb)
-				}
-			}
-			if len(verbs) > 0 {
-				accesses = append(accesses, fmt.Sprintf("%v access to %v", verbs, resources))
+		if len(resources) == 0 {
+			continue
+		}
+		var verbs []string
+		for _, verb := range rule.Verbs {
+			if isInList(verbRegex, verb) {
+				verbs = append(verbs, verb)
 			}
 		}
+		if len(verbs) == 0 {
+			continue
+		}
+		accesses = append(accesses, fmt.Sprintf("%v access to %v", verbs, resources))
 	}
 	return accesses
 }
@@ -198,7 +188,7 @@ func checkAccess(rules []rbacV1.PolicyRule, resourceRegex, verbRegex []*regexp.R
 // isInList returns true if a match found in the list for the given name or a wildcard
 func isInList(regexlist []*regexp.Regexp, name string) bool {
 	for _, regex := range regexlist {
-		if regex.MatchString("*") || regex.MatchString(name) {
+		if name == "*" || regex.MatchString(name) {
 			return true
 		}
 	}
