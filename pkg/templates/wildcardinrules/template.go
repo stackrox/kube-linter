@@ -13,11 +13,6 @@ import (
 	rbacV1 "k8s.io/api/rbac/v1"
 )
 
-var (
-	roleGVK        = rbacV1.SchemeGroupVersion.WithKind(objectkinds.Role)
-	clusterRoleGVK = rbacV1.SchemeGroupVersion.WithKind(objectkinds.ClusterRole)
-)
-
 func init() {
 	templates.Register(check.Template{
 		HumanName:   "Wildcard Use in Role and ClusterRole Rules",
@@ -37,7 +32,6 @@ func init() {
 				if ok {
 					results = append(results, findWildCard(role.Rules)...)
 				}
-
 				crole, ok := object.K8sObject.(*rbacV1.ClusterRole)
 				if ok {
 					results = append(results, findWildCard(crole.Rules)...)
