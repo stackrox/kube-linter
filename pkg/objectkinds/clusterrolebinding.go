@@ -13,7 +13,7 @@ const (
 )
 
 var (
-	clusterRoleBindingGVK = rbacV1.SchemeGroupVersion.WithKind(ClusterRoleBinding)
+	clusterRoleBindingGVK = rbacV1.SchemeGroupVersion.WithKind("ClusterRoleBinding")
 )
 
 func init() {
