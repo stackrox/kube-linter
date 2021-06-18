@@ -1,8 +1,6 @@
 package objectkinds
 
 import (
-	"fmt"
-
 	rbacV1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
