@@ -1,8 +1,6 @@
 package objectkinds
 
 import (
-	"fmt"
-
 	rbacV1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -14,7 +12,7 @@ const (
 
 var (
 	// roleGVK represents Kubernetes Role objects. Case sensitive.
-	roleGVK = rbacV1.SchemeGroupVersion.WithKind(Role)
+	roleGVK = rbacV1.SchemeGroupVersion.WithKind("Role")
 )
 
 func init() {
@@ -25,5 +23,5 @@ func init() {
 
 // GetRoleAPIVersion returns Role's APIVersion
 func GetRoleAPIVersion() string {
-	return fmt.Sprintf("%s/%s", roleGVK.Group, roleGVK.Version)
+	return roleGVK.GroupVersion().String()
 }
