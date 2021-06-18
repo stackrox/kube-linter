@@ -10,7 +10,6 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
-	"golang.stackrox.io/kube-linter/pkg/extract"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	"golang.stackrox.io/kube-linter/pkg/templates"
@@ -22,13 +21,6 @@ import (
 
 const (
 	templateKey = "access-to-resources"
-)
-
-var (
-	roleGVK               = rbacV1.SchemeGroupVersion.WithKind(objectkinds.Role)
-	clusterRoleGVK        = rbacV1.SchemeGroupVersion.WithKind(objectkinds.ClusterRole)
-	roleBindingGVK        = rbacV1.SchemeGroupVersion.WithKind(objectkinds.RoleBinding)
-	clusterRoleBindingGVK = rbacV1.SchemeGroupVersion.WithKind(objectkinds.ClusterRoleBinding)
 )
 
 func init() {
@@ -135,10 +127,6 @@ func findRole(name, namespace string, lintCtx lintcontext.LintContext, resources
 	results := []diagnostic.Diagnostic{}
 	roleExists := false
 	for _, object := range lintCtx.Objects() {
-		gvk := extract.GVK(object.K8sObject)
-		if gvk != roleGVK {
-			continue
-		}
 		r, ok := object.K8sObject.(*rbacV1.Role)
 		if !ok {
 			continue
