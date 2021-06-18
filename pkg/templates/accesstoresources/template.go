@@ -125,7 +125,7 @@ func findAggregatedAccesses(clusterroles []*rbacV1.ClusterRole, selectors []meta
 // find role by name and namespace that has access to the specified resources and verbs
 func findRole(name, namespace string, lintCtx lintcontext.LintContext, resources, verbs []*regexp.Regexp, flag bool) []diagnostic.Diagnostic {
 	results := []diagnostic.Diagnostic{}
-	roleExists := false
+	var roleExists bool
 	for _, object := range lintCtx.Objects() {
 		r, ok := object.K8sObject.(*rbacV1.Role)
 		if !ok {
