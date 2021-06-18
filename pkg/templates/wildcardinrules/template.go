@@ -6,7 +6,6 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
-	"golang.stackrox.io/kube-linter/pkg/extract"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	"golang.stackrox.io/kube-linter/pkg/templates"
@@ -33,23 +32,17 @@ func init() {
 		ParseAndValidateParams: params.ParseAndValidate,
 		Instantiate: params.WrapInstantiateFunc(func(_ params.Params) (check.Func, error) {
 			return func(lintCtx lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
-				gvk := extract.GVK(object.K8sObject)
-				if gvk == roleGVK {
-					role, ok := object.K8sObject.(*rbacV1.Role)
-					if !ok {
-						return nil
-					}
-					return findWildCard(role.Rules)
+				var results []diagnostic.Diagnostic
+				role, ok := object.K8sObject.(*rbacV1.Role)
+				if ok {
+					results = append(results, findWildCard(role.Rules)...)
 				}
 
-				if gvk == clusterRoleGVK {
-					crole, ok := object.K8sObject.(*rbacV1.ClusterRole)
-					if !ok {
-						return nil
-					}
-					return findWildCard(crole.Rules)
+				crole, ok := object.K8sObject.(*rbacV1.ClusterRole)
+				if ok {
+					results = append(results, findWildCard(crole.Rules)...)
 				}
-				return nil
+				return results
 			}, nil
 		}),
 	})
