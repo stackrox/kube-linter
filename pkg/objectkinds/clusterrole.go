@@ -13,7 +13,7 @@ const (
 )
 
 var (
-	clusterRoleGVK = rbacV1.SchemeGroupVersion.WithKind(ClusterRole)
+	clusterRoleGVK = rbacV1.SchemeGroupVersion.WithKind("ClusterRole")
 )
 
 func init() {
