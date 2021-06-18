@@ -24,5 +24,5 @@ func init() {
 
 // GetClusterRoleBindingAPIVersion returns ClusterRoleBinding's APIVersion
 func GetClusterRoleBindingAPIVersion() string {
-	return fmt.Sprintf("%s/%s", clusterRoleBindingGVK.Group, clusterRoleBindingGVK.Version)
+	return clusterRoleBindingGVK.GroupVersion().String()
 }
