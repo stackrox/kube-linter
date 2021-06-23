@@ -2,7 +2,6 @@ package upgradeconfig
 
 import (
 	"fmt"
-	"reflect"
 	"regexp"
 	"strings"
 
@@ -111,41 +110,37 @@ func init() {
 				if !found {
 					return nil
 				}
-				strategyType, found := extract.TypeFromUpdateStrategy(strategy)
-				if !found {
+				if !strategy.TypeExists {
 					return nil
 				}
-				if !compiledRegex.MatchString(strategyType) {
+				if !compiledRegex.MatchString(strategy.Type) {
 					newD := diagnostic.Diagnostic{
 						Message: fmt.Sprintf("object has %s strategy type but must match regex %s",
-							stringutils.Ternary(len(strategyType) > 0, strategyType, "no"), p.StrategyTypeRegex)}
+							stringutils.Ternary(len(strategy.Type) > 0, strategy.Type, "no"), p.StrategyTypeRegex)}
 					diagnostics = append(diagnostics, newD)
 				}
-				rollingUpdate, found := extract.RollingUpdateFromUpdateStrategy(strategy)
-				if !found {
+				if !strategy.RollingConfigExists {
 					return nil
 				}
-				if needsRollingUpdateDefinition(p) && !reflect.Indirect(reflect.ValueOf(rollingUpdate)).IsValid() {
+				if needsRollingUpdateDefinition(p) && !strategy.RollingConfigValid {
 					newD := diagnostic.Diagnostic{Message: "object has no rolling update parameters defined"}
 					diagnostics = append(diagnostics, newD)
 				}
-				maxUnavailable, found := extract.MaxUnavailableFromRollingUpdate(rollingUpdate)
-				if found {
-					if !compareIntOrString(p.MaxPodsUnavailable, p.MinPodsUnavailable, maxUnavailable) {
+				if strategy.MaxUnavailableExists {
+					if !compareIntOrString(p.MaxPodsUnavailable, p.MinPodsUnavailable, strategy.MaxUnavailable) {
 						minStr := fmt.Sprintf("at least %s", p.MinPodsUnavailable)
 						maxStr := fmt.Sprintf("no more than %s", p.MaxPodsUnavailable)
-						msg := fmt.Sprintf("object has a max unavailable of %s but %s is required", maxUnavailable.String(),
+						msg := fmt.Sprintf("object has a max unavailable of %s but %s is required", strategy.MaxUnavailable.String(),
 							conditional(len(p.MinPodsUnavailable) > 0, minStr, len(p.MaxPodsUnavailable) > 0, maxStr, " and "))
 						newD := diagnostic.Diagnostic{Message: msg}
 						diagnostics = append(diagnostics, newD)
 					}
 				}
-				maxSurge, found := extract.MaxSurgeFromRollingUpdate(rollingUpdate)
-				if found {
-					if !compareIntOrString(p.MaxSurge, p.MinSurge, maxSurge) {
+				if strategy.MaxSurgeExists {
+					if !compareIntOrString(p.MaxSurge, p.MinSurge, strategy.MaxSurge) {
 						minStr := fmt.Sprintf("at least %s", p.MinSurge)
 						maxStr := fmt.Sprintf("no more than %s", p.MaxSurge)
-						msg := fmt.Sprintf("object has a max surge of %s but %s is required", maxSurge.String(),
+						msg := fmt.Sprintf("object has a max surge of %s but %s is required", strategy.MaxSurge.String(),
 							conditional(len(p.MinSurge) > 0, minStr, len(p.MaxSurge) > 0, maxStr, " and "))
 						newD := diagnostic.Diagnostic{Message: msg}
 						diagnostics = append(diagnostics, newD)

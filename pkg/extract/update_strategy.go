@@ -7,9 +7,20 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-// UpdateStrategy will extract the UpdateStrategy struct from a provided
-// object if it exists
-func UpdateStrategy(obj k8sutil.Object) (interface{}, bool) {
+// UpdateStrategyValues contains testable data from an UpdateStrategy struct
+type UpdateStrategyValues struct {
+	Type                 string
+	TypeExists           bool
+	RollingConfigExists  bool
+	RollingConfigValid   bool
+	MaxUnavailableExists bool
+	MaxUnavailable       *intstr.IntOrString
+	MaxSurgeExists       bool
+	MaxSurge             *intstr.IntOrString
+}
+
+// UpdateStrategy will extract the data from an UpdateStrategy into a common struct
+func UpdateStrategy(obj k8sutil.Object) (*UpdateStrategyValues, bool) {
 	objValue := reflect.Indirect(reflect.ValueOf(obj))
 	spec := objValue.FieldByName("Spec")
 	if !spec.IsValid() {
@@ -22,13 +33,27 @@ func UpdateStrategy(obj k8sutil.Object) (interface{}, bool) {
 			return nil, false
 		}
 	}
-	return strategy.Interface(), true
+	strategyType, typeFound := typeFromUpdateStrategy(strategy)
+	rollingUpdate, rollingUpdateFound := rollingUpdateFromUpdateStrategy(strategy)
+	maxUnavailable, maxUnavailableFound := maxUnavailableFromRollingUpdate(rollingUpdate)
+	maxSurge, maxSurgeFound := maxSurgeFromRollingUpdate(rollingUpdate)
+
+	return &UpdateStrategyValues{
+		Type:                 strategyType,
+		TypeExists:           typeFound,
+		RollingConfigExists:  rollingUpdateFound,
+		RollingConfigValid:   reflect.Indirect(rollingUpdate).IsValid(),
+		MaxUnavailable:       maxUnavailable,
+		MaxUnavailableExists: maxUnavailableFound,
+		MaxSurge:             maxSurge,
+		MaxSurgeExists:       maxSurgeFound,
+	}, true
 }
 
-// TypeFromUpdateStrategy will extract the Type from a provided
+// typeFromUpdateStrategy will extract the Type from a provided
 // UpdateStrategy struct if it exists
-func TypeFromUpdateStrategy(strategy interface{}) (string, bool) {
-	obj := reflect.Indirect(reflect.ValueOf(strategy))
+func typeFromUpdateStrategy(strategy reflect.Value) (string, bool) {
+	obj := reflect.Indirect(strategy)
 	strategyType := obj.FieldByName("Type")
 	if !strategyType.IsValid() {
 		return "", false
@@ -36,27 +61,27 @@ func TypeFromUpdateStrategy(strategy interface{}) (string, bool) {
 	return strategyType.String(), true
 }
 
-// RollingUpdateFromUpdateStrategy will extract the RollingUpdate struct from a provided
+// rollingUpdateFromUpdateStrategy will extract the RollingUpdate struct from a provided
 // RollingUpdate struct if it exists
-func RollingUpdateFromUpdateStrategy(strategy interface{}) (interface{}, bool) {
-	obj := reflect.Indirect(reflect.ValueOf(strategy))
+func rollingUpdateFromUpdateStrategy(strategy reflect.Value) (reflect.Value, bool) {
+	obj := reflect.Indirect(strategy)
 	rollingUpdate := obj.FieldByName("RollingUpdate")
 	if !rollingUpdate.IsValid() {
 		rollingUpdate = obj.FieldByName("RollingParams")
 		if !rollingUpdate.IsValid() {
-			return nil, false
+			return rollingUpdate, false
 		}
 	}
 	if rollingUpdate.Kind() == reflect.Ptr && !rollingUpdate.IsNil() {
 		rollingUpdate = rollingUpdate.Elem()
 	}
-	return rollingUpdate.Interface(), true
+	return rollingUpdate, true
 }
 
-// MaxUnavailableFromRollingUpdate will extract the MaxUnavailable field from a provided
+// maxUnavailableFromRollingUpdate will extract the MaxUnavailable field from a provided
 // RollingUpdate struct if it exists
-func MaxUnavailableFromRollingUpdate(rollingUpdate interface{}) (*intstr.IntOrString, bool) {
-	obj := reflect.Indirect(reflect.ValueOf(rollingUpdate))
+func maxUnavailableFromRollingUpdate(rollingUpdate reflect.Value) (*intstr.IntOrString, bool) {
+	obj := reflect.Indirect(rollingUpdate)
 	if !obj.IsValid() {
 		return nil, false
 	}
@@ -71,10 +96,10 @@ func MaxUnavailableFromRollingUpdate(rollingUpdate interface{}) (*intstr.IntOrSt
 	return maxUnavailableVal, true
 }
 
-// MaxSurgeFromRollingUpdate will extract the MaxSurge field from a provided
+// maxSurgeFromRollingUpdate will extract the MaxSurge field from a provided
 // RollingUpdate struct if it exists
-func MaxSurgeFromRollingUpdate(rollingUpdate interface{}) (*intstr.IntOrString, bool) {
-	obj := reflect.Indirect(reflect.ValueOf(rollingUpdate))
+func maxSurgeFromRollingUpdate(rollingUpdate reflect.Value) (*intstr.IntOrString, bool) {
+	obj := reflect.Indirect(rollingUpdate)
 	if !obj.IsValid() {
 		return nil, false
 	}
