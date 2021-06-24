@@ -20,12 +20,12 @@ var (
 	strategyTypeRegexParamDesc = util.MustParseParameterDesc(`{
 	"Name": "strategyTypeRegex",
 	"Type": "string",
-	"Description": "",
+	"Description": "A regular expression the defines the type of update strategy allowed.",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
 	"ArrayElemType": "",
-	"Required": false,
+	"Required": true,
 	"NoRegex": false,
 	"NotNegatable": false,
 	"XXXStructFieldName": "StrategyTypeRegex",
@@ -36,7 +36,7 @@ var (
 	maxPodsUnavailableParamDesc = util.MustParseParameterDesc(`{
 	"Name": "maxPodsUnavailable",
 	"Type": "string",
-	"Description": "",
+	"Description": "The maximum value that be set in a RollingUpdate configuration for the MaxUnavailable.  This can be an integer or a percent.",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
@@ -52,7 +52,7 @@ var (
 	minPodsUnavailableParamDesc = util.MustParseParameterDesc(`{
 	"Name": "minPodsUnavailable",
 	"Type": "string",
-	"Description": "",
+	"Description": "The minimum value that be set in a RollingUpdate configuration for the MaxUnavailable.  This can be an integer or a percent.",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
@@ -68,7 +68,7 @@ var (
 	maxSurgeParamDesc = util.MustParseParameterDesc(`{
 	"Name": "maxSurge",
 	"Type": "string",
-	"Description": "",
+	"Description": "The maximum value that be set in a RollingUpdate configuration for the MaxSurge.  This can be an integer or a percent.",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
@@ -84,7 +84,7 @@ var (
 	minSurgeParamDesc = util.MustParseParameterDesc(`{
 	"Name": "minSurge",
 	"Type": "string",
-	"Description": "",
+	"Description": "The minimum value that be set in a RollingUpdate configuration for the MaxSurge.  This can be an integer or a percent.",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
@@ -108,6 +108,9 @@ var (
 
 func (p *Params) Validate() error {
 	var validationErrors []string
+	if p.StrategyTypeRegex == "" {
+		validationErrors = append(validationErrors, "required param strategyTypeRegex not found")
+	}
 	if len(validationErrors) > 0 {
 		return errors.Errorf("invalid parameters: %s", strings.Join(validationErrors, ", "))
     }

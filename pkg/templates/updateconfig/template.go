@@ -1,4 +1,4 @@
-package upgradeconfig
+package updateconfig
 
 import (
 	"fmt"
@@ -13,7 +13,7 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	"golang.stackrox.io/kube-linter/pkg/templates"
-	"golang.stackrox.io/kube-linter/pkg/templates/upgradeconfig/internal/params"
+	"golang.stackrox.io/kube-linter/pkg/templates/updateconfig/internal/params"
 
 	"k8s.io/apimachinery/pkg/util/intstr"
 
@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	templateKey = "upgrade-configuration"
+	templateKey = "update-configuration"
 )
 
 func compareIntOrString(max, min string, actual *intstr.IntOrString) bool {
@@ -90,9 +90,9 @@ func needsRollingUpdateDefinition(p params.Params) bool {
 
 func init() {
 	templates.Register(check.Template{
-		HumanName:   "Upgrade configuration",
+		HumanName:   "Update configuration",
 		Key:         templateKey,
-		Description: "Flag configurations that do not meet the specified upgrade configuration",
+		Description: "Flag configurations that do not meet the specified update configuration",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},

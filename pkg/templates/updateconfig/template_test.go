@@ -1,4 +1,4 @@
-package upgradeconfig
+package updateconfig
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext/mocks"
 	"golang.stackrox.io/kube-linter/pkg/templates"
-	"golang.stackrox.io/kube-linter/pkg/templates/upgradeconfig/internal/params"
+	"golang.stackrox.io/kube-linter/pkg/templates/updateconfig/internal/params"
 
 	ocsAppsv1 "github.com/openshift/api/apps/v1"
 	appsv1 "k8s.io/api/apps/v1"

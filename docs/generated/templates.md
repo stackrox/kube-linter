@@ -666,11 +666,11 @@ KubeLinter supports the following templates:
 ]
 ```
 
-## Upgrade configuration
+## Update configuration
 
-**Key**: `upgrade-configuration`
+**Key**: `update-configuration`
 
-**Description**: Flag configurations that do not meet the specified upgrade configuration
+**Description**: Flag configurations that do not meet the specified update configuration
 
 **Supported Objects**: DeploymentLike
 
@@ -681,15 +681,15 @@ KubeLinter supports the following templates:
   {
     "name": "strategyTypeRegex",
     "type": "string",
-    "description": "",
-    "required": false,
+    "description": "A regular expression the defines the type of update strategy allowed.",
+    "required": true,
     "regexAllowed": true,
     "negationAllowed": true
   },
   {
     "name": "maxPodsUnavailable",
     "type": "string",
-    "description": "",
+    "description": "The maximum value that be set in a RollingUpdate configuration for the MaxUnavailable.  This can be an integer or a percent.",
     "required": false,
     "regexAllowed": true,
     "negationAllowed": true
@@ -697,7 +697,7 @@ KubeLinter supports the following templates:
   {
     "name": "minPodsUnavailable",
     "type": "string",
-    "description": "",
+    "description": "The minimum value that be set in a RollingUpdate configuration for the MaxUnavailable.  This can be an integer or a percent.",
     "required": false,
     "regexAllowed": true,
     "negationAllowed": true
@@ -705,7 +705,7 @@ KubeLinter supports the following templates:
   {
     "name": "maxSurge",
     "type": "string",
-    "description": "",
+    "description": "The maximum value that be set in a RollingUpdate configuration for the MaxSurge.  This can be an integer or a percent.",
     "required": false,
     "regexAllowed": true,
     "negationAllowed": true
@@ -713,7 +713,7 @@ KubeLinter supports the following templates:
   {
     "name": "minSurge",
     "type": "string",
-    "description": "",
+    "description": "The minimum value that be set in a RollingUpdate configuration for the MaxSurge.  This can be an integer or a percent.",
     "required": false,
     "regexAllowed": true,
     "negationAllowed": true
