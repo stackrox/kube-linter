@@ -2,6 +2,45 @@
 
 KubeLinter supports the following templates:
 
+## Access to Resources
+
+**Key**: `access-to-resources`
+
+**Description**: Flag cluster role bindings and role bindings that grant access to the specified resource kinds and verbs
+
+**Supported Objects**: Role,ClusterRole,ClusterRoleBinding,RoleBinding
+
+**Parameters**:
+
+```json
+[
+  {
+    "name": "flagRolesNotFound",
+    "type": "boolean",
+    "description": "Set to true to flag the roles that are referenced in bindings but not found in the context",
+    "required": false
+  },
+  {
+    "name": "resources",
+    "type": "array",
+    "description": "An array of regular expressions specifying resources. e.g. ^secrets$ for secrets and ^*$ for any resources",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": false,
+    "arrayElemType": "string"
+  },
+  {
+    "name": "verbs",
+    "type": "array",
+    "description": "An array of regular expressions specifying verbs. e.g. ^create$ for create and ^*$ for any k8s verbs",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": false,
+    "arrayElemType": "string"
+  }
+]
+```
+
 ## Anti affinity not specified
 
 **Key**: `anti-affinity`
@@ -462,6 +501,20 @@ KubeLinter supports the following templates:
 []
 ```
 
+## Read Secret From Environment Variables
+
+**Key**: `read-secret-from-env-var`
+
+**Description**: Flag environment variables that use SecretKeyRef
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[]
+```
+
 ## Readiness Probe Not Specified
 
 **Key**: `readiness-probe`
@@ -613,6 +666,20 @@ KubeLinter supports the following templates:
 ]
 ```
 
+## Use Namespaces for Administrative Boundaries between Resources
+
+**Key**: `use-namespace`
+
+**Description**: Flag resources with no namespace specified or using default namespace
+
+**Supported Objects**: DeploymentLike,Service
+
+**Parameters**:
+
+```json
+[]
+```
+
 ## Verify container capabilities
 
 **Key**: `verify-container-capabilities`
@@ -644,6 +711,20 @@ KubeLinter supports the following templates:
     "arrayElemType": "string"
   }
 ]
+```
+
+## Wildcard Use in Role and ClusterRole Rules
+
+**Key**: `wildcard-in-rules`
+
+**Description**: Flag Roles and ClusterRoles that use wildcard * in rules
+
+**Supported Objects**: Role,ClusterRole
+
+**Parameters**:
+
+```json
+[]
 ```
 
 ## Writable Host Mounts

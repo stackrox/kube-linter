@@ -2,6 +2,7 @@ package all
 
 import (
 	// Import all check templates.
+	_ "golang.stackrox.io/kube-linter/pkg/templates/accesstoresources"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/antiaffinity"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/clusteradminrolebinding"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/containercapabilities"
@@ -17,6 +18,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/livenessprobe"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/memoryrequirements"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/mismatchingselector"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/namespace"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/nonexistentserviceaccount"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/ports"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/privileged"
@@ -24,6 +26,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/privilegeescalation"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/readinessprobe"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/readonlyrootfs"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/readsecret"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/replicas"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/requiredannotation"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/requiredlabel"
@@ -32,5 +35,6 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/servicetype"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/sysctl"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/unsafeprocmount"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/wildcardinrules"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/writablehostmount"
 )

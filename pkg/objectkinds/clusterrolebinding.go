@@ -11,15 +11,16 @@ const (
 )
 
 var (
-	clusterRoleBindingGVK = schema.GroupVersionKind{
-		Group:   rbacV1.GroupName,
-		Version: "v1",
-		Kind:    ClusterRoleBinding,
-	}
+	clusterRoleBindingGVK = rbacV1.SchemeGroupVersion.WithKind("ClusterRoleBinding")
 )
 
 func init() {
 	registerObjectKind(ClusterRoleBinding, matcherFunc(func(gvk schema.GroupVersionKind) bool {
 		return gvk == clusterRoleBindingGVK
 	}))
+}
+
+// GetClusterRoleBindingAPIVersion returns ClusterRoleBinding's APIVersion
+func GetClusterRoleBindingAPIVersion() string {
+	return clusterRoleBindingGVK.GroupVersion().String()
 }
