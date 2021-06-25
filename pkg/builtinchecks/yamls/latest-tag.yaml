@@ -1,0 +1,9 @@
+name: "latest-tag"
+description: "Indicates when a deployment-like object is running a container with a floating image tag, \"latest\""
+remediation: "Use a container image with a proper image tag, outside the set blocked tag regex \".*:(latest)$\"."
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "latest-tag"
+params:
+  BlockList: [".*:(latest)$" ]

@@ -15,6 +15,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/hostmounts"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/hostnetwork"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/hostpid"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/latesttag"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/livenessprobe"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/memoryrequirements"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/mismatchingselector"
