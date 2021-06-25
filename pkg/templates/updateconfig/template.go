@@ -3,8 +3,10 @@ package updateconfig
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 
+	"golang.stackrox.io/kube-linter/internal/errorhelpers"
 	"golang.stackrox.io/kube-linter/internal/stringutils"
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
@@ -16,16 +18,39 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/templates/updateconfig/internal/params"
 
 	"k8s.io/apimachinery/pkg/util/intstr"
-
-	"github.com/pkg/errors"
 )
 
 const (
 	templateKey = "update-configuration"
 )
 
-func compareIntOrString(max, min string, actual *intstr.IntOrString) bool {
-	if len(max) == 0 && len(min) == 0 {
+func parseIntOrString(data string) (*intstr.IntOrString, error) {
+	val, err := strconv.Atoi(data)
+	if err != nil {
+		// This is not an integer.  Is it a valid string?
+		if !strings.HasSuffix(data, "%") {
+			return nil, fmt.Errorf("%s is not a valid string.  It does not end with %s", data, "%")
+		}
+		strLen := len(data)
+		intVal := data[:strLen-1]
+		val, err = strconv.Atoi(intVal)
+		if err != nil {
+			// Not going to try harder
+			return nil, fmt.Errorf("unable to parse %s", data)
+		}
+		if val > 100 || val < 0 {
+			return nil, fmt.Errorf("%s isn't a valid percent", data)
+		}
+	} else if val < 0 {
+		return nil, fmt.Errorf("%d isn't a valid value", val)
+	}
+	converted := intstr.Parse(data)
+	return &converted, nil
+
+}
+
+func compareIntOrString(max, min, actual *intstr.IntOrString) bool {
+	if max == nil && min == nil {
 		return true
 	}
 	if actual == nil {
@@ -36,13 +61,12 @@ func compareIntOrString(max, min string, actual *intstr.IntOrString) bool {
 		return false
 	}
 	actualIsPercent := strings.Contains(actual.String(), "%")
-	if len(max) > 0 {
-		maxIntOrString := intstr.Parse(max)
-		maxIsPercent := strings.Contains(maxIntOrString.String(), "%")
+	if max != nil {
+		maxIsPercent := strings.Contains(max.String(), "%")
 		if actualIsPercent != maxIsPercent {
 			return false
 		}
-		maxVal, err := intstr.GetValueFromIntOrPercent(&maxIntOrString, 100, false)
+		maxVal, err := intstr.GetValueFromIntOrPercent(max, 100, false)
 		if err != nil {
 			return false
 		}
@@ -50,13 +74,12 @@ func compareIntOrString(max, min string, actual *intstr.IntOrString) bool {
 			return false
 		}
 	}
-	if len(min) > 0 {
-		minIntOrString := intstr.Parse(min)
-		minIsPercent := strings.Contains(minIntOrString.String(), "%")
+	if min != nil {
+		minIsPercent := strings.Contains(min.String(), "%")
 		if actualIsPercent != minIsPercent {
 			return false
 		}
-		minVal, err := intstr.GetValueFromIntOrPercent(&minIntOrString, 100, false)
+		minVal, err := intstr.GetValueFromIntOrPercent(min, 100, false)
 		if err != nil {
 			return false
 		}
@@ -99,9 +122,38 @@ func init() {
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,
 		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
+			var maxPodsUnavailable, minPodsUnavailable, maxSurge, minSurge *intstr.IntOrString
+			errorList := errorhelpers.NewErrorList("configuration verification")
 			compiledRegex, err := regexp.Compile(p.StrategyTypeRegex)
 			if err != nil {
-				return nil, errors.Wrapf(err, "invalid regex %s", p.StrategyTypeRegex)
+				errorList.AddWrapf(err, "invalid regex %s", p.StrategyTypeRegex)
+			}
+			if len(p.MaxPodsUnavailable) > 0 {
+				maxPodsUnavailable, err = parseIntOrString(p.MaxPodsUnavailable)
+				if err != nil {
+					errorList.AddWrapf(err, "invalid MaxPodsUnavailable %s", p.MaxPodsUnavailable)
+				}
+			}
+			if len(p.MinPodsUnavailable) > 0 {
+				minPodsUnavailable, err = parseIntOrString(p.MinPodsUnavailable)
+				if err != nil {
+					errorList.AddWrapf(err, "invalid MinPodsUnavailable %s", p.MinPodsUnavailable)
+				}
+			}
+			if len(p.MaxSurge) > 0 {
+				maxSurge, err = parseIntOrString(p.MaxSurge)
+				if err != nil {
+					errorList.AddWrapf(err, "invalid MaxSurge %s", p.MaxSurge)
+				}
+			}
+			if len(p.MinSurge) > 0 {
+				minSurge, err = parseIntOrString(p.MinSurge)
+				if err != nil {
+					errorList.AddWrapf(err, "invalid MinSurge %s", p.MinSurge)
+				}
+			}
+			if errorList.ToError() != nil {
+				return nil, errorList.ToError()
 			}
 			return func(_ lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				var diagnostics []diagnostic.Diagnostic
@@ -127,7 +179,7 @@ func init() {
 					diagnostics = append(diagnostics, newD)
 				}
 				if strategy.MaxUnavailableExists {
-					if !compareIntOrString(p.MaxPodsUnavailable, p.MinPodsUnavailable, strategy.MaxUnavailable) {
+					if !compareIntOrString(maxPodsUnavailable, minPodsUnavailable, strategy.MaxUnavailable) {
 						minStr := fmt.Sprintf("at least %s", p.MinPodsUnavailable)
 						maxStr := fmt.Sprintf("no more than %s", p.MaxPodsUnavailable)
 						msg := fmt.Sprintf("object has a max unavailable of %s but %s is required", strategy.MaxUnavailable.String(),
@@ -137,7 +189,7 @@ func init() {
 					}
 				}
 				if strategy.MaxSurgeExists {
-					if !compareIntOrString(p.MaxSurge, p.MinSurge, strategy.MaxSurge) {
+					if !compareIntOrString(maxSurge, minSurge, strategy.MaxSurge) {
 						minStr := fmt.Sprintf("at least %s", p.MinSurge)
 						maxStr := fmt.Sprintf("no more than %s", p.MaxSurge)
 						msg := fmt.Sprintf("object has a max surge of %s but %s is required", strategy.MaxSurge.String(),

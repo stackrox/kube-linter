@@ -762,3 +762,56 @@ func (s *UpgradeConfigTestSuite) TestMaxMinSurgePercent() {
 		},
 	})
 }
+
+func (s *UpgradeConfigTestSuite) TestTemplateConfig() {
+	const (
+		validDeployment = "valid-deployment"
+	)
+	maxSurgeValid := intstr.FromString("10%")
+	maxUnavailableValid := intstr.FromInt(10)
+	s.addDeploymentWithStrategy(validDeployment, appsv1.DeploymentStrategy{Type: appsv1.RollingUpdateDeploymentStrategyType, RollingUpdate: &appsv1.RollingUpdateDeployment{MaxUnavailable: &maxUnavailableValid, MaxSurge: &maxSurgeValid}})
+
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{
+				StrategyTypeRegex:  "^(RollingUpdate|Rolling)$",
+				MinPodsUnavailable: "10",
+				MaxPodsUnavailable: "40",
+				MinSurge:           "10%",
+				MaxSurge:           "40%",
+			},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				validDeployment: {},
+			},
+			ExpectInstantiationError: false,
+		},
+		{
+			Param: params.Params{
+				StrategyTypeRegex:  "^(RollingUpdate|Rolling)$",
+				MinPodsUnavailable: "-1",
+			},
+			ExpectInstantiationError: true,
+		},
+		{
+			Param: params.Params{
+				StrategyTypeRegex:  "^(RollingUpdate|Rolling)$",
+				MaxPodsUnavailable: "1%1",
+			},
+			ExpectInstantiationError: true,
+		},
+		{
+			Param: params.Params{
+				StrategyTypeRegex: "^(RollingUpdate|Rolling)$",
+				MinSurge:          "115%",
+			},
+			ExpectInstantiationError: true,
+		},
+		{
+			Param: params.Params{
+				StrategyTypeRegex: "^(RollingUpdate|Rolling)$",
+				MaxSurge:          "1%1%",
+			},
+			ExpectInstantiationError: true,
+		},
+	})
+}
