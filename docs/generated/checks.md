@@ -322,6 +322,22 @@ KubeLinter includes the following built-in checks:
 {}
 ```
 
+## no-rolling-update-strategy
+
+**Enabled by default**: No
+
+**Description**: Indicates when a deployment doesn't use a rolling update strategy
+
+**Remediation**: Use a rolling update strategy to avoid service disruption during an update. A rolling update strategy allows for pods to be systematicaly replaced in a controlled fashion to ensure no service disruption.
+
+**Template**: [update-configuration](generated/templates.md#update-configuration)
+
+**Parameters**:
+
+```json
+{"strategyTypeRegex":"^(RollingUpdate|Rolling)$"}
+```
+
 ## non-existent-service-account
 
 **Enabled by default**: Yes

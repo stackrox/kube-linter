@@ -666,6 +666,61 @@ KubeLinter supports the following templates:
 ]
 ```
 
+## Update configuration
+
+**Key**: `update-configuration`
+
+**Description**: Flag configurations that do not meet the specified update configuration
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[
+  {
+    "name": "strategyTypeRegex",
+    "type": "string",
+    "description": "A regular expression the defines the type of update strategy allowed.",
+    "required": true,
+    "regexAllowed": true,
+    "negationAllowed": true
+  },
+  {
+    "name": "maxPodsUnavailable",
+    "type": "string",
+    "description": "The maximum value that be set in a RollingUpdate configuration for the MaxUnavailable.  This can be an integer or a percent.",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true
+  },
+  {
+    "name": "minPodsUnavailable",
+    "type": "string",
+    "description": "The minimum value that be set in a RollingUpdate configuration for the MaxUnavailable.  This can be an integer or a percent.",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true
+  },
+  {
+    "name": "maxSurge",
+    "type": "string",
+    "description": "The maximum value that be set in a RollingUpdate configuration for the MaxSurge.  This can be an integer or a percent.",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true
+  },
+  {
+    "name": "minSurge",
+    "type": "string",
+    "description": "The minimum value that be set in a RollingUpdate configuration for the MaxSurge.  This can be an integer or a percent.",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true
+  }
+]
+```
+
 ## Use Namespaces for Administrative Boundaries between Resources
 
 **Key**: `use-namespace`

@@ -1,0 +1,12 @@
+name: "no-rolling-update-strategy"
+description: "Indicates when a deployment doesn't use a rolling update strategy"
+remediation: >-
+  Use a rolling update strategy to avoid service disruption during an update.
+  A rolling update strategy allows for pods to be systematicaly replaced in a
+  controlled fashion to ensure no service disruption.
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "update-configuration"
+params:
+  strategyTypeRegex: "^(RollingUpdate|Rolling)$"
