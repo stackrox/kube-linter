@@ -152,8 +152,8 @@ func init() {
 					errorList.AddWrapf(err, "invalid MinSurge %s", p.MinSurge)
 				}
 			}
-			if errorList.ToError() != nil {
-				return nil, errorList.ToError()
+			if err := errorList.ToError(); err != nil {
+				return nil, err
 			}
 			return func(_ lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				var diagnostics []diagnostic.Diagnostic
