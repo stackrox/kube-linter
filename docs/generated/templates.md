@@ -318,6 +318,30 @@ KubeLinter supports the following templates:
 []
 ```
 
+## Latest Tag
+
+**Key**: `latest-tag`
+
+**Description**: Flag applications running containers with floating container image tag, "latest"
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[
+  {
+    "name": "blockList",
+    "type": "array",
+    "description": "list of regular expressions for blocked or bad container image tags",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true,
+    "arrayElemType": "string"
+  }
+]
+```
+
 ## Liveness Probe Not Specified
 
 **Key**: `liveness-probe`

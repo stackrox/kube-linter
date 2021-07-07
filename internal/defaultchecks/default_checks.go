@@ -16,6 +16,7 @@ var (
 		"sensitive-host-mounts",
 		"host-network",
 		"host-pid",
+		"latest-tag",
 		"mismatching-selector",
 		"no-anti-affinity",
 		"no-extensions-v1beta",

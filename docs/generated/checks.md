@@ -210,6 +210,22 @@ KubeLinter includes the following built-in checks:
 {}
 ```
 
+## latest-tag
+
+**Enabled by default**: Yes
+
+**Description**: Indicates when a deployment-like object is running a container with a floating image tag, "latest"
+
+**Remediation**: Use a container image with a proper image tag, outside the set blocked tag regex ".*:(latest)$".
+
+**Template**: [latest-tag](generated/templates.md#latest-tag)
+
+**Parameters**:
+
+```json
+{"BlockList":[".*:(latest)$"]}
+```
+
 ## minimum-three-replicas
 
 **Enabled by default**: No
