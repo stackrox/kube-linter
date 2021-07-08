@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/set"
 	"helm.sh/helm/v3/pkg/chartutil"
+	"helm.sh/helm/v3/pkg/cli/values"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -36,6 +37,7 @@ func CreateContexts(filesOrDirs ...string) ([]LintContext, error) {
 // CreateContextsWithOptions creates a context with additional Options
 func CreateContextsWithOptions(options Options, filesOrDirs ...string) ([]LintContext, error) {
 	contextsByDir := make(map[string]*lintContextImpl)
+	contextsByChartDir := make(map[string][]LintContext)
 	for _, fileOrDir := range filesOrDirs {
 		// Stdin
 		if fileOrDir == "-" {
@@ -59,14 +61,17 @@ func CreateContextsWithOptions(options Options, filesOrDirs ...string) ([]LintCo
 				return nil
 			}
 
+			if _, exists := contextsByChartDir[currentPath]; exists {
+				return nil
+			}
+
 			if !info.IsDir() {
 				if strings.HasSuffix(strings.ToLower(currentPath), ".tgz") {
-					ctx := newCtx(options)
-					if err := ctx.loadObjectsFromTgzHelmChart(currentPath); err != nil {
+					lintCtxs, err := CreateHelmContextsWithOptions(HelmOptions{Options: options, FromArchive: true}, currentPath)
+					if err != nil {
 						return err
 					}
-
-					contextsByDir[currentPath] = ctx
+					contextsByChartDir[currentPath] = lintCtxs
 					return nil
 				}
 
@@ -85,15 +90,11 @@ func CreateContextsWithOptions(options Options, filesOrDirs ...string) ([]LintCo
 				return nil
 			}
 			if isHelm, _ := chartutil.IsChartDir(currentPath); isHelm {
-				// Path has already been loaded, possibly through another argument. Skip.
-				if _, alreadyExists := contextsByDir[currentPath]; alreadyExists {
-					return nil
-				}
-				ctx := newCtx(options)
-				contextsByDir[currentPath] = ctx
-				if err := ctx.loadObjectsFromHelmChart(currentPath); err != nil {
+				lintCtxs, err := CreateHelmContextsWithOptions(HelmOptions{Options: options, FromDir: true}, currentPath)
+				if err != nil {
 					return err
 				}
+				contextsByChartDir[currentPath] = lintCtxs
 				return filepath.SkipDir
 			}
 			return nil
@@ -102,24 +103,55 @@ func CreateContextsWithOptions(options Options, filesOrDirs ...string) ([]LintCo
 			return nil, errors.Wrapf(err, "loading from path %q", fileOrDir)
 		}
 	}
-	dirs := make([]string, 0, len(contextsByDir))
+	dirs := make([]string, 0, len(contextsByDir)+len(contextsByChartDir))
 	for dir := range contextsByDir {
+		dirs = append(dirs, dir)
+	}
+	for dir := range contextsByChartDir {
 		dirs = append(dirs, dir)
 	}
 	sort.Strings(dirs)
 	var contexts []LintContext
 	for _, dir := range dirs {
+		if helmCtxs, ok := contextsByChartDir[dir]; ok {
+			contexts = append(contexts, helmCtxs...)
+			continue
+		}
 		contexts = append(contexts, contextsByDir[dir])
 	}
 	return contexts, nil
 }
 
-// CreateContextsFromHelmArchive creates a context from TGZ reader of Helm Chart.
+// CreateContextsFromHelmArchive creates a context from a tgz file based on a provided tgzReader
 func CreateContextsFromHelmArchive(fileName string, tgzReader io.Reader) ([]LintContext, error) {
-	ctx := newCtx(Options{})
-	if err := ctx.readObjectsFromTgzHelmChart(fileName, tgzReader); err != nil {
-		return nil, err
-	}
+	return CreateHelmContextsWithOptions(HelmOptions{FromReader: tgzReader}, fileName)
+}
 
-	return []LintContext{ctx}, nil
+// HelmOptions represent Helm-specific values that can be provided to modify how objects are parsed to create lint contexts
+type HelmOptions struct {
+	Options
+
+	// HelmValuesOptions provide options for additional values.yamls that can be provided to Helm on loading a chart
+	// These will be ignored for contexts that are not Helm-based
+	HelmValuesOptions []values.Options
+
+	// Whether to treat this as a Helm chart directory
+	FromDir bool
+	// Whether to treat this as a Helm chart archive (tgz).
+	FromArchive bool
+	// FromReader is used if isDir and isArchive are both false
+	FromReader io.Reader
+}
+
+// CreateContextsFromHelmArchive creates a context based on provided options
+func CreateHelmContextsWithOptions(options HelmOptions, fileOrDir string) ([]LintContext, error) {
+	contextsByHelmValues := []LintContext{}
+	for _, helmValueOptions := range options.HelmValuesOptions {
+		ctx := newHelmCtx(options.Options, helmValueOptions)
+		if err := ctx.loadObjectsFromHelmChart(fileOrDir, options); err != nil {
+			return nil, err
+		}
+		contextsByHelmValues = append(contextsByHelmValues, ctx)
+	}
+	return contextsByHelmValues, nil
 }
