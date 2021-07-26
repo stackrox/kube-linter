@@ -45,6 +45,7 @@ var (
 func Command() *cobra.Command {
 	var configPath string
 	var verbose bool
+	var errorOnInvalidYaml bool
 	format := flagutil.NewEnumFlag("Output format", formatters.GetEnabledFormatters(), common.PlainFormat)
 
 	v := viper.New()
@@ -87,6 +88,17 @@ func Command() *cobra.Command {
 					}
 				}
 			}
+
+			if errorOnInvalidYaml {
+				for _, lintCtx := range lintCtxs {
+					for _, invalidObj := range lintCtx.InvalidObjects() {
+						err=errors.Errorf("%s: %v\n", invalidObj.Metadata.FilePath, invalidObj.LoadErr)
+					}
+				}
+				if err != nil {
+					return err
+				}
+			}
 			var atLeastOneObjectFound bool
 			for _, lintCtx := range lintCtxs {
 				if len(lintCtx.Objects()) > 0 {
@@ -119,6 +131,7 @@ func Command() *cobra.Command {
 		},
 	}
 
+	c.Flags().BoolVarP(&errorOnInvalidYaml, "fail-on-invalid-yaml", "", false, "Error out when we have invalid yaml")
 	c.Flags().StringVar(&configPath, "config", "", "Path to config file")
 	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 	c.Flags().Var(format, "format", format.Usage())
