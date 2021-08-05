@@ -119,6 +119,20 @@ KubeLinter supports the following templates:
 ]
 ```
 
+## Dangling NetworkPolicies
+
+**Key**: `dangling-networkpolicy`
+
+**Description**: Flag NetworkPolicies which do not match any application
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[]
+```
+
 ## Dangling Services
 
 **Key**: `dangling-service`

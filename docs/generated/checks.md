@@ -50,6 +50,22 @@ KubeLinter includes the following built-in checks:
 {}
 ```
 
+## dangling-networkpolicy
+
+**Enabled by default**: No
+
+**Description**: Indicates when networkpolicies do not have any associated deployments.
+
+**Remediation**: Confirm that your networkPolicy's podselector correctly matches the labels on one of your deployments.
+
+**Template**: [dangling-networkpolicy](generated/templates.md#dangling-networkpolicies)
+
+**Parameters**:
+
+```json
+{}
+```
+
 ## dangling-service
 
 **Enabled by default**: Yes
