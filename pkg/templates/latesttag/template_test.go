@@ -37,12 +37,14 @@ func (s *ContainerImageTestSuite) addDeploymentWithContainerImage(name, containe
 	s.ctx.AddContainerToDeployment(s.T(), name, v1.Container{Name: containerName, Image: containerImage})
 }
 
-func (s *ContainerImageTestSuite) TestImproperContainerTag() {
+func (s *ContainerImageTestSuite) TestImproperContainerImage() {
 	const (
 		depWithLatestAsContainerImageTag = "dep-with-latest-as-container-image-tag"
+		depWithNotAllowedImageRegistry   = "dep-with-not-allowed-image-registry"
 	)
 
 	s.addDeploymentWithContainerImage(depWithLatestAsContainerImageTag, "example.com/test:latest")
+	s.addDeploymentWithContainerImage(depWithNotAllowedImageRegistry, "test.com/test:v1.0.0")
 
 	s.Validate(s.ctx, []templates.TestCase{
 		{
@@ -51,7 +53,18 @@ func (s *ContainerImageTestSuite) TestImproperContainerTag() {
 			},
 			Diagnostics: map[string][]diagnostic.Diagnostic{
 				depWithLatestAsContainerImageTag: {
-					{Message: "The container \"test-container\" is using a floating image tag, \"example.com/test:latest\"."},
+					{Message: "The container \"test-container\" is using an invalid container image, \"example.com/test:latest\". Please use images that are not blocked by the `BlockList` criteria : [\".*:(latest)$\"]"},
+				},
+			},
+			ExpectInstantiationError: false,
+		},
+		{
+			Param: params.Params{
+				AllowList: []string{"^(example.com)"},
+			},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				depWithNotAllowedImageRegistry: {
+					{Message: "The container \"test-container\" is using an invalid container image, \"test.com/test:v1.0.0\". Please use images that satisfies the `AllowList` criteria : [\"^(example.com)\"]"},
 				},
 			},
 			ExpectInstantiationError: false,
@@ -76,6 +89,15 @@ func (s *ContainerImageTestSuite) TestAcceptableContainerImage() {
 			Diagnostics: map[string][]diagnostic.Diagnostic{
 				depWithLatestAsContainerImageName: nil,
 				depWithAcceptableContainerImage:   nil,
+			},
+			ExpectInstantiationError: false,
+		},
+		{
+			Param: params.Params{
+				AllowList: []string{"^(example.com)"},
+			},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				depWithAcceptableContainerImage: nil,
 			},
 			ExpectInstantiationError: false,
 		},
