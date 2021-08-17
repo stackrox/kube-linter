@@ -139,6 +139,7 @@ The following are tutorials on KubeLinter written by users. If you have one that
 
 * [Ensuring YAML best practices using KubeLinter](https://www.civo.com/learn/yaml-best-practices-using-kubelinter) at civo.com by Saiyam Pathak.
 * [Analyze Kubernetes files for errors with KubeLinter](https://opensource.com/article/21/1/kubelinter) at opensource.com by Jessica Cherry.
+* [How to add a new check in KubeLinter?](https://www.psaggu.com/upstream-contribution/2021/08/17/notes.html) by Priyanka Saggu.
 
 ## Community
 
