@@ -322,14 +322,24 @@ KubeLinter supports the following templates:
 
 **Key**: `image-pull-policy`
 
-**Description**: Flag containers with Always image pull policy
+**Description**: Flag containers with forbidden image pull policy
 
 **Supported Objects**: DeploymentLike
 
 **Parameters**:
 
 ```json
-[]
+[
+  {
+    "name": "forbiddenPolicies",
+    "type": "array",
+    "description": "list of bad image pull policy",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true,
+    "arrayElemType": "string"
+  }
+]
 ```
 
 ## Latest Tag

@@ -17,16 +17,20 @@ func init() {
 	templates.Register(check.Template{
 		HumanName:   "Image Pull Policy",
 		Key:         "image-pull-policy",
-		Description: "Flag containers with Always image pull policy",
+		Description: "Flag containers with forbidden image pull policy",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,
-		Instantiate: params.WrapInstantiateFunc(func(_ params.Params) (check.Func, error) {
+		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
 			return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
-				if container.ImagePullPolicy == v1.PullAlways {
-					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q has a Always pull image policy", container.Name)}}
+				forbiddenPolicies := map[string]bool{}
+				for _, v := range p.ForbiddenPolicies {
+					forbiddenPolicies[v] = true
+				}
+				if _, ok := forbiddenPolicies[string(container.ImagePullPolicy)]; ok {
+					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q has a %s pull image policy", container.Name, container.ImagePullPolicy)}}
 				}
 				return nil
 			}), nil

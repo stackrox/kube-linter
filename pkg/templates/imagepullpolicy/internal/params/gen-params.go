@@ -17,7 +17,24 @@ var (
 	_ = util.MustParseParameterDesc
 	_ = fmt.Sprintf
 
+	forbiddenPoliciesParamDesc = util.MustParseParameterDesc(`{
+	"Name": "forbiddenPolicies",
+	"Type": "array",
+	"Description": "list of bad image pull policy",
+	"Examples": null,
+	"Enum": null,
+	"SubParameters": null,
+	"ArrayElemType": "string",
+	"Required": false,
+	"NoRegex": false,
+	"NotNegatable": false,
+	"XXXStructFieldName": "ForbiddenPolicies",
+	"XXXIsPointer": false
+}
+`)
+
 	ParamDescs = []check.ParameterDesc{
+		forbiddenPoliciesParamDesc,
 	}
 )
 
