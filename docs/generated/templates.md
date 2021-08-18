@@ -318,6 +318,20 @@ KubeLinter supports the following templates:
 []
 ```
 
+## Image Pull Policy
+
+**Key**: `image-pull-policy`
+
+**Description**: Flag containers with Always image pull policy
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[]
+```
+
 ## Latest Tag
 
 **Key**: `latest-tag`
