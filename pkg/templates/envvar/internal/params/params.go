@@ -9,4 +9,7 @@ type Params struct {
 
 	// The value of the environment variable.
 	Value string
+
+	// Check match of the environment variable.
+	Match string
 }

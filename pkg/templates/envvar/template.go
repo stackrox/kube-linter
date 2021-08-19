@@ -37,7 +37,7 @@ func init() {
 			return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
 				var results []diagnostic.Diagnostic
 				for _, envVar := range container.Env {
-					if nameMatcher(envVar.Name) && valueMatcher(envVar.Value) {
+					if nameMatcher(envVar.Name) && (p.Match != valueMatcher(envVar.Value)) {
 						results = append(results, diagnostic.Diagnostic{
 							Message: fmt.Sprintf("environment variable %s in container %q found", envVar.Name, container.Name),
 						})
