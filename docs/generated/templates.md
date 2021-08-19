@@ -224,6 +224,12 @@ KubeLinter supports the following templates:
     "required": false,
     "regexAllowed": true,
     "negationAllowed": true
+  },
+  {
+    "name": "match",
+    "type": "boolean",
+    "description": "Check match of the environment variable.",
+    "required": false
   }
 ]
 ```
