@@ -68,6 +68,7 @@ var (
 	ParamDescs = []check.ParameterDesc{
 		nameParamDesc,
 		valueParamDesc,
+		matchParamDesc,
 	}
 )
 
