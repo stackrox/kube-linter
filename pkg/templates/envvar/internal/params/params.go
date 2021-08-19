@@ -11,5 +11,5 @@ type Params struct {
 	Value string
 
 	// Check match of the environment variable.
-	Match string
+	Match bool
 }
