@@ -333,10 +333,10 @@ KubeLinter supports the following templates:
   {
     "name": "forbiddenPolicies",
     "type": "array",
-    "description": "list of bad image pull policy",
+    "description": "list of forbidden image pull policy",
     "required": false,
-    "regexAllowed": true,
-    "negationAllowed": true,
+    "regexAllowed": false,
+    "negationAllowed": false,
     "arrayElemType": "string"
   }
 ]

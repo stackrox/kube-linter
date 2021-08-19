@@ -1,4 +1,4 @@
-package livenessprobe
+package imagepullpolicy
 
 import (
 	"fmt"
@@ -13,10 +13,14 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
+const (
+	templateKey = "image-pull-policy"
+)
+
 func init() {
 	templates.Register(check.Template{
 		HumanName:   "Image Pull Policy",
-		Key:         "image-pull-policy",
+		Key:         templateKey,
 		Description: "Flag containers with forbidden image pull policy",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
@@ -24,13 +28,13 @@ func init() {
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,
 		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
+			forbiddenPolicies := map[string]bool{}
+			for _, v := range p.ForbiddenPolicies {
+				forbiddenPolicies[v] = true
+			}
 			return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
-				forbiddenPolicies := map[string]bool{}
-				for _, v := range p.ForbiddenPolicies {
-					forbiddenPolicies[v] = true
-				}
 				if _, ok := forbiddenPolicies[string(container.ImagePullPolicy)]; ok {
-					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q has a %s pull image policy", container.Name, container.ImagePullPolicy)}}
+					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q has imagePullPolicy set to %s", container.Name, container.ImagePullPolicy)}}
 				}
 				return nil
 			}), nil
