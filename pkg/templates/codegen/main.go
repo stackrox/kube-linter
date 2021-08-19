@@ -73,7 +73,7 @@ var (
 func (p *Params) Validate() error {
 	var validationErrors []string
 	{{- range . }}
-	{{- if eq .ParamDesc.Type "object" }} 
+	{{- if eq .ParamDesc.Type "object" }}
 	return errors.Errorf("parameter validation not yet supported for object type \"{{ .ParamDesc.Key }}\"")
 	{{- end }}
 	{{- if .ParamDesc.Required }}
@@ -85,6 +85,24 @@ func (p *Params) Validate() error {
 	}
 	{{- end }}
 	{{- if .ParamDesc.Enum }}
+	{{- if eq .ParamDesc.Type "array" }}
+	for _, value := range p.{{ .ParamDesc.XXXStructFieldName }} {
+		var found bool
+		for _, allowedValue := range []string{
+			{{- range .ParamDesc.Enum }}
+			"{{ . }}",
+			{{- end }}
+		}{
+			if value == allowedValue {
+				found = true
+				break
+			}
+		}
+		if !found {
+			validationErrors = append(validationErrors, fmt.Sprintf("param {{ .ParamDesc.Name }} has invalid value %q, must be one of {{ .ParamDesc.Enum }}", p.{{ .ParamDesc.XXXStructFieldName }}))
+		}
+	}
+	{{- else }}
 	var found bool
 	for _, allowedValue := range []string{
 		{{- range .ParamDesc.Enum }}
@@ -99,6 +117,7 @@ func (p *Params) Validate() error {
 	if !found {
 		validationErrors = append(validationErrors, fmt.Sprintf("param {{ .ParamDesc.Name }} has invalid value %q, must be one of {{ .ParamDesc.Enum }}", p.{{ .ParamDesc.XXXStructFieldName }}))
 	}
+	{{- end }}
 	{{- end }}
 	{{- end }}
 	if len(validationErrors) > 0 {

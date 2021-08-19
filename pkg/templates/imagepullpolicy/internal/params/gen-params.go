@@ -22,7 +22,11 @@ var (
 	"Type": "array",
 	"Description": "list of forbidden image pull policy",
 	"Examples": null,
-	"Enum": null,
+	"Enum": [
+		"Always",
+		"IfNotPresent",
+		"Never"
+	],
 	"SubParameters": null,
 	"ArrayElemType": "string",
 	"Required": false,
@@ -40,6 +44,22 @@ var (
 
 func (p *Params) Validate() error {
 	var validationErrors []string
+	for _, value := range p.ForbiddenPolicies {
+		var found bool
+		for _, allowedValue := range []string{
+			"Always",
+			"IfNotPresent",
+			"Never",
+		}{
+			if value == allowedValue {
+				found = true
+				break
+			}
+		}
+		if !found {
+			validationErrors = append(validationErrors, fmt.Sprintf("param forbiddenPolicies has invalid value %q, must be one of [Always IfNotPresent Never]", p.ForbiddenPolicies))
+		}
+	}
 	if len(validationErrors) > 0 {
 		return errors.Errorf("invalid parameters: %s", strings.Join(validationErrors, ", "))
     }
