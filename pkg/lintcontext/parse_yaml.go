@@ -84,7 +84,7 @@ func (w nopWriter) Write(p []byte) (n int, err error) {
 	return len(p), nil
 }
 
-func (l *lintContextImpl) renderHelmChart(dir string) (map[string]string, error) {
+func (l *lintContextImpl) renderHelmChart(dir string, valuesFiles []string) (map[string]string, error) {
 	// Helm doesn't have great logging behaviour, and can spam stderr, so silence their logging.
 	// TODO: capture these logs.
 	log.SetOutput(nopWriter{})
@@ -96,7 +96,16 @@ func (l *lintContextImpl) renderHelmChart(dir string) (map[string]string, error)
 	if err := chrt.Validate(); err != nil {
 		return nil, err
 	}
-	valOpts := &values.Options{ValueFiles: []string{filepath.Join(dir, "values.yaml")}}
+	var fullPathValues = []string{filepath.Join(dir, "values.yaml")}
+	for _, valuesFile := range valuesFiles {
+		fullPath, err := filepath.Abs(valuesFile)
+		if err != nil {
+			return nil, err
+		}
+		fullPathValues = append(fullPathValues, fullPath)
+	}
+	valOpts := &values.Options{ValueFiles: fullPathValues}
+
 	values, err := valOpts.MergeValues(nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "loading values.yaml file")
@@ -119,9 +128,9 @@ func (l *lintContextImpl) renderValues(chrt *chart.Chart, values map[string]inte
 	return rendered, nil
 }
 
-func (l *lintContextImpl) loadObjectsFromHelmChart(dir string) error {
+func (l *lintContextImpl) loadObjectsFromHelmChart(dir string, valuesFiles []string) error {
 	metadata := ObjectMetadata{FilePath: dir}
-	renderedFiles, err := l.renderHelmChart(dir)
+	renderedFiles, err := l.renderHelmChart(dir, valuesFiles)
 	if err != nil {
 		l.addInvalidObjects(InvalidObject{Metadata: metadata, LoadErr: err})
 		return nil

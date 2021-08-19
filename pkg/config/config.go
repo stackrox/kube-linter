@@ -26,6 +26,9 @@ type ChecksConfig struct {
 	// Exclude wins.
 	// +flagName=include
 	Include []string `json:"include"`
+	// A list of helm values files.
+	// +flagName=values
+	Values []string `json:"values"`
 }
 
 // Config represents the config file format.
