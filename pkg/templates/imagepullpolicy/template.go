@@ -3,6 +3,7 @@ package imagepullpolicy
 import (
 	"fmt"
 
+	"golang.stackrox.io/kube-linter/internal/set"
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
@@ -28,12 +29,9 @@ func init() {
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,
 		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
-			forbiddenPolicies := map[string]bool{}
-			for _, v := range p.ForbiddenPolicies {
-				forbiddenPolicies[v] = true
-			}
+			forbiddenPolicies := set.NewStringSet(p.ForbiddenPolicies...)
 			return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
-				if _, ok := forbiddenPolicies[string(container.ImagePullPolicy)]; ok {
+				if forbiddenPolicies.Contains(string(container.ImagePullPolicy)) {
 					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q has imagePullPolicy set to %s", container.Name, container.ImagePullPolicy)}}
 				}
 				return nil
