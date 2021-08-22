@@ -8,6 +8,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/containercapabilities"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/cpurequirements"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/danglingnetworkpolicy"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/danglingnetworkpolicyrule"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/danglingservice"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/deprecatedserviceaccount"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/disallowedgvk"
