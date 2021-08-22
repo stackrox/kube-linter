@@ -1,0 +1,7 @@
+name: "non-isolated-pod"
+description: "Alert on deployment-like objects that are not selected by any networkpolicy."
+remediation: "Ensure pod does not accept unsafe traffic by isolating it with a networkpolicy object."
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "non-isolated-pod"
