@@ -54,7 +54,7 @@ func init() {
 					}
 				}
 				return []diagnostic.Diagnostic{{
-					Message: "pod/ deploymentLike object is non-isolated",
+					Message: "pods created by this object are non-isolated",
 				}}
 			}, nil
 		}),
