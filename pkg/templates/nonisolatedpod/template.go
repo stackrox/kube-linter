@@ -11,15 +11,19 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	"golang.stackrox.io/kube-linter/pkg/templates/nonisolatedpod/internal/params"
-	v1 "k8s.io/api/networking/v1"
+	networkingV1 "k8s.io/api/networking/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
+)
+
+const (
+	templateKey = "non-isolated-pod"
 )
 
 func init() {
 	templates.Register(check.Template{
 		HumanName:   "Non Isolated Pods",
-		Key:         "non-isolated-pod",
+		Key:         templateKey,
 		Description: "Flag Pod that is not selected by any networkPolicy",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.NetworkPolicy},
@@ -33,7 +37,7 @@ func init() {
 					return nil
 				}
 				for _, obj := range lintCtx.Objects() {
-					networkpolicy, ok := obj.K8sObject.(*v1.NetworkPolicy)
+					networkpolicy, ok := obj.K8sObject.(*networkingV1.NetworkPolicy)
 					if !ok {
 						continue
 					}
