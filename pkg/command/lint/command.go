@@ -92,7 +92,7 @@ func Command() *cobra.Command {
 			if errorOnInvalidYaml {
 				for _, lintCtx := range lintCtxs {
 					for _, invalidObj := range lintCtx.InvalidObjects() {
-						err=errors.Errorf("%s: %v\n", invalidObj.Metadata.FilePath, invalidObj.LoadErr)
+						err = errors.Errorf("%s: %v\n", invalidObj.Metadata.FilePath, invalidObj.LoadErr)
 					}
 				}
 				if err != nil {
