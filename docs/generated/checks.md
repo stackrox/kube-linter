@@ -214,9 +214,9 @@ KubeLinter includes the following built-in checks:
 
 **Enabled by default**: Yes
 
-**Description**: Indicates when a deployment-like object is running a container with a floating image tag, "latest"
+**Description**: Indicates when a deployment-like object is running a container with an invalid container image
 
-**Remediation**: Use a container image with a proper image tag, outside the set blocked tag regex ".*:(latest)$".
+**Remediation**: Use a container image with a proper image tag satisfying either the "AllowList" & "BlockList" regex patterns.
 
 **Template**: [latest-tag](generated/templates.md#latest-tag)
 

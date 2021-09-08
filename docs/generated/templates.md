@@ -346,7 +346,7 @@ KubeLinter supports the following templates:
 
 **Key**: `latest-tag`
 
-**Description**: Flag applications running containers with floating container image tag, "latest"
+**Description**: Flag applications running container images that do not satisfies "allowList" & "blockList" parameters criteria.
 
 **Supported Objects**: DeploymentLike
 
@@ -357,7 +357,16 @@ KubeLinter supports the following templates:
   {
     "name": "blockList",
     "type": "array",
-    "description": "list of regular expressions for blocked or bad container image tags",
+    "description": "list of regular expressions specifying pattern(s) for container images that will be blocked. */",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true,
+    "arrayElemType": "string"
+  },
+  {
+    "name": "allowList",
+    "type": "array",
+    "description": "list of regular expressions specifying pattern(s) for container images that will be allowed.",
     "required": false,
     "regexAllowed": true,
     "negationAllowed": true,

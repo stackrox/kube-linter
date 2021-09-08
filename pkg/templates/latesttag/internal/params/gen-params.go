@@ -20,7 +20,7 @@ var (
 	blockListParamDesc = util.MustParseParameterDesc(`{
 	"Name": "blockList",
 	"Type": "array",
-	"Description": "list of regular expressions for blocked or bad container image tags",
+	"Description": "list of regular expressions specifying pattern(s) for container images that will be blocked. */",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
@@ -33,8 +33,25 @@ var (
 }
 `)
 
+	allowListParamDesc = util.MustParseParameterDesc(`{
+	"Name": "allowList",
+	"Type": "array",
+	"Description": "list of regular expressions specifying pattern(s) for container images that will be allowed.",
+	"Examples": null,
+	"Enum": null,
+	"SubParameters": null,
+	"ArrayElemType": "string",
+	"Required": false,
+	"NoRegex": false,
+	"NotNegatable": false,
+	"XXXStructFieldName": "AllowList",
+	"XXXIsPointer": false
+}
+`)
+
 	ParamDescs = []check.ParameterDesc{
 		blockListParamDesc,
+		allowListParamDesc,
 	}
 )
 
