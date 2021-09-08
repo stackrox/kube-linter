@@ -370,6 +370,22 @@ KubeLinter includes the following built-in checks:
 {}
 ```
 
+## non-isolated-pod
+
+**Enabled by default**: No
+
+**Description**: Alert on deployment-like objects that are not selected by any NetworkPolicy.
+
+**Remediation**: Ensure pod does not accept unsafe traffic by isolating it with a NetworkPolicy. See https://cloud.redhat.com/blog/guide-to-kubernetes-ingress-network-policies for more details.
+
+**Template**: [non-isolated-pod](generated/templates.md#non-isolated-pods)
+
+**Parameters**:
+
+```json
+{}
+```
+
 ## privilege-escalation-container
 
 **Enabled by default**: Yes

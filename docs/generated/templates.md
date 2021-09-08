@@ -473,6 +473,20 @@ KubeLinter supports the following templates:
 []
 ```
 
+## Non Isolated Pods
+
+**Key**: `non-isolated-pod`
+
+**Description**: Flag Pod that is not selected by any networkPolicy
+
+**Supported Objects**: NetworkPolicy
+
+**Parameters**:
+
+```json
+[]
+```
+
 ## Ports
 
 **Key**: `ports`
