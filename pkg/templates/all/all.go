@@ -23,6 +23,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/namespace"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/nonexistentserviceaccount"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/nonisolatedpod"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/pdb"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/ports"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/privileged"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/privilegedports"

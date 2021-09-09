@@ -1,0 +1,10 @@
+name: "pod-disruption-budget"
+description: "Indicates when a DeploymentLike object do not have a \"Pod Disruption Budget\" specified provided it's replica count is more than the minimum specified value"
+remediation: "Create a \"Pod Disruption Budget\" in the specified namespace with a \"MaxUnavailableValue\" set equal to or more than the specified criteria."
+scope:
+  objectKinds:
+    - PodDisruptionBudget
+    - DeploymentLike
+template: "pod-disruption-budget"
+params:
+  minimumMaxUnavailableCriteria: "1"

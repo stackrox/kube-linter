@@ -23,6 +23,7 @@ var (
 		"no-read-only-root-fs",
 		"non-existent-service-account",
 		"ssh-port",
+		"pod-disruption-budget",
 		"privilege-escalation-container",
 		"privileged-container",
 		"run-as-non-root",

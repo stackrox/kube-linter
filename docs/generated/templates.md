@@ -487,6 +487,29 @@ KubeLinter supports the following templates:
 []
 ```
 
+## Pod Disruption Budget not specified
+
+**Key**: `pod-disruption-budget`
+
+**Description**: Flag DeploymentLike objects having no "Pod Disruption Budget" set in case if the replica count is more than 1
+
+**Supported Objects**: DeploymentLike,PodDisruptionBudget
+
+**Parameters**:
+
+```json
+[
+  {
+    "name": "minimumMaxUnavailableCriteria",
+    "type": "string",
+    "description": "The minimum value of \"MaxUnavailable\" field in the PodDisruptionBudget object",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true
+  }
+]
+```
+
 ## Ports
 
 **Key**: `ports`

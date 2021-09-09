@@ -386,6 +386,22 @@ KubeLinter includes the following built-in checks:
 {}
 ```
 
+## pod-disruption-budget
+
+**Enabled by default**: Yes
+
+**Description**: Indicates when a DeploymentLike object do not have a "Pod Disruption Budget" specified provided it's replica count is more than the minimum specified value
+
+**Remediation**: Create a "Pod Disruption Budget" in the specified namespace with a "MaxUnavailableValue" set equal to or more than the specified criteria.
+
+**Template**: [pod-disruption-budget](generated/templates.md#pod-disruption-budget-not-specified)
+
+**Parameters**:
+
+```json
+{"minimumMaxUnavailableCriteria":"1"}
+```
+
 ## privilege-escalation-container
 
 **Enabled by default**: Yes
