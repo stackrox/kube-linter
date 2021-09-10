@@ -246,9 +246,9 @@ KubeLinter includes the following built-in checks:
 
 **Enabled by default**: Yes
 
-**Description**: Indicates when a deployment-like object is running a container with a floating image tag, "latest"
+**Description**: Indicates when a deployment-like object is running a container with an invalid container image
 
-**Remediation**: Use a container image with a proper image tag, outside the set blocked tag regex ".*:(latest)$".
+**Remediation**: Use a container image with a proper image tag satisfying either the "AllowList" & "BlockList" regex patterns.
 
 **Template**: [latest-tag](generated/templates.md#latest-tag)
 
@@ -395,6 +395,22 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Create the missing service account, or refer to an existing service account.
 
 **Template**: [non-existent-service-account](generated/templates.md#non-existent-service-account)
+
+**Parameters**:
+
+```json
+{}
+```
+
+## non-isolated-pod
+
+**Enabled by default**: No
+
+**Description**: Alert on deployment-like objects that are not selected by any NetworkPolicy.
+
+**Remediation**: Ensure pod does not accept unsafe traffic by isolating it with a NetworkPolicy. See https://cloud.redhat.com/blog/guide-to-kubernetes-ingress-network-policies for more details.
+
+**Template**: [non-isolated-pod](generated/templates.md#non-isolated-pods)
 
 **Parameters**:
 

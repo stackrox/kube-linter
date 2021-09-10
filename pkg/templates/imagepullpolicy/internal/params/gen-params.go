@@ -17,46 +17,49 @@ var (
 	_ = util.MustParseParameterDesc
 	_ = fmt.Sprintf
 
-	blockListParamDesc = util.MustParseParameterDesc(`{
-	"Name": "blockList",
+	forbiddenPoliciesParamDesc = util.MustParseParameterDesc(`{
+	"Name": "forbiddenPolicies",
 	"Type": "array",
-	"Description": "list of regular expressions specifying pattern(s) for container images that will be blocked. */",
+	"Description": "list of forbidden image pull policy",
 	"Examples": null,
-	"Enum": null,
+	"Enum": [
+		"Always",
+		"IfNotPresent",
+		"Never"
+	],
 	"SubParameters": null,
 	"ArrayElemType": "string",
 	"Required": false,
-	"NoRegex": false,
-	"NotNegatable": false,
-	"XXXStructFieldName": "BlockList",
-	"XXXIsPointer": false
-}
-`)
-
-	allowListParamDesc = util.MustParseParameterDesc(`{
-	"Name": "allowList",
-	"Type": "array",
-	"Description": "list of regular expressions specifying pattern(s) for container images that will be allowed.",
-	"Examples": null,
-	"Enum": null,
-	"SubParameters": null,
-	"ArrayElemType": "string",
-	"Required": false,
-	"NoRegex": false,
-	"NotNegatable": false,
-	"XXXStructFieldName": "AllowList",
+	"NoRegex": true,
+	"NotNegatable": true,
+	"XXXStructFieldName": "ForbiddenPolicies",
 	"XXXIsPointer": false
 }
 `)
 
 	ParamDescs = []check.ParameterDesc{
-		blockListParamDesc,
-		allowListParamDesc,
+		forbiddenPoliciesParamDesc,
 	}
 )
 
 func (p *Params) Validate() error {
 	var validationErrors []string
+	for _, value := range p.ForbiddenPolicies {
+		var found bool
+		for _, allowedValue := range []string{
+			"Always",
+			"IfNotPresent",
+			"Never",
+		}{
+			if value == allowedValue {
+				found = true
+				break
+			}
+		}
+		if !found {
+			validationErrors = append(validationErrors, fmt.Sprintf("param forbiddenPolicies has invalid value %q, must be one of [Always IfNotPresent Never]", p.ForbiddenPolicies))
+		}
+	}
 	if len(validationErrors) > 0 {
 		return errors.Errorf("invalid parameters: %s", strings.Join(validationErrors, ", "))
     }

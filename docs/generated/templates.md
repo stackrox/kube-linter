@@ -346,11 +346,35 @@ KubeLinter supports the following templates:
 []
 ```
 
+## Image Pull Policy
+
+**Key**: `image-pull-policy`
+
+**Description**: Flag containers with forbidden image pull policy
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[
+  {
+    "name": "forbiddenPolicies",
+    "type": "array",
+    "description": "list of forbidden image pull policy",
+    "required": false,
+    "regexAllowed": false,
+    "negationAllowed": false,
+    "arrayElemType": "string"
+  }
+]
+```
+
 ## Latest Tag
 
 **Key**: `latest-tag`
 
-**Description**: Flag applications running containers with floating container image tag, "latest"
+**Description**: Flag applications running container images that do not satisfies "allowList" & "blockList" parameters criteria.
 
 **Supported Objects**: DeploymentLike
 
@@ -361,7 +385,16 @@ KubeLinter supports the following templates:
   {
     "name": "blockList",
     "type": "array",
-    "description": "list of regular expressions for blocked or bad container image tags",
+    "description": "list of regular expressions specifying pattern(s) for container images that will be blocked. */",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true,
+    "arrayElemType": "string"
+  },
+  {
+    "name": "allowList",
+    "type": "array",
+    "description": "list of regular expressions specifying pattern(s) for container images that will be allowed.",
     "required": false,
     "regexAllowed": true,
     "negationAllowed": true,
@@ -461,6 +494,20 @@ KubeLinter supports the following templates:
 **Description**: Flag cases where a pod references a non-existent service account
 
 **Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[]
+```
+
+## Non Isolated Pods
+
+**Key**: `non-isolated-pod`
+
+**Description**: Flag Pod that is not selected by any networkPolicy
+
+**Supported Objects**: NetworkPolicy
 
 **Parameters**:
 

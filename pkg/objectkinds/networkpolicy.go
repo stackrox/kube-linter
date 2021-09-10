@@ -19,3 +19,8 @@ func init() {
 		return gvk == networkpolicyGVK
 	}))
 }
+
+//GetNetworkPolicyAPIVersion returns networkpolicy's apiversion
+func GetNetworkPolicyAPIVersion() string {
+	return networkpolicyGVK.GroupVersion().String()
+}

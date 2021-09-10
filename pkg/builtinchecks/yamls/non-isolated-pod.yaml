@@ -1,0 +1,7 @@
+name: "non-isolated-pod"
+description: "Alert on deployment-like objects that are not selected by any NetworkPolicy."
+remediation: "Ensure pod does not accept unsafe traffic by isolating it with a NetworkPolicy. See https://cloud.redhat.com/blog/guide-to-kubernetes-ingress-network-policies for more details."
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "non-isolated-pod"
