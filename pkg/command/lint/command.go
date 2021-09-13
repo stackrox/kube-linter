@@ -95,8 +95,7 @@ func Command() *cobra.Command {
 				}
 			}
 			if !atLeastOneObjectFound {
-				fmt.Fprintln(os.Stderr, "Warning: no valid objects found.")
-				return nil
+				return errors.New("no valid objects found")
 			}
 			result, err := run.Run(lintCtxs, checkRegistry, enabledChecks)
 			if err != nil {
