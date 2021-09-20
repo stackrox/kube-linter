@@ -155,7 +155,7 @@ func addSarifResult(sarifRun *sarif.Run, cwd string, report *diagnostic.WithCont
 	}
 
 	sarifRun.AddResult(report.Check).
-		WithMessage(*sarif.NewTextMessage(messageText)).
+		WithMessage(sarif.NewTextMessage(messageText)).
 		WithLocation(sarifLocation)
 
 	return nil
