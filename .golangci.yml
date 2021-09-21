@@ -41,6 +41,9 @@ linters-settings:
       - emptyStringTest
       - hugeParam
       - rangeValCopy
+  gosimple:
+    go: "1.16"
+    checks: ["all"]
   nolintlint:
     allow-leading-space: false # require machine-readable nolint directives (i.e. with no leading space)
     allow-unused: false # report any unused nolint directives
@@ -48,6 +51,12 @@ linters-settings:
     require-specific: true # require nolint directives to be specific about which linter is being skipped
   revive:
     min-confidence: 0
+  staticcheck:
+    go: "1.16"
+    checks: ["all"]
+  stylecheck:
+    go: "1.16"
+    checks: ["all", "-ST1000"]
 
 linters:
   # please, do not use `enable-all`: it's deprecated and will be removed soon.
@@ -91,14 +100,14 @@ linters:
     - revive
     - rowserrcheck
     # - scopelint
-    # - staticcheck
+    - staticcheck
     # - structcheck
-    # - stylecheck
+    - stylecheck
     # - testpackage
     # - typecheck
     - unconvert
     - unparam
-    # - unused
+    - unused
     # - varcheck
     # - whitespace
     # - wsl

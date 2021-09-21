@@ -40,11 +40,6 @@ $(GOLANGCILINT_BIN): deps
 	@echo "+ $@"
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint
 
-STATICCHECK_BIN := $(GOBIN)/staticcheck
-$(STATICCHECK_BIN): deps
-	@echo "+ $@"
-	go install honnef.co/go/tools/cmd/staticcheck
-
 ###########
 ## Lint ##
 ###########
@@ -60,12 +55,8 @@ else
 	golangci-lint run --fix
 endif
 
-.PHONY: staticcheck
-staticcheck: $(STATICCHECK_BIN)
-	staticcheck -checks=all,-ST1000 ./...
-
 .PHONY: lint
-lint: golangci-lint staticcheck
+lint: golangci-lint
 
 ####################
 ## Code generation #
