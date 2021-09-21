@@ -1,7 +1,6 @@
 package lintcontext
 
 import (
-	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -112,14 +111,4 @@ func CreateContextsWithOptions(options Options, filesOrDirs ...string) ([]LintCo
 		contexts = append(contexts, contextsByDir[dir])
 	}
 	return contexts, nil
-}
-
-// CreateContextsFromHelmArchive creates a context from TGZ reader of Helm Chart.
-func CreateContextsFromHelmArchive(fileName string, tgzReader io.Reader) ([]LintContext, error) {
-	ctx := newCtx(Options{})
-	if err := ctx.readObjectsFromTgzHelmChart(fileName, tgzReader); err != nil {
-		return nil, err
-	}
-
-	return []LintContext{ctx}, nil
 }
