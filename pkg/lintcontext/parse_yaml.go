@@ -170,6 +170,10 @@ func (l *lintContextImpl) loadObjectsFromHelmChart(chartPath string, chartType c
 	}
 
 	for path, contents := range renderedFiles {
+		// Skip NOTES.txt file that may be present among templates but is not a kubernetes resource.
+		if strings.HasSuffix(path, string(filepath.Separator)+chartutil.NotesName) {
+			continue
+		}
 		// The first element of path will be the same as the last element of chartPath, because
 		// Helm duplicates it.
 		pathToTemplate := filepath.Join(filepath.Dir(chartPath), path)
