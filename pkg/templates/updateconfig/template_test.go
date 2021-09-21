@@ -453,26 +453,32 @@ func (s *UpgradeConfigTestSuite) TestMaxMinPodsUnavailablePercent() {
 func (s *UpgradeConfigTestSuite) TestMinSurgeInteger() {
 	const (
 		noExplicitRollingUpdate                  = "no-explicit-rolling-update"
+		deploymentInvalidStrategy                = "deployment-invalid-strategy"
 		deploymentWithRollingUpdate              = "deployment-rolling-update-min-1"
 		deploymentConfigWithRollingUpdate        = "deployment-config-rolling-update-min-1"
 		deploymentWithValidRollingUpdate         = "deployment-rolling-update-min-2"
 		deploymentConfigWithValidRollingUpdate   = "deployment-config-rolling-update-min-2"
 		deploymentWithPercentRollingUpdate       = "deployment-rolling-update-min-10%"
 		deploymentConfigWithPercentRollingUpdate = "deployment-config-rolling-update-min-10%"
-		daemonSetWithStrategy                    = "deamon-set-ignore-integer"
+		daemonSetInvalidStrategy                 = "daemon-set-invalid-strategy"
+		daemonSetSurgeTooLow                     = "daemon-set-rolling-update-1"
+		daemonSetSurgeValid                      = "daemon-set-rolling-update-2"
 		replicationController                    = "replication-controller-ignore-integer"
 	)
 	maxSurge := intstr.FromInt(1)
 	maxSurgeValid := intstr.FromInt(2)
 	maxSurgePercent := intstr.FromString("10%")
 	s.addDeploymentWithStrategy(noExplicitRollingUpdate, appsv1.DeploymentStrategy{Type: appsv1.RollingUpdateDeploymentStrategyType})
+	s.addDeploymentWithStrategy(deploymentInvalidStrategy, appsv1.DeploymentStrategy{Type: appsv1.RollingUpdateDeploymentStrategyType, RollingUpdate: &appsv1.RollingUpdateDeployment{MaxUnavailable: &maxSurge}})
 	s.addDeploymentWithStrategy(deploymentWithRollingUpdate, appsv1.DeploymentStrategy{Type: appsv1.RollingUpdateDeploymentStrategyType, RollingUpdate: &appsv1.RollingUpdateDeployment{MaxSurge: &maxSurge}})
 	s.addDeploymentConfigWithStrategy(deploymentConfigWithRollingUpdate, ocsAppsv1.DeploymentStrategy{Type: ocsAppsv1.DeploymentStrategyTypeRolling, RollingParams: &ocsAppsv1.RollingDeploymentStrategyParams{MaxSurge: &maxSurge}})
 	s.addDeploymentWithStrategy(deploymentWithPercentRollingUpdate, appsv1.DeploymentStrategy{Type: appsv1.RollingUpdateDeploymentStrategyType, RollingUpdate: &appsv1.RollingUpdateDeployment{MaxSurge: &maxSurgePercent}})
 	s.addDeploymentConfigWithStrategy(deploymentConfigWithPercentRollingUpdate, ocsAppsv1.DeploymentStrategy{Type: ocsAppsv1.DeploymentStrategyTypeRolling, RollingParams: &ocsAppsv1.RollingDeploymentStrategyParams{MaxSurge: &maxSurgePercent}})
 	s.addDeploymentWithStrategy(deploymentWithValidRollingUpdate, appsv1.DeploymentStrategy{Type: appsv1.RollingUpdateDeploymentStrategyType, RollingUpdate: &appsv1.RollingUpdateDeployment{MaxSurge: &maxSurgeValid}})
 	s.addDeploymentConfigWithStrategy(deploymentConfigWithValidRollingUpdate, ocsAppsv1.DeploymentStrategy{Type: ocsAppsv1.DeploymentStrategyTypeRolling, RollingParams: &ocsAppsv1.RollingDeploymentStrategyParams{MaxSurge: &maxSurgeValid}})
-	s.addDaemonSetWithStrategy(daemonSetWithStrategy, appsv1.DaemonSetUpdateStrategy{Type: appsv1.RollingUpdateDaemonSetStrategyType, RollingUpdate: &appsv1.RollingUpdateDaemonSet{MaxUnavailable: &maxSurge}})
+	s.addDaemonSetWithStrategy(daemonSetInvalidStrategy, appsv1.DaemonSetUpdateStrategy{Type: appsv1.RollingUpdateDaemonSetStrategyType, RollingUpdate: &appsv1.RollingUpdateDaemonSet{MaxUnavailable: &maxSurge}})
+	s.addDaemonSetWithStrategy(daemonSetSurgeTooLow, appsv1.DaemonSetUpdateStrategy{Type: appsv1.RollingUpdateDaemonSetStrategyType, RollingUpdate: &appsv1.RollingUpdateDaemonSet{MaxSurge: &maxSurge}})
+	s.addDaemonSetWithStrategy(daemonSetSurgeValid, appsv1.DaemonSetUpdateStrategy{Type: appsv1.RollingUpdateDaemonSetStrategyType, RollingUpdate: &appsv1.RollingUpdateDaemonSet{MaxSurge: &maxSurgeValid}})
 	s.addReplicationControllerWithReplicas(replicationController, 2)
 
 	s.Validate(s.ctx, []templates.TestCase{
@@ -484,6 +490,9 @@ func (s *UpgradeConfigTestSuite) TestMinSurgeInteger() {
 			Diagnostics: map[string][]diagnostic.Diagnostic{
 				noExplicitRollingUpdate: {
 					{Message: "object has no rolling update parameters defined"},
+				},
+				deploymentInvalidStrategy: {
+					{Message: "object has a max surge of <nil> but at least 2 is required"},
 				},
 				deploymentWithRollingUpdate: {
 					{Message: "object has a max surge of 1 but at least 2 is required"},
@@ -499,8 +508,14 @@ func (s *UpgradeConfigTestSuite) TestMinSurgeInteger() {
 				},
 				deploymentWithValidRollingUpdate:       {},
 				deploymentConfigWithValidRollingUpdate: {},
-				daemonSetWithStrategy:                  {},
-				replicationController:                  {},
+				daemonSetInvalidStrategy: {
+					{Message: "object has a max surge of <nil> but at least 2 is required"},
+				},
+				daemonSetSurgeTooLow: {
+					{Message: "object has a max surge of 1 but at least 2 is required"},
+				},
+				daemonSetSurgeValid:   {},
+				replicationController: {},
 			},
 			ExpectInstantiationError: false,
 		},
