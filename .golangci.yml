@@ -4,23 +4,7 @@ run:
 issues:
   exclude-use-default: false
 
-  exclude-rules:
-    - linters:
-        - golint
-      text: "should have a package comment, unless it's in another file for this package"
-    - linters:
-        - golint
-      text: "should not use dot imports"
-    - linters:
-        - golint
-      text: "returns unexported type .* which can be annoying to use"
-    - linters:
-        - golint
-      text: "error strings should not be capitalized or end with punctuation or a newline"
-
 linters-settings:
-  golint:
-    min-confidence: 0
   govet:
     enable-all: true
     disable:
@@ -62,6 +46,8 @@ linters-settings:
     allow-unused: false # report any unused nolint directives
     require-explanation: false # don't require an explanation for nolint directives
     require-specific: true # require nolint directives to be specific about which linter is being skipped
+  revive:
+    min-confidence: 0
 
 linters:
   # please, do not use `enable-all`: it's deprecated and will be removed soon.
@@ -88,7 +74,6 @@ linters:
     # - goerr113
     - gofmt
     - goimports
-    - golint
     # - gomnd
     # - goprintffuncname
     # - gosec
@@ -103,6 +88,7 @@ linters:
     # - nestif
     - nolintlint
     # - prealloc
+    - revive
     - rowserrcheck
     # - scopelint
     # - staticcheck
