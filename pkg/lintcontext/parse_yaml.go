@@ -32,6 +32,15 @@ const (
 	maxFileSizeBytes = 10 * 1024 * 1024
 )
 
+type chartType int
+
+const (
+	// Helm chart is set of files in a directory
+	chartInDirectory chartType = iota
+	// Helm chart is compressed in .tgz archive
+	chartInTgzFile
+)
+
 var (
 	decoder runtime.Decoder
 )
@@ -142,37 +151,30 @@ func (l *lintContextImpl) renderValues(chrt *chart.Chart, values map[string]inte
 	return rendered, nil
 }
 
-func (l *lintContextImpl) loadObjectsFromHelmChart(dir string) error {
-	metadata := ObjectMetadata{FilePath: dir}
-	renderedFiles, err := l.renderHelmChart(dir)
+func (l *lintContextImpl) loadObjectsFromHelmChart(chartPath string, chartType chartType) error {
+	metadata := ObjectMetadata{FilePath: chartPath}
+
+	var renderedFiles map[string]string
+	var err error
+	switch chartType {
+	case chartInDirectory:
+		renderedFiles, err = l.renderHelmChart(chartPath)
+	case chartInTgzFile:
+		renderedFiles, err = l.renderTgzHelmChart(chartPath)
+	default:
+		return errors.Errorf("unknown chart type %q", chartType)
+	}
 	if err != nil {
 		l.addInvalidObjects(InvalidObject{Metadata: metadata, LoadErr: err})
 		return nil
 	}
-	for path, contents := range renderedFiles {
-		// The first element of path will be the same as the last element of dir, because
-		// Helm duplicates it.
-		pathToTemplate := filepath.Join(filepath.Dir(dir), path)
-		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
-			return errors.Wrapf(err, "loading objects from rendered helm chart %s/%s", dir, pathToTemplate)
-		}
-	}
-	return nil
-}
 
-func (l *lintContextImpl) loadObjectsFromTgzHelmChart(tgzFile string) error {
-	metadata := ObjectMetadata{FilePath: tgzFile}
-	renderedFiles, err := l.renderTgzHelmChart(tgzFile)
-	if err != nil {
-		l.invalidObjects = append(l.invalidObjects, InvalidObject{Metadata: metadata, LoadErr: err})
-		return nil
-	}
 	for path, contents := range renderedFiles {
-		// The first element of path will be the same as the last element of tgzFile, because
+		// The first element of path will be the same as the last element of chartPath, because
 		// Helm duplicates it.
-		pathToTemplate := filepath.Join(filepath.Dir(tgzFile), path)
+		pathToTemplate := filepath.Join(filepath.Dir(chartPath), path)
 		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
-			return errors.Wrapf(err, "loading objects from rendered helm chart %s/%s", tgzFile, pathToTemplate)
+			return errors.Wrapf(err, "loading objects from rendered helm chart %s/%s", chartPath, pathToTemplate)
 		}
 	}
 	return nil
