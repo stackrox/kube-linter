@@ -29,9 +29,17 @@ func init() {
 				if !found {
 					return nil
 				}
-				if sa := podSpec.DeprecatedServiceAccount; sa != "" {
+
+				sa := podSpec.DeprecatedServiceAccount
+				san := podSpec.ServiceAccountName
+				if sa != "" && sa != san {
+					if san == "" { // only serviceAccount is specified
+						return []diagnostic.Diagnostic{{Message: fmt.Sprintf(
+							"serviceAccount is specified (%s), but this field is deprecated; use serviceAccountName instead", sa)}}
+					}
+					// serviceAccount and serviceAccountName both specified but do not match
 					return []diagnostic.Diagnostic{{Message: fmt.Sprintf(
-						"serviceAccount is specified (%s), but this field is deprecated; use serviceAccountName instead", sa)}}
+						"serviceAccount (%s) and serviceAccountName (%s) are both specified with non-matching values. serviceAccount is deprecated; unspecify serviceAccount or make values match.", sa, san)}}
 				}
 				return nil
 			}, nil
