@@ -93,14 +93,37 @@ func (l *lintContextImpl) renderHelmChart(dir string) (map[string]string, error)
 	if err != nil {
 		return nil, err
 	}
+
 	if err := chrt.Validate(); err != nil {
 		return nil, err
 	}
+
 	valOpts := &values.Options{ValueFiles: []string{filepath.Join(dir, "values.yaml")}}
 	values, err := valOpts.MergeValues(nil)
 	if err != nil {
 		return nil, errors.Wrap(err, "loading values.yaml file")
 	}
+
+	return l.renderValues(chrt, values)
+}
+
+func (l *lintContextImpl) renderTgzHelmChart(tgzFile string) (map[string]string, error) {
+	log.SetOutput(nopWriter{})
+	defer log.SetOutput(os.Stderr)
+	chrt, err := loader.LoadFile(tgzFile)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := chrt.Validate(); err != nil {
+		return nil, err
+	}
+
+	values, err := l.loadTgzHelmValues(tgzFile, chrt)
+	if err != nil {
+		return nil, errors.Wrap(err, "loading values.yaml file")
+	}
+
 	return l.renderValues(chrt, values)
 }
 
@@ -153,31 +176,6 @@ func (l *lintContextImpl) loadObjectsFromTgzHelmChart(tgzFile string) error {
 		}
 	}
 	return nil
-}
-
-func (l *lintContextImpl) renderTgzHelmChart(tgzFile string) (map[string]string, error) {
-	log.SetOutput(nopWriter{})
-	defer log.SetOutput(os.Stderr)
-	chrt, err := loader.LoadFile(tgzFile)
-
-	if err != nil {
-		return nil, err
-	}
-	if err := chrt.Validate(); err != nil {
-		return nil, err
-	}
-
-	return l.renderChart(tgzFile, chrt)
-}
-
-func (l *lintContextImpl) parseValues(filePath string, bytes []byte) (map[string]interface{}, error) {
-	currentMap := map[string]interface{}{}
-
-	if err := y.Unmarshal(bytes, &currentMap); err != nil {
-		return nil, errors.Wrapf(err, "failed to parse %s", filePath)
-	}
-
-	return currentMap, nil
 }
 
 func (l *lintContextImpl) loadObjectFromYAMLReader(filePath string, r *yaml.YAMLReader) error {
@@ -239,11 +237,7 @@ func (l *lintContextImpl) loadObjectsFromReader(filePath string, reader io.Reade
 	}
 }
 
-func (l *lintContextImpl) renderChart(fileName string, chart *chart.Chart) (map[string]string, error) {
-	if err := chart.Validate(); err != nil {
-		return nil, err
-	}
-
+func (l *lintContextImpl) loadTgzHelmValues(fileName string, chart *chart.Chart) (map[string]interface{}, error) {
 	valuesIndex := -1
 	for i, f := range chart.Raw {
 		if f.Name == "values.yaml" {
@@ -257,10 +251,10 @@ func (l *lintContextImpl) renderChart(fileName string, chart *chart.Chart) (map[
 		return nil, errors.Errorf("%s not found", indexName)
 	}
 
-	values, err := l.parseValues(indexName, chart.Raw[valuesIndex].Data)
-	if err != nil {
-		return nil, errors.Wrap(err, "loading values.yaml file")
+	values := map[string]interface{}{}
+	if err := y.Unmarshal(chart.Raw[valuesIndex].Data, &values); err != nil {
+		return nil, errors.Wrapf(err, "failed to parse %s", indexName)
 	}
 
-	return l.renderValues(chart, values)
+	return values, nil
 }
