@@ -178,7 +178,8 @@ func (l *lintContextImpl) loadObjectsFromHelmChart(chartPath string, chartType c
 		// Helm duplicates it.
 		pathToTemplate := filepath.Join(filepath.Dir(chartPath), path)
 		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
-			return errors.Wrapf(err, "loading objects from rendered helm chart %s/%s", chartPath, pathToTemplate)
+			loadErr := errors.Wrapf(err, "loading object %s from rendered helm chart %s", pathToTemplate, chartPath)
+			l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: pathToTemplate}, LoadErr: loadErr})
 		}
 	}
 	return nil
