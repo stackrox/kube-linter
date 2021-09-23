@@ -53,6 +53,8 @@ func PodSpec(obj k8sutil.Object) (coreV1.PodSpec, bool) {
 // Selector extracts a selector from the given object, if available.
 func Selector(obj k8sutil.Object) (*metaV1.LabelSelector, bool) {
 	switch obj := obj.(type) {
+	case *ocsAppsV1.DeploymentConfig:
+		return &metaV1.LabelSelector{MatchLabels: obj.Spec.Selector}, true
 	case *batchV1Beta1.CronJob:
 		selector := obj.Spec.JobTemplate.Spec.Selector
 		return selector, true
