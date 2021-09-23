@@ -11,6 +11,7 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/templates/replicas/internal/params"
 
 	appsv1 "k8s.io/api/apps/v1"
+	ocsAppsV1 "github.com/openshift/api/apps/v1"
 )
 
 func TestReplicas(t *testing.T) {
@@ -35,13 +36,26 @@ func (s *ReplicaTestSuite) addDeploymentWithReplicas(name string, replicas int32
 	})
 }
 
+func (s *ReplicaTestSuite) addDeploymentConfigWithReplicas(name string, replicas int32) {
+	s.ctx.AddMockDeploymentConfig(s.T(), name)
+	s.ctx.ModifyDeploymentConfig(s.T(), name, func(dc *ocsAppsV1.DeploymentConfig) {
+		dc.Spec.Replicas = replicas
+	})
+}
+
 func (s *ReplicaTestSuite) TestTooFewReplicas() {
 	const (
-		noExplicitReplicasDepName = "no-explicit-replicas"
-		twoReplicasDepName        = "two-replicas"
+		noExplicitReplicasDepName 		= "no-explicit-replicas"
+		noExplicitReplicasDepNameDc 	= "no-explicit-replicas-dc"
+		twoReplicasDepName        		= "two-replicas"
+		twoReplicasDepNameDc        	= "two-replicas-dc"
 	)
+
 	s.ctx.AddMockDeployment(s.T(), noExplicitReplicasDepName)
 	s.addDeploymentWithReplicas(twoReplicasDepName, 2)
+
+	s.ctx.AddMockDeploymentConfig(s.T(), noExplicitReplicasDepNameDc)
+	s.addDeploymentConfigWithReplicas(twoReplicasDepNameDc, 2)
 
 	s.Validate(s.ctx, []templates.TestCase{
 		{
@@ -52,7 +66,13 @@ func (s *ReplicaTestSuite) TestTooFewReplicas() {
 				noExplicitReplicasDepName: {
 					{Message: "object has 1 replica but minimum required replicas is 3"},
 				},
+				noExplicitReplicasDepNameDc: {
+					{Message: "object has 1 replica but minimum required replicas is 3"},
+				},
 				twoReplicasDepName: {
+					{Message: "object has 2 replicas but minimum required replicas is 3"},
+				},
+				twoReplicasDepNameDc: {
 					{Message: "object has 2 replicas but minimum required replicas is 3"},
 				},
 			},

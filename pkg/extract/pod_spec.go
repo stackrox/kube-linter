@@ -84,6 +84,9 @@ func Replicas(obj k8sutil.Object) (int32, bool) {
 	if !replicas.IsValid() {
 		return 0, false
 	}
+
+	//TODO: below is needed for DeploymentConfigs
+	//numReplicas, ok := replicas.Interface().(int32)
 	numReplicas, ok := replicas.Interface().(*int32)
 	if ok {
 		if numReplicas != nil {
