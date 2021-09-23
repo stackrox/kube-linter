@@ -63,6 +63,27 @@ Installing KubeLinter from source is as simple as following these steps:
    .gobin/kube-linter version
    ```
 
+### Testing KubeLinter
+There are several layers of testing. Each layer is expected to pass.
+
+1. `go` unit tests:
+
+   ```bash
+   make test
+   ```
+
+2. end-to-end integration tests:
+
+   ```bash
+   make e2e-test
+   ```
+
+3. and finally, end-to-end integration tests using `bats-core`:
+
+   ```bash
+   make e2e-bats
+   ```
+
 ## Using KubeLinter
 
 ### Local YAML Linting

@@ -1,0 +1,28 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire
+  annotations:
+    email: kubelinter@stackrox.com
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: dont-fire
+  annotations:
+    email: kubelinter@stackrox.com
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1
+  annotations:
+    whois: kubelinter@stackrox.com
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: app2
+  annotations:
+    whois: kubelinter@stackrox.com

@@ -1,0 +1,68 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          volumeMounts:
+            - name: thingsock
+              mountPath: "/var/run/thing.sock"
+      volumes:
+        - name: thingsock
+          hostPath:
+            path: /var/run/thing.sock
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: dont-fire
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          volumeMounts:
+            - name: thingsock
+              mountPath: "/var/run/thing.sock"
+      volumes:
+        - name: thingsock
+          hostPath:
+            path: /var/run/thing.sock
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        volumeMounts:
+        - name: dockersock
+          mountPath: "/var/run/docker.sock"
+      volumes:
+      - name: dockersock
+        hostPath:
+          path: /var/run/docker.sock
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: app
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        volumeMounts:
+        - name: dockersock
+          mountPath: "/var/run/docker.sock"
+      volumes:
+      - name: dockersock
+        hostPath:
+          path: /var/run/docker.sock

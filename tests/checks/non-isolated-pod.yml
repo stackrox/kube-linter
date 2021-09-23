@@ -1,0 +1,82 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dont-fire1
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: dont-fire1
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dont-fire2
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: dont-fire2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire
+spec:
+  selector:
+    app.kubernetes.io/name: dont-fire1
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: dont-fire1
+    spec:
+      containers:
+        - name: app
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: dont-fire
+spec:
+  selector:
+    app.kubernetes.io/name: dont-fire2
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: dont-fire2
+    spec:
+      containers:
+        - name: app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1
+spec:
+  selector:
+    app.kubernetes.io/name: app1
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: app1
+    spec:
+      containers:
+        - name: app
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: app2
+spec:
+  selector:
+    app.kubernetes.io/name: app2
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: app2
+    spec:
+      containers:
+        - name: app
