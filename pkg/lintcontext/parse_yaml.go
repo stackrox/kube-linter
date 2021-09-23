@@ -152,37 +152,58 @@ func (l *lintContextImpl) renderValues(chrt *chart.Chart, values map[string]inte
 }
 
 func (l *lintContextImpl) loadObjectsFromHelmChart(chartPath string, chartType chartType) error {
-	metadata := ObjectMetadata{FilePath: chartPath}
-
 	var renderedFiles map[string]string
 	var err error
 	switch chartType {
 	case chartInDirectory:
 		renderedFiles, err = l.renderHelmChart(chartPath)
+		if err == nil {
+			renderedFiles = normalizeDirectoryPaths(renderedFiles)
+		}
 	case chartInTgzFile:
 		renderedFiles, err = l.renderTgzHelmChart(chartPath)
+		// Note that normalizeDirectoryPaths is not called in case of tgz charts.
+		// Assuming that `mychart-0.1.0.tgz` actually contains everything under `mychart` directory inside.
 	default:
 		return errors.Errorf("unknown chart type %q", chartType)
 	}
 	if err != nil {
-		l.addInvalidObjects(InvalidObject{Metadata: metadata, LoadErr: err})
+		l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: chartPath}, LoadErr: err})
 		return nil
 	}
 
 	for path, contents := range renderedFiles {
+		pathToTemplate := filepath.Join(chartPath, path)
 		// Skip NOTES.txt file that may be present among templates but is not a kubernetes resource.
-		if strings.HasSuffix(path, string(filepath.Separator)+chartutil.NotesName) {
+		if strings.HasSuffix(pathToTemplate, string(os.PathSeparator)+chartutil.NotesName) {
 			continue
 		}
-		// The first element of path will be the same as the last element of chartPath, because
-		// Helm duplicates it.
-		pathToTemplate := filepath.Join(filepath.Dir(chartPath), path)
 		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
 			loadErr := errors.Wrapf(err, "loading object %s from rendered helm chart %s", pathToTemplate, chartPath)
 			l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: pathToTemplate}, LoadErr: loadErr})
 		}
 	}
 	return nil
+}
+
+// normalizeDirectoryPaths removes the first element of the path that gets added by the Helm library.
+// Helm adds chart name as the first path component, however this is not always correct, e.g. in case the helm chart
+// directory was renamed, as shown in https://github.com/stackrox/kube-linter/issues/212
+// The function converts mychart/templates/deployment.yaml to templates/deployment.yaml.
+// The actual correct chart path will be prepended later in loadObjectsFromHelmChart.
+func normalizeDirectoryPaths(renderedFiles map[string]string) map[string]string {
+	normalizedFiles := make(map[string]string, len(renderedFiles))
+	for key, val := range renderedFiles {
+		// Go does not seem to have a library function that allows to split the first element of path, therefore
+		// splitting "by hand" on path separator char, which is ok if you check path.Split() implementation ;-)
+		splitPath := strings.SplitN(key, string(os.PathSeparator), 2)
+		if len(splitPath) > 1 {
+			normalizedFiles[splitPath[1]] = val
+		} else {
+			normalizedFiles[splitPath[0]] = val
+		}
+	}
+	return normalizedFiles
 }
 
 func (l *lintContextImpl) loadObjectFromYAMLReader(filePath string, r *yaml.YAMLReader) error {
