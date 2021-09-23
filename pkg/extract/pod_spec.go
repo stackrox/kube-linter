@@ -3,6 +3,7 @@ package extract
 import (
 	"reflect"
 
+	ocsAppsV1 "github.com/openshift/api/apps/v1"
 	"golang.stackrox.io/kube-linter/pkg/k8sutil"
 	batchV1Beta1 "k8s.io/api/batch/v1beta1"
 	coreV1 "k8s.io/api/core/v1"
@@ -52,6 +53,8 @@ func PodSpec(obj k8sutil.Object) (coreV1.PodSpec, bool) {
 // Selector extracts a selector from the given object, if available.
 func Selector(obj k8sutil.Object) (*metaV1.LabelSelector, bool) {
 	switch obj := obj.(type) {
+	case *ocsAppsV1.DeploymentConfig:
+		return &metaV1.LabelSelector{MatchLabels: obj.Spec.Selector}, true
 	case *batchV1Beta1.CronJob:
 		selector := obj.Spec.JobTemplate.Spec.Selector
 		return selector, true
@@ -75,6 +78,11 @@ func Selector(obj k8sutil.Object) (*metaV1.LabelSelector, bool) {
 
 // Replicas extracts replicas from the given object, if available.
 func Replicas(obj k8sutil.Object) (int32, bool) {
+	// DeploymentConfigs are treated specially because the number of replicas is
+	// an int32, not a *int32.
+	if depConfig, isDepConfig := obj.(*ocsAppsV1.DeploymentConfig); isDepConfig {
+		return depConfig.Spec.Replicas, true
+	}
 	objValue := reflect.Indirect(reflect.ValueOf(obj))
 	spec := objValue.FieldByName("Spec")
 	if !spec.IsValid() {
@@ -84,6 +92,7 @@ func Replicas(obj k8sutil.Object) (int32, bool) {
 	if !replicas.IsValid() {
 		return 0, false
 	}
+
 	numReplicas, ok := replicas.Interface().(*int32)
 	if ok {
 		if numReplicas != nil {
