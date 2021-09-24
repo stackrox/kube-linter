@@ -27,4 +27,8 @@ func AddFlags(c *cobra.Command, v *viper.Viper) {
 	if err := v.BindPFlag("checks.include", c.Flags().Lookup("include")); err != nil {
 		panic(err)
 	}
+	c.Flags().StringSlice("values", nil, "A list of helm values files.")
+	if err := v.BindPFlag("checks.values", c.Flags().Lookup("values")); err != nil {
+		panic(err)
+	}
 }
