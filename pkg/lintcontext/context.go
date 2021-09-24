@@ -5,6 +5,7 @@ import (
 
 	"golang.stackrox.io/kube-linter/internal/stringutils"
 	"golang.stackrox.io/kube-linter/pkg/k8sutil"
+	"helm.sh/helm/v3/pkg/cli/values"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -77,7 +78,8 @@ type lintContextImpl struct {
 	objects        []Object
 	invalidObjects []InvalidObject
 
-	customDecoder runtime.Decoder
+	customDecoder     runtime.Decoder
+	helmValuesOptions values.Options
 }
 
 // Objects returns the (valid) objects loaded from this LintContext.
@@ -104,5 +106,12 @@ func (l *lintContextImpl) addInvalidObjects(objs ...InvalidObject) {
 func newCtx(options Options) *lintContextImpl {
 	return &lintContextImpl{
 		customDecoder: options.CustomDecoder,
+	}
+}
+
+func newHelmCtx(options Options, helmValueOptions values.Options) *lintContextImpl {
+	return &lintContextImpl{
+		customDecoder:     options.CustomDecoder,
+		helmValuesOptions: helmValueOptions,
 	}
 }
