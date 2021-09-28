@@ -126,10 +126,9 @@ func (l *lintContextImpl) loadObjectsFromHelmChart(dir string) error {
 		l.addInvalidObjects(InvalidObject{Metadata: metadata, LoadErr: err})
 		return nil
 	}
-	for path, contents := range renderedFiles {
-		// The first element of path will be the same as the last element of dir, because
-		// Helm duplicates it.
-		pathToTemplate := filepath.Join(filepath.Dir(dir), path)
+	// Paths returned by helm include redundant directory in front, therefore we strip it out.
+	for path, contents := range normalizeDirectoryPaths(renderedFiles) {
+		pathToTemplate := filepath.Join(dir, path)
 
 		// Skip NOTES.txt file that may be present among templates but is not a kubernetes resource.
 		if strings.HasSuffix(pathToTemplate, string(filepath.Separator)+chartutil.NotesName) {
@@ -152,9 +151,7 @@ func (l *lintContextImpl) loadObjectsFromTgzHelmChart(tgzFile string) error {
 		return nil
 	}
 	for path, contents := range renderedFiles {
-		// The first element of path will be the same as the last element of tgzFile, because
-		// Helm duplicates it.
-		pathToTemplate := filepath.Join(filepath.Dir(tgzFile), path)
+		pathToTemplate := filepath.Join(tgzFile, path)
 
 		// Skip NOTES.txt file that may be present among templates but is not a kubernetes resource.
 		if strings.HasSuffix(pathToTemplate, string(filepath.Separator)+chartutil.NotesName) {
@@ -312,4 +309,23 @@ func (l *lintContextImpl) readObjectsFromTgzHelmChart(fileName string, tgzReader
 			l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: pathToTemplate}, LoadErr: loadErr})
 		}
 	}
+}
+
+// normalizeDirectoryPaths removes the first element of the path that gets added by the Helm library.
+// Helm adds chart name as the first path component, however this is not always correct, e.g. in case the helm chart
+// directory was renamed, as shown in https://github.com/stackrox/kube-linter/issues/212
+// The function converts mychart/templates/deployment.yaml to templates/deployment.yaml.
+func normalizeDirectoryPaths(renderedFiles map[string]string) map[string]string {
+	normalizedFiles := make(map[string]string, len(renderedFiles))
+	for key, val := range renderedFiles {
+		// Go does not seem to have a library function that allows to split the first element of path, therefore
+		// splitting "by hand" on path separator char, which is ok if you check path.Split() implementation ;-)
+		splitPath := strings.SplitN(key, string(os.PathSeparator), 2)
+		if len(splitPath) > 1 {
+			normalizedFiles[splitPath[1]] = val
+		} else {
+			normalizedFiles[splitPath[0]] = val
+		}
+	}
+	return normalizedFiles
 }
