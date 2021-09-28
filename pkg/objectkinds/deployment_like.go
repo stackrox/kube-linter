@@ -24,6 +24,7 @@ var (
 			{Group: coreV1.GroupName, Kind: "ReplicationController"},
 			{Group: batchV1.GroupName, Kind: "Job"},
 			{Group: batchV1Beta1.GroupName, Kind: "CronJob"},
+			{Group: batchV1.GroupName, Kind: "CronJob"},
 		} {
 			if _, ok := m[gk]; ok {
 				panic(fmt.Sprintf("group kind double-registered: %v", gk))
