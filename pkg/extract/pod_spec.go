@@ -5,6 +5,7 @@ import (
 
 	ocsAppsV1 "github.com/openshift/api/apps/v1"
 	"golang.stackrox.io/kube-linter/pkg/k8sutil"
+	batchV1 "k8s.io/api/batch/v1"
 	batchV1Beta1 "k8s.io/api/batch/v1beta1"
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -19,6 +20,8 @@ func PodTemplateSpec(obj k8sutil.Object) (coreV1.PodTemplateSpec, bool) {
 			Spec:       obj.Spec,
 		}, true
 	case *batchV1Beta1.CronJob:
+		return obj.Spec.JobTemplate.Spec.Template, true
+	case *batchV1.CronJob:
 		return obj.Spec.JobTemplate.Spec.Template, true
 	default:
 		objValue := reflect.Indirect(reflect.ValueOf(obj))
@@ -56,8 +59,9 @@ func Selector(obj k8sutil.Object) (*metaV1.LabelSelector, bool) {
 	case *ocsAppsV1.DeploymentConfig:
 		return &metaV1.LabelSelector{MatchLabels: obj.Spec.Selector}, true
 	case *batchV1Beta1.CronJob:
-		selector := obj.Spec.JobTemplate.Spec.Selector
-		return selector, true
+		return obj.Spec.JobTemplate.Spec.Selector, true
+	case *batchV1.CronJob:
+		return obj.Spec.JobTemplate.Spec.Selector, true
 	default:
 		objValue := reflect.Indirect(reflect.ValueOf(obj))
 		spec := objValue.FieldByName("Spec")

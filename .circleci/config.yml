@@ -17,6 +17,7 @@ version: 2.1
 jobs:
   lint:
     executor: custom
+    resource_class: large
     steps:
     - checkout
 
