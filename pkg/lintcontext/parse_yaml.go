@@ -119,51 +119,23 @@ func (l *lintContextImpl) renderValues(chrt *chart.Chart, values map[string]inte
 	return rendered, nil
 }
 
-func (l *lintContextImpl) loadObjectsFromHelmChart(dir string) error {
-	metadata := ObjectMetadata{FilePath: dir}
+func (l *lintContextImpl) loadObjectsFromHelmChart(dir string) {
 	renderedFiles, err := l.renderHelmChart(dir)
 	if err != nil {
-		l.addInvalidObjects(InvalidObject{Metadata: metadata, LoadErr: err})
-		return nil
+		l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: dir}, LoadErr: err})
+		return
 	}
 	// Paths returned by helm include redundant directory in front, therefore we strip it out.
-	for path, contents := range normalizeDirectoryPaths(renderedFiles) {
-		pathToTemplate := filepath.Join(dir, path)
-
-		// Skip NOTES.txt file that may be present among templates but is not a kubernetes resource.
-		if strings.HasSuffix(pathToTemplate, string(filepath.Separator)+chartutil.NotesName) {
-			continue
-		}
-
-		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
-			loadErr := errors.Wrapf(err, "loading object %s from rendered helm chart %s", pathToTemplate, dir)
-			l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: pathToTemplate}, LoadErr: loadErr})
-		}
-	}
-	return nil
+	l.loadHelmRenderedTemplates(dir, normalizeDirectoryPaths(renderedFiles))
 }
 
-func (l *lintContextImpl) loadObjectsFromTgzHelmChart(tgzFile string) error {
-	metadata := ObjectMetadata{FilePath: tgzFile}
+func (l *lintContextImpl) loadObjectsFromTgzHelmChart(tgzFile string) {
 	renderedFiles, err := l.renderTgzHelmChart(tgzFile)
 	if err != nil {
-		l.invalidObjects = append(l.invalidObjects, InvalidObject{Metadata: metadata, LoadErr: err})
-		return nil
+		l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: tgzFile}, LoadErr: err})
+		return
 	}
-	for path, contents := range renderedFiles {
-		pathToTemplate := filepath.Join(tgzFile, path)
-
-		// Skip NOTES.txt file that may be present among templates but is not a kubernetes resource.
-		if strings.HasSuffix(pathToTemplate, string(filepath.Separator)+chartutil.NotesName) {
-			continue
-		}
-
-		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
-			loadErr := errors.Wrapf(err, "loading object %s from rendered helm chart %s", pathToTemplate, tgzFile)
-			l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: pathToTemplate}, LoadErr: loadErr})
-		}
-	}
-	return nil
+	l.loadHelmRenderedTemplates(tgzFile, renderedFiles)
 }
 
 func (l *lintContextImpl) renderTgzHelmChart(tgzFile string) (map[string]string, error) {
@@ -290,14 +262,17 @@ func (l *lintContextImpl) renderTgzHelmChartReader(fileName string, tgzReader io
 }
 
 func (l *lintContextImpl) readObjectsFromTgzHelmChart(fileName string, tgzReader io.Reader) {
-	metadata := ObjectMetadata{FilePath: fileName}
 	renderedFiles, err := l.renderTgzHelmChartReader(fileName, tgzReader)
 	if err != nil {
-		l.invalidObjects = append(l.invalidObjects, InvalidObject{Metadata: metadata, LoadErr: err})
+		l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: fileName}, LoadErr: err})
 		return
 	}
+	l.loadHelmRenderedTemplates(fileName, renderedFiles)
+}
+
+func (l *lintContextImpl) loadHelmRenderedTemplates(chartPath string, renderedFiles map[string]string) {
 	for path, contents := range renderedFiles {
-		pathToTemplate := filepath.Join(fileName, path)
+		pathToTemplate := filepath.Join(chartPath, path)
 
 		// Skip NOTES.txt file that may be present among templates but is not a kubernetes resource.
 		if strings.HasSuffix(pathToTemplate, string(filepath.Separator)+chartutil.NotesName) {
@@ -305,7 +280,7 @@ func (l *lintContextImpl) readObjectsFromTgzHelmChart(fileName string, tgzReader
 		}
 
 		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
-			loadErr := errors.Wrapf(err, "loading object %s from rendered helm chart %s", pathToTemplate, fileName)
+			loadErr := errors.Wrapf(err, "loading object %s from rendered helm chart %s", pathToTemplate, chartPath)
 			l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: pathToTemplate}, LoadErr: loadErr})
 		}
 	}
