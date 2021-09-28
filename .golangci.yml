@@ -4,27 +4,12 @@ run:
 issues:
   exclude-use-default: false
 
-  exclude-rules:
-    - linters:
-        - golint
-      text: "should have a package comment, unless it's in another file for this package"
-    - linters:
-        - golint
-      text: "should not use dot imports"
-    - linters:
-        - golint
-      text: "returns unexported type .* which can be annoying to use"
-    - linters:
-        - golint
-      text: "error strings should not be capitalized or end with punctuation or a newline"
-
 linters-settings:
-  golint:
-    min-confidence: 0
   govet:
     enable-all: true
     disable:
       - shadow
+      - fieldalignment
     settings:
       printf: # analyzer name, run `go tool vet help` to see all analyzers
         funcs: # run `go tool vet help printf` to see available settings for `printf` analyzer
@@ -56,11 +41,22 @@ linters-settings:
       - emptyStringTest
       - hugeParam
       - rangeValCopy
+  gosimple:
+    go: "1.16"
+    checks: ["all"]
   nolintlint:
     allow-leading-space: false # require machine-readable nolint directives (i.e. with no leading space)
     allow-unused: false # report any unused nolint directives
     require-explanation: false # don't require an explanation for nolint directives
     require-specific: true # require nolint directives to be specific about which linter is being skipped
+  revive:
+    min-confidence: 0
+  staticcheck:
+    go: "1.16"
+    checks: ["all"]
+  stylecheck:
+    go: "1.16"
+    checks: ["all", "-ST1000"]
 
 linters:
   # please, do not use `enable-all`: it's deprecated and will be removed soon.
@@ -87,7 +83,6 @@ linters:
     # - goerr113
     - gofmt
     - goimports
-    - golint
     # - gomnd
     # - goprintffuncname
     # - gosec
@@ -102,16 +97,17 @@ linters:
     # - nestif
     - nolintlint
     # - prealloc
+    - revive
     - rowserrcheck
     # - scopelint
-    # - staticcheck
+    - staticcheck
     # - structcheck
-    # - stylecheck
+    - stylecheck
     # - testpackage
     # - typecheck
     - unconvert
     - unparam
-    # - unused
+    - unused
     # - varcheck
     # - whitespace
     # - wsl
