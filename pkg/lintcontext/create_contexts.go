@@ -115,6 +115,8 @@ func CreateContextsWithOptions(options Options, filesOrDirs ...string) ([]LintCo
 }
 
 // CreateContextsFromHelmArchive creates a context from TGZ reader of Helm Chart.
+// Note: although this function is not used in CLI, it is exposed from kube-linter library and therefore should stay.
+// See https://github.com/stackrox/kube-linter/pull/173
 func CreateContextsFromHelmArchive(fileName string, tgzReader io.Reader) ([]LintContext, error) {
 	ctx := newCtx(Options{})
 	ctx.readObjectsFromTgzHelmChart(fileName, tgzReader)
