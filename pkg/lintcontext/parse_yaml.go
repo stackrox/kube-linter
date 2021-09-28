@@ -119,76 +119,35 @@ func (l *lintContextImpl) renderValues(chrt *chart.Chart, values map[string]inte
 	return rendered, nil
 }
 
-func (l *lintContextImpl) loadObjectsFromHelmChart(dir string) error {
-	metadata := ObjectMetadata{FilePath: dir}
+func (l *lintContextImpl) loadObjectsFromHelmChart(dir string) {
 	renderedFiles, err := l.renderHelmChart(dir)
 	if err != nil {
-		l.addInvalidObjects(InvalidObject{Metadata: metadata, LoadErr: err})
-		return nil
+		l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: dir}, LoadErr: err})
+		return
 	}
 	// Paths returned by helm include redundant directory in front, therefore we strip it out.
-	for path, contents := range normalizeDirectoryPaths(renderedFiles) {
-		pathToTemplate := filepath.Join(dir, path)
-
-		// Skip NOTES.txt file that may be present among templates but is not a kubernetes resource.
-		if strings.HasSuffix(pathToTemplate, string(filepath.Separator)+chartutil.NotesName) {
-			continue
-		}
-
-		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
-			loadErr := errors.Wrapf(err, "loading object %s from rendered helm chart %s", pathToTemplate, dir)
-			l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: pathToTemplate}, LoadErr: loadErr})
-		}
-	}
-	return nil
+	l.loadHelmRenderedTemplates(dir, normalizeDirectoryPaths(renderedFiles))
 }
 
-func (l *lintContextImpl) loadObjectsFromTgzHelmChart(tgzFile string) error {
-	metadata := ObjectMetadata{FilePath: tgzFile}
+func (l *lintContextImpl) loadObjectsFromTgzHelmChart(tgzFile string) {
 	renderedFiles, err := l.renderTgzHelmChart(tgzFile)
 	if err != nil {
-		l.invalidObjects = append(l.invalidObjects, InvalidObject{Metadata: metadata, LoadErr: err})
-		return nil
+		l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: tgzFile}, LoadErr: err})
+		return
 	}
-	for path, contents := range renderedFiles {
-		pathToTemplate := filepath.Join(tgzFile, path)
-
-		// Skip NOTES.txt file that may be present among templates but is not a kubernetes resource.
-		if strings.HasSuffix(pathToTemplate, string(filepath.Separator)+chartutil.NotesName) {
-			continue
-		}
-
-		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
-			loadErr := errors.Wrapf(err, "loading object %s from rendered helm chart %s", pathToTemplate, tgzFile)
-			l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: pathToTemplate}, LoadErr: loadErr})
-		}
-	}
-	return nil
+	l.loadHelmRenderedTemplates(tgzFile, renderedFiles)
 }
 
 func (l *lintContextImpl) renderTgzHelmChart(tgzFile string) (map[string]string, error) {
 	log.SetOutput(nopWriter{})
 	defer log.SetOutput(os.Stderr)
-	chrt, err := loader.LoadFile(tgzFile)
 
+	chrt, err := loader.LoadFile(tgzFile)
 	if err != nil {
-		return nil, err
-	}
-	if err := chrt.Validate(); err != nil {
 		return nil, err
 	}
 
 	return l.renderChart(tgzFile, chrt)
-}
-
-func (l *lintContextImpl) parseValues(filePath string, bytes []byte) (map[string]interface{}, error) {
-	currentMap := map[string]interface{}{}
-
-	if err := y.Unmarshal(bytes, &currentMap); err != nil {
-		return nil, errors.Wrapf(err, "failed to parse %s", filePath)
-	}
-
-	return currentMap, nil
 }
 
 func (l *lintContextImpl) loadObjectFromYAMLReader(filePath string, r *yaml.YAMLReader) error {
@@ -268,9 +227,9 @@ func (l *lintContextImpl) renderChart(fileName string, chart *chart.Chart) (map[
 		return nil, errors.Errorf("%s not found", indexName)
 	}
 
-	values, err := l.parseValues(indexName, chart.Raw[valuesIndex].Data)
-	if err != nil {
-		return nil, errors.Wrap(err, "loading values.yaml file")
+	values := map[string]interface{}{}
+	if err := y.Unmarshal(chart.Raw[valuesIndex].Data, &values); err != nil {
+		return nil, errors.Wrapf(err, "failed to parse values file %s", indexName)
 	}
 
 	return l.renderValues(chart, values)
@@ -280,8 +239,8 @@ func (l *lintContextImpl) renderTgzHelmChartReader(fileName string, tgzReader io
 	// Helm doesn't have great logging behaviour, and can spam stderr, so silence their logging.
 	log.SetOutput(nopWriter{})
 	defer log.SetOutput(os.Stderr)
-	chrt, err := loader.LoadArchive(tgzReader)
 
+	chrt, err := loader.LoadArchive(tgzReader)
 	if err != nil {
 		return nil, err
 	}
@@ -290,14 +249,17 @@ func (l *lintContextImpl) renderTgzHelmChartReader(fileName string, tgzReader io
 }
 
 func (l *lintContextImpl) readObjectsFromTgzHelmChart(fileName string, tgzReader io.Reader) {
-	metadata := ObjectMetadata{FilePath: fileName}
 	renderedFiles, err := l.renderTgzHelmChartReader(fileName, tgzReader)
 	if err != nil {
-		l.invalidObjects = append(l.invalidObjects, InvalidObject{Metadata: metadata, LoadErr: err})
+		l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: fileName}, LoadErr: err})
 		return
 	}
+	l.loadHelmRenderedTemplates(fileName, renderedFiles)
+}
+
+func (l *lintContextImpl) loadHelmRenderedTemplates(chartPath string, renderedFiles map[string]string) {
 	for path, contents := range renderedFiles {
-		pathToTemplate := filepath.Join(fileName, path)
+		pathToTemplate := filepath.Join(chartPath, path)
 
 		// Skip NOTES.txt file that may be present among templates but is not a kubernetes resource.
 		if strings.HasSuffix(pathToTemplate, string(filepath.Separator)+chartutil.NotesName) {
@@ -305,7 +267,7 @@ func (l *lintContextImpl) readObjectsFromTgzHelmChart(fileName string, tgzReader
 		}
 
 		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
-			loadErr := errors.Wrapf(err, "loading object %s from rendered helm chart %s", pathToTemplate, fileName)
+			loadErr := errors.Wrapf(err, "loading object %s from rendered helm chart %s", pathToTemplate, chartPath)
 			l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: pathToTemplate}, LoadErr: loadErr})
 		}
 	}
