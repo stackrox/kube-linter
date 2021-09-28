@@ -8,20 +8,35 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const chartTarball = "../../tests/testdata/mychart-0.1.0.tgz"
+
 func TestCreateContextsFromHelmArchive(t *testing.T) {
-	fileName := "../../tests/testdata/mychart-0.1.0.tgz"
-	file, err := os.Open(fileName)
+	file, err := os.Open(chartTarball)
 	require.NoError(t, err)
 
-	lintCtxs, err := CreateContextsFromHelmArchive("test", file)
-	assert.NoError(t, err)
+	defer func() {
+		require.NoError(t, file.Close())
+	}()
 
-	var atLeastOneObjectFound bool
-	for _, lintCtx := range lintCtxs {
-		if len(lintCtx.Objects()) > 0 {
-			atLeastOneObjectFound = true
-			break
-		}
-	}
-	assert.True(t, atLeastOneObjectFound, "no valid objects found")
+	lintCtxs, err := CreateContextsFromHelmArchive("test", file)
+	require.NoError(t, err)
+
+	assert.NotNil(t, verifyAndGetContext(t, lintCtxs))
+}
+
+func TestCreateContexts_WithHelmArchive(t *testing.T) {
+	lintCtxs, err := CreateContexts(chartTarball)
+	require.NoError(t, err)
+
+	assert.NotNil(t, verifyAndGetContext(t, lintCtxs))
+}
+
+func verifyAndGetContext(t *testing.T, lintCtxs []LintContext) LintContext {
+	assert.Len(t, lintCtxs, 1, "expecting single lint context to be present")
+	lintCtx := lintCtxs[0]
+
+	assert.NotEmpty(t, lintCtx.Objects(), "no valid objects found")
+	assert.Empty(t, lintCtx.InvalidObjects(), "no invalid objects expected")
+
+	return lintCtx
 }
