@@ -137,7 +137,8 @@ func (l *lintContextImpl) loadObjectsFromHelmChart(dir string) error {
 		}
 
 		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
-			return errors.Wrapf(err, "loading objects from rendered helm chart %s/%s", dir, pathToTemplate)
+			loadErr := errors.Wrapf(err, "loading object %s from rendered helm chart %s", pathToTemplate, dir)
+			l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: pathToTemplate}, LoadErr: loadErr})
 		}
 	}
 	return nil
@@ -161,7 +162,8 @@ func (l *lintContextImpl) loadObjectsFromTgzHelmChart(tgzFile string) error {
 		}
 
 		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
-			return errors.Wrapf(err, "loading objects from rendered helm chart %s/%s", tgzFile, pathToTemplate)
+			loadErr := errors.Wrapf(err, "loading object %s from rendered helm chart %s", pathToTemplate, tgzFile)
+			l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: pathToTemplate}, LoadErr: loadErr})
 		}
 	}
 	return nil
@@ -290,12 +292,12 @@ func (l *lintContextImpl) renderTgzHelmChartReader(fileName string, tgzReader io
 	return l.renderChart(fileName, chrt)
 }
 
-func (l *lintContextImpl) readObjectsFromTgzHelmChart(fileName string, tgzReader io.Reader) error {
+func (l *lintContextImpl) readObjectsFromTgzHelmChart(fileName string, tgzReader io.Reader) {
 	metadata := ObjectMetadata{FilePath: fileName}
 	renderedFiles, err := l.renderTgzHelmChartReader(fileName, tgzReader)
 	if err != nil {
 		l.invalidObjects = append(l.invalidObjects, InvalidObject{Metadata: metadata, LoadErr: err})
-		return nil
+		return
 	}
 	for path, contents := range renderedFiles {
 		pathToTemplate := filepath.Join(fileName, path)
@@ -306,8 +308,8 @@ func (l *lintContextImpl) readObjectsFromTgzHelmChart(fileName string, tgzReader
 		}
 
 		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
-			return errors.Wrapf(err, "loading objects from rendered helm chart %s", pathToTemplate)
+			loadErr := errors.Wrapf(err, "loading object %s from rendered helm chart %s", pathToTemplate, fileName)
+			l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: pathToTemplate}, LoadErr: loadErr})
 		}
 	}
-	return nil
 }

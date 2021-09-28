@@ -117,9 +117,7 @@ func CreateContextsWithOptions(options Options, filesOrDirs ...string) ([]LintCo
 // CreateContextsFromHelmArchive creates a context from TGZ reader of Helm Chart.
 func CreateContextsFromHelmArchive(fileName string, tgzReader io.Reader) ([]LintContext, error) {
 	ctx := newCtx(Options{})
-	if err := ctx.readObjectsFromTgzHelmChart(fileName, tgzReader); err != nil {
-		return nil, err
-	}
+	ctx.readObjectsFromTgzHelmChart(fileName, tgzReader)
 
 	return []LintContext{ctx}, nil
 }
