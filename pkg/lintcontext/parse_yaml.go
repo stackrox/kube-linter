@@ -130,6 +130,12 @@ func (l *lintContextImpl) loadObjectsFromHelmChart(dir string) error {
 		// The first element of path will be the same as the last element of dir, because
 		// Helm duplicates it.
 		pathToTemplate := filepath.Join(filepath.Dir(dir), path)
+
+		// Skip NOTES.txt file that may be present among templates but is not a kubernetes resource.
+		if strings.HasSuffix(pathToTemplate, string(filepath.Separator)+chartutil.NotesName) {
+			continue
+		}
+
 		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
 			return errors.Wrapf(err, "loading objects from rendered helm chart %s/%s", dir, pathToTemplate)
 		}
@@ -148,6 +154,12 @@ func (l *lintContextImpl) loadObjectsFromTgzHelmChart(tgzFile string) error {
 		// The first element of path will be the same as the last element of tgzFile, because
 		// Helm duplicates it.
 		pathToTemplate := filepath.Join(filepath.Dir(tgzFile), path)
+
+		// Skip NOTES.txt file that may be present among templates but is not a kubernetes resource.
+		if strings.HasSuffix(pathToTemplate, string(filepath.Separator)+chartutil.NotesName) {
+			continue
+		}
+
 		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
 			return errors.Wrapf(err, "loading objects from rendered helm chart %s/%s", tgzFile, pathToTemplate)
 		}
@@ -287,6 +299,12 @@ func (l *lintContextImpl) readObjectsFromTgzHelmChart(fileName string, tgzReader
 	}
 	for path, contents := range renderedFiles {
 		pathToTemplate := filepath.Join(fileName, path)
+
+		// Skip NOTES.txt file that may be present among templates but is not a kubernetes resource.
+		if strings.HasSuffix(pathToTemplate, string(filepath.Separator)+chartutil.NotesName) {
+			continue
+		}
+
 		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
 			return errors.Wrapf(err, "loading objects from rendered helm chart %s", pathToTemplate)
 		}
