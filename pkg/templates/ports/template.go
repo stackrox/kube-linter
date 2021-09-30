@@ -34,9 +34,15 @@ func init() {
 			return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
 				var results []diagnostic.Diagnostic
 				for _, port := range container.Ports {
-					if int(port.ContainerPort) == p.Port && protocolMatcher(string(port.Protocol)) {
+					// The k8s protocol defaults to TCP even if not set in the YAML.
+					protocol := string(port.Protocol)
+					if protocol == "" {
+						protocol = "TCP"
+					}
+					if int(port.ContainerPort) == p.Port && protocolMatcher(protocol) {
 						results = append(results, diagnostic.Diagnostic{
-							Message: fmt.Sprintf("port %d and protocol %s in container %q found", port.ContainerPort, string(port.Protocol), container.Name),
+							Message: fmt.Sprintf("port %d and protocol %s in container %q found",
+								port.ContainerPort, protocol, container.Name),
 						})
 					}
 				}
