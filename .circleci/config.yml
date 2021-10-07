@@ -24,7 +24,7 @@ jobs:
     - run:
         name: Run lint checks
         command: |
-          echo hello && make lint
+          make lint
 
     - run:
         name: Ensure generated files are up-to-date
