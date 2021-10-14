@@ -216,7 +216,7 @@ KubeLinter includes the following built-in checks:
 
 **Description**: Indicates when a deployment-like object is running a container with an invalid container image
 
-**Remediation**: Use a container image with a proper image tag satisfying either the "AllowList" & "BlockList" regex patterns.
+**Remediation**: Use a container image with a specific tag other than latest.
 
 **Template**: [latest-tag](generated/templates.md#latest-tag)
 
