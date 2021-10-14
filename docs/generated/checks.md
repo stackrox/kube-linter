@@ -223,7 +223,7 @@ KubeLinter includes the following built-in checks:
 **Parameters**:
 
 ```json
-{"BlockList":[".*:(latest)$","^((?!:).)*$","^(.*/[^:]+)$"]}
+{"BlockList":[".*:(latest)$","^[^:]*$","(.*/[^:]+)$"]}
 ```
 
 ## minimum-three-replicas
