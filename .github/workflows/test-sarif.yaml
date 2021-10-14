@@ -64,8 +64,8 @@ jobs:
           set -ex
           GO111MODULE=on go get github.com/neilpa/yajsv@v1.4.0
           schema=$(jq -r '.["$schema"]' results.sarif)
-          [ -n "$schema" ] && wget -nv $schema
-          yajsv -s $(basename $schema) results.sarif
+          [ "$schema" = https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json ]
+          yajsv -s ./scripts/sarif-schema-2.1.0.json sarif/results.sarif
 
       - name: Upload SARIF output file to GitHub
         uses: github/codeql-action/upload-sarif@v1
