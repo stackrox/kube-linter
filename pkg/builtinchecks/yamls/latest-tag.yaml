@@ -1,6 +1,6 @@
 name: "latest-tag"
 description: "Indicates when a deployment-like object is running a container with an invalid container image"
-remediation: "Use a container image with a specific tag, other than latest"
+remediation: "Use a container image with a specific tag other than latest."
 scope:
   objectKinds:
     - DeploymentLike
