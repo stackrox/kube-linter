@@ -120,7 +120,7 @@ KubeLinter includes the following built-in checks:
 
 **Description**: Indicates when deployments use the deprecated serviceAccount field.
 
-**Remediation**: Use the serviceAccountName field instead.
+**Remediation**: Use the serviceAccountName field instead. If you must specify serviceAccount, ensure values for serviceAccount and serviceAccountName match.
 
 **Template**: [deprecated-service-account-field](generated/templates.md#deprecated-service-account-field)
 

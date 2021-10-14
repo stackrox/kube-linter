@@ -6,7 +6,6 @@ import (
 	ocsAppsV1 "github.com/openshift/api/apps/v1"
 	appsV1 "k8s.io/api/apps/v1"
 	batchV1 "k8s.io/api/batch/v1"
-	batchV1Beta1 "k8s.io/api/batch/v1beta1"
 	coreV1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
@@ -23,7 +22,7 @@ var (
 			{Group: coreV1.GroupName, Kind: "Pod"},
 			{Group: coreV1.GroupName, Kind: "ReplicationController"},
 			{Group: batchV1.GroupName, Kind: "Job"},
-			{Group: batchV1Beta1.GroupName, Kind: "CronJob"},
+			{Group: batchV1.GroupName, Kind: "CronJob"},
 		} {
 			if _, ok := m[gk]; ok {
 				panic(fmt.Sprintf("group kind double-registered: %v", gk))

@@ -36,7 +36,7 @@ func init() {
 				if selector == nil || (len(selector.MatchLabels) == 0 && len(selector.MatchExpressions) == 0) {
 					switch object.K8sObject.(type) {
 					// It's okay for CronJobs and Jobs not to have selectors.
-					case *v1beta1.CronJob, *v1.Job:
+					case *v1beta1.CronJob, *v1.Job, *v1.CronJob:
 						return nil
 					}
 					return []diagnostic.Diagnostic{{
