@@ -6,4 +6,4 @@ scope:
     - DeploymentLike
 template: "latest-tag"
 params:
-  BlockList: [".*:(latest)$", "^((?!:).)*$", "^(.*/[^:]+)$"]
+  BlockList: [".*:(latest)$", "!^[^:]*$", "(.*/[^:]+)$"]
