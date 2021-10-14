@@ -65,7 +65,7 @@ func parsePeerForOnlyPodSelector(peer v1.NetworkPolicyPeer, lintCtx lintcontext.
 	}
 	nsSelector := peer.NamespaceSelector
 	if nsSelector != nil {
-		return "" // currently i am handling the case of rule that has only podselector
+		return "" // For now, we assume all pods with namespace selectors are okay
 	}
 	return findMatchingPods(podSelector, lintCtx, currNamespace)
 }
