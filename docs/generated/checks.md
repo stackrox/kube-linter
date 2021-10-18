@@ -66,15 +66,15 @@ KubeLinter includes the following built-in checks:
 {}
 ```
 
-## dangling-networkpolicy-rule
+## dangling-networkpolicypeer-podselector
 
 **Enabled by default**: No
 
-**Description**: Indicates when networkpoly's rules do not have any associated deployments. Applied on rules which are specified with podSelectors only.
+**Description**: Indicates when NetworkPolicyPeer in Egress/Ingress rules -in the Spec of NetworkPolicy- do not have any associated deployments. Applied on peer specified with podSelectors only.
 
-**Remediation**: Confirm that your networkPolicy ingress/egress rule's podselector correctly matches the labels on one of your deployments.
+**Remediation**: Confirm that your NetworkPolicy's Ingress/Egress peer's podselector correctly matches the labels on one of your deployments.
 
-**Template**: [dangling-networkpolicy-rule](generated/templates.md#dangling-networkpolicy-rules)
+**Template**: [dangling-networkpolicypeer-podselector](generated/templates.md#dangling-networkpolicypeer-podselector)
 
 **Parameters**:
 

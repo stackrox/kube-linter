@@ -17,6 +17,10 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 )
 
+const (
+	templateKey = "dangling-networkpolicy"
+)
+
 func init() {
 	templates.Register(check.Template{
 		HumanName:   "Dangling NetworkPolicies",

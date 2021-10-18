@@ -1,4 +1,4 @@
-package danglingnetworkpolicyrule
+package danglingnetworkpolicypeer
 
 import (
 	"fmt"
@@ -10,18 +10,22 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	"golang.stackrox.io/kube-linter/pkg/templates"
-	"golang.stackrox.io/kube-linter/pkg/templates/danglingnetworkpolicyrule/internal/params"
+	"golang.stackrox.io/kube-linter/pkg/templates/danglingnetworkpolicypeer/internal/params"
 
 	v1 "k8s.io/api/networking/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 )
 
+const (
+	templateKey = "dangling-networkpolicypeer-podselector"
+)
+
 func init() {
 	templates.Register(check.Template{
-		HumanName:   "Dangling NetworkPolicy Rules",
-		Key:         "dangling-networkpolicy-rule",
-		Description: "Flag NetworkPolicy's rules which do not match any application",
+		HumanName:   "Dangling NetworkPolicyPeer PodSelector",
+		Key:         templateKey,
+		Description: "Flag NetworkPolicyPeer in Ingress/Egress rules which their podselector do not match any application. Applied to peers consisting with podSelectors only.",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
@@ -37,18 +41,18 @@ func init() {
 				ingressRules := networkpolicy.Spec.Ingress
 				for _, inrule := range ingressRules {
 					for _, peer := range inrule.From {
-						res := parsePeerForOnlyPodSelector(peer, lintCtx, networkpolicy.Namespace)
-						if res != "" {
-							results = append(results, diagnostic.Diagnostic{Message: res})
+						res := getAndCheckifPodSelectorMatchesPods(peer, lintCtx, networkpolicy.Namespace)
+						if res != nil {
+							results = append(results, res[len(res)-1])
 						}
 					}
 				}
 				egressRules := networkpolicy.Spec.Egress
 				for _, torule := range egressRules {
 					for _, peer := range torule.To {
-						res := parsePeerForOnlyPodSelector(peer, lintCtx, networkpolicy.Namespace)
-						if res != "" {
-							results = append(results, diagnostic.Diagnostic{Message: res})
+						res := getAndCheckifPodSelectorMatchesPods(peer, lintCtx, networkpolicy.Namespace)
+						if res != nil {
+							results = append(results, res[len(res)-1])
 						}
 					}
 				}
@@ -58,23 +62,23 @@ func init() {
 	})
 }
 
-func parsePeerForOnlyPodSelector(peer v1.NetworkPolicyPeer, lintCtx lintcontext.LintContext, currNamespace string) string {
+func getAndCheckifPodSelectorMatchesPods(peer v1.NetworkPolicyPeer, lintCtx lintcontext.LintContext, currNamespace string) []diagnostic.Diagnostic {
 	podSelector := peer.PodSelector
 	if podSelector == nil {
-		return ""
+		return nil
 	}
 	nsSelector := peer.NamespaceSelector
 	if nsSelector != nil {
-		return "" // For now, we assume all pods with namespace selectors are okay
+		return nil // For now, we assume all pods with namespace selectors are okay
 	}
 	return findMatchingPods(podSelector, lintCtx, currNamespace)
 }
 
-func findMatchingPods(podSelector *metaV1.LabelSelector, lintCtx lintcontext.LintContext, currNamespace string) string {
+func findMatchingPods(podSelector *metaV1.LabelSelector, lintCtx lintcontext.LintContext, currNamespace string) []diagnostic.Diagnostic {
 	labelSelector, err := metaV1.LabelSelectorAsSelector(&metaV1.LabelSelector{MatchLabels: podSelector.MatchLabels,
 		MatchExpressions: podSelector.MatchExpressions})
 	if err != nil {
-		return fmt.Sprintf("networkpolicy ingress rule has invalid podSelector: %v", err)
+		return []diagnostic.Diagnostic{{Message: fmt.Sprintf("networkpolicy ingress rule has invalid podSelector: %v", err)}}
 	}
 	for _, obj := range lintCtx.Objects() {
 		podTemplateSpec, hasPods := extract.PodTemplateSpec(obj.K8sObject)
@@ -85,8 +89,8 @@ func findMatchingPods(podSelector *metaV1.LabelSelector, lintCtx lintcontext.Lin
 			continue
 		}
 		if labelSelector.Matches(labels.Set(podTemplateSpec.Labels)) {
-			return "" // found
+			return nil // found
 		}
 	}
-	return fmt.Sprintf("no pods found matching networkpolicy rule's podSelector labels (%v)", podSelector)
+	return []diagnostic.Diagnostic{{Message: fmt.Sprintf("no pods found matching networkpolicy rule's podSelector labels (%v)", labelSelector)}}
 }

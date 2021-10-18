@@ -1,7 +1,0 @@
-name: "dangling-networkpolicy-rule"
-description: "Indicates when networkpoly's rules do not have any associated deployments. Applied on rules which are specified with podSelectors only."
-remediation: "Confirm that your networkPolicy ingress/egress rule's podselector correctly matches the labels on one of your deployments."
-scope:
-  objectKinds:
-    - NetworkPolicy
-template: "dangling-networkpolicy-rule"
