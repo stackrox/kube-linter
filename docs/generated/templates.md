@@ -703,7 +703,7 @@ KubeLinter supports the following templates:
 
 **Key**: `duplicate-kinds`
 
-**Description**: Flag containers that have duplicates of a single kind
+**Description**: Flag containers that have duplicates of a kind
 
 **Supported Objects**: DeploymentLike
 

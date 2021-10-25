@@ -534,9 +534,9 @@ KubeLinter includes the following built-in checks:
 
 **Enabled by default**: Yes
 
-**Description**: Indicates when too many of a single kind exist within a cluster
+**Description**: Indicates when too many of a kind exist within a cluster
 
-**Remediation**: Ensure to not have duplicate's of a single kind
+**Remediation**: Ensure to not have duplicate's of a kind
 
 **Template**: [Duplicate Kinds](generated/templates.md#duplicate-kinds)
 
