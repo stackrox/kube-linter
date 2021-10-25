@@ -699,9 +699,9 @@ KubeLinter supports the following templates:
 ]
 ```
 
-## Too many kind
+## Duplicate Kinds
 
-**Key**: `too-many-of-a-kind`
+**Key**: `duplicate-kinds`
 
 **Description**: Flag containers that have duplicates of a single kind
 

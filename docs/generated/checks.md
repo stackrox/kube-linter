@@ -530,7 +530,7 @@ KubeLinter includes the following built-in checks:
 {"port":22,"protocol":"TCP"}
 ```
 
-## too-many-of-a-kind
+## duplicate-kinds
 
 **Enabled by default**: Yes
 
@@ -538,7 +538,7 @@ KubeLinter includes the following built-in checks:
 
 **Remediation**: Ensure to not have duplicate's of a single kind
 
-**Template**: [Too many kind](generated/templates.md#too-many-kind)
+**Template**: [Duplicate Kinds](generated/templates.md#duplicate-kinds)
 
 **Parameters**:
 
