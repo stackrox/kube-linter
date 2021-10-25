@@ -699,6 +699,20 @@ KubeLinter supports the following templates:
 ]
 ```
 
+## Too many kind
+
+**Key**: `too-many-of-a-kind`
+
+**Description**: Flag containers that have duplicates of a single kind
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[]
+```
+
 ## Unsafe Proc Mount
 
 **Key**: `unsafe-proc-mount`

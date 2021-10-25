@@ -530,6 +530,22 @@ KubeLinter includes the following built-in checks:
 {"port":22,"protocol":"TCP"}
 ```
 
+## too-many-of-a-kind
+
+**Enabled by default**: Yes
+
+**Description**: Indicates when too many of a single kind exist within a cluster
+
+**Remediation**: Ensure to not have duplicate's of a single kind
+
+**Template**: [Too many kind](generated/templates.md#too-many-kind)
+
+**Parameters**:
+
+````json
+{}
+````
+
 ## unsafe-proc-mount
 
 **Enabled by default**: No
