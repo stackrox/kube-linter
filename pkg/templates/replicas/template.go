@@ -34,7 +34,7 @@ func init() {
 				if !found {
 					return nil
 				}
-				if int(replicas) >= p.MinReplicas {
+				if int(replicas) >= p.MinReplicas || int(replicas) == 0 {
 					return nil
 				}
 				return []diagnostic.Diagnostic{
