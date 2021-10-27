@@ -18,8 +18,9 @@ func PerContainerCheck(matchFunc func(container *v1.Container) []diagnostic.Diag
 			return nil
 		}
 		var results []diagnostic.Diagnostic
-		for i := range podSpec.Containers {
-			results = append(results, matchFunc(&podSpec.Containers[i])...)
+		containers := podSpec.AllContainers()
+		for i := range containers {
+			results = append(results, matchFunc(&containers[i])...)
 		}
 		return results
 	}

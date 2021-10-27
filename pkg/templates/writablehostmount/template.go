@@ -39,7 +39,7 @@ func init() {
 					return nil
 				}
 				var results []diagnostic.Diagnostic
-				for _, container := range podSpec.Containers {
+				for _, container := range podSpec.AllContainers() {
 					for _, mount := range container.VolumeMounts {
 						if mount.ReadOnly {
 							continue
