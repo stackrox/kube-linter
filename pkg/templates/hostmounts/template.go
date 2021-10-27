@@ -44,7 +44,7 @@ func init() {
 					return nil
 				}
 				var results []diagnostic.Diagnostic
-				containers := podSpec.Containers
+				containers := podSpec.AllContainers()
 				for _, v := range podSpec.Volumes {
 					if v.HostPath == nil {
 						continue
