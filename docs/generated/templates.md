@@ -119,6 +119,34 @@ KubeLinter supports the following templates:
 ]
 ```
 
+## Dangling NetworkPolicies
+
+**Key**: `dangling-networkpolicy`
+
+**Description**: Flag NetworkPolicies which do not match any application
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[]
+```
+
+## Dangling NetworkPolicyPeer PodSelector
+
+**Key**: `dangling-networkpolicypeer-podselector`
+
+**Description**: Flag NetworkPolicyPeer in Ingress/Egress rules which their podselector do not match any application. Applied to peers consisting with podSelectors only.
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[]
+```
+
 ## Dangling Services
 
 **Key**: `dangling-service`

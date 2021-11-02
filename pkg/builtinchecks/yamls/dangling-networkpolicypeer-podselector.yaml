@@ -1,0 +1,7 @@
+name: "dangling-networkpolicypeer-podselector"
+description: "Indicates when NetworkPolicyPeer in Egress/Ingress rules -in the Spec of NetworkPolicy- do not have any associated deployments. Applied on peer specified with podSelectors only."
+remediation: "Confirm that your NetworkPolicy's Ingress/Egress peer's podselector correctly matches the labels on one of your deployments."
+scope:
+  objectKinds:
+    - NetworkPolicy
+template: "dangling-networkpolicypeer-podselector"
