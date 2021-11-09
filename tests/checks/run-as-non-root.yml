@@ -1,0 +1,58 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app1
+  template:
+    spec:
+      containers:
+        - name: app
+          runAsUser: 1001
+          securityContext:
+            runAsNonRoot: true
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: dont-fire
+spec:
+  selector:
+    app.kubernetes.io/name: app2
+  template:
+    spec:
+      containers:
+        - name: app2
+          runAsUser: 1001
+          securityContext:
+            runAsNonRoot: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app1
+  template:
+    spec:
+      containers:
+        - name: app
+          runAsUser: 0
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: app2
+spec:
+  selector:
+    app.kubernetes.io/name: app2
+  template:
+    spec:
+      containers:
+      - name: app2
+        runAsUser: 0
