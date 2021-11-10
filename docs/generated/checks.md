@@ -562,6 +562,22 @@ KubeLinter includes the following built-in checks:
 {"port":22,"protocol":"TCP"}
 ```
 
+## duplicate-kinds
+
+**Enabled by default**: Yes
+
+**Description**: Indicates when too many of a kind exist within a cluster
+
+**Remediation**: Ensure to not have duplicate's of a kind
+
+**Template**: [Duplicate Kinds](generated/templates.md#duplicate-kinds)
+
+**Parameters**:
+
+````json
+{}
+````
+
 ## unsafe-proc-mount
 
 **Enabled by default**: No

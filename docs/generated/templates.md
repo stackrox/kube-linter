@@ -727,6 +727,20 @@ KubeLinter supports the following templates:
 ]
 ```
 
+## Duplicate Kinds
+
+**Key**: `duplicate-kinds`
+
+**Description**: Flag containers that have duplicates of a kind
+
+**Supported Objects**: DeploymentLike
+
+**Parameters**:
+
+```json
+[]
+```
+
 ## Unsafe Proc Mount
 
 **Key**: `unsafe-proc-mount`

@@ -1,0 +1,7 @@
+name: "duplicate-kinds"
+description: "Indicates when too many of a kind exist within a cluster"
+remediation: "Ensure to not have duplicate's of a kind"
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "duplicate-kinds"
