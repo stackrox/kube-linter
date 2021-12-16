@@ -27,8 +27,4 @@ func AddFlags(c *cobra.Command, v *viper.Viper) {
 	if err := v.BindPFlag("checks.include", c.Flags().Lookup("include")); err != nil {
 		panic(err)
 	}
-	c.Flags().Bool("", false, "")
-	if err := v.BindPFlag("allowOpenshiftKinds", c.Flags().Lookup("allowOpenshiftKinds")); err != nil {
-		panic(err)
-	}
 }
