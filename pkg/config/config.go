@@ -31,8 +31,9 @@ type ChecksConfig struct {
 // Config represents the config file format.
 type Config struct {
 	// +flagName=-
-	CustomChecks []Check      `json:"customChecks,omitempty"`
-	Checks       ChecksConfig `json:"checks,omitempty"`
+	CustomChecks        []Check      `json:"customChecks,omitempty"`
+	Checks              ChecksConfig `json:"checks,omitempty"`
+	AllowOpenshiftKinds bool         `json:"allowOpenshiftKinds"`
 }
 
 // Defines the list of default config filenames to check if parameter isn't passed in

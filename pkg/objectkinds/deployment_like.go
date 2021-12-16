@@ -4,26 +4,34 @@ import (
 	"fmt"
 
 	ocsAppsV1 "github.com/openshift/api/apps/v1"
+	"github.com/spf13/viper"
 	appsV1 "k8s.io/api/apps/v1"
 	batchV1 "k8s.io/api/batch/v1"
 	coreV1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
+var openshiftKinds = []schema.GroupKind{
+	{Group: ocsAppsV1.GroupName, Kind: "DeploymentConfig"},
+}
+
+var kubeKinds = []schema.GroupKind{
+	{Group: appsV1.GroupName, Kind: "Deployment"},
+	{Group: appsV1.GroupName, Kind: "DaemonSet"},
+	{Group: appsV1.GroupName, Kind: "StatefulSet"},
+	{Group: appsV1.GroupName, Kind: "ReplicaSet"},
+	{Group: coreV1.GroupName, Kind: "Pod"},
+	{Group: coreV1.GroupName, Kind: "ReplicationController"},
+	{Group: batchV1.GroupName, Kind: "Job"},
+	{Group: batchV1.GroupName, Kind: "CronJob"},
+}
 var (
 	deploymentLikeGroupKinds = func() map[schema.GroupKind]struct{} {
 		m := make(map[schema.GroupKind]struct{})
-		for _, gk := range []schema.GroupKind{
-			{Group: appsV1.GroupName, Kind: "Deployment"},
-			{Group: appsV1.GroupName, Kind: "DaemonSet"},
-			{Group: ocsAppsV1.GroupName, Kind: "DeploymentConfig"},
-			{Group: appsV1.GroupName, Kind: "StatefulSet"},
-			{Group: appsV1.GroupName, Kind: "ReplicaSet"},
-			{Group: coreV1.GroupName, Kind: "Pod"},
-			{Group: coreV1.GroupName, Kind: "ReplicationController"},
-			{Group: batchV1.GroupName, Kind: "Job"},
-			{Group: batchV1.GroupName, Kind: "CronJob"},
-		} {
+		if viper.GetBool("allowOpenshiftKinds") {
+			kubeKinds = append(kubeKinds, openshiftKinds...)
+		}
+		for _, gk := range kubeKinds {
 			if _, ok := m[gk]; ok {
 				panic(fmt.Sprintf("group kind double-registered: %v", gk))
 			}
