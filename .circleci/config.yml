@@ -75,6 +75,8 @@ jobs:
         name: Run unit tests
         command: |
           GOMAXPROCS=1 make test
+    - *saveGoBuildCache
+    - *saveGoModCache
 
   build:
     executor: custom
@@ -88,8 +90,6 @@ jobs:
           make build
 
     - check-binary-version-match
-    - *saveGoBuildCache
-    - *saveGoModCache
 
     - run:
         name: Create a GitHub release, if on tag.
