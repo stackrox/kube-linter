@@ -1,6 +1,7 @@
 package common
 
 import (
+	"github.com/ghodss/yaml"
 	"strings"
 	"text/template"
 
@@ -27,6 +28,13 @@ var (
 				finalNewline = ""
 			}
 			return "```" + lang + "\n" + code + finalNewline + "```"
+		},
+		"mustToYaml": func(v interface{}) (string, error) {
+			output, err := yaml.Marshal(v)
+			if err != nil {
+				return "", err
+			}
+			return string(output), nil
 		},
 	}
 
