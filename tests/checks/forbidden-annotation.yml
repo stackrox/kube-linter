@@ -1,0 +1,21 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1
+  annotations:
+    reloader.stakater.com/auto: "true"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire
+  annotations:
+    reloader.stakater.com/auto: "false"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire
+  annotations:
+    reloader.stakater.com/auto: T
