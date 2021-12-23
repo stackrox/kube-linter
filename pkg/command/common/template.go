@@ -1,9 +1,10 @@
 package common
 
 import (
-	"github.com/ghodss/yaml"
 	"strings"
 	"text/template"
+
+	"github.com/ghodss/yaml"
 
 	"github.com/Masterminds/sprig/v3"
 	"github.com/fatih/color"
