@@ -39,7 +39,7 @@ jobs:
     - run:
         name: Run unit tests
         command: |
-          make test
+          GOMAXPROCS=1 make test
 
   build:
     executor: custom
