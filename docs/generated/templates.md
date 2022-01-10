@@ -256,6 +256,37 @@ KubeLinter supports the following templates:
 ]
 ```
 
+## Forbidden Annotation
+
+**Key**: `forbidden-annotation`
+
+**Description**: Flag objects carrying at least one annotation matching the provided patterns
+
+**Supported Objects**: Any
+
+**Parameters**:
+
+```json
+[
+  {
+    "name": "key",
+    "type": "string",
+    "description": "Key of the forbidden annotation.",
+    "required": true,
+    "regexAllowed": true,
+    "negationAllowed": true
+  },
+  {
+    "name": "value",
+    "type": "string",
+    "description": "Value of the forbidden annotation.",
+    "required": false,
+    "regexAllowed": true,
+    "negationAllowed": true
+  }
+]
+```
+
 ## Forbidden Service Types
 
 **Key**: `forbidden-service-types`

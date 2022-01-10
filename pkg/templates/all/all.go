@@ -13,6 +13,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/deprecatedserviceaccount"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/disallowedgvk"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/envvar"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/forbiddenannotation"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/hostipc"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/hostmounts"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/hostnetwork"

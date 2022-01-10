@@ -1,0 +1,13 @@
+checks:
+  addAllBuiltIn: false
+customChecks:
+  name: "forbid-annotation-reloader-stakater-auto"
+  description: ""
+  remediation: "Remove reloader.stakater.com/auto annotation"
+  scope:
+    objectKinds:
+      - DeploymentLike
+  template: "forbidden-annotation"
+  params:
+    key: "reloader.stakater.com/auto"
+    value: 'true'
