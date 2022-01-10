@@ -20,7 +20,7 @@ var (
 	keyParamDesc = util.MustParseParameterDesc(`{
 	"Name": "key",
 	"Type": "string",
-	"Description": "Key of the forbidden label.",
+	"Description": "Key of the forbidden annotation.",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
@@ -36,7 +36,7 @@ var (
 	valueParamDesc = util.MustParseParameterDesc(`{
 	"Name": "value",
 	"Type": "string",
-	"Description": "Value of the forbidden label.",
+	"Description": "Value of the forbidden annotation.",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,

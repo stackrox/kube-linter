@@ -271,7 +271,7 @@ KubeLinter supports the following templates:
   {
     "name": "key",
     "type": "string",
-    "description": "Key of the forbidden label.",
+    "description": "Key of the forbidden annotation.",
     "required": true,
     "regexAllowed": true,
     "negationAllowed": true
@@ -279,7 +279,7 @@ KubeLinter supports the following templates:
   {
     "name": "value",
     "type": "string",
-    "description": "Value of the forbidden label.",
+    "description": "Value of the forbidden annotation.",
     "required": false,
     "regexAllowed": true,
     "negationAllowed": true
