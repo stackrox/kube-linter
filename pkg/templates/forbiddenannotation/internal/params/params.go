@@ -7,6 +7,6 @@ type Params struct {
 	// +required
 	Key string
 
-	// Value of the forbidden label.
+	// Value of the forbidden annotation.
 	Value string
 }
