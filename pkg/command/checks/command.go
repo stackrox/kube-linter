@@ -45,11 +45,11 @@ KubeLinter includes the following built-in checks:
 **Remediation**: {{.Remediation}}
 
 **Template**: [{{.Template}}](generated/templates.md#{{ templateLink . }})
-
+{{ if .Params }}
 **Parameters**:
 
-{{ mustToJson (default (dict) .Params ) | codeBlock "json" }}
-
+{{ mustToYaml (default (dict) .Params ) | codeBlock "yaml" }}
+{{ end -}}
 {{ end -}}
 `
 )

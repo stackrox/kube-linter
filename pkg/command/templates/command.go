@@ -23,10 +23,11 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: {{ join "," .SupportedObjectKinds.ObjectKinds }}
 
+{{ if .HumanReadableParameters }}
 **Parameters**:
 
-{{ toPrettyJson .HumanReadableParameters | codeBlock "json" }}
-
+{{ mustToYaml .HumanReadableParameters | codeBlock "yaml" }}
+{{ end }}
 {{ end -}}
 `
 

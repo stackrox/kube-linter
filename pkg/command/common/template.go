@@ -4,6 +4,8 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/ghodss/yaml"
+
 	"github.com/Masterminds/sprig/v3"
 	"github.com/fatih/color"
 	"golang.stackrox.io/kube-linter/internal/utils"
@@ -27,6 +29,13 @@ var (
 				finalNewline = ""
 			}
 			return "```" + lang + "\n" + code + finalNewline + "```"
+		},
+		"mustToYaml": func(v interface{}) (string, error) {
+			output, err := yaml.Marshal(v)
+			if err != nil {
+				return "", err
+			}
+			return string(output), nil
 		},
 	}
 
