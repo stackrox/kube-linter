@@ -1,3 +1,34 @@
+goModCacheKey: &goModCacheKey 'rox-go-binary-pkg-mod-v2-{{ checksum "go.sum" }}'
+restoreGoModCache: &restoreGoModCache
+  restore_cache:
+    name: Restore Go module cache
+    keys:
+      - *goModCacheKey
+
+saveGoModCache: &saveGoModCache
+  save_cache:
+    name: Saving Go module cache
+    key: *goModCacheKey
+    paths:
+      - /home/circleci/go/pkg/mod
+
+restoreGoBuildCache: &restoreGoBuildCache
+  restore_cache:
+    name: Restoring Go build cache
+    keys:
+      - go-cache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .Revision }}
+      - go-cache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-
+      - go-cache-v1-{{ .Environment.CIRCLE_JOB }}-master-
+      - go-cache-v1-{{ .Environment.CIRCLE_JOB }}-
+      - go-cache-v1-
+
+saveGoBuildCache: &saveGoBuildCache
+  save_cache:
+    name: Saving Go build cache
+    key: go-cache-v1-{{ .Environment.CIRCLE_JOB }}-{{ .Branch }}-{{ .Revision }}
+    paths:
+      - /home/circleci/.cache/go-build
+
 orbs:
   win: circleci/windows@2.4.0
 
@@ -20,6 +51,8 @@ jobs:
     resource_class: large
     steps:
     - checkout
+    - *restoreGoBuildCache
+    - *restoreGoModCache
 
     - run:
         name: Run lint checks
@@ -36,16 +69,21 @@ jobs:
     executor: custom
     steps:
     - checkout
+    - *restoreGoBuildCache
+    - *restoreGoModCache
     - run:
         name: Run unit tests
         command: |
           GOMAXPROCS=1 make test
+    - *saveGoBuildCache
+    - *saveGoModCache
 
   build:
     executor: custom
     steps:
     - checkout
-
+    - *restoreGoBuildCache
+    - *restoreGoModCache
     - run:
         name: Build binaries
         command: |
