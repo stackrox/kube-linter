@@ -13,9 +13,10 @@ on:
   pull_request:
   # `push` event type should also be turned on in order for GitHub to be able to figure out diff between alerts in
   # source and target branches of PR and display it in Actions | Code scanning results.
+  # Workflows triggered by Dependabot on the "push" event run with read-only access and uploading Code Scanning results
+  # requires write access.
   push:
-    branches:
-      - main
+    branches-ignore: "dependabot/**"
 
 jobs:
   build-and-test:
