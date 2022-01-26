@@ -9,7 +9,7 @@ require (
 	github.com/golangci/golangci-lint v1.42.1
 	github.com/mitchellh/mapstructure v1.4.2
 	github.com/openshift/api v3.9.0+incompatible
-	github.com/owenrumney/go-sarif v1.0.11
+	github.com/owenrumney/go-sarif/v2 v2.0.17
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/pflag v1.0.5
