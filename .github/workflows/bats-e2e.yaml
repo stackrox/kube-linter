@@ -5,8 +5,11 @@ on:
   - push
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
+  bats:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v2
         with:
