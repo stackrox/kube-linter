@@ -1,4 +1,4 @@
-name: Test kube-linter via BATS
+name: Test kube-linter
 
 on:
   - pull_request
@@ -15,7 +15,6 @@ jobs:
 
       - name: Read Go version from go.mod
         run: echo "GO_VERSION=$(grep -E "^go\s+[0-9.]+$" go.mod | cut -d " " -f 2)" >> $GITHUB_ENV
-
       - name: Setup Go environment
         uses: actions/setup-go@v2
         with:
@@ -32,13 +31,22 @@ jobs:
       - name: Build binaries
         run: make build
 
-      - name: Print kube-linter version
-        run: .gobin/kube-linter version
+      - name: Verify the binary version
+        run: |
+          expected_version="$(./get-tag)"
+          version_from_binary="$(.gobin/kube-linter version)"
+          echo "Version from kube-linter binary: ${version_from_binary}. Expected version: ${expected_version}"
+          [[ "${version_from_binary}" == "${expected_version}" ]]
 
-      - name: Setup BATS
-        uses: mig4/setup-bats@v1
-        with:
-          bats-version: 1.5.0
+      - name: Run lint checks
+        run: make lint
 
-      - name: Run bats tests
-        run: make e2e-bats
+      - name: Ensure generated files are up-to-date
+        run: make generated-srcs && git diff --exit-code HEAD
+
+      - name: Run unit tests
+        run: make test
+
+      - name: Run E2E tests
+        run: make e2e-test
+
