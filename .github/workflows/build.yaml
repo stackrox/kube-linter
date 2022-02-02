@@ -91,4 +91,4 @@ jobs:
 
           # Make sure the lint command can run without errors.
           # TODO: run the full suite of E2E tests on Windows.
-          ./kube-linter.exe lint .
+          ./kube-linter.exe lint tests\checks\access-to-create-pods.yml
