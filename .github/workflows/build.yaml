@@ -23,13 +23,13 @@ jobs:
       - name: Go Build Cache
         uses: actions/cache@v2
         with:
-          path: ${{ steps.go-cache-paths.outputs.go-build }}
+          path: ~/.cache
           key: ${{ runner.os }}-go-build-${{ hashFiles('**/go.sum') }}
 
       - name: Go Mod Cache
         uses: actions/cache@v2
         with:
-          path: ${{ steps.go-cache-paths.outputs.go-mod }}
+          path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
 
       - name: Build binaries
@@ -91,4 +91,4 @@ jobs:
 
           # Make sure the lint command can run without errors.
           # TODO: run the full suite of E2E tests on Windows.
-          ./kube-linter.exe lint tests\checks\access-to-create-pods.yml
+          ./kube-linter.exe lint "tests/checks/access-to-create-pods.yml"
