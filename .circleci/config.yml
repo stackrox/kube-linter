@@ -46,38 +46,6 @@ runOnAllTags: &runOnAllTags
 version: 2.1
 
 jobs:
-  lint:
-    executor: custom
-    resource_class: large
-    steps:
-    - checkout
-    - *restoreGoBuildCache
-    - *restoreGoModCache
-
-    - run:
-        name: Run lint checks
-        command: |
-          make lint
-
-    - run:
-        name: Ensure generated files are up-to-date
-        command: |
-          make generated-srcs
-          git diff --exit-code HEAD
-
-  test:
-    executor: custom
-    steps:
-    - checkout
-    - *restoreGoBuildCache
-    - *restoreGoModCache
-    - run:
-        name: Run unit tests
-        command: |
-          GOMAXPROCS=1 make test
-    - *saveGoBuildCache
-    - *saveGoModCache
-
   build:
     executor: custom
     steps:
@@ -125,31 +93,6 @@ jobs:
           name: Run E2E tests
           command: |
             make e2e-test
-
-  sanity-test-windows:
-    executor:
-      name: win/default  # references orb defined above.
-      size: "medium"
-
-    steps:
-      - checkout
-      - attach_workspace:
-          at: /home/circleci/kube-linter
-
-      - run:
-          name: Run E2E tests
-          shell: bash.exe
-          command: |
-            # In Windows, the workspace is attached relative to the current directory.
-            tag="$(./get-tag)"
-            cd home/circleci/kube-linter/bin/windows
-            version_from_bin="$(./kube-linter.exe version)"
-            echo "Expected tag ${tag}, got ${version_from_bin}"
-            [[ "${tag}" == "${version_from_bin}" ]]
-
-            # Make sure the lint command can run without errors.
-            # TODO: run the full suite of E2E tests on Windows.
-            ./kube-linter.exe lint .
 
   image:
     executor: custom
@@ -235,20 +178,8 @@ workflows:
   version: 2
   build:
     jobs:
-    - lint:
-        <<: *runOnAllTags
-    - test:
-        <<: *runOnAllTags
     - build:
         <<: *runOnAllTags
-    - e2e-test:
-        <<: *runOnAllTags
-        requires:
-          - build
-    - sanity-test-windows:
-        <<: *runOnAllTags
-        requires:
-          - build
     - image:
         <<: *runOnAllTags
         context: docker-io-push
