@@ -1,0 +1,94 @@
+name: Test kube-linter
+
+on:
+  - pull_request
+  - push
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Checkout all repo history to make tags available for figuring out kube-linter version during build.
+          fetch-depth: 0
+
+      - name: Read Go version from go.mod
+        run: echo "GO_VERSION=$(grep -E "^go\s+[0-9.]+$" go.mod | cut -d " " -f 2)" >> $GITHUB_ENV
+      - name: Setup Go environment
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+
+      - name: Go Build Cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache
+          key: ${{ runner.os }}-go-build-${{ hashFiles('**/go.sum') }}
+
+      - name: Go Mod Cache
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
+
+      - name: Build binaries
+        run: make build
+
+      - name: Upload windows binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: kube-linter.exe
+          path: bin/windows/kube-linter.exe
+
+      - name: Verify the binary version
+        run: |
+          expected_version="$(./get-tag)"
+          version_from_binary="$(.gobin/kube-linter version)"
+          echo "Version from kube-linter binary: ${version_from_binary}. Expected version: ${expected_version}"
+          [[ "${version_from_binary}" == "${expected_version}" ]]
+
+      - name: Run lint checks
+        run: make lint
+
+      - name: Ensure generated files are up-to-date
+        run: make generated-srcs && git diff --exit-code HEAD
+
+      - name: Run unit tests
+        run: make test
+
+      - name: Run E2E tests
+        run: make e2e-test
+
+      - name: Setup BATS
+        uses: mig4/setup-bats@v1
+        with:
+          bats-version: 1.5.0
+
+      - name: Run bats tests
+        run: make e2e-bats
+
+  windows-sanity-test:
+    name: Windows sanity test
+    needs: build-and-test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          # Checkout all repo history to make tags available for figuring out kube-linter version during build.
+          fetch-depth: 0
+      - name: Download windows executable
+        uses: actions/download-artifact@v2
+        with:
+          name: kube-linter.exe
+      - shell: bash
+        run: |
+          # In Windows, the workspace is attached relative to the current directory.
+          tag="$(./get-tag)"
+          version_from_bin="$(./kube-linter.exe version)"
+          echo "Expected tag ${tag}, got ${version_from_bin}"
+          [[ "${tag}" == "${version_from_bin}" ]]
+
+          # Make sure the lint command can run without errors.
+          # TODO: run the full suite of E2E tests on Windows.
+          ./kube-linter.exe lint "tests/checks/access-to-create-pods.yml"

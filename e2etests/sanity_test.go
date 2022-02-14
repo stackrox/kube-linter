@@ -1,3 +1,4 @@
+//go:build e2e
 // +build e2e
 
 package e2etests
@@ -37,7 +38,7 @@ func TestKubeLinterWithBuiltInChecksDoesntCrashOnHelmChartsRepo(t *testing.T) {
 
 	chartsDir := filepath.Join(tmpDir, "charts")
 
-	gitCloneOut, err := exec.Command("git", "clone", "git@github.com:helm/charts.git", chartsDir).CombinedOutput()
+	gitCloneOut, err := exec.Command("git", "clone", "https://github.com/helm/charts.git", chartsDir).CombinedOutput()
 	require.NoError(t, err, "Git clone failed. output: %s", string(gitCloneOut))
 
 	kubeLinterOut, err := exec.Command(kubeLinterBin, "lint", chartsDir, "--config", "testdata/all-built-in-config.yaml").CombinedOutput()
