@@ -51,7 +51,7 @@ func init() {
 
 			if len(blockedRegexes) > 0 && len(allowedRegexes) > 0 {
 				err := fmt.Errorf("check has both \"allowList\" & \"blockList\" parameter's values set")
-				return nil, errors.Wrapf(err, "Only one of the paramater lists can be used at a time.")
+				return nil, errors.Wrapf(err, "only one of the paramater lists can be used at a time")
 			}
 
 			return util.PerContainerCheck(func(container *v1.Container) (results []diagnostic.Diagnostic) {
