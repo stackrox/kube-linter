@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -325,7 +324,7 @@ func processTemplate(dir string) error {
 }
 
 func mainCmd() error {
-	fileInfos, err := ioutil.ReadDir(".")
+	fileInfos, err := os.ReadDir(".")
 	if err != nil {
 		return err
 	}
