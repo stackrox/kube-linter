@@ -1,0 +1,9 @@
+name: "no-node-affinity"
+description: "Alert on deployments that have no node affinity defined"
+remediation: >-
+  Specify node-affinity in your pod specification to ensure that the orchestrator attempts to schedule replicas on specified nodes.
+  Refer to https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity for details.
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "no-node-affinity"
