@@ -30,9 +30,9 @@ func init() {
 				if podTemplateSpec.Spec.Affinity == nil {
 					return []diagnostic.Diagnostic{{Message: "object does not define any node affinity rules."}}
 				}
-                if podTemplateSpec.Spec.Affinity.NodeAffinity == nil {
-                    return []diagnostic.Diagnostic{{Message: "object does not define any node affinity rules."}}
-                }
+				if podTemplateSpec.Spec.Affinity.NodeAffinity == nil {
+					return []diagnostic.Diagnostic{{Message: "object does not define any node affinity rules."}}
+				}
 				return nil
 			}, nil
 		}),

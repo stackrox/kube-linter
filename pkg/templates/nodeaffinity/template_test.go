@@ -1,14 +1,14 @@
 package nodeaffinity
 
 import (
-	"testing"
 	"github.com/stretchr/testify/suite"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext/mocks"
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	"golang.stackrox.io/kube-linter/pkg/templates/nodeaffinity/internal/params"
 	appsV1 "k8s.io/api/apps/v1"
-    v1 "k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
+	"testing"
 )
 
 func TestReplicas(t *testing.T) {
@@ -21,9 +21,9 @@ type ReplicaTestSuite struct {
 }
 
 const (
-    templateKey = "no-node-affinity"
-    deploymentName = "deployment"
-    nodeAffinityErrorMessage = "object does not define any node affinity rules."
+	templateKey              = "no-node-affinity"
+	deploymentName           = "deployment"
+	nodeAffinityErrorMessage = "object does not define any node affinity rules."
 )
 
 func (s *ReplicaTestSuite) SetupTest() {
@@ -32,14 +32,14 @@ func (s *ReplicaTestSuite) SetupTest() {
 }
 
 func (s *ReplicaTestSuite) TestIgnoreNodeAffinityCheckOnObjectWithoutAffinity() {
-    s.ctx.AddMockClusterRole(s.T(), deploymentName)
-    s.Validate(s.ctx, []templates.TestCase{
-        {
-            Param: params.Params{},
-            Diagnostics: nil,
-            ExpectInstantiationError: false,
-        },
-    })
+	s.ctx.AddMockClusterRole(s.T(), deploymentName)
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param:                    params.Params{},
+			Diagnostics:              nil,
+			ExpectInstantiationError: false,
+		},
+	})
 }
 
 func (s *ReplicaTestSuite) TestNoPodTemplateSpecAffinityDefined() {
@@ -51,7 +51,7 @@ func (s *ReplicaTestSuite) TestNoPodTemplateSpecAffinityDefined() {
 			Diagnostics: map[string][]diagnostic.Diagnostic{
 				deploymentName: {
 					{
-					    Message: nodeAffinityErrorMessage,
+						Message: nodeAffinityErrorMessage,
 					},
 				},
 			},
@@ -70,19 +70,19 @@ func (s *ReplicaTestSuite) TestNoNodeAffinityDefined() {
 		deployment.Spec.Template.Spec.Affinity = affinity
 	})
 
-    s.Validate(s.ctx, []templates.TestCase{
-        {
-            Param: params.Params{},
-            Diagnostics: map[string][]diagnostic.Diagnostic{
-                deploymentName: {
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				deploymentName: {
 					{
-					    Message: nodeAffinityErrorMessage,
+						Message: nodeAffinityErrorMessage,
 					},
-                },
-            },
-            ExpectInstantiationError: false,
-        },
-    })
+				},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
 }
 
 func (s *ReplicaTestSuite) TestNodeAffinityDefined() {
@@ -91,33 +91,33 @@ func (s *ReplicaTestSuite) TestNodeAffinityDefined() {
 	s.ctx.ModifyDeployment(s.T(), deploymentName, func(deployment *appsV1.Deployment) {
 		affinity := &v1.Affinity{
 			NodeAffinity: &v1.NodeAffinity{
-                RequiredDuringSchedulingIgnoredDuringExecution: &v1.NodeSelector{
-                    NodeSelectorTerms: []v1.NodeSelectorTerm{
-                        {
-                            MatchExpressions: []v1.NodeSelectorRequirement{
-                                {
-                                    Key: "nodeKey",
-                                    Operator: "In",
-                                    Values: []string{
-                                        "NodeA",
-                                        "NodeB",
-                                        "NodeC",
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
+				RequiredDuringSchedulingIgnoredDuringExecution: &v1.NodeSelector{
+					NodeSelectorTerms: []v1.NodeSelectorTerm{
+						{
+							MatchExpressions: []v1.NodeSelectorRequirement{
+								{
+									Key:      "nodeKey",
+									Operator: "In",
+									Values: []string{
+										"NodeA",
+										"NodeB",
+										"NodeC",
+									},
+								},
+							},
+						},
+					},
+				},
 			},
 		}
 		deployment.Spec.Template.Spec.Affinity = affinity
 	})
 
-    s.Validate(s.ctx, []templates.TestCase{
-        {
-            Param: params.Params{},
-            Diagnostics: nil,
-            ExpectInstantiationError: false,
-        },
-    })
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param:                    params.Params{},
+			Diagnostics:              nil,
+			ExpectInstantiationError: false,
+		},
+	})
 }
