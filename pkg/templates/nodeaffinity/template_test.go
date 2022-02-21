@@ -1,6 +1,8 @@
 package nodeaffinity
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/suite"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext/mocks"
@@ -8,7 +10,6 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/templates/nodeaffinity/internal/params"
 	appsV1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
-	"testing"
 )
 
 func TestReplicas(t *testing.T) {
