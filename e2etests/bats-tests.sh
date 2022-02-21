@@ -359,6 +359,21 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "no-node-affinity" {
+  tmp="tests/checks/no-node-affinity.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include no-node-affinity --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment: object does not define any node affinity rules." ]]
+  [[ "${count}" == "1" ]]
+}
+
 @test "no-read-only-root-fs" {
   tmp="tests/checks/no-read-only-root-fs.yml"
   cmd="${KUBE_LINTER_BIN} lint --include no-read-only-root-fs --do-not-auto-add-defaults --format json ${tmp}"
@@ -734,4 +749,3 @@ get_value_from() {
   [[ "${message}" == "Deployment: annotation matching \"reloader.stakater.com/auto=true\" found" ]]
   [[ "${count}" == "1" ]]
 }
-

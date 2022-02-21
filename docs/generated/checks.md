@@ -283,6 +283,15 @@ version: v1beta.+
 **Remediation**: Specify a liveness probe in your container. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/ for details.
 
 **Template**: [liveness-probe](generated/templates.md#liveness-probe-not-specified)
+## no-node-affinity
+
+**Enabled by default**: No
+
+**Description**: Alert on deployments that have no node affinity defined
+
+**Remediation**: Specify node-affinity in your pod specification to ensure that the orchestrator attempts to schedule replicas on specified nodes. Refer to https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity for details.
+
+**Template**: [no-node-affinity](generated/templates.md#node-affinity)
 ## no-read-only-root-fs
 
 **Enabled by default**: Yes
