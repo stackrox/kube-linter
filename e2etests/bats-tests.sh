@@ -749,3 +749,4 @@ get_value_from() {
   [[ "${message}" == "Deployment: annotation matching \"reloader.stakater.com/auto=true\" found" ]]
   [[ "${count}" == "1" ]]
 }
+

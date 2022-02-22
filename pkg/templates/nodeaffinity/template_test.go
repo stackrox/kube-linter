@@ -12,11 +12,11 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-func TestReplicas(t *testing.T) {
-	suite.Run(t, new(ReplicaTestSuite))
+func TestNodeAffinity(t *testing.T) {
+	suite.Run(t, new(NodeAffinityTestSuite))
 }
 
-type ReplicaTestSuite struct {
+type NodeAffinityTestSuite struct {
 	templates.TemplateTestSuite
 	ctx *mocks.MockLintContext
 }
@@ -27,12 +27,12 @@ const (
 	nodeAffinityErrorMessage = "object does not define any node affinity rules."
 )
 
-func (s *ReplicaTestSuite) SetupTest() {
+func (s *NodeAffinityTestSuite) SetupTest() {
 	s.Init(templateKey)
 	s.ctx = mocks.NewMockContext()
 }
 
-func (s *ReplicaTestSuite) TestIgnoreNodeAffinityCheckOnObjectWithoutAffinity() {
+func (s *NodeAffinityTestSuite) TestIgnoreNodeAffinityCheckOnObjectWithoutAffinity() {
 	s.ctx.AddMockClusterRole(s.T(), deploymentName)
 	s.Validate(s.ctx, []templates.TestCase{
 		{
@@ -43,7 +43,7 @@ func (s *ReplicaTestSuite) TestIgnoreNodeAffinityCheckOnObjectWithoutAffinity() 
 	})
 }
 
-func (s *ReplicaTestSuite) TestNoPodTemplateSpecAffinityDefined() {
+func (s *NodeAffinityTestSuite) TestNoPodTemplateSpecAffinityDefined() {
 	s.ctx.AddMockDeployment(s.T(), deploymentName)
 
 	s.Validate(s.ctx, []templates.TestCase{
@@ -61,7 +61,7 @@ func (s *ReplicaTestSuite) TestNoPodTemplateSpecAffinityDefined() {
 	})
 }
 
-func (s *ReplicaTestSuite) TestNoNodeAffinityDefined() {
+func (s *NodeAffinityTestSuite) TestNoNodeAffinityDefined() {
 	s.ctx.AddMockDeployment(s.T(), deploymentName)
 
 	s.ctx.ModifyDeployment(s.T(), deploymentName, func(deployment *appsV1.Deployment) {
@@ -86,7 +86,7 @@ func (s *ReplicaTestSuite) TestNoNodeAffinityDefined() {
 	})
 }
 
-func (s *ReplicaTestSuite) TestNodeAffinityDefined() {
+func (s *NodeAffinityTestSuite) TestNodeAffinityDefined() {
 	s.ctx.AddMockDeployment(s.T(), deploymentName)
 
 	s.ctx.ModifyDeployment(s.T(), deploymentName, func(deployment *appsV1.Deployment) {
