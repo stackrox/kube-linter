@@ -24,6 +24,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/memoryrequirements"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/mismatchingselector"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/namespace"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/nodeaffinity"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/nonexistentserviceaccount"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/nonisolatedpod"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/ports"

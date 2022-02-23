@@ -417,6 +417,15 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 
+## Node Affinity
+
+**Key**: `no-node-affinity`
+
+**Description**: Flag objects that don't have node affinity rules set
+
+**Supported Objects**: DeploymentLike
+
+
 ## Non-Existent Service Account
 
 **Key**: `non-existent-service-account`
