@@ -19,6 +19,7 @@ import (
 	"helm.sh/helm/v3/pkg/chartutil"
 	"helm.sh/helm/v3/pkg/cli/values"
 	"helm.sh/helm/v3/pkg/engine"
+	autoscalingV2Beta1 "k8s.io/api/autoscaling/v2beta1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
@@ -39,8 +40,8 @@ var (
 func init() {
 	clientScheme := scheme.Scheme
 
-	// Add OpenShift schema
-	schemeBuilder := runtime.NewSchemeBuilder(ocsAppsV1.AddToScheme)
+	// Add OpenShift and Autoscaling schema
+	schemeBuilder := runtime.NewSchemeBuilder(ocsAppsV1.AddToScheme, autoscalingV2Beta1.AddToScheme)
 	if err := schemeBuilder.AddToScheme(clientScheme); err != nil {
 		panic(fmt.Sprintf("Can not add OpenShift schema %v", err))
 	}

@@ -108,6 +108,7 @@ func checkObjectPaths(t *testing.T, objects []Object, expectedPrefix string) {
 	}
 	expectedPaths := []string{
 		path.Join(expectedPrefix, "templates/deployment.yaml"),
+		path.Join(expectedPrefix, "templates/hpa.yaml"),
 		path.Join(expectedPrefix, "templates/service.yaml"),
 		path.Join(expectedPrefix, "templates/serviceaccount.yaml"),
 		path.Join(expectedPrefix, "templates/tests/test-connection.yaml"),
