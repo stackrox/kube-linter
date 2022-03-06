@@ -2,7 +2,7 @@
 
 load bats-support-clone
 load test_helper/bats-support/load
-load test_helper/redhatcop-bats-library/src/error-handling.bash
+load test_helper/redhatcop-bats-library/src/error-handling
 
 # NOTE: Each test matches to a built-in check outputted via 'kube-linter check'
 
