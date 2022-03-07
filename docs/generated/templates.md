@@ -102,6 +102,15 @@ KubeLinter supports the following templates:
   type: integer
 ```
 
+## Dangling HorizontalPodAutoscalers
+
+**Key**: `dangling-horizontalpodautoscaler`
+
+**Description**: Flag HorizontalPodAutoscalers that target a resource that does not exist
+
+**Supported Objects**: HorizontalPodAutoscaler
+
+
 ## Dangling NetworkPolicies
 
 **Key**: `dangling-networkpolicy`
@@ -299,6 +308,24 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
+
+## HorizontalPodAutoscaler Minimum replicas
+
+**Key**: `hpa-minimum-replicas`
+
+**Description**: Flag applications running fewer than the specified number of replicas
+
+**Supported Objects**: HorizontalPodAutoscaler
+
+
+**Parameters**:
+
+```yaml
+- description: The minimum number of replicas a HorizontalPodAutoscaler should have
+  name: minReplicas
+  required: false
+  type: integer
+```
 
 ## Image Pull Policy
 

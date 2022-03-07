@@ -58,6 +58,15 @@ verbs:
 **Remediation**: Create and assign a separate role that has access to specific resources/actions needed for the service account.
 
 **Template**: [cluster-admin-role-binding](generated/templates.md#cluster-admin-role-binding)
+## dangling-horizontalpodautoscaler
+
+**Enabled by default**: No
+
+**Description**: Indicates when HorizontalPodAutoscalers target a missing resource.
+
+**Remediation**: Confirm that your HorizontalPodAutoscaler's scaleTargetRef correctly matches one of your deployments.
+
+**Template**: [dangling-horizontalpodautoscaler](generated/templates.md#dangling-horizontalpodautoscalers)
 ## dangling-networkpolicy
 
 **Enabled by default**: No
@@ -201,6 +210,21 @@ forbiddenServiceTypes:
 **Remediation**: Ensure the host's process namespace is not shared.
 
 **Template**: [host-pid](generated/templates.md#host-pid)
+## hpa-minimum-three-replicas
+
+**Enabled by default**: No
+
+**Description**: Indicates when a HorizontalPodAutoscaler specifies less than three minReplicas
+
+**Remediation**: Increase be number of replicas in the HorizontalPodAutoscaler to at least three to increase fault tolerance.
+
+**Template**: [hpa-minimum-replicas](generated/templates.md#horizontalpodautoscaler-minimum-replicas)
+
+**Parameters**:
+
+```yaml
+minReplicas: 3
+```
 ## latest-tag
 
 **Enabled by default**: Yes
