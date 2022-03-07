@@ -61,6 +61,21 @@ get_value_from() {
   [[ "${count}" == "1" ]]
 }
 
+@test "dangling-horizontalpodautoscaler" {
+  tmp="tests/checks/dangling-hpa.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include dangling-horizontalpodautoscaler --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "HorizontalPodAutoscaler: no resources found matching HorizontalPodAutoscaler scaleTargetRef ({Deployment app2 apps/v1})" ]]
+  [[ "${count}" == "1" ]]
+}
+
 @test "dangling-networkpolicy" {
   tmp="tests/checks/dangling-networkpolicy.yml"
   cmd="${KUBE_LINTER_BIN} lint --include dangling-networkpolicy --do-not-auto-add-defaults --format json ${tmp}"
