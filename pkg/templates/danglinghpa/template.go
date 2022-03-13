@@ -47,7 +47,7 @@ func init() {
 						return nil
 					}
 				}
-				return []diagnostic.Diagnostic{{Message: fmt.Sprintf("no resources found matching HorizontalPodAutoscaler scaleTargetRef (%v) ", hpa.Spec.ScaleTargetRef)}}
+				return []diagnostic.Diagnostic{{Message: fmt.Sprintf("no resources found matching HorizontalPodAutoscaler scaleTargetRef (%v)", hpa.Spec.ScaleTargetRef)}}
 			}, nil
 		}),
 	})
