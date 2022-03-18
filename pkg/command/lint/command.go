@@ -44,6 +44,7 @@ var (
 // Command is the command for the lint command.
 func Command() *cobra.Command {
 	var configPath string
+	var failIfNoObjects bool
 	var verbose bool
 	format := flagutil.NewEnumFlag("Output format", formatters.GetEnabledFormatters(), common.PlainFormat)
 
@@ -95,7 +96,11 @@ func Command() *cobra.Command {
 				}
 			}
 			if !atLeastOneObjectFound {
-				fmt.Fprintln(os.Stderr, "Warning: no valid objects found.")
+				msg := "no valid objects found"
+				if failIfNoObjects {
+					return errors.New(msg)
+				}
+				fmt.Fprintf(os.Stderr, "Warning: %s.\n", msg)
 				return nil
 			}
 			result, err := run.Run(lintCtxs, checkRegistry, enabledChecks)
@@ -120,6 +125,7 @@ func Command() *cobra.Command {
 	}
 
 	c.Flags().StringVar(&configPath, "config", "", "Path to config file")
+	c.Flags().BoolVarP(&failIfNoObjects, "fail-if-no-objects-found", "", false, "Return non-zero exit code if no valid objects are found or failed to parse")
 	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 	c.Flags().Var(format, "format", format.Usage())
 
