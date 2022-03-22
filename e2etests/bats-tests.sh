@@ -635,11 +635,13 @@ get_value_from() {
 
   message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
   message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
   count=$(get_value_from "${lines[0]}" '.Reports | length')
 
   [[ "${message1}" == "Deployment: port 22 and protocol TCP in container \"app\" found" ]]
   [[ "${message2}" == "DeploymentConfig: port 22 and protocol TCP in container \"app\" found" ]]
-  [[ "${count}" == "2" ]]
+  [[ "${message3}" == "DeploymentConfig: port 22 and protocol TCP in container \"app-no-protocol\" found" ]]
+  [[ "${count}" == "3" ]]
 }
 
 @test "unsafe-proc-mount" {
@@ -779,4 +781,3 @@ get_value_from() {
   [[ "${message}" == "Deployment: annotation matching \"reloader.stakater.com/auto=true\" found" ]]
   [[ "${count}" == "1" ]]
 }
-
