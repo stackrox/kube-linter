@@ -46,6 +46,7 @@ func Command() *cobra.Command {
 	var configPath string
 	var failIfNoObjects bool
 	var verbose bool
+	var errorOnInvalidResource bool
 	format := flagutil.NewEnumFlag("Output format", formatters.GetEnabledFormatters(), common.PlainFormat)
 
 	v := viper.New()
@@ -81,13 +82,23 @@ func Command() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if verbose {
+			if verbose || errorOnInvalidResource {
+				hasInvalidObjects := false
+				prefix := "Warning"
+				if errorOnInvalidResource {
+					prefix = "Error"
+				}
 				for _, lintCtx := range lintCtxs {
 					for _, invalidObj := range lintCtx.InvalidObjects() {
-						fmt.Fprintf(os.Stderr, "Warning: failed to load object from %s: %v\n", invalidObj.Metadata.FilePath, invalidObj.LoadErr)
+						hasInvalidObjects = true
+						_, _ = fmt.Fprintf(os.Stderr, "%s: failed to load object from %s: %v\n", prefix, invalidObj.Metadata.FilePath, invalidObj.LoadErr)
 					}
 				}
+				if hasInvalidObjects && errorOnInvalidResource {
+					return fmt.Errorf("unable to load all objects")
+				}
 			}
+
 			var atLeastOneObjectFound bool
 			for _, lintCtx := range lintCtxs {
 				if len(lintCtx.Objects()) > 0 {
@@ -128,6 +139,7 @@ func Command() *cobra.Command {
 	c.Flags().BoolVarP(&failIfNoObjects, "fail-if-no-objects-found", "", false, "Return non-zero exit code if no valid objects are found or failed to parse")
 	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 	c.Flags().Var(format, "format", format.Usage())
+	c.Flags().BoolVarP(&errorOnInvalidResource, "fail-on-invalid-resource", "", false, "Error out when we have an invalid resource")
 
 	config.AddFlags(c, v)
 	return c
