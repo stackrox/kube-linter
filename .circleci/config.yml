@@ -35,7 +35,7 @@ orbs:
 executors:
   custom:
     docker:
-      - image: cimg/go:1.16.8
+      - image: cimg/go:1.17.8
     working_directory: /home/circleci/kube-linter
 
 runOnAllTags: &runOnAllTags
