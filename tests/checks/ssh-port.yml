@@ -54,3 +54,16 @@ spec:
         ports:
         - containerPort: 22
           protocol: TCP
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: app3
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: app-no-protocol
+          ports:
+            - containerPort: 22
