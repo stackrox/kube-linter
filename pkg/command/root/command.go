@@ -2,6 +2,7 @@ package root
 
 import (
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"golang.stackrox.io/kube-linter/pkg/command/checks"
@@ -13,7 +14,7 @@ import (
 // Command is the root command.
 func Command() *cobra.Command {
 	c := &cobra.Command{
-		Use:           os.Args[0],
+		Use:           filepath.Base(os.Args[0]),
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}

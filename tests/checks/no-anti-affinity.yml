@@ -1,0 +1,73 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dont-fire
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: dont-fire
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - dont-fire
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: app
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: dont-fire
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: dont-fire
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - dont-fire
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: app
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: app2
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: app

@@ -14,10 +14,18 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"resources":["^pods$","^deployments$","^statefulsets$","^replicasets$","^cronjob$","^jobs$","^daemonsets$"],"verbs":["^create$"]}
+```yaml
+resources:
+- ^pods$
+- ^deployments$
+- ^statefulsets$
+- ^replicasets$
+- ^cronjob$
+- ^jobs$
+- ^daemonsets$
+verbs:
+- ^create$
 ```
-
 ## access-to-secrets
 
 **Enabled by default**: No
@@ -30,10 +38,17 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"resources":["^secrets$"],"verbs":["^get$","^list$","^delete$","^create$","^watch$","^*$"]}
+```yaml
+resources:
+- ^secrets$
+verbs:
+- ^get$
+- ^list$
+- ^delete$
+- ^create$
+- ^watch$
+- ^*$
 ```
-
 ## cluster-admin-role-binding
 
 **Enabled by default**: No
@@ -43,13 +58,33 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Create and assign a separate role that has access to specific resources/actions needed for the service account.
 
 **Template**: [cluster-admin-role-binding](generated/templates.md#cluster-admin-role-binding)
+## dangling-horizontalpodautoscaler
 
-**Parameters**:
+**Enabled by default**: No
 
-```json
-{}
-```
+**Description**: Indicates when HorizontalPodAutoscalers target a missing resource.
 
+**Remediation**: Confirm that your HorizontalPodAutoscaler's scaleTargetRef correctly matches one of your deployments.
+
+**Template**: [dangling-horizontalpodautoscaler](generated/templates.md#dangling-horizontalpodautoscalers)
+## dangling-networkpolicy
+
+**Enabled by default**: No
+
+**Description**: Indicates when networkpolicies do not have any associated deployments.
+
+**Remediation**: Confirm that your networkPolicy's podselector correctly matches the labels on one of your deployments.
+
+**Template**: [dangling-networkpolicy](generated/templates.md#dangling-networkpolicies)
+## dangling-networkpolicypeer-podselector
+
+**Enabled by default**: No
+
+**Description**: Indicates when NetworkPolicyPeer in Egress/Ingress rules -in the Spec of NetworkPolicy- do not have any associated deployments. Applied on peer specified with podSelectors only.
+
+**Remediation**: Confirm that your NetworkPolicy's Ingress/Egress peer's podselector correctly matches the labels on one of your deployments.
+
+**Template**: [dangling-networkpolicypeer-podselector](generated/templates.md#dangling-networkpolicypeer-podselector)
 ## dangling-service
 
 **Enabled by default**: Yes
@@ -59,13 +94,6 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Confirm that your service's selector correctly matches the labels on one of your deployments.
 
 **Template**: [dangling-service](generated/templates.md#dangling-services)
-
-**Parameters**:
-
-```json
-{}
-```
-
 ## default-service-account
 
 **Enabled by default**: No
@@ -78,10 +106,9 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"serviceAccount":"^(|default)$"}
+```yaml
+serviceAccount: ^(|default)$
 ```
-
 ## deprecated-service-account-field
 
 **Enabled by default**: Yes
@@ -91,13 +118,6 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Use the serviceAccountName field instead. If you must specify serviceAccount, ensure values for serviceAccount and serviceAccountName match.
 
 **Template**: [deprecated-service-account-field](generated/templates.md#deprecated-service-account-field)
-
-**Parameters**:
-
-```json
-{}
-```
-
 ## docker-sock
 
 **Enabled by default**: Yes
@@ -110,10 +130,10 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"dirs":["docker.sock$"]}
+```yaml
+dirs:
+- docker.sock$
 ```
-
 ## drop-net-raw-capability
 
 **Enabled by default**: Yes
@@ -126,10 +146,10 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"forbiddenCapabilities":["NET_RAW"]}
+```yaml
+forbiddenCapabilities:
+- NET_RAW
 ```
-
 ## env-var-secret
 
 **Enabled by default**: Yes
@@ -142,10 +162,10 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"name":"(?i).*secret.*","value":".+"}
+```yaml
+name: (?i).*secret.*
+value: .+
 ```
-
 ## exposed-services
 
 **Enabled by default**: No
@@ -158,10 +178,11 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"forbiddenServiceTypes":["NodePort","LoadBalancer"]}
+```yaml
+forbiddenServiceTypes:
+- NodePort
+- LoadBalancer
 ```
-
 ## host-ipc
 
 **Enabled by default**: Yes
@@ -171,13 +192,6 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Ensure the host's IPC namespace is not shared.
 
 **Template**: [host-ipc](generated/templates.md#host-ipc)
-
-**Parameters**:
-
-```json
-{}
-```
-
 ## host-network
 
 **Enabled by default**: Yes
@@ -187,13 +201,6 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Ensure the host's network namespace is not shared.
 
 **Template**: [host-network](generated/templates.md#host-network)
-
-**Parameters**:
-
-```json
-{}
-```
-
 ## host-pid
 
 **Enabled by default**: Yes
@@ -203,29 +210,39 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Ensure the host's process namespace is not shared.
 
 **Template**: [host-pid](generated/templates.md#host-pid)
+## hpa-minimum-three-replicas
+
+**Enabled by default**: No
+
+**Description**: Indicates when a HorizontalPodAutoscaler specifies less than three minReplicas
+
+**Remediation**: Increase be number of replicas in the HorizontalPodAutoscaler to at least three to increase fault tolerance.
+
+**Template**: [hpa-minimum-replicas](generated/templates.md#horizontalpodautoscaler-minimum-replicas)
 
 **Parameters**:
 
-```json
-{}
+```yaml
+minReplicas: 3
 ```
-
 ## latest-tag
 
 **Enabled by default**: Yes
 
 **Description**: Indicates when a deployment-like object is running a container with an invalid container image
 
-**Remediation**: Use a container image with a proper image tag satisfying either the "AllowList" & "BlockList" regex patterns.
+**Remediation**: Use a container image with a specific tag other than latest.
 
 **Template**: [latest-tag](generated/templates.md#latest-tag)
 
 **Parameters**:
 
-```json
-{"BlockList":[".*:(latest)$"]}
+```yaml
+BlockList:
+- .*:(latest)$
+- ^[^:]*$
+- (.*/[^:]+)$
 ```
-
 ## minimum-three-replicas
 
 **Enabled by default**: No
@@ -238,10 +255,9 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"minReplicas":3}
+```yaml
+minReplicas: 3
 ```
-
 ## mismatching-selector
 
 **Enabled by default**: Yes
@@ -251,13 +267,6 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Confirm that your deployment selector correctly matches the labels in its pod template.
 
 **Template**: [mismatching-selector](generated/templates.md#mismatching-selector)
-
-**Parameters**:
-
-```json
-{}
-```
-
 ## no-anti-affinity
 
 **Enabled by default**: Yes
@@ -270,10 +279,9 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"minReplicas":2}
+```yaml
+minReplicas: 2
 ```
-
 ## no-extensions-v1beta
 
 **Enabled by default**: Yes
@@ -286,10 +294,10 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"group":"extensions","version":"v1beta.+"}
+```yaml
+group: extensions
+version: v1beta.+
 ```
-
 ## no-liveness-probe
 
 **Enabled by default**: No
@@ -299,13 +307,15 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Specify a liveness probe in your container. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/ for details.
 
 **Template**: [liveness-probe](generated/templates.md#liveness-probe-not-specified)
+## no-node-affinity
 
-**Parameters**:
+**Enabled by default**: No
 
-```json
-{}
-```
+**Description**: Alert on deployments that have no node affinity defined
 
+**Remediation**: Specify node-affinity in your pod specification to ensure that the orchestrator attempts to schedule replicas on specified nodes. Refer to https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity for details.
+
+**Template**: [no-node-affinity](generated/templates.md#node-affinity)
 ## no-read-only-root-fs
 
 **Enabled by default**: Yes
@@ -315,13 +325,6 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Set readOnlyRootFilesystem to true in the container securityContext.
 
 **Template**: [read-only-root-fs](generated/templates.md#read-only-root-filesystems)
-
-**Parameters**:
-
-```json
-{}
-```
-
 ## no-readiness-probe
 
 **Enabled by default**: No
@@ -331,13 +334,6 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Specify a readiness probe in your container. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/ for details.
 
 **Template**: [readiness-probe](generated/templates.md#readiness-probe-not-specified)
-
-**Parameters**:
-
-```json
-{}
-```
-
 ## no-rolling-update-strategy
 
 **Enabled by default**: No
@@ -350,10 +346,9 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"strategyTypeRegex":"^(RollingUpdate|Rolling)$"}
+```yaml
+strategyTypeRegex: ^(RollingUpdate|Rolling)$
 ```
-
 ## non-existent-service-account
 
 **Enabled by default**: Yes
@@ -363,13 +358,6 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Create the missing service account, or refer to an existing service account.
 
 **Template**: [non-existent-service-account](generated/templates.md#non-existent-service-account)
-
-**Parameters**:
-
-```json
-{}
-```
-
 ## non-isolated-pod
 
 **Enabled by default**: No
@@ -379,13 +367,6 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Ensure pod does not accept unsafe traffic by isolating it with a NetworkPolicy. See https://cloud.redhat.com/blog/guide-to-kubernetes-ingress-network-policies for more details.
 
 **Template**: [non-isolated-pod](generated/templates.md#non-isolated-pods)
-
-**Parameters**:
-
-```json
-{}
-```
-
 ## privilege-escalation-container
 
 **Enabled by default**: Yes
@@ -395,13 +376,6 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Ensure containers do not allow privilege escalation by setting allowPrivilegeEscalation=false." See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for more details.
 
 **Template**: [privilege-escalation-container](generated/templates.md#privilege-escalation-on-containers)
-
-**Parameters**:
-
-```json
-{}
-```
-
 ## privileged-container
 
 **Enabled by default**: Yes
@@ -411,13 +385,6 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Do not run your container as privileged unless it is required.
 
 **Template**: [privileged](generated/templates.md#privileged-containers)
-
-**Parameters**:
-
-```json
-{}
-```
-
 ## privileged-ports
 
 **Enabled by default**: No
@@ -427,13 +394,6 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Ensure privileged ports [0, 1024] are not mapped within containers.
 
 **Template**: [privileged-ports](generated/templates.md#privileged-ports)
-
-**Parameters**:
-
-```json
-{}
-```
-
 ## read-secret-from-env-var
 
 **Enabled by default**: No
@@ -443,13 +403,6 @@ KubeLinter includes the following built-in checks:
 **Remediation**: If possible, rewrite application code to read secrets from mounted secret files, rather than from environment variables. Refer to https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets for details.
 
 **Template**: [read-secret-from-env-var](generated/templates.md#read-secret-from-environment-variables)
-
-**Parameters**:
-
-```json
-{}
-```
-
 ## required-annotation-email
 
 **Enabled by default**: No
@@ -462,10 +415,10 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"key":"email","value":"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+"}
+```yaml
+key: email
+value: '[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'
 ```
-
 ## required-label-owner
 
 **Enabled by default**: No
@@ -478,10 +431,9 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"key":"owner"}
+```yaml
+key: owner
 ```
-
 ## run-as-non-root
 
 **Enabled by default**: Yes
@@ -491,13 +443,6 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Set runAsUser to a non-zero number and runAsNonRoot to true in your pod or container securityContext. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for details.
 
 **Template**: [run-as-non-root](generated/templates.md#run-as-non-root-user)
-
-**Parameters**:
-
-```json
-{}
-```
-
 ## sensitive-host-mounts
 
 **Enabled by default**: Yes
@@ -510,10 +455,17 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"dirs":["^/$","^/boot$","^/dev$","^/etc$","^/lib$","^/proc$","^/sys$","^/usr$"]}
+```yaml
+dirs:
+- ^/$
+- ^/boot$
+- ^/dev$
+- ^/etc$
+- ^/lib$
+- ^/proc$
+- ^/sys$
+- ^/usr$
 ```
-
 ## ssh-port
 
 **Enabled by default**: Yes
@@ -526,10 +478,10 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"port":22,"protocol":"TCP"}
+```yaml
+port: 22
+protocol: TCP
 ```
-
 ## unsafe-proc-mount
 
 **Enabled by default**: No
@@ -539,13 +491,6 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Ensure container does not unsafely exposes parts of /proc by setting procMount=Default.  Unmasked ProcMount bypasses the default masking behavior of the container runtime. See https://kubernetes.io/docs/concepts/security/pod-security-standards/ for more details.
 
 **Template**: [unsafe-proc-mount](generated/templates.md#unsafe-proc-mount)
-
-**Parameters**:
-
-```json
-{}
-```
-
 ## unsafe-sysctls
 
 **Enabled by default**: Yes
@@ -558,10 +503,14 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"unsafeSysCtls":["kernel.msg","kernel.sem","kernel.shm","fs.mqueue.","net."]}
+```yaml
+unsafeSysCtls:
+- kernel.msg
+- kernel.sem
+- kernel.shm
+- fs.mqueue.
+- net.
 ```
-
 ## unset-cpu-requirements
 
 **Enabled by default**: Yes
@@ -574,10 +523,11 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"lowerBoundMillis":0,"requirementsType":"any","upperBoundMillis":0}
+```yaml
+lowerBoundMillis: 0
+requirementsType: any
+upperBoundMillis: 0
 ```
-
 ## unset-memory-requirements
 
 **Enabled by default**: Yes
@@ -590,10 +540,11 @@ KubeLinter includes the following built-in checks:
 
 **Parameters**:
 
-```json
-{"lowerBoundMB":0,"requirementsType":"any","upperBoundMB":0}
+```yaml
+lowerBoundMB: 0
+requirementsType: any
+upperBoundMB: 0
 ```
-
 ## use-namespace
 
 **Enabled by default**: No
@@ -603,13 +554,6 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Create namespaces for objects in your deployment.
 
 **Template**: [use-namespace](generated/templates.md#use-namespaces-for-administrative-boundaries-between-resources)
-
-**Parameters**:
-
-```json
-{}
-```
-
 ## wildcard-in-rules
 
 **Enabled by default**: No
@@ -619,13 +563,6 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Where possible replace any use of wildcards in clusterroles and roles with specific objects or actions.
 
 **Template**: [wildcard-in-rules](generated/templates.md#wildcard-use-in-role-and-clusterrole-rules)
-
-**Parameters**:
-
-```json
-{}
-```
-
 ## writable-host-mount
 
 **Enabled by default**: No
@@ -635,10 +572,3 @@ KubeLinter includes the following built-in checks:
 **Remediation**: Set containers to mount host paths as readOnly, if you need to access files on the host.
 
 **Template**: [writable-host-mount](generated/templates.md#writable-host-mounts)
-
-**Parameters**:
-
-```json
-{}
-```
-

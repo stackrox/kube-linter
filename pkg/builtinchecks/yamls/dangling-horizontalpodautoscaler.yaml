@@ -1,0 +1,7 @@
+name: "dangling-horizontalpodautoscaler"
+description: "Indicates when HorizontalPodAutoscalers target a missing resource."
+remediation: "Confirm that your HorizontalPodAutoscaler's scaleTargetRef correctly matches one of your deployments."
+scope:
+  objectKinds:
+    - HorizontalPodAutoscaler
+template: "dangling-horizontalpodautoscaler"

@@ -108,3 +108,11 @@ test:
 e2e-test: $(KUBE_LINTER_BIN)
 	KUBE_LINTER_BIN="$(KUBE_LINTER_BIN)" go test -tags e2e -count=1 ./e2etests/...
 
+.PHONY: e2e-bats
+e2e-bats: $(KUBE_LINTER_BIN)
+	@command -v jq &> /dev/null || { echo >&2 'ERROR: jq not installed; See: https://stedolan.github.io/jq/download - Aborting'; exit 1; }
+	@command -v diff &> /dev/null || { echo >&2 'ERROR: diff not installed; See: https://www.baeldung.com/linux/diff-command - Aborting'; exit 1; }
+	@command -v bats &> /dev/null || { echo >&2 'ERROR: bats not installed; See: https://bats-core.readthedocs.io/en/stable/installation.html - Aborting'; exit 1; }
+
+	KUBE_LINTER_BIN="$(KUBE_LINTER_BIN)" e2etests/bats-tests.sh
+	KUBE_LINTER_BIN="$(KUBE_LINTER_BIN)" e2etests/check-bats-tests.sh

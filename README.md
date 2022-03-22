@@ -23,7 +23,7 @@ Visit https://docs.kubelinter.io for detailed documentation on installing, using
 To install using [Go](https://golang.org/), run the following command:
 
 ```bash
-GO111MODULE=on go get golang.stackrox.io/kube-linter/cmd/kube-linter
+GO111MODULE=on go install golang.stackrox.io/kube-linter/cmd/kube-linter
 ```
 Otherwise, download the latest binary from [Releases](https://github.com/stackrox/kube-linter/releases) and add it to your
 PATH.
@@ -61,6 +61,27 @@ Installing KubeLinter from source is as simple as following these steps:
 
    ```bash
    .gobin/kube-linter version
+   ```
+
+### Testing KubeLinter
+There are several layers of testing. Each layer is expected to pass.
+
+1. `go` unit tests:
+
+   ```bash
+   make test
+   ```
+
+2. end-to-end integration tests:
+
+   ```bash
+   make e2e-test
+   ```
+
+3. and finally, end-to-end integration tests using `bats-core`:
+
+   ```bash
+   make e2e-bats
    ```
 
 ## Using KubeLinter

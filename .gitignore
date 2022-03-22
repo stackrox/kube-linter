@@ -10,3 +10,4 @@
 # Empty file touched by `make deps`
 /deps
 
+e2etests/test_helper

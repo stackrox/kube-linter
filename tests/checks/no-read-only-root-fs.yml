@@ -1,0 +1,52 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: app
+          securityContext:
+            readOnlyRootFilesystem: true
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: dont-fire
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: app
+          securityContext:
+            readOnlyRootFilesystem: true
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: app
+        securityContext:
+          readOnlyRootFilesystem: false
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: app2
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: app
+        securityContext:
+          readOnlyRootFilesystem: false

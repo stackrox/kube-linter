@@ -1,0 +1,30 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: app
+        requests:
+          cpu: 1
+        limits:
+          cpu: 1
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: app2
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: app
+        requests:
+          cpu: 1
+        limits:
+          cpu: 1

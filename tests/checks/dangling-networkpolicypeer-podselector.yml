@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: app
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: app1
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: app2
+      ports:
+        - protocol: TCP
+          port: 8080

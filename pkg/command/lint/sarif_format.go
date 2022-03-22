@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"github.com/owenrumney/go-sarif/sarif"
+	"github.com/owenrumney/go-sarif/v2/sarif"
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/consts"
 	"golang.stackrox.io/kube-linter/pkg/command/checks"
@@ -51,7 +51,7 @@ func formatSarif(out io.Writer, result run.Result) error {
 		return err
 	}
 
-	sarifRun := sarif.NewRun(consts.ProgramName, consts.MainURL)
+	sarifRun := sarif.NewRunWithInformationURI(consts.ProgramName, consts.MainURL)
 	sarifReport.AddRun(sarifRun)
 
 	sarifRun.Tool.Driver.WithVersion(result.Summary.KubeLinterVersion)
@@ -103,7 +103,7 @@ func addSarifRule(sarifRun *sarif.Run, check *config.Check) error {
 		// 2) Rule ID, short and full descriptions are shown at different spots on the screen but it is helpful to see
 		//    them together.
 		// Markdown format for Help seemed to be ignored therefore we only provide the plain text version.
-		WithHelp(helpText)
+		WithTextHelp(helpText)
 
 	return nil
 }
@@ -154,9 +154,11 @@ func addSarifResult(sarifRun *sarif.Run, cwd string, report *diagnostic.WithCont
 		return err
 	}
 
-	sarifRun.AddResult(report.Check).
-		WithMessage(sarif.NewTextMessage(messageText)).
-		WithLocation(sarifLocation)
+	result := sarif.NewRuleResult(report.Check).
+		WithMessage(sarif.NewTextMessage(messageText))
+	result.AddLocation(sarifLocation)
+
+	sarifRun.AddResult(result)
 
 	return nil
 }

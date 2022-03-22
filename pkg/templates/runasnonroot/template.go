@@ -51,7 +51,7 @@ func init() {
 					return nil
 				}
 				var results []diagnostic.Diagnostic
-				for _, container := range podSpec.Containers {
+				for _, container := range podSpec.AllContainers() {
 					runAsUser := effectiveRunAsUser(podSpec.SecurityContext, container.SecurityContext)
 					// runAsUser explicitly set to non-root. All good.
 					if runAsUser != nil && *runAsUser > 0 {

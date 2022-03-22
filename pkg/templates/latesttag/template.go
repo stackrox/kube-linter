@@ -8,11 +8,11 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
-	"golang.stackrox.io/kube-linter/pkg/extract"
-	"golang.stackrox.io/kube-linter/pkg/lintcontext"
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	"golang.stackrox.io/kube-linter/pkg/templates/latesttag/internal/params"
+	"golang.stackrox.io/kube-linter/pkg/templates/util"
+	v1 "k8s.io/api/core/v1"
 )
 
 const (
@@ -51,26 +51,17 @@ func init() {
 
 			if len(blockedRegexes) > 0 && len(allowedRegexes) > 0 {
 				err := fmt.Errorf("check has both \"allowList\" & \"blockList\" parameter's values set")
-				return nil, errors.Wrapf(err, "Only one of the paramater lists can be used at a time.")
+				return nil, errors.Wrapf(err, "only one of the paramater lists can be used at a time")
 			}
 
-			return func(_ lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
-				podSpec, found := extract.PodSpec(object.K8sObject)
-				if !found {
-					return nil
-				}
-
-				var results []diagnostic.Diagnostic
-
-				for _, container := range podSpec.Containers {
-					if len(blockedRegexes) > 0 && isInList(blockedRegexes, container.Image) {
-						results = append(results, diagnostic.Diagnostic{Message: fmt.Sprintf("The container %q is using an invalid container image, %q. Please use images that are not blocked by the `BlockList` criteria : %q", container.Name, container.Image, blockedRegexes)})
-					} else if len(allowedRegexes) > 0 && !isInList(allowedRegexes, container.Image) {
-						results = append(results, diagnostic.Diagnostic{Message: fmt.Sprintf("The container %q is using an invalid container image, %q. Please use images that satisfies the `AllowList` criteria : %q", container.Name, container.Image, allowedRegexes)})
-					}
+			return util.PerContainerCheck(func(container *v1.Container) (results []diagnostic.Diagnostic) {
+				if len(blockedRegexes) > 0 && isInList(blockedRegexes, container.Image) {
+					results = append(results, diagnostic.Diagnostic{Message: fmt.Sprintf("The container %q is using an invalid container image, %q. Please use images that are not blocked by the `BlockList` criteria : %q", container.Name, container.Image, blockedRegexes)})
+				} else if len(allowedRegexes) > 0 && !isInList(allowedRegexes, container.Image) {
+					results = append(results, diagnostic.Diagnostic{Message: fmt.Sprintf("The container %q is using an invalid container image, %q. Please use images that satisfies the `AllowList` criteria : %q", container.Name, container.Image, allowedRegexes)})
 				}
 				return results
-			}, nil
+			}), nil
 		}),
 	})
 }

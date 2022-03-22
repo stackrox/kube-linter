@@ -1,0 +1,7 @@
+name: "dangling-networkpolicy"
+description: "Indicates when networkpolicies do not have any associated deployments."
+remediation: "Confirm that your networkPolicy's podselector correctly matches the labels on one of your deployments."
+scope:
+  objectKinds:
+    - NetworkPolicy
+template: "dangling-networkpolicy"

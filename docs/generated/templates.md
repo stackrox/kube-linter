@@ -10,35 +10,31 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: Role,ClusterRole,ClusterRoleBinding,RoleBinding
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "flagRolesNotFound",
-    "type": "boolean",
-    "description": "Set to true to flag the roles that are referenced in bindings but not found in the context",
-    "required": false
-  },
-  {
-    "name": "resources",
-    "type": "array",
-    "description": "An array of regular expressions specifying resources. e.g. ^secrets$ for secrets and ^*$ for any resources",
-    "required": false,
-    "regexAllowed": true,
-    "negationAllowed": false,
-    "arrayElemType": "string"
-  },
-  {
-    "name": "verbs",
-    "type": "array",
-    "description": "An array of regular expressions specifying verbs. e.g. ^create$ for create and ^*$ for any k8s verbs",
-    "required": false,
-    "regexAllowed": true,
-    "negationAllowed": false,
-    "arrayElemType": "string"
-  }
-]
+```yaml
+- description: Set to true to flag the roles that are referenced in bindings but not
+    found in the context
+  name: flagRolesNotFound
+  required: false
+  type: boolean
+- arrayElemType: string
+  description: An array of regular expressions specifying resources. e.g. ^secrets$
+    for secrets and ^*$ for any resources
+  name: resources
+  negationAllowed: false
+  regexAllowed: true
+  required: false
+  type: array
+- arrayElemType: string
+  description: An array of regular expressions specifying verbs. e.g. ^create$ for
+    create and ^*$ for any k8s verbs
+  name: verbs
+  negationAllowed: false
+  regexAllowed: true
+  required: false
+  type: array
 ```
 
 ## Anti affinity not specified
@@ -49,25 +45,22 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "minReplicas",
-    "type": "integer",
-    "description": "The minimum number of replicas a deployment must have before anti-affinity is enforced on it",
-    "required": false
-  },
-  {
-    "name": "topologyKey",
-    "type": "string",
-    "description": "The topology key that the anti-affinity term should use. If not specified, it defaults to \"kubernetes.io/hostname\".",
-    "required": false,
-    "regexAllowed": true,
-    "negationAllowed": true
-  }
-]
+```yaml
+- description: The minimum number of replicas a deployment must have before anti-affinity
+    is enforced on it
+  name: minReplicas
+  required: false
+  type: integer
+- description: The topology key that the anti-affinity term should use. If not specified,
+    it defaults to "kubernetes.io/hostname".
+  name: topologyKey
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
 ```
 
 ## cluster-admin Role Binding
@@ -78,11 +71,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: ClusterRoleBinding
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## CPU Requirements
 
@@ -92,32 +80,54 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "requirementsType",
-    "type": "string",
-    "description": "The type of requirement. Use any to apply to both requests and limits.",
-    "required": true,
-    "regexAllowed": true,
-    "negationAllowed": true
-  },
-  {
-    "name": "lowerBoundMillis",
-    "type": "integer",
-    "description": "The lower bound of the requirement (inclusive), specified as a number of milli-cores. If not specified, it is treated as a lower bound of zero.",
-    "required": false
-  },
-  {
-    "name": "upperBoundMillis",
-    "type": "integer",
-    "description": "The upper bound of the requirement (inclusive), specified as a number of milli-cores. If not specified, it is treated as \"no upper bound\".",
-    "required": false
-  }
-]
+```yaml
+- description: The type of requirement. Use any to apply to both requests and limits.
+  name: requirementsType
+  negationAllowed: true
+  regexAllowed: true
+  required: true
+  type: string
+- description: The lower bound of the requirement (inclusive), specified as a number
+    of milli-cores. If not specified, it is treated as a lower bound of zero.
+  name: lowerBoundMillis
+  required: false
+  type: integer
+- description: The upper bound of the requirement (inclusive), specified as a number
+    of milli-cores. If not specified, it is treated as "no upper bound".
+  name: upperBoundMillis
+  required: false
+  type: integer
 ```
+
+## Dangling HorizontalPodAutoscalers
+
+**Key**: `dangling-horizontalpodautoscaler`
+
+**Description**: Flag HorizontalPodAutoscalers that target a resource that does not exist
+
+**Supported Objects**: HorizontalPodAutoscaler
+
+
+## Dangling NetworkPolicies
+
+**Key**: `dangling-networkpolicy`
+
+**Description**: Flag NetworkPolicies which do not match any application
+
+**Supported Objects**: DeploymentLike
+
+
+## Dangling NetworkPolicyPeer PodSelector
+
+**Key**: `dangling-networkpolicypeer-podselector`
+
+**Description**: Flag NetworkPolicyPeer in Ingress/Egress rules which their podselector do not match any application. Applied to peers consisting with podSelectors only.
+
+**Supported Objects**: DeploymentLike
+
 
 ## Dangling Services
 
@@ -127,11 +137,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## Deprecated Service Account Field
 
@@ -141,11 +146,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## Disallowed API Objects
 
@@ -155,46 +155,36 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: Any
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "group",
-    "type": "string",
-    "description": "The disallowed object group.",
-    "required": false,
-    "examples": [
-      "apps"
-    ],
-    "regexAllowed": true,
-    "negationAllowed": true
-  },
-  {
-    "name": "version",
-    "type": "string",
-    "description": "The disallowed object API version.",
-    "required": false,
-    "examples": [
-      "v1",
-      "v1beta1"
-    ],
-    "regexAllowed": true,
-    "negationAllowed": true
-  },
-  {
-    "name": "kind",
-    "type": "string",
-    "description": "The disallowed kind.",
-    "required": false,
-    "examples": [
-      "Deployment",
-      "DaemonSet"
-    ],
-    "regexAllowed": true,
-    "negationAllowed": true
-  }
-]
+```yaml
+- description: The disallowed object group.
+  examples:
+  - apps
+  name: group
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
+- description: The disallowed object API version.
+  examples:
+  - v1
+  - v1beta1
+  name: version
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
+- description: The disallowed kind.
+  examples:
+  - Deployment
+  - DaemonSet
+  name: kind
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
 ```
 
 ## Environment Variables
@@ -205,27 +195,48 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "name",
-    "type": "string",
-    "description": "The name of the environment variable.",
-    "required": true,
-    "regexAllowed": true,
-    "negationAllowed": true
-  },
-  {
-    "name": "value",
-    "type": "string",
-    "description": "The value of the environment variable.",
-    "required": false,
-    "regexAllowed": true,
-    "negationAllowed": true
-  }
-]
+```yaml
+- description: The name of the environment variable.
+  name: name
+  negationAllowed: true
+  regexAllowed: true
+  required: true
+  type: string
+- description: The value of the environment variable.
+  name: value
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
+```
+
+## Forbidden Annotation
+
+**Key**: `forbidden-annotation`
+
+**Description**: Flag objects carrying at least one annotation matching the provided patterns
+
+**Supported Objects**: Any
+
+
+**Parameters**:
+
+```yaml
+- description: Key of the forbidden annotation.
+  name: key
+  negationAllowed: true
+  regexAllowed: true
+  required: true
+  type: string
+- description: Value of the forbidden annotation.
+  name: value
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
 ```
 
 ## Forbidden Service Types
@@ -236,20 +247,17 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: Service
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "forbiddenServiceTypes",
-    "type": "array",
-    "description": "An array of service types that should not be used",
-    "required": false,
-    "regexAllowed": false,
-    "negationAllowed": false,
-    "arrayElemType": "string"
-  }
-]
+```yaml
+- arrayElemType: string
+  description: An array of service types that should not be used
+  name: forbiddenServiceTypes
+  negationAllowed: false
+  regexAllowed: false
+  required: false
+  type: array
 ```
 
 ## Host IPC
@@ -260,11 +268,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## Host Mounts
 
@@ -274,20 +277,18 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "dirs",
-    "type": "array",
-    "description": "An array of regular expressions specifying system directories to be mounted on containers. e.g. ^/usr$ for /usr",
-    "required": false,
-    "regexAllowed": true,
-    "negationAllowed": false,
-    "arrayElemType": "string"
-  }
-]
+```yaml
+- arrayElemType: string
+  description: An array of regular expressions specifying system directories to be
+    mounted on containers. e.g. ^/usr$ for /usr
+  name: dirs
+  negationAllowed: false
+  regexAllowed: true
+  required: false
+  type: array
 ```
 
 ## Host Network
@@ -298,11 +299,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## Host PID
 
@@ -312,10 +308,23 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
+
+## HorizontalPodAutoscaler Minimum replicas
+
+**Key**: `hpa-minimum-replicas`
+
+**Description**: Flag applications running fewer than the specified number of replicas
+
+**Supported Objects**: HorizontalPodAutoscaler
+
+
 **Parameters**:
 
-```json
-[]
+```yaml
+- description: The minimum number of replicas a HorizontalPodAutoscaler should have
+  name: minReplicas
+  required: false
+  type: integer
 ```
 
 ## Image Pull Policy
@@ -326,20 +335,17 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "forbiddenPolicies",
-    "type": "array",
-    "description": "list of forbidden image pull policy",
-    "required": false,
-    "regexAllowed": false,
-    "negationAllowed": false,
-    "arrayElemType": "string"
-  }
-]
+```yaml
+- arrayElemType: string
+  description: list of forbidden image pull policy
+  name: forbiddenPolicies
+  negationAllowed: false
+  regexAllowed: false
+  required: false
+  type: array
 ```
 
 ## Latest Tag
@@ -350,29 +356,26 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "blockList",
-    "type": "array",
-    "description": "list of regular expressions specifying pattern(s) for container images that will be blocked. */",
-    "required": false,
-    "regexAllowed": true,
-    "negationAllowed": true,
-    "arrayElemType": "string"
-  },
-  {
-    "name": "allowList",
-    "type": "array",
-    "description": "list of regular expressions specifying pattern(s) for container images that will be allowed.",
-    "required": false,
-    "regexAllowed": true,
-    "negationAllowed": true,
-    "arrayElemType": "string"
-  }
-]
+```yaml
+- arrayElemType: string
+  description: list of regular expressions specifying pattern(s) for container images
+    that will be blocked. */
+  name: blockList
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: array
+- arrayElemType: string
+  description: list of regular expressions specifying pattern(s) for container images
+    that will be allowed.
+  name: allowList
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: array
 ```
 
 ## Liveness Probe Not Specified
@@ -383,11 +386,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## Memory Requirements
 
@@ -397,31 +395,26 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "requirementsType",
-    "type": "string",
-    "description": "The type of requirement. Use any to apply to both requests and limits.",
-    "required": true,
-    "regexAllowed": true,
-    "negationAllowed": true
-  },
-  {
-    "name": "lowerBoundMB",
-    "type": "integer",
-    "description": "The lower bound of the requirement (inclusive), specified as a number of MB.",
-    "required": false
-  },
-  {
-    "name": "upperBoundMB",
-    "type": "integer",
-    "description": "The upper bound of the requirement (inclusive), specified as a number of MB. If not specified, it is treated as \"no upper bound\".",
-    "required": false
-  }
-]
+```yaml
+- description: The type of requirement. Use any to apply to both requests and limits.
+  name: requirementsType
+  negationAllowed: true
+  regexAllowed: true
+  required: true
+  type: string
+- description: The lower bound of the requirement (inclusive), specified as a number
+    of MB.
+  name: lowerBoundMB
+  required: false
+  type: integer
+- description: The upper bound of the requirement (inclusive), specified as a number
+    of MB. If not specified, it is treated as "no upper bound".
+  name: upperBoundMB
+  required: false
+  type: integer
 ```
 
 ## Minimum replicas
@@ -432,17 +425,14 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "minReplicas",
-    "type": "integer",
-    "description": "The minimum number of replicas a deployment should have",
-    "required": false
-  }
-]
+```yaml
+- description: The minimum number of replicas a deployment should have
+  name: minReplicas
+  required: false
+  type: integer
 ```
 
 ## Mismatching Selector
@@ -453,11 +443,15 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
-**Parameters**:
 
-```json
-[]
-```
+## Node Affinity
+
+**Key**: `no-node-affinity`
+
+**Description**: Flag objects that don't have node affinity rules set
+
+**Supported Objects**: DeploymentLike
+
 
 ## Non-Existent Service Account
 
@@ -467,11 +461,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## Non Isolated Pods
 
@@ -481,11 +470,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: NetworkPolicy
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## Ports
 
@@ -495,25 +479,20 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "port",
-    "type": "integer",
-    "description": "The port",
-    "required": false
-  },
-  {
-    "name": "protocol",
-    "type": "string",
-    "description": "The protocol",
-    "required": false,
-    "regexAllowed": true,
-    "negationAllowed": true
-  }
-]
+```yaml
+- description: The port
+  name: port
+  required: false
+  type: integer
+- description: The protocol
+  name: protocol
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
 ```
 
 ## Privilege Escalation on Containers
@@ -524,11 +503,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## Privileged Containers
 
@@ -538,11 +512,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## Privileged Ports
 
@@ -552,11 +521,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## Read-only Root Filesystems
 
@@ -566,11 +530,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## Read Secret From Environment Variables
 
@@ -580,11 +539,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## Readiness Probe Not Specified
 
@@ -594,11 +548,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## Required Annotation
 
@@ -608,27 +557,22 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: Any
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "key",
-    "type": "string",
-    "description": "Key of the required label.",
-    "required": true,
-    "regexAllowed": true,
-    "negationAllowed": true
-  },
-  {
-    "name": "value",
-    "type": "string",
-    "description": "Value of the required label.",
-    "required": false,
-    "regexAllowed": true,
-    "negationAllowed": true
-  }
-]
+```yaml
+- description: Key of the required label.
+  name: key
+  negationAllowed: true
+  regexAllowed: true
+  required: true
+  type: string
+- description: Value of the required label.
+  name: value
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
 ```
 
 ## Required Label
@@ -639,27 +583,22 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: Any
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "key",
-    "type": "string",
-    "description": "Key of the required label.",
-    "required": true,
-    "regexAllowed": true,
-    "negationAllowed": true
-  },
-  {
-    "name": "value",
-    "type": "string",
-    "description": "Value of the required label.",
-    "required": false,
-    "regexAllowed": true,
-    "negationAllowed": true
-  }
-]
+```yaml
+- description: Key of the required label.
+  name: key
+  negationAllowed: true
+  regexAllowed: true
+  required: true
+  type: string
+- description: Value of the required label.
+  name: value
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
 ```
 
 ## Run as non-root user
@@ -670,11 +609,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## Service Account
 
@@ -684,19 +618,16 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "serviceAccount",
-    "type": "string",
-    "description": "A regex specifying the required service account to match.",
-    "required": true,
-    "regexAllowed": true,
-    "negationAllowed": true
-  }
-]
+```yaml
+- description: A regex specifying the required service account to match.
+  name: serviceAccount
+  negationAllowed: true
+  regexAllowed: true
+  required: true
+  type: string
 ```
 
 ## Unsafe Proc Mount
@@ -707,11 +638,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## Unsafe Sysctls
 
@@ -721,20 +647,17 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "unsafeSysCtls",
-    "type": "array",
-    "description": "An array of unsafe system controls",
-    "required": false,
-    "regexAllowed": false,
-    "negationAllowed": false,
-    "arrayElemType": "string"
-  }
-]
+```yaml
+- arrayElemType: string
+  description: An array of unsafe system controls
+  name: unsafeSysCtls
+  negationAllowed: false
+  regexAllowed: false
+  required: false
+  type: array
 ```
 
 ## Update configuration
@@ -745,51 +668,44 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "strategyTypeRegex",
-    "type": "string",
-    "description": "A regular expression the defines the type of update strategy allowed.",
-    "required": true,
-    "regexAllowed": true,
-    "negationAllowed": true
-  },
-  {
-    "name": "maxPodsUnavailable",
-    "type": "string",
-    "description": "The maximum value that be set in a RollingUpdate configuration for the MaxUnavailable.  This can be an integer or a percent.",
-    "required": false,
-    "regexAllowed": true,
-    "negationAllowed": true
-  },
-  {
-    "name": "minPodsUnavailable",
-    "type": "string",
-    "description": "The minimum value that be set in a RollingUpdate configuration for the MaxUnavailable.  This can be an integer or a percent.",
-    "required": false,
-    "regexAllowed": true,
-    "negationAllowed": true
-  },
-  {
-    "name": "maxSurge",
-    "type": "string",
-    "description": "The maximum value that be set in a RollingUpdate configuration for the MaxSurge.  This can be an integer or a percent.",
-    "required": false,
-    "regexAllowed": true,
-    "negationAllowed": true
-  },
-  {
-    "name": "minSurge",
-    "type": "string",
-    "description": "The minimum value that be set in a RollingUpdate configuration for the MaxSurge.  This can be an integer or a percent.",
-    "required": false,
-    "regexAllowed": true,
-    "negationAllowed": true
-  }
-]
+```yaml
+- description: A regular expression the defines the type of update strategy allowed.
+  name: strategyTypeRegex
+  negationAllowed: true
+  regexAllowed: true
+  required: true
+  type: string
+- description: The maximum value that be set in a RollingUpdate configuration for
+    the MaxUnavailable.  This can be an integer or a percent.
+  name: maxPodsUnavailable
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
+- description: The minimum value that be set in a RollingUpdate configuration for
+    the MaxUnavailable.  This can be an integer or a percent.
+  name: minPodsUnavailable
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
+- description: The maximum value that be set in a RollingUpdate configuration for
+    the MaxSurge.  This can be an integer or a percent.
+  name: maxSurge
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
+- description: The minimum value that be set in a RollingUpdate configuration for
+    the MaxSurge.  This can be an integer or a percent.
+  name: minSurge
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
 ```
 
 ## Use Namespaces for Administrative Boundaries between Resources
@@ -800,11 +716,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike,Service
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## Verify container capabilities
 
@@ -814,29 +725,26 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
+
 **Parameters**:
 
-```json
-[
-  {
-    "name": "forbiddenCapabilities",
-    "type": "array",
-    "description": "List of capabilities that needs to be removed from containers.",
-    "required": false,
-    "regexAllowed": false,
-    "negationAllowed": false,
-    "arrayElemType": "string"
-  },
-  {
-    "name": "exceptions",
-    "type": "array",
-    "description": "List of capabilities that are exceptions to the above list. This should only be filled when the above contains \"all\", and is used to forgive capabilities in ADD list.",
-    "required": false,
-    "regexAllowed": false,
-    "negationAllowed": false,
-    "arrayElemType": "string"
-  }
-]
+```yaml
+- arrayElemType: string
+  description: List of capabilities that needs to be removed from containers.
+  name: forbiddenCapabilities
+  negationAllowed: false
+  regexAllowed: false
+  required: false
+  type: array
+- arrayElemType: string
+  description: List of capabilities that are exceptions to the above list. This should
+    only be filled when the above contains "all", and is used to forgive capabilities
+    in ADD list.
+  name: exceptions
+  negationAllowed: false
+  regexAllowed: false
+  required: false
+  type: array
 ```
 
 ## Wildcard Use in Role and ClusterRole Rules
@@ -847,11 +755,6 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: Role,ClusterRole
 
-**Parameters**:
-
-```json
-[]
-```
 
 ## Writable Host Mounts
 
@@ -861,9 +764,4 @@ KubeLinter supports the following templates:
 
 **Supported Objects**: DeploymentLike
 
-**Parameters**:
-
-```json
-[]
-```
 
