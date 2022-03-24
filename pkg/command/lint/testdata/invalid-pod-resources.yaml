@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  name: foo-pod
+  namespace: foo
+spec:
+  containers:
+    - image: busybox
+      name: invalid
+      command:
+        - "sleep"
+      args:
+        - "infinity"
+      resources:
+        limits:
+          cpu: 25m
+          memory: 1GB
+        requests:
+          cpu: 25m
+          memory: 1GB
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+status: {}
