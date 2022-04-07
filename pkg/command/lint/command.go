@@ -2,6 +2,8 @@ package lint
 
 import (
 	"fmt"
+	"golang.stackrox.io/kube-linter/pkg/diagnostic"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"os"
 
 	"golang.stackrox.io/kube-linter/internal/flagutil"
@@ -82,30 +84,21 @@ func Command() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if verbose || errorOnInvalidResource {
-				hasInvalidObjects := false
-				prefix := "Warning"
-				if errorOnInvalidResource {
-					prefix = "Error"
-				}
-				for _, lintCtx := range lintCtxs {
-					for _, invalidObj := range lintCtx.InvalidObjects() {
-						hasInvalidObjects = true
-						_, _ = fmt.Fprintf(os.Stderr, "%s: failed to load object from %s: %v\n", prefix, invalidObj.Metadata.FilePath, invalidObj.LoadErr)
-					}
-				}
-				if hasInvalidObjects && errorOnInvalidResource {
-					return fmt.Errorf("unable to load all objects")
+			invalidObjectsResult := generateReportFromInvalidObjects(lintCtxs)
+			if verbose {
+				for _, invalidObj := range invalidObjectsResult {
+					_, _ = fmt.Fprintf(os.Stderr, "Warning: failed to load object from %s: %v\n", invalidObj.Object.Metadata.FilePath, invalidObj.Diagnostic.Message)
 				}
 			}
 
-			var atLeastOneObjectFound bool
+			var atLeastOneObjectFound = errorOnInvalidResource && len(invalidObjectsResult) > 0
 			for _, lintCtx := range lintCtxs {
 				if len(lintCtx.Objects()) > 0 {
 					atLeastOneObjectFound = true
 					break
 				}
 			}
+
 			if !atLeastOneObjectFound {
 				msg := "no valid objects found"
 				if failIfNoObjects {
@@ -117,6 +110,10 @@ func Command() *cobra.Command {
 			result, err := run.Run(lintCtxs, checkRegistry, enabledChecks)
 			if err != nil {
 				return err
+			}
+
+			if errorOnInvalidResource {
+				result.Reports = append(result.Reports, invalidObjectsResult...)
 			}
 
 			formatter, err := formatters.FormatterByType(format.String())
@@ -143,4 +140,24 @@ func Command() *cobra.Command {
 
 	config.AddFlags(c, v)
 	return c
+}
+
+func generateReportFromInvalidObjects(lintCtxs []lintcontext.LintContext) []diagnostic.WithContext {
+	var invalidObjectsResult []diagnostic.WithContext
+	for _, lintCtx := range lintCtxs {
+		for _, invalidObj := range lintCtx.InvalidObjects() {
+			invalidObjectsResult = append(invalidObjectsResult, diagnostic.WithContext{
+				Diagnostic: diagnostic.Diagnostic{
+					Message: invalidObj.LoadErr.Error(),
+				},
+				Check:       "failed-to-load-object",
+				Remediation: "Confirm that the file is accessible and is valid k8s yaml.",
+				Object: lintcontext.Object{
+					Metadata:  invalidObj.Metadata,
+					K8sObject: &unstructured.Unstructured{},
+				},
+			})
+		}
+	}
+	return invalidObjectsResult
 }
