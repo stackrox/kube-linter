@@ -2,9 +2,10 @@ package lint
 
 import (
 	"fmt"
+	"os"
+
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"os"
 
 	"golang.stackrox.io/kube-linter/internal/flagutil"
 	"golang.stackrox.io/kube-linter/pkg/builtinchecks"
