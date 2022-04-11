@@ -1,8 +1,6 @@
 package lint
 
 import (
-	"fmt"
-	"os"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -12,8 +10,6 @@ import (
 )
 
 func TestCommand_InvalidResources(t *testing.T) {
-	path, _ := os.Getwd()
-	fmt.Println(path)
 	tests := []struct {
 		name    string
 		cmd     *cobra.Command
