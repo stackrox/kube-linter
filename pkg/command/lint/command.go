@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"golang.stackrox.io/kube-linter/pkg/diagnostic"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+
 	"golang.stackrox.io/kube-linter/internal/flagutil"
 	"golang.stackrox.io/kube-linter/pkg/builtinchecks"
 	"golang.stackrox.io/kube-linter/pkg/checkregistry"
@@ -46,6 +49,7 @@ func Command() *cobra.Command {
 	var configPath string
 	var failIfNoObjects bool
 	var verbose bool
+	var errorOnInvalidResource bool
 	format := flagutil.NewEnumFlag("Output format", formatters.GetEnabledFormatters(), common.PlainFormat)
 
 	v := viper.New()
@@ -81,20 +85,21 @@ func Command() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			invalidObjectsResult := generateReportFromInvalidObjects(lintCtxs)
 			if verbose {
-				for _, lintCtx := range lintCtxs {
-					for _, invalidObj := range lintCtx.InvalidObjects() {
-						fmt.Fprintf(os.Stderr, "Warning: failed to load object from %s: %v\n", invalidObj.Metadata.FilePath, invalidObj.LoadErr)
-					}
+				for _, invalidObj := range invalidObjectsResult {
+					_, _ = fmt.Fprintf(os.Stderr, "Warning: failed to load object from %s: %v\n", invalidObj.Object.Metadata.FilePath, invalidObj.Diagnostic.Message)
 				}
 			}
-			var atLeastOneObjectFound bool
+
+			var atLeastOneObjectFound = errorOnInvalidResource && len(invalidObjectsResult) > 0
 			for _, lintCtx := range lintCtxs {
 				if len(lintCtx.Objects()) > 0 {
 					atLeastOneObjectFound = true
 					break
 				}
 			}
+
 			if !atLeastOneObjectFound {
 				msg := "no valid objects found"
 				if failIfNoObjects {
@@ -106,6 +111,10 @@ func Command() *cobra.Command {
 			result, err := run.Run(lintCtxs, checkRegistry, enabledChecks)
 			if err != nil {
 				return err
+			}
+
+			if errorOnInvalidResource {
+				result.Reports = append(result.Reports, invalidObjectsResult...)
 			}
 
 			formatter, err := formatters.FormatterByType(format.String())
@@ -128,7 +137,28 @@ func Command() *cobra.Command {
 	c.Flags().BoolVarP(&failIfNoObjects, "fail-if-no-objects-found", "", false, "Return non-zero exit code if no valid objects are found or failed to parse")
 	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 	c.Flags().Var(format, "format", format.Usage())
+	c.Flags().BoolVarP(&errorOnInvalidResource, "fail-on-invalid-resource", "", false, "Error out when we have an invalid resource")
 
 	config.AddFlags(c, v)
 	return c
+}
+
+func generateReportFromInvalidObjects(lintCtxs []lintcontext.LintContext) []diagnostic.WithContext {
+	var invalidObjectsResult []diagnostic.WithContext
+	for _, lintCtx := range lintCtxs {
+		for _, invalidObj := range lintCtx.InvalidObjects() {
+			invalidObjectsResult = append(invalidObjectsResult, diagnostic.WithContext{
+				Diagnostic: diagnostic.Diagnostic{
+					Message: invalidObj.LoadErr.Error(),
+				},
+				Check:       "failed-to-load-object",
+				Remediation: "Confirm that the file is accessible and is valid k8s yaml.",
+				Object: lintcontext.Object{
+					Metadata:  invalidObj.Metadata,
+					K8sObject: &unstructured.Unstructured{},
+				},
+			})
+		}
+	}
+	return invalidObjectsResult
 }
