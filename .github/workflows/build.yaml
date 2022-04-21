@@ -76,7 +76,7 @@ jobs:
 
   test-sarif:
     # Workflows triggered by Dependabot on the "push" event run with read-only access and uploading Code Scanning results requires write access.
-    if: (!contains(github.head_ref, 'dependabot') && (github.event_name != 'push'))
+    if: ((github.event_name == 'push') && !contains(github.head_ref, 'dependabot'))
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
