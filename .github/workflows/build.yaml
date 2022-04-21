@@ -80,10 +80,10 @@ jobs:
           name: bin
 
       - name: Print kube-linter version
-        run: ls -alhr
+        run: linux/kube-linter version
 
       - name: Run kube-linter on a sample file with SARIF output
-        run: bin/linux/kube-linter lint --format=sarif tests/testdata/splunk.yaml > results.sarif
+        run: linux/kube-linter lint --format=sarif tests/testdata/splunk.yaml > results.sarif
         continue-on-error: true
 
       - name: Dump output file and check it is not empty
@@ -128,10 +128,10 @@ jobs:
         run: |
           # In Windows, the workspace is attached relative to the current directory.
           tag="$(./get-tag)"
-          version_from_bin="$(bin/windows/kube-linter.exe version)"
+          version_from_bin="$(windows/kube-linter.exe version)"
           echo "Expected tag ${tag}, got ${version_from_bin}"
           [[ "${tag}" == "${version_from_bin}" ]]
 
           # Make sure the lint command can run without errors.
           # TODO: run the full suite of E2E tests on Windows.
-          ./kube-linter.exe lint "tests/checks/access-to-create-pods.yml"
+          windows/kube-linter.exe lint "tests/checks/access-to-create-pods.yml"
