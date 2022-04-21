@@ -100,7 +100,7 @@ jobs:
           path: results.sarif
 
       - name: Install yajsv
-        run:  curl https://github.com/neilpa/yajsv/releases/download/v1.4.0/yajsv.linux.amd64 -Lso yajsv
+        run:  curl https://github.com/neilpa/yajsv/releases/download/v1.4.0/yajsv.linux.amd64 -lsSfo yajsv && chmod +x yajsv
 
       - name: Check if output file is valid according to SARIF schema
         run: |
