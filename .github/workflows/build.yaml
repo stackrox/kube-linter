@@ -41,6 +41,12 @@ jobs:
           name: kube-linter.exe
           path: bin/windows/kube-linter.exe
 
+      - name: Upload linux binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: kube-linter
+          path: bin/linux/kube-linter
+
       - name: Verify the binary version
         run: |
           expected_version="$(./get-tag)"
@@ -67,6 +73,50 @@ jobs:
 
       - name: Run bats tests
         run: make e2e-bats
+
+  test-sarif:
+    # Workflows triggered by Dependabot on the "push" event run with read-only access and uploading Code Scanning results
+    # requires write access.
+    if: !contains(github.head_ref, 'dependabot') && github.event_name != 'push'
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download executable
+        uses: actions/download-artifact@v2
+        with:
+          name: kube-linter
+
+      - name: Print kube-linter version
+        run: ./kube-linter version
+
+      - name: Run kube-linter on a sample file with SARIF output
+        run: ./kube-linter lint --format=sarif tests/testdata/splunk.yaml > results.sarif
+        continue-on-error: true
+
+      - name: Dump output file and check it is not empty
+        # The if part will generate no-zero exit code if the file is empty. See https://github.com/stedolan/jq/issues/1142#issuecomment-432003984
+        run: jq -es 'if . == [] then null else .[] | . end' results.sarif
+
+      - name: Upload output file as GitHub artifact for manual investigation
+        uses: actions/upload-artifact@v2
+        with:
+          name: results.sarif
+          path: results.sarif
+
+      - name: Check if output file is valid according to SARIF schema
+        run: |
+          set -ex
+          GO111MODULE=on go get github.com/neilpa/yajsv@v1.4.0
+          schema=$(jq -r '.["$schema"]' results.sarif)
+          [ "$schema" = https://json.schemastore.org/sarif-2.1.0-rtm.5.json ]
+          yajsv -s ./scripts/sarif/sarif-schema-2.1.0.json results.sarif
+
+      - name: Upload SARIF output file to GitHub
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: results.sarif
 
   windows-sanity-test:
     name: Windows sanity test
