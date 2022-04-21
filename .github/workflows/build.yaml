@@ -78,15 +78,16 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: bin
+          path: bin/
       
       - name: Set permissions to file
         run:  chmod +x linux/kube-linter
 
       - name: Print kube-linter version
-        run:  linux/kube-linter version
+        run:  bin/linux/kube-linter version
 
       - name: Run kube-linter on a sample file with SARIF output
-        run:  linux/kube-linter lint --format=sarif tests/testdata/splunk.yaml > results.sarif
+        run:  bin/linux/kube-linter lint --format=sarif tests/testdata/splunk.yaml > results.sarif
         continue-on-error: true
 
       - name: Dump output file and check it is not empty
