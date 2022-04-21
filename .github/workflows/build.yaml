@@ -80,7 +80,7 @@ jobs:
           name: bin
 
       - name: Print kube-linter version
-        run: bin/linux/kube-linter version
+        run: ls -alhr
 
       - name: Run kube-linter on a sample file with SARIF output
         run: bin/linux/kube-linter lint --format=sarif tests/testdata/splunk.yaml > results.sarif
