@@ -99,13 +99,15 @@ jobs:
           name: results.sarif
           path: results.sarif
 
+      - name: Install yajsv
+        run:  curl https://github.com/neilpa/yajsv/releases/download/v1.4.0/yajsv.linux.amd64 -Lso yajsv
+
       - name: Check if output file is valid according to SARIF schema
         run: |
           set -ex
-          GO111MODULE=on go get github.com/neilpa/yajsv@v1.4.0
           schema=$(jq -r '.["$schema"]' results.sarif)
           [ "$schema" = https://json.schemastore.org/sarif-2.1.0-rtm.5.json ]
-          yajsv -s ./scripts/sarif/sarif-schema-2.1.0.json results.sarif
+          ./yajsv -s ./scripts/sarif/sarif-schema-2.1.0.json results.sarif
 
       - name: Upload SARIF output file to GitHub
         # Workflows triggered by Dependabot on the "push" event run with read-only access and uploading Code Scanning results requires write access.
