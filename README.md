@@ -101,7 +101,7 @@ DmAszeH26g1s3OSsG/focPWkN88wEKQ5eiE95v+Z2snUQPl/mjPdvqpyjA==
 
 cosign verify --key kubelinter-cosign $IMAGE_NAME
 ```
-C
+
 KubeLinter also provides [cosign keyless signatures](https://github.com/sigstore/cosign/blob/623d50f9b77ee85886a166daac648455e65003ec/KEYLESS.md).
 
 You can verify the KubeLinter image with:
