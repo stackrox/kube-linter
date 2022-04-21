@@ -35,17 +35,11 @@ jobs:
       - name: Build binaries
         run: make build
 
-      - name: Upload windows binary
+      - name: Upload binary
         uses: actions/upload-artifact@v2
         with:
-          name: kube-linter.exe
-          path: bin/windows/kube-linter.exe
-
-      - name: Upload linux binary
-        uses: actions/upload-artifact@v2
-        with:
-          name: kube-linter
-          path: bin/linux/kube-linter
+          name: bin
+          path: bin
 
       - name: Verify the binary version
         run: |
@@ -75,8 +69,6 @@ jobs:
         run: make e2e-bats
 
   test-sarif:
-    # Workflows triggered by Dependabot on the "push" event run with read-only access and uploading Code Scanning results requires write access.
-    if: ((github.event_name == 'push') && !contains(github.head_ref, 'dependabot'))
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
@@ -85,13 +77,13 @@ jobs:
       - name: Download executable
         uses: actions/download-artifact@v2
         with:
-          name: kube-linter
+          name: bin
 
       - name: Print kube-linter version
-        run: ./kube-linter version
+        run: bin/linux/kube-linter version
 
       - name: Run kube-linter on a sample file with SARIF output
-        run: ./kube-linter lint --format=sarif tests/testdata/splunk.yaml > results.sarif
+        run: bin/linux/kube-linter lint --format=sarif tests/testdata/splunk.yaml > results.sarif
         continue-on-error: true
 
       - name: Dump output file and check it is not empty
@@ -113,6 +105,8 @@ jobs:
           yajsv -s ./scripts/sarif/sarif-schema-2.1.0.json results.sarif
 
       - name: Upload SARIF output file to GitHub
+        # Workflows triggered by Dependabot on the "push" event run with read-only access and uploading Code Scanning results requires write access.
+        if: ((github.event_name == 'push') && !contains(github.head_ref, 'dependabot')) || (github.event_name != 'push')
         uses: github/codeql-action/upload-sarif@v1
         with:
           sarif_file: results.sarif
@@ -129,12 +123,12 @@ jobs:
       - name: Download windows executable
         uses: actions/download-artifact@v2
         with:
-          name: kube-linter.exe
+          name: bin
       - shell: bash
         run: |
           # In Windows, the workspace is attached relative to the current directory.
           tag="$(./get-tag)"
-          version_from_bin="$(./kube-linter.exe version)"
+          version_from_bin="$(bin/windows/kube-linter.exe version)"
           echo "Expected tag ${tag}, got ${version_from_bin}"
           [[ "${tag}" == "${version_from_bin}" ]]
 
