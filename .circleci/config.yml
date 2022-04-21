@@ -140,6 +140,7 @@ commands:
       - run:
           name: Determine whether to run step
           command: |
+            sleep 3600
             set +e
             if [[ "${CIRCLE_BRANCH}" == "main" || -n "${CIRCLE_TAG}" ]]; then
               echo "On main or tag, running the step"
