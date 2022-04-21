@@ -111,7 +111,7 @@ To build KubeLinter from source:
 KubeLinter images are signed by [cosign](https://github.com/sigstore/cosign).
 We recommend verifying the image before using it.
 
-Once you've installed cosign, you can use the [KubeLinter public key](kubelinter-cosign.pub) to verify the KubeLinter image with:
+Once you've installed cosign, you can use the [KubeLinter public key](https://github.com/stackrox/kube-linter/blob/main/kubelinter-cosign.pub) to verify the KubeLinter image with:
 
 ```shell
 cat kubelinter-cosign.pub
