@@ -237,3 +237,42 @@ jobs:
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
+
+  update_release_draft:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download executables
+        uses: actions/download-artifact@v2
+        with:
+          name: bin
+      - uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Release Asset Linux
+        id: upload-release-asset-linux
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: linux/kube-linter
+          asset_name: kube-linter-linux
+      - name: Upload Release Asset Windows
+        id: upload-release-asset-windows
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: windows/kube-linter.exe
+          asset_name: kube-linter-windows
+      - name: Upload Release Asset Mac
+        id: upload-release-asset-mac
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: darwin/kube-linter
+          asset_name: kube-linter-mac
