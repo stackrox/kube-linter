@@ -239,6 +239,7 @@ jobs:
         run: cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
 
   update_release_draft:
+    if: (github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/'))
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
@@ -247,6 +248,7 @@ jobs:
         with:
           name: bin
       - uses: release-drafter/release-drafter@v5
+        id: release_drafter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload Release Asset Linux
@@ -255,24 +257,30 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
           asset_path: linux/kube-linter
           asset_name: kube-linter-linux
+          asset_content_type: application/octet-stream
       - name: Upload Release Asset Windows
         id: upload-release-asset-windows
         uses: gfreezy/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
           asset_path: windows/kube-linter.exe
           asset_name: kube-linter-windows
+          asset_content_type: application/octet-stream
       - name: Upload Release Asset Mac
         id: upload-release-asset-mac
         uses: gfreezy/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
           asset_path: darwin/kube-linter
           asset_name: kube-linter-mac
+          asset_content_type: application/octet-stream
