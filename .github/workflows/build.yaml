@@ -35,11 +35,11 @@ jobs:
       - name: Build binaries
         run: make build
 
-      - name: Upload windows binary
+      - name: Upload binary
         uses: actions/upload-artifact@v2
         with:
-          name: kube-linter.exe
-          path: bin/windows/kube-linter.exe
+          name: bin
+          path: bin
 
       - name: Verify the binary version
         run: |
@@ -68,6 +68,54 @@ jobs:
       - name: Run bats tests
         run: make e2e-bats
 
+  test-sarif:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Download executable
+        uses: actions/download-artifact@v2
+        with:
+          name: bin
+      
+      - name: Set permissions to file
+        run:  chmod +x linux/kube-linter
+
+      - name: Print kube-linter version
+        run:  linux/kube-linter version
+
+      - name: Run kube-linter on a sample file with SARIF output
+        run:  linux/kube-linter lint --format=sarif tests/testdata/splunk.yaml > results.sarif
+        continue-on-error: true
+
+      - name: Dump output file and check it is not empty
+        # The if part will generate no-zero exit code if the file is empty. See https://github.com/stedolan/jq/issues/1142#issuecomment-432003984
+        run: jq -es 'if . == [] then null else .[] | . end' results.sarif
+
+      - name: Upload output file as GitHub artifact for manual investigation
+        uses: actions/upload-artifact@v2
+        with:
+          name: results.sarif
+          path: results.sarif
+
+      - name: Install yajsv
+        run:  curl https://github.com/neilpa/yajsv/releases/download/v1.4.0/yajsv.linux.amd64 -LsSfo yajsv && chmod +x yajsv
+
+      - name: Check if output file is valid according to SARIF schema
+        run: |
+          set -ex
+          schema=$(jq -r '.["$schema"]' results.sarif)
+          [ "$schema" = https://json.schemastore.org/sarif-2.1.0-rtm.5.json ]
+          ./yajsv -s ./scripts/sarif/sarif-schema-2.1.0.json results.sarif
+
+      - name: Upload SARIF output file to GitHub
+        # Workflows triggered by Dependabot on the "push" event run with read-only access and uploading Code Scanning results requires write access.
+        if: ((github.event_name == 'push') && !contains(github.head_ref, 'dependabot')) || (github.event_name != 'push')
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: results.sarif
+
   windows-sanity-test:
     name: Windows sanity test
     needs: build-and-test
@@ -80,15 +128,16 @@ jobs:
       - name: Download windows executable
         uses: actions/download-artifact@v2
         with:
-          name: kube-linter.exe
+          name: bin
+          path: tmp/
       - shell: bash
         run: |
           # In Windows, the workspace is attached relative to the current directory.
           tag="$(./get-tag)"
-          version_from_bin="$(./kube-linter.exe version)"
+          version_from_bin="$(tmp/windows/kube-linter.exe version)"
           echo "Expected tag ${tag}, got ${version_from_bin}"
           [[ "${tag}" == "${version_from_bin}" ]]
 
           # Make sure the lint command can run without errors.
           # TODO: run the full suite of E2E tests on Windows.
-          ./kube-linter.exe lint "tests/checks/access-to-create-pods.yml"
+          tmp/windows/kube-linter.exe lint "tests/checks/access-to-create-pods.yml"
