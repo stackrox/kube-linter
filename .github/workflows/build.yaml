@@ -239,7 +239,7 @@ jobs:
         run: cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
 
   update_release_draft:
-    if: github.ref == 'refs/heads/main'
+    if: (github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/'))
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
