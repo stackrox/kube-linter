@@ -149,6 +149,7 @@ jobs:
           tmp/windows/kube-linter.exe lint "tests/checks/access-to-create-pods.yml"
 
   image:
+    if: github.ref == 'refs/heads/main'
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
