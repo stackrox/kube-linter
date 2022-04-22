@@ -106,6 +106,33 @@ To build KubeLinter from source:
    echo export PATH='"${PATH}:'"$(pwd)/.gobin"'"'
    ```
 
+## Verifying KubeLinter images
+
+KubeLinter images are signed by [cosign](https://github.com/sigstore/cosign).
+We recommend verifying the image before using it.
+
+Once you've installed cosign, you can use the [KubeLinter public key](https://github.com/stackrox/kube-linter/blob/main/kubelinter-cosign.pub) to verify the KubeLinter image with:
+
+```shell
+cat kubelinter-cosign.pub
+-----BEGIN PUBLIC KEY-----
+MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEl0HCkCRzYv0qH5QiazoXeXe2qwFX
+DmAszeH26g1s3OSsG/focPWkN88wEKQ5eiE95v+Z2snUQPl/mjPdvqpyjA==
+-----END PUBLIC KEY-----
+
+
+cosign verify --key kubelinter-cosign $IMAGE_NAME
+```
+
+KubeLinter also provides [cosign keyless signatures](https://github.com/sigstore/cosign/blob/623d50f9b77ee85886a166daac648455e65003ec/KEYLESS.md).
+
+You can verify the KubeLinter image with:
+```shell
+# NOTE: Keyless signatures are NOT PRODUCTION ready.
+
+COSIGN_EXPERIMENTAL=1 cosign verify $IMAGE_NAME
+```
+
 ## Usage
 
 <!-- tabs:start -->
