@@ -67,7 +67,7 @@ func createContextsAndVerifyPaths(t *testing.T, useTarball, useAbsolutePath, ren
 	var lintCtxs []LintContext
 	if useFromArchiveFunction {
 		var file *os.File
-		file, err = os.Open(testPath)
+		file, err = os.Open(filepath.Clean(testPath))
 		require.NoError(t, err)
 
 		defer func() {

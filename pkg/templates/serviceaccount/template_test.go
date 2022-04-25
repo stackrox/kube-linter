@@ -36,6 +36,7 @@ func (s *ServiceAccountTestSuite) addDeploymentWithServiceAccount(name, serviceA
 }
 
 func (s *ServiceAccountTestSuite) TestServiceAccountName() {
+	//#nosec G101 -- This is a false positive
 	const (
 		matchingSAWithAutoMountTokenNil      = "match-sa-token-mount-nil"
 		matchingSAWithAutoMountTokenTrue     = "match-sa-token-mount-true"

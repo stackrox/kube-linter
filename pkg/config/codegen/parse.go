@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"text/template"
@@ -231,8 +232,7 @@ func mainCmd() error {
 			FlagDesc: flagDesc,
 		})
 	}
-
-	outF, err := os.Create(outFileName)
+	outF, err := os.Create(filepath.Clean(outFileName))
 	if err != nil {
 		return errors.Wrap(err, "creating output file")
 	}

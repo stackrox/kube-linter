@@ -98,8 +98,8 @@ func transform(p *ParameterDesc, nestingLevel int) HumanReadableParamDesc {
 
 	if len(p.SubParameters) > 0 {
 		subParamFields := make([]HumanReadableParamDesc, 0, len(p.SubParameters))
-		for _, subParam := range p.SubParameters {
-			subParamFields = append(subParamFields, transform(&subParam, nestingLevel+1))
+		for i := range p.SubParameters {
+			subParamFields = append(subParamFields, transform(&p.SubParameters[i], nestingLevel+1))
 		}
 		out.SubParameters = subParamFields
 	}

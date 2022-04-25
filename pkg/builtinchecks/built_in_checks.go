@@ -28,6 +28,7 @@ func LoadInto(registry checkregistry.CheckRegistry) error {
 		return err
 	}
 	for _, chk := range checks {
+		chk := chk
 		if err := registry.Register(&chk); err != nil {
 			return errors.Wrapf(err, "registering default check %s", chk.Name)
 		}

@@ -312,7 +312,7 @@ func processTemplate(dir string) error {
 	}
 
 	outFileName := filepath.Join(dir, "internal", "params", "gen-params.go")
-	outF, err := os.Create(outFileName)
+	outF, err := os.Create(filepath.Clean(outFileName))
 	if err != nil {
 		return errors.Wrap(err, "creating output file")
 	}
