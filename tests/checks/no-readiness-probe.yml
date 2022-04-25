@@ -52,3 +52,22 @@ spec:
     spec:
       containers:
       - name: app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: some-container
+      containers:
+        - name: app
+          readinessProbe:
+            exec:
+              command:
+                - cat
+                - /tmp/healthy
+            initialDelaySeconds: 5
+            periodSeconds: 5
