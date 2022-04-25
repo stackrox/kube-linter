@@ -41,7 +41,7 @@ func (s *ContainerImageTestSuite) TestImproperContainerImage() {
 	//#nosec G101 -- This is a false positive
 	const (
 		depWithLatestAsContainerImageTag = "dep-with-latest-as-container-image-tag"
-		depWithNotAllowedImageRegistry = "dep-with-not-allowed-image-registry"
+		depWithNotAllowedImageRegistry   = "dep-with-not-allowed-image-registry"
 	)
 
 	s.addDeploymentWithContainerImage(depWithLatestAsContainerImageTag, "example.com/test:latest")
