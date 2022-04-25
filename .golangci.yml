@@ -41,6 +41,9 @@ linters-settings:
       - emptyStringTest
       - hugeParam
       - rangeValCopy
+  gosec:
+    excludes:
+      - G101
   gosimple:
     go: "1.16"
     checks: ["all"]

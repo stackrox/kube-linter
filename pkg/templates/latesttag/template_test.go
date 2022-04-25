@@ -38,7 +38,6 @@ func (s *ContainerImageTestSuite) addDeploymentWithContainerImage(name, containe
 }
 
 func (s *ContainerImageTestSuite) TestImproperContainerImage() {
-	//#nosec G101 -- This is a false positive
 	const (
 		depWithLatestAsContainerImageTag = "dep-with-latest-as-container-image-tag"
 		depWithNotAllowedImageRegistry   = "dep-with-not-allowed-image-registry"
@@ -74,7 +73,6 @@ func (s *ContainerImageTestSuite) TestImproperContainerImage() {
 }
 
 func (s *ContainerImageTestSuite) TestAcceptableContainerImage() {
-	//#nosec G101 -- This is a false positive
 	const (
 		depWithLatestAsContainerImageName = "dep-with-latest-as-container-image-name"
 		depWithAcceptableContainerImage   = "dep-with-acceptable-container-image"
