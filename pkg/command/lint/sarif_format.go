@@ -66,15 +66,15 @@ func formatSarif(out io.Writer, result run.Result) error {
 		// WithWorkingDirectory helps GitHub resolve artifact locations from repo root when their paths are absolute.
 		WithWorkingDirectory(sarif.NewArtifactLocation().WithUri("file://" + cwd))
 
-	for _, c := range result.Checks {
-		err = addSarifRule(sarifRun, &c)
+	for i := range result.Checks {
+		err = addSarifRule(sarifRun, &result.Checks[i])
 		if err != nil {
 			return err
 		}
 	}
 
-	for _, r := range result.Reports {
-		err = addSarifResult(sarifRun, cwd, &r)
+	for i := range result.Reports {
+		err = addSarifResult(sarifRun, cwd, &result.Reports[i])
 		if err != nil {
 			return err
 		}

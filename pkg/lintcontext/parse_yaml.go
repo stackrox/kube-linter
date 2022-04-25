@@ -187,7 +187,7 @@ func (l *lintContextImpl) loadObjectsFromYAMLFile(filePath string, info os.FileI
 	if info.Size() > maxFileSizeBytes {
 		return nil
 	}
-	file, err := os.Open(filePath)
+	file, err := os.Open(filepath.Clean(filePath))
 	if err != nil {
 		return errors.Wrapf(err, "opening file at %s", filePath)
 	}
