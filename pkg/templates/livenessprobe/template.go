@@ -24,7 +24,7 @@ func init() {
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,
 		Instantiate: params.WrapInstantiateFunc(func(_ params.Params) (check.Func, error) {
-			return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
+			return util.PerNonInitContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
 				if container.LivenessProbe == nil {
 					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q does not specify a liveness probe", container.Name)}}
 				}
