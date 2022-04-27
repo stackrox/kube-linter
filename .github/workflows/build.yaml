@@ -1,8 +1,11 @@
 name: Test kube-linter
 
 on:
-  - pull_request
-  - push
+  pull_request:
+  # Workflows triggered by Dependabot on the "push" event run with read-only access.
+  # Uploading Code Scanning results requires write access. Ignore dependabot branches for auto-merge.
+  push:
+    branches-ignore: "dependabot/**"
 
 env:
   # Use docker.io for Docker Hub if empty
