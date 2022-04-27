@@ -7,7 +7,7 @@ require (
 	github.com/fatih/color v1.13.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/golangci/golangci-lint v1.45.2
-	github.com/mitchellh/mapstructure v1.4.3
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/openshift/api v3.9.0+incompatible
 	github.com/owenrumney/go-sarif/v2 v2.1.1
 	github.com/pkg/errors v0.9.1
