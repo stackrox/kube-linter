@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: test
+  name: test-target-port
+spec:
+  ports:
+    - targetPort: 1234
+    - targetPort: 'n-3456789012345'
+    - targetPort: 0
+    - targetPort: 'n234567890123456'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: test
+  name: kind-deployment
+spec:
+  template:
+    spec:
+      containers:
+        - name: test-port-name
+          ports:
+            - name: 'n23456789012345'
+              containerPort: 1234
+            - name: 'n234567890123456'
+              containerPort: 1235
+            - name: '123456'
+              containerPort: 123456

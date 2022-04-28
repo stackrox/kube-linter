@@ -644,6 +644,31 @@ get_value_from() {
   [[ "${count}" == "3" ]]
 }
 
+@test "target-port-specification" {
+  tmp="tests/checks/target-port-specification.yaml"
+  cmd="${KUBE_LINTER_BIN} lint --include target-port-specification --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [[ "${status}" -eq 1 ]]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "4" ]]
+
+  # TODO: export to helper function so that it can be used for other tests
+  actual_messages=()
+  for (( i=0; i<$((count)); i++ ))
+  do
+    actual_message=$(get_value_from "${lines[0]}" ".Reports[${i}] | .Object.K8sObject.GroupVersionKind.Kind + \": \" + .Diagnostic.Message")
+    actual_messages+=("${actual_message}")
+  done
+
+  [[ "${actual_messages[0]}" == "Service: port targetPort \"0\" in service \"test-target-port\" must be between 1 and 65535, inclusive" ]]
+  [[ "${actual_messages[1]}" == "Service: port targetPort \"n234567890123456\" in service \"test-target-port\" must be no more than 15 characters" ]]
+  [[ "${actual_messages[2]}" == "Deployment: port name \"n234567890123456\" in container \"test-port-name\" must be no more than 15 characters" ]]
+  [[ "${actual_messages[3]}" == "Deployment: port name \"123456\" in container \"test-port-name\" must contain at least one letter or number (a-z, 0-9)" ]]
+}
+
 @test "unsafe-proc-mount" {
   tmp="tests/checks/unsafe-proc-mount.yml"
   cmd="${KUBE_LINTER_BIN} lint --include unsafe-proc-mount --do-not-auto-add-defaults --format json ${tmp}"

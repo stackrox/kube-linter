@@ -29,5 +29,6 @@ var (
 		"unsafe-sysctls",
 		"unset-cpu-requirements",
 		"unset-memory-requirements",
+		"target-port-specification",
 	)
 )

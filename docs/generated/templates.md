@@ -630,6 +630,24 @@ KubeLinter supports the following templates:
   type: string
 ```
 
+## Target Port
+
+**Key**: `target-port`
+
+**Description**: Flag containers and services using not allowed port names or numbers
+
+**Supported Objects**: DeploymentLike,Service
+
+
+**Parameters**:
+
+```yaml
+- description: Set to true to validate targetPort names
+  name: targetPort
+  required: false
+  type: boolean
+```
+
 ## Unsafe Proc Mount
 
 **Key**: `unsafe-proc-mount`
