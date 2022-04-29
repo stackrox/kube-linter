@@ -60,6 +60,10 @@ func findPodPorts(podSpec *customtypes.PodSpec) []diagnostic.Diagnostic {
 	containers := podSpec.AllContainers()
 	for _, container := range containers {
 		for _, port := range container.Ports {
+			if port.Name == "" {
+				continue
+			}
+
 			violations := k8sValidation.IsValidPortName(port.Name)
 			for _, violation := range violations {
 				results = append(results, diagnostic.Diagnostic{
@@ -77,22 +81,27 @@ func findServicePorts(service *coreV1.Service) []diagnostic.Diagnostic {
 	var results []diagnostic.Diagnostic
 
 	for _, port := range service.Spec.Ports {
-		if port.TargetPort.Type == intstr.String {
-			violations := k8sValidation.IsValidPortName(port.TargetPort.String())
+		targetPort := port.TargetPort
+		if targetPort.Type == intstr.Int && targetPort.IntVal == 0 {
+			continue
+		}
+
+		if targetPort.Type == intstr.String {
+			violations := k8sValidation.IsValidPortName(targetPort.String())
 			for _, violation := range violations {
 				results = append(results, diagnostic.Diagnostic{
 					Message: fmt.Sprintf("port targetPort %q in service %q %s",
-						port.TargetPort.String(), service.Name, violation),
+						targetPort.String(), service.Name, violation),
 				})
 			}
 		}
 
-		if port.TargetPort.Type == intstr.Int {
-			violations := k8sValidation.IsValidPortNum(port.TargetPort.IntValue())
+		if targetPort.Type == intstr.Int {
+			violations := k8sValidation.IsValidPortNum(targetPort.IntValue())
 			for _, violation := range violations {
 				results = append(results, diagnostic.Diagnostic{
 					Message: fmt.Sprintf("port targetPort %q in service %q %s",
-						port.TargetPort.String(), service.Name, violation),
+						targetPort.String(), service.Name, violation),
 				})
 			}
 		}

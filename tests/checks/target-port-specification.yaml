@@ -7,7 +7,7 @@ spec:
   ports:
     - targetPort: 1234
     - targetPort: 'n-3456789012345'
-    - targetPort: 0
+    - targetPort: 123456
     - targetPort: 'n234567890123456'
 ---
 apiVersion: apps/v1
@@ -44,3 +44,26 @@ spec:
     spec:
       containers:
         - name: target-port-spec-empty
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: test
+  name: no-target-port
+spec:
+  ports:
+    - port: 8080
+      name: test
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: test
+  name: no-target-port
+spec:
+  template:
+    spec:
+      containers:
+        - name: no-target-port
+          ports:
+            - containerPort: 1234

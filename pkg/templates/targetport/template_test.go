@@ -89,12 +89,6 @@ func (s *TargetPortTestSuite) TestServices() {
 			TargetPort:          intstr.FromInt(8080),
 			ExpectedDiagnostics: nil,
 		},
-		"zero-number": {
-			TargetPort: intstr.FromInt(0),
-			ExpectedDiagnostics: []diagnostic.Diagnostic{
-				{Message: "port targetPort \"0\" in service \"zero-number\" must be between 1 and 65535, inclusive"},
-			},
-		},
 		"negative-number": {
 			TargetPort: intstr.FromInt(-1),
 			ExpectedDiagnostics: []diagnostic.Diagnostic{
@@ -203,13 +197,6 @@ func (s *TargetPortTestSuite) TestDeployments() {
 			TargetPort: "long-name-over-15",
 			ExpectedDiagnostics: []diagnostic.Diagnostic{
 				{Message: "port name \"long-name-over-15\" in container \"long-string\" must be no more than 15 characters"},
-			},
-		},
-		"empty-string": {
-			TargetPort: "",
-			ExpectedDiagnostics: []diagnostic.Diagnostic{
-				{Message: "port name \"\" in container \"empty-string\" must contain only alpha-numeric characters (a-z, 0-9), and hyphens (-)"},
-				{Message: "port name \"\" in container \"empty-string\" must contain at least one letter or number (a-z, 0-9)"},
 			},
 		},
 		"capital-string": {
