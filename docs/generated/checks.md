@@ -488,7 +488,7 @@ protocol: TCP
 
 **Description**: Indicates when deployments or services are using port names that are violating specifications.
 
-**Remediation**: Ensure that port naming is in conjunction with the specification. For more information, please look at the Kubernetes Service specification on this page: https://kubernetes.io/docs/reference/_print/#ServiceSpec. And additional information about IANA Service naming can be found on the following page: https://www.rfc-editor.org/rfc/rfc6335.html#section-5.1
+**Remediation**: Ensure that port naming is in conjunction with the specification. For more information, please look at the Kubernetes Service specification on this page: https://kubernetes.io/docs/reference/_print/#ServiceSpec. And additional information about IANA Service naming can be found on the following page: https://www.rfc-editor.org/rfc/rfc6335.html#section-5.1.
 
 **Template**: [target-port](generated/templates.md#target-port)
 

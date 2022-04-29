@@ -2,6 +2,7 @@ package targetport
 
 import (
 	"fmt"
+
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
@@ -11,7 +12,7 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	"golang.stackrox.io/kube-linter/pkg/templates/targetport/internal/params"
-	"k8s.io/api/core/v1"
+	coreV1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	k8sValidation "k8s.io/apimachinery/pkg/util/validation"
 )
@@ -41,7 +42,7 @@ func init() {
 					return findPodPorts(&podSpec)
 				}
 
-				service, foundService := object.K8sObject.(*v1.Service)
+				service, foundService := object.K8sObject.(*coreV1.Service)
 				if foundService {
 					return findServicePorts(service)
 				}
@@ -72,7 +73,7 @@ func findPodPorts(podSpec *customtypes.PodSpec) []diagnostic.Diagnostic {
 	return results
 }
 
-func findServicePorts(service *v1.Service) []diagnostic.Diagnostic {
+func findServicePorts(service *coreV1.Service) []diagnostic.Diagnostic {
 	var results []diagnostic.Diagnostic
 
 	for _, port := range service.Spec.Ports {
