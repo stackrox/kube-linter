@@ -663,10 +663,10 @@ get_value_from() {
     actual_messages+=("${actual_message}")
   done
 
-  [[ "${actual_messages[0]}" == "Service: port targetPort \"0\" in service \"test-target-port\" must be between 1 and 65535, inclusive" ]]
-  [[ "${actual_messages[1]}" == "Service: port targetPort \"n234567890123456\" in service \"test-target-port\" must be no more than 15 characters" ]]
-  [[ "${actual_messages[2]}" == "Deployment: port name \"n234567890123456\" in container \"test-port-name\" must be no more than 15 characters" ]]
-  [[ "${actual_messages[3]}" == "Deployment: port name \"123456\" in container \"test-port-name\" must contain at least one letter or number (a-z, 0-9)" ]]
+  [[ "${actual_messages[0]}" == "Service: port targetPort \"0\" in service \"target-port-spec\" must be between 1 and 65535, inclusive" ]]
+  [[ "${actual_messages[1]}" == "Service: port targetPort \"n234567890123456\" in service \"target-port-spec\" must be no more than 15 characters" ]]
+  [[ "${actual_messages[2]}" == "Deployment: port name \"n234567890123456\" in container \"target-port-spec\" must be no more than 15 characters" ]]
+  [[ "${actual_messages[3]}" == "Deployment: port name \"123456\" in container \"target-port-spec\" must contain at least one letter or number (a-z, 0-9)" ]]
 }
 
 @test "unsafe-proc-mount" {

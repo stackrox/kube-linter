@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: test
-  name: test-target-port
+  name: target-port-spec
 spec:
   ports:
     - targetPort: 1234
@@ -14,12 +14,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: test
-  name: kind-deployment
+  name: target-port-spec
 spec:
   template:
     spec:
       containers:
-        - name: test-port-name
+        - name: target-port-spec
           ports:
             - name: 'n23456789012345'
               containerPort: 1234
@@ -27,3 +27,20 @@ spec:
               containerPort: 1235
             - name: '123456'
               containerPort: 123456
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: test
+  name: target-port-spec-empty
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: test
+  name: target-port-spec-empty
+spec:
+  template:
+    spec:
+      containers:
+        - name: target-port-spec-empty
