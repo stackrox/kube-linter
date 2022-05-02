@@ -17,24 +17,7 @@ var (
 	_ = util.MustParseParameterDesc
 	_ = fmt.Sprintf
 
-	targetPortParamDesc = util.MustParseParameterDesc(`{
-	"Name": "targetPort",
-	"Type": "boolean",
-	"Description": "Set to true to validate targetPort names",
-	"Examples": null,
-	"Enum": null,
-	"SubParameters": null,
-	"ArrayElemType": "",
-	"Required": false,
-	"NoRegex": false,
-	"NotNegatable": false,
-	"XXXStructFieldName": "TargetPort",
-	"XXXIsPointer": false
-}
-`)
-
 	ParamDescs = []check.ParameterDesc{
-		targetPortParamDesc,
 	}
 )
 

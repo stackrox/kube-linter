@@ -11,5 +11,3 @@ scope:
     - DeploymentLike
     - Service
 template: "target-port"
-params:
-  targetPort: true

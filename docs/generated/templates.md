@@ -639,15 +639,6 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike,Service
 
 
-**Parameters**:
-
-```yaml
-- description: Set to true to validate targetPort names
-  name: targetPort
-  required: false
-  type: boolean
-```
-
 ## Unsafe Proc Mount
 
 **Key**: `unsafe-proc-mount`

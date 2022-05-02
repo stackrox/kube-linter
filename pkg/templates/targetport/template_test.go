@@ -47,21 +47,6 @@ func (s *TargetPortTestSuite) AddDeploymentWithPortName(name, portName string) {
 	})
 }
 
-func (s *TargetPortTestSuite) TestSkipTemplate() {
-	s.AddServiceWithTargetPort("test-skip", intstr.FromString("port--name"))
-
-	expectedDiagnostics := map[string][]diagnostic.Diagnostic{}
-	s.Validate(s.ctx, []templates.TestCase{
-		{
-			Param: params.Params{
-				TargetPort: false,
-			},
-			Diagnostics:              expectedDiagnostics,
-			ExpectInstantiationError: false,
-		},
-	})
-}
-
 func (s *TargetPortTestSuite) TestNoPorts() {
 	s.ctx.AddMockService(s.T(), "test-empty")
 	s.ctx.AddMockDeployment(s.T(), "test-empty")
@@ -69,9 +54,7 @@ func (s *TargetPortTestSuite) TestNoPorts() {
 	expectedDiagnostics := map[string][]diagnostic.Diagnostic{}
 	s.Validate(s.ctx, []templates.TestCase{
 		{
-			Param: params.Params{
-				TargetPort: true,
-			},
+			Param:                    params.Params{},
 			Diagnostics:              expectedDiagnostics,
 			ExpectInstantiationError: false,
 		},
@@ -169,9 +152,7 @@ func (s *TargetPortTestSuite) TestServices() {
 
 	s.Validate(s.ctx, []templates.TestCase{
 		{
-			Param: params.Params{
-				TargetPort: true,
-			},
+			Param:                    params.Params{},
 			Diagnostics:              expectedDiagnostics,
 			ExpectInstantiationError: false,
 		},
@@ -246,9 +227,7 @@ func (s *TargetPortTestSuite) TestDeployments() {
 
 	s.Validate(s.ctx, []templates.TestCase{
 		{
-			Param: params.Params{
-				TargetPort: true,
-			},
+			Param:                    params.Params{},
 			Diagnostics:              expectedDiagnostics,
 			ExpectInstantiationError: false,
 		},

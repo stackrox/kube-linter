@@ -31,12 +31,8 @@ func init() {
 		},
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,
-		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
+		Instantiate: params.WrapInstantiateFunc(func(_ params.Params) (check.Func, error) {
 			return func(_ lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
-				if !p.TargetPort {
-					return nil
-				}
-
 				podSpec, foundPodSpec := extract.PodSpec(object.K8sObject)
 				if foundPodSpec {
 					return findPodPorts(&podSpec)
