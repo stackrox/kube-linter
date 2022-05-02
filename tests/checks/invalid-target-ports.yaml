@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: test
-  name: target-port-spec
+  name: invalid-target-ports
 spec:
   ports:
     - targetPort: 1234
@@ -14,12 +14,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: test
-  name: target-port-spec
+  name: invalid-target-ports
 spec:
   template:
     spec:
       containers:
-        - name: target-port-spec
+        - name: invalid-target-ports
           ports:
             - name: 'n23456789012345'
               containerPort: 1234
@@ -32,18 +32,18 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: test
-  name: target-port-spec-empty
+  name: empty-ports
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: test
-  name: target-port-spec-empty
+  name: empty-ports
 spec:
   template:
     spec:
       containers:
-        - name: target-port-spec-empty
+        - name: empty-ports
 ---
 apiVersion: v1
 kind: Service

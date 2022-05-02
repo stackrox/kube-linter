@@ -16,6 +16,7 @@ var (
 		"sensitive-host-mounts",
 		"host-network",
 		"host-pid",
+		"invalid-target-ports",
 		"latest-tag",
 		"mismatching-selector",
 		"no-anti-affinity",
@@ -29,6 +30,5 @@ var (
 		"unsafe-sysctls",
 		"unset-cpu-requirements",
 		"unset-memory-requirements",
-		"target-port-specification",
 	)
 )
