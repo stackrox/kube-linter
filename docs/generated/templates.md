@@ -630,6 +630,15 @@ KubeLinter supports the following templates:
   type: string
 ```
 
+## Target Port
+
+**Key**: `target-port`
+
+**Description**: Flag containers and services using not allowed port names or numbers
+
+**Supported Objects**: DeploymentLike,Service
+
+
 ## Unsafe Proc Mount
 
 **Key**: `unsafe-proc-mount`

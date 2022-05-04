@@ -43,6 +43,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/serviceaccount"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/servicetype"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/sysctl"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/targetport"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/unsafeprocmount"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/updateconfig"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/wildcardinrules"

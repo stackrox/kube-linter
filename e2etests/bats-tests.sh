@@ -289,6 +289,31 @@ get_value_from() {
   [[ "${count}" == "1" ]]
 }
 
+@test "invalid-target-ports" {
+  tmp="tests/checks/invalid-target-ports.yaml"
+  cmd="${KUBE_LINTER_BIN} lint --include invalid-target-ports --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [[ "${status}" -eq 1 ]]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "4" ]]
+
+  # TODO: export to helper function so that it can be used for other tests
+  actual_messages=()
+  for (( i=0; i<$((count)); i++ ))
+  do
+    actual_message=$(get_value_from "${lines[0]}" ".Reports[${i}] | .Object.K8sObject.GroupVersionKind.Kind + \": \" + .Diagnostic.Message")
+    actual_messages+=("${actual_message}")
+  done
+
+  [[ "${actual_messages[0]}" == "Service: port targetPort \"123456\" in service \"invalid-target-ports\" must be between 1 and 65535, inclusive" ]]
+  [[ "${actual_messages[1]}" == "Service: port targetPort \"n234567890123456\" in service \"invalid-target-ports\" must be no more than 15 characters" ]]
+  [[ "${actual_messages[2]}" == "Deployment: port name \"n234567890123456\" in container \"invalid-target-ports\" must be no more than 15 characters" ]]
+  [[ "${actual_messages[3]}" == "Deployment: port name \"123456\" in container \"invalid-target-ports\" must contain at least one letter or number (a-z, 0-9)" ]]
+}
+
 @test "latest-tag" {
   tmp="tests/checks/latest-tag.yml"
   cmd="${KUBE_LINTER_BIN} lint --include latest-tag --do-not-auto-add-defaults --format json ${tmp}"
