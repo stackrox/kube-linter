@@ -224,7 +224,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-      - name: Extract Alpien Docker metadata
+      - name: Extract Alpine Docker metadata
         id: meta-alpine
         uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
         with:
@@ -232,15 +232,15 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.ALPINE_IMAGE_NAME }}
             ${{ env.ALPINE_IMAGE_NAME }}
 
-      - name: Build and push Alpien Docker image
+      - name: Build and push Alpine Docker image
         id: build-and-push-alpine
         uses: docker/build-push-action@ac9327eae2b366085ac7f6a2d02df8aa8ead720a
         with:
           context: image
           file: image/Dockerfile_alpine
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta-alpine.outputs.tags }}
+          labels: ${{ steps.meta-alpine.outputs.labels }}
 
       # Workaround: https://github.com/sigstore/cosign-installer/issues/73
       - name: Write cosign private key to file
