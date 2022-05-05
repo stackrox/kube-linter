@@ -99,9 +99,9 @@ jobs:
     steps:
     - checkout
     - check-label-to-run:
-        label: push-docker-image 
+        label: push-docker-image
     - setup_remote_docker
-    
+
     - run:
         name: Build image
         command: |
@@ -162,7 +162,7 @@ commands:
             version_from_binary="$(.gobin/kube-linter version)"
             echo "Version from kube-linter binary: ${version_from_binary}. Expected version: ${expected_version}"
             [[ "${version_from_binary}" == "${expected_version}" ]]
-  
+
   check-image-version-match:
     description: Check the built image matches with the expected version
     steps:
