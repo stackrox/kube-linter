@@ -1,5 +1,13 @@
 version: 2
 updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "janisz"
+    schedule:
+      interval: 'weekly'
+      day: 'wednesday'
   - package-ecosystem: 'gomod'
     directory: '/'
     schedule:
@@ -7,4 +15,4 @@ updates:
       day: 'wednesday'
     open-pull-requests-limit: 3
     reviewers:
-      - "stackrox/backend-dep-updaters"
+      - "janisz"
