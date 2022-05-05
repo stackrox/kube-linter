@@ -61,26 +61,30 @@ func init() {
 				if !hasPods {
 					return nil
 				}
+				affinity := podTemplateSpec.Spec.Affinity
+				// Short-circuit if no affinity rule is specified within the pod spec.
+				if affinity == nil || affinity.PodAntiAffinity == nil {
+					return []diagnostic.Diagnostic{
+						{Message: fmt.Sprintf("object has %d %s but does not specify inter pod anti-affinity",
+							replicas, stringutils.Ternary(replicas > 1, "replicas", "replica"))},
+					}
+				}
 				var foundIssues []diagnostic.Diagnostic
-				if affinity := podTemplateSpec.Spec.Affinity; affinity != nil && affinity.PodAntiAffinity != nil {
-					preferredAffinity := affinity.PodAntiAffinity.PreferredDuringSchedulingIgnoredDuringExecution
-					requiredAffinity := affinity.PodAntiAffinity.RequiredDuringSchedulingIgnoredDuringExecution
-					for _, preferred := range preferredAffinity {
-						err := affinityTermMatchesLabelsAgainstNodes(preferred.PodAffinityTerm,
-							podTemplateSpec.Namespace, podTemplateSpec.Labels, topologyKeyMatcher)
-						if err == nil {
-							return nil
-						}
+				preferredAffinity := affinity.PodAntiAffinity.PreferredDuringSchedulingIgnoredDuringExecution
+				requiredAffinity := affinity.PodAntiAffinity.RequiredDuringSchedulingIgnoredDuringExecution
+				for _, preferred := range preferredAffinity {
+					err := affinityTermMatchesLabelsAgainstNodes(preferred.PodAffinityTerm,
+						podTemplateSpec.Namespace, podTemplateSpec.Labels, topologyKeyMatcher)
+					if err != nil {
 						foundIssues = append(foundIssues, diagnostic.Diagnostic{
 							Message: err.Error(),
 						})
 					}
-					for _, required := range requiredAffinity {
-						err := affinityTermMatchesLabelsAgainstNodes(required, podTemplateSpec.Namespace,
-							podTemplateSpec.Labels, topologyKeyMatcher)
-						if err == nil {
-							return nil
-						}
+				}
+				for _, required := range requiredAffinity {
+					err := affinityTermMatchesLabelsAgainstNodes(required, podTemplateSpec.Namespace,
+						podTemplateSpec.Labels, topologyKeyMatcher)
+					if err != nil {
 						foundIssues = append(foundIssues, diagnostic.Diagnostic{
 							Message: err.Error(),
 						})
@@ -89,10 +93,7 @@ func init() {
 				if foundIssues != nil {
 					return foundIssues
 				}
-				return []diagnostic.Diagnostic{
-					{Message: fmt.Sprintf("object has %d %s but does not specify inter pod anti-affinity",
-						replicas, stringutils.Ternary(replicas > 1, "replicas", "replica"))},
-				}
+				return nil
 			}, nil
 		}),
 	})
