@@ -210,7 +210,7 @@ jobs:
       # https://github.com/docker/metadata-action
       - name: Extract Docker metadata
         id: meta
-        uses: docker/metadata-action@v3.8.0
+        uses: docker/metadata-action@v4.0.1
         with:
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
@@ -229,7 +229,7 @@ jobs:
 
       - name: Extract Alpine Docker metadata
         id: meta-alpine
-        uses: docker/metadata-action@v3.8.0
+        uses: docker/metadata-action@v4.0.1
         with:
           flavor: |
             latest=auto
