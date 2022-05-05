@@ -2,6 +2,7 @@ package antiaffinity
 
 import (
 	"fmt"
+	"strings"
 
 	"golang.stackrox.io/kube-linter/internal/stringutils"
 	"golang.stackrox.io/kube-linter/pkg/check"
@@ -28,9 +29,10 @@ func defaultTopologyKeyMatcher(topologyKey string) bool {
 
 func init() {
 	templates.Register(check.Template{
-		HumanName:   "Anti affinity not specified",
-		Key:         templateKey,
-		Description: "Flag objects with multiple replicas but inter-pod anti affinity not specified in the pod template spec",
+		HumanName: "Anti affinity not specified",
+		Key:       templateKey,
+		Description: "Flag objects with multiple replicas but inter-pod anti affinity not specified in the pod " +
+			"template spec",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
@@ -59,30 +61,45 @@ func init() {
 				if !hasPods {
 					return nil
 				}
-				if affinity := podTemplateSpec.Spec.Affinity; affinity != nil && affinity.PodAntiAffinity != nil {
-					preferredAffinity := affinity.PodAntiAffinity.PreferredDuringSchedulingIgnoredDuringExecution
-					requiredAffinity := affinity.PodAntiAffinity.RequiredDuringSchedulingIgnoredDuringExecution
-					for _, preferred := range preferredAffinity {
-						if affinityTermMatchesLabelsAgainstNodes(preferred.PodAffinityTerm, podTemplateSpec.Namespace, podTemplateSpec.Labels, topologyKeyMatcher) {
-							return nil
-						}
-					}
-					for _, required := range requiredAffinity {
-						if affinityTermMatchesLabelsAgainstNodes(required, podTemplateSpec.Namespace, podTemplateSpec.Labels, topologyKeyMatcher) {
-							return nil
-						}
+				affinity := podTemplateSpec.Spec.Affinity
+				// Short-circuit if no affinity rule is specified within the pod spec.
+				if affinity == nil || affinity.PodAntiAffinity == nil {
+					return []diagnostic.Diagnostic{
+						{Message: fmt.Sprintf("object has %d %s but does not specify inter pod anti-affinity",
+							replicas, stringutils.Ternary(replicas > 1, "replicas", "replica"))},
 					}
 				}
-				return []diagnostic.Diagnostic{
-					{Message: fmt.Sprintf("object has %d %s but does not specify inter pod anti-affinity", replicas, stringutils.Ternary(replicas > 1, "replicas", "replica"))},
+				var foundIssues []diagnostic.Diagnostic
+				preferredAffinity := affinity.PodAntiAffinity.PreferredDuringSchedulingIgnoredDuringExecution
+				requiredAffinity := affinity.PodAntiAffinity.RequiredDuringSchedulingIgnoredDuringExecution
+				for _, preferred := range preferredAffinity {
+					err := validateAffinityTermMatchesAgainstNodes(preferred.PodAffinityTerm,
+						podTemplateSpec.Namespace, podTemplateSpec.Labels, topologyKeyMatcher)
+					if err != nil {
+						foundIssues = append(foundIssues, diagnostic.Diagnostic{
+							Message: err.Error(),
+						})
+					}
 				}
+				for _, required := range requiredAffinity {
+					err := validateAffinityTermMatchesAgainstNodes(required, podTemplateSpec.Namespace,
+						podTemplateSpec.Labels, topologyKeyMatcher)
+					if err != nil {
+						foundIssues = append(foundIssues, diagnostic.Diagnostic{
+							Message: err.Error(),
+						})
+					}
+				}
+				return foundIssues
 			}, nil
 		}),
 	})
 }
 
-func affinityTermMatchesLabelsAgainstNodes(affinityTerm coreV1.PodAffinityTerm, podNamespace string, podLabels map[string]string, topologyKeyMatcher func(string) bool) bool {
-	// If namespaces is not specified in the affinity term, that means the affinity term implicitly applies to the pod's namespace.
+func validateAffinityTermMatchesAgainstNodes(affinityTerm coreV1.PodAffinityTerm, podNamespace string,
+	podLabels map[string]string, topologyKeyMatcher func(string) bool) error {
+	// If namespaces is not specified in the affinity term, that means the affinity term implicitly applies to
+	// the pod's namespace.
 	if len(affinityTerm.Namespaces) > 0 {
 		var matchingNSFound bool
 		for _, ns := range affinityTerm.Namespaces {
@@ -92,15 +109,21 @@ func affinityTermMatchesLabelsAgainstNodes(affinityTerm coreV1.PodAffinityTerm, 
 			}
 		}
 		if !matchingNSFound {
-			return false
+			return fmt.Errorf("pod's namespace %q not found in anti-affinity's namespaces [%s]",
+				podNamespace, strings.Join(affinityTerm.Namespaces, ", "))
 		}
 	}
 	labelSelector, err := metaV1.LabelSelectorAsSelector(affinityTerm.LabelSelector)
 	if err != nil {
-		return false
+		return err
 	}
-	if topologyKeyMatcher(affinityTerm.TopologyKey) && labelSelector.Matches(labels.Set(podLabels)) {
-		return true
+
+	if !topologyKeyMatcher(affinityTerm.TopologyKey) {
+		return fmt.Errorf("anti-affinity's topology key does not match %q", affinityTerm.TopologyKey)
 	}
-	return false
+	if !labelSelector.Matches(labels.Set(podLabels)) {
+		return fmt.Errorf("pod's labels %q do not match with anti-affinity's labels %q",
+			labels.Set(podLabels).String(), labelSelector.String())
+	}
+	return nil
 }

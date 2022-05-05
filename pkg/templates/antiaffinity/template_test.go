@@ -81,7 +81,8 @@ func (s *AntiAffinityTestSuite) TestNoAntiAffinity() {
 	})
 }
 
-func (s *AntiAffinityTestSuite) addDeploymentWithAntiAffinity(name string, replicas int32, topologyKey string) {
+func (s *AntiAffinityTestSuite) addDeploymentWithAntiAffinity(name string, replicas int32, topologyKey string,
+	labelName string, namespace string) {
 	s.addDeploymentWithReplicas(name, replicas)
 	s.ctx.ModifyDeployment(s.T(), name, func(deployment *appsV1.Deployment) {
 		deployment.Spec.Template.Labels = map[string]string{"app": name}
@@ -92,14 +93,14 @@ func (s *AntiAffinityTestSuite) addDeploymentWithAntiAffinity(name string, repli
 						Weight: 1,
 						PodAffinityTerm: v1.PodAffinityTerm{
 							TopologyKey:   topologyKey,
-							LabelSelector: &metaV1.LabelSelector{MatchLabels: map[string]string{"app": name}},
+							Namespaces:    []string{namespace},
+							LabelSelector: &metaV1.LabelSelector{MatchLabels: map[string]string{"app": labelName}},
 						},
 					},
 				},
 			},
 		}
 	})
-
 }
 
 func (s *AntiAffinityTestSuite) TestWithAntiAffinity() {
@@ -107,10 +108,18 @@ func (s *AntiAffinityTestSuite) TestWithAntiAffinity() {
 		kubernetesIOHostnameDepName = "kubernetes-io-hostname"
 		otherValidKeyDepName        = "other-valid-key"
 		weirdKeyDepName             = "weird-key"
+		nonMatchingLabelSelectors   = "non-matching-label-selector"
+		nonMatchingNamespace        = "non-matching-namespace"
 	)
-	s.addDeploymentWithAntiAffinity(kubernetesIOHostnameDepName, 2, "kubernetes.io/hostname")
-	s.addDeploymentWithAntiAffinity(otherValidKeyDepName, 3, "other.valid/key")
-	s.addDeploymentWithAntiAffinity(weirdKeyDepName, 4, "weird/key")
+	s.addDeploymentWithAntiAffinity(kubernetesIOHostnameDepName, 2, "kubernetes.io/hostname",
+		kubernetesIOHostnameDepName, "")
+	s.addDeploymentWithAntiAffinity(otherValidKeyDepName, 3, "other.valid/key",
+		otherValidKeyDepName, "")
+	s.addDeploymentWithAntiAffinity(weirdKeyDepName, 4, "weird/key", weirdKeyDepName, "")
+	s.addDeploymentWithAntiAffinity(nonMatchingLabelSelectors, 4, "other.valid/key",
+		"non-matching", "")
+	s.addDeploymentWithAntiAffinity(nonMatchingNamespace, 4, "other.valid/key",
+		nonMatchingNamespace, "non-matching-namespace")
 
 	s.Validate(s.ctx, []templates.TestCase{
 		{
@@ -119,10 +128,16 @@ func (s *AntiAffinityTestSuite) TestWithAntiAffinity() {
 			},
 			Diagnostics: map[string][]diagnostic.Diagnostic{
 				otherValidKeyDepName: {
-					{Message: "object has 3 replicas but does not specify inter pod anti-affinity"},
+					{Message: "anti-affinity's topology key does not match \"other.valid/key\""},
 				},
 				weirdKeyDepName: {
-					{Message: "object has 4 replicas but does not specify inter pod anti-affinity"},
+					{Message: "anti-affinity's topology key does not match \"weird/key\""},
+				},
+				nonMatchingLabelSelectors: {
+					{Message: "anti-affinity's topology key does not match \"other.valid/key\""},
+				},
+				nonMatchingNamespace: {
+					{Message: "pod's namespace \"\" not found in anti-affinity's namespaces [non-matching-namespace]"},
 				},
 			},
 			ExpectInstantiationError: false,
@@ -134,10 +149,17 @@ func (s *AntiAffinityTestSuite) TestWithAntiAffinity() {
 			},
 			Diagnostics: map[string][]diagnostic.Diagnostic{
 				kubernetesIOHostnameDepName: {
-					{Message: "object has 2 replicas but does not specify inter pod anti-affinity"},
+					{Message: "anti-affinity's topology key does not match \"kubernetes.io/hostname\""},
 				},
 				weirdKeyDepName: {
-					{Message: "object has 4 replicas but does not specify inter pod anti-affinity"},
+					{Message: "anti-affinity's topology key does not match \"weird/key\""},
+				},
+				nonMatchingLabelSelectors: {
+					{Message: "pod's labels \"app=non-matching-label-selector\" do not match with anti-affinity's " +
+						"labels \"app=non-matching\""},
+				},
+				nonMatchingNamespace: {
+					{Message: "pod's namespace \"\" not found in anti-affinity's namespaces [non-matching-namespace]"},
 				},
 			},
 			ExpectInstantiationError: false,
@@ -147,7 +169,15 @@ func (s *AntiAffinityTestSuite) TestWithAntiAffinity() {
 				MinReplicas: 2,
 				TopologyKey: ".+",
 			},
-			Diagnostics:              nil,
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				nonMatchingLabelSelectors: {
+					{Message: "pod's labels \"app=non-matching-label-selector\" do not match with anti-affinity's " +
+						"labels \"app=non-matching\""},
+				},
+				nonMatchingNamespace: {
+					{Message: "pod's namespace \"\" not found in anti-affinity's namespaces [non-matching-namespace]"},
+				},
+			},
 			ExpectInstantiationError: false,
 		},
 	})
