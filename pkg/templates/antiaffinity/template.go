@@ -73,7 +73,7 @@ func init() {
 				preferredAffinity := affinity.PodAntiAffinity.PreferredDuringSchedulingIgnoredDuringExecution
 				requiredAffinity := affinity.PodAntiAffinity.RequiredDuringSchedulingIgnoredDuringExecution
 				for _, preferred := range preferredAffinity {
-					err := affinityTermMatchesLabelsAgainstNodes(preferred.PodAffinityTerm,
+					err := validateAffinityTermMatchesAgainstNodes(preferred.PodAffinityTerm,
 						podTemplateSpec.Namespace, podTemplateSpec.Labels, topologyKeyMatcher)
 					if err != nil {
 						foundIssues = append(foundIssues, diagnostic.Diagnostic{
@@ -82,7 +82,7 @@ func init() {
 					}
 				}
 				for _, required := range requiredAffinity {
-					err := affinityTermMatchesLabelsAgainstNodes(required, podTemplateSpec.Namespace,
+					err := validateAffinityTermMatchesAgainstNodes(required, podTemplateSpec.Namespace,
 						podTemplateSpec.Labels, topologyKeyMatcher)
 					if err != nil {
 						foundIssues = append(foundIssues, diagnostic.Diagnostic{
@@ -90,16 +90,13 @@ func init() {
 						})
 					}
 				}
-				if foundIssues != nil {
-					return foundIssues
-				}
-				return nil
+				return foundIssues
 			}, nil
 		}),
 	})
 }
 
-func affinityTermMatchesLabelsAgainstNodes(affinityTerm coreV1.PodAffinityTerm, podNamespace string,
+func validateAffinityTermMatchesAgainstNodes(affinityTerm coreV1.PodAffinityTerm, podNamespace string,
 	podLabels map[string]string, topologyKeyMatcher func(string) bool) error {
 	// If namespaces is not specified in the affinity term, that means the affinity term implicitly applies to
 	// the pod's namespace.
