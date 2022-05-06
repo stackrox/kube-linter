@@ -800,9 +800,11 @@ get_value_from() {
   print_info "${status}" "${output}" "${cmd}" "${tmp}"
   [ "$status" -eq 1 ]
 
-  message=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
   count=$(get_value_from "${lines[0]}" '.Reports | length')
 
-  [[ "${message}" == "Deployment: annotation matching \"reloader.stakater.com/auto=true\" found" ]]
-  [[ "${count}" == "1" ]]
+  [[ "${message1}" == "Deployment: annotation matching \"reloader.stakater.com/auto=true\" found" ]]
+  [[ "${message2}" == "ServiceAccount: annotation matching \"eks.amazonaws.com/role-arn=!arn:aws:iam::\\d+:role\\/\\S+\" found" ]]
+  [[ "${count}" == "2" ]]
 }

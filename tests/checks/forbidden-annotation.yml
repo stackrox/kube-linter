@@ -19,3 +19,17 @@ metadata:
   name: dont-fire
   annotations:
     reloader.stakater.com/auto: T
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bad-irsa-role
+  annotations:
+    eks.amazonaws.com/role-arn: this-is-not-a-valid-iam-role-arn
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: good-irsa-role
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::121212121212:role/role-name-goes-here
