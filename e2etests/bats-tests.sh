@@ -802,9 +802,11 @@ get_value_from() {
 
   message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
   message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  failing_resource=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.Name')
   count=$(get_value_from "${lines[0]}" '.Reports | length')
 
   [[ "${message1}" == "Deployment: annotation matching \"reloader.stakater.com/auto=true\" found" ]]
-  [[ "${message2}" == "ServiceAccount: annotation matching \"eks.amazonaws.com/role-arn=!arn:aws:iam::\\d+:role\\/\\S+\" found" ]]
+  [[ "${message2}" == "ServiceAccount: annotation matching \"eks.amazonaws.com/role-arn=arn:aws:iam::\d{12}:role\/[a-zA-Z_+=,.@-]+$\" found" ]]
+  [[ "${failing_resource}" == "bad-irsa-role" ]]
   [[ "${count}" == "2" ]]
 }
