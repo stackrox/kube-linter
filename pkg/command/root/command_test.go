@@ -2,11 +2,12 @@ package root
 
 import (
 	"fmt"
+	"io"
+	"testing"
+
 	"github.com/fatih/color"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"io"
-	"testing"
 )
 
 func TestCommand(t *testing.T) {

@@ -1,10 +1,10 @@
 package root
 
 import (
-	"github.com/fatih/color"
 	"os"
 	"path/filepath"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 	"golang.stackrox.io/kube-linter/pkg/command/checks"
 	"golang.stackrox.io/kube-linter/pkg/command/lint"
