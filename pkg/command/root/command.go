@@ -1,6 +1,7 @@
 package root
 
 import (
+	"github.com/fatih/color"
 	"os"
 	"path/filepath"
 
@@ -11,12 +12,22 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/command/version"
 )
 
+const (
+	colorFlag = "with-color"
+)
+
 // Command is the root command.
 func Command() *cobra.Command {
 	c := &cobra.Command{
 		Use:           filepath.Base(os.Args[0]),
 		SilenceUsage:  true,
 		SilenceErrors: true,
+		PersistentPreRun: func(cmd *cobra.Command, _ []string) {
+			// Only forcefully set colorful output if the flag has been set.
+			if cmd.Flags().Changed(colorFlag) {
+				color.NoColor = false
+			}
+		},
 	}
 	c.AddCommand(
 		checks.Command(),
@@ -24,5 +35,6 @@ func Command() *cobra.Command {
 		templates.Command(),
 		version.Command(),
 	)
+	c.PersistentFlags().Bool(colorFlag, true, "Force color output")
 	return c
 }
