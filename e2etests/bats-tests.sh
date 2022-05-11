@@ -16,6 +16,11 @@ get_value_from() {
   echo "${value}"
 }
 
+@test "check-installed-bash-version" {
+    run "bash --version"
+    [[ "${BASH_VERSION:0:1}" -ge '4' ]] || false
+}
+
 @test "access-to-create-pods" {
   tmp="tests/checks/access-to-create-pods.yml"
   cmd="${KUBE_LINTER_BIN} lint --include access-to-create-pods --do-not-auto-add-defaults --format json ${tmp}"
