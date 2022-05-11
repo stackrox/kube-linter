@@ -16,7 +16,7 @@ get_value_from() {
   echo "${value}"
 }
 
-@test "check-installed-bash-version" {
+@test "template-check-installed-bash-version" {
     run "bash --version"
     [[ "${BASH_VERSION:0:1}" -ge '4' ]] || false
 }
