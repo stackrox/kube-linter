@@ -84,7 +84,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Download executable
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: bin
 
@@ -133,7 +133,7 @@ jobs:
           # Checkout all repo history to make tags available for figuring out kube-linter version during build.
           fetch-depth: 0
       - name: Download windows executable
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: bin
           path: tmp/
@@ -163,7 +163,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Download executable
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: bin
 
@@ -289,7 +289,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download executables
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: bin
       - uses: release-drafter/release-drafter@v5
