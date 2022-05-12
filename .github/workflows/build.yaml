@@ -6,6 +6,8 @@ on:
   # Uploading Code Scanning results requires write access. Ignore dependabot branches for auto-merge.
   push:
     branches-ignore: "dependabot/**"
+    tags: 
+      - "*"
 
 env:
   # Use docker.io for Docker Hub if empty
