@@ -152,7 +152,7 @@ jobs:
           tmp/windows/kube-linter.exe lint "tests/checks/access-to-create-pods.yml"
 
   image:
-    if: startsWith(github.ref, 'refs/tags/')
+    if: (github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/'))
     needs: build-and-test
     runs-on: ubuntu-latest
 
