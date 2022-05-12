@@ -45,7 +45,7 @@ jobs:
         run: make build
 
       - name: Upload binary
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: bin
           path: bin
@@ -103,7 +103,7 @@ jobs:
         run: jq -es 'if . == [] then null else .[] | . end' results.sarif
 
       - name: Upload output file as GitHub artifact for manual investigation
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: results.sarif
           path: results.sarif
