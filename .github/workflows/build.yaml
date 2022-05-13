@@ -290,6 +290,8 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v2.3.0
       - name: Download executables
         uses: actions/download-artifact@v3
         with:
@@ -303,6 +305,19 @@ jobs:
             fi
             tar -C "${os}" -czf "kube-linter-${os}.tar.gz" "${bin_name}"
             zip --junk-paths "kube-linter-${os}.zip" "${os}/${bin_name}"
+          done
+      # Workaround: https://github.com/sigstore/cosign-installer/issues/73
+      - name: Write cosign private key to file
+        env:
+          KEY: ${{ secrets.COSIGN_KEY }}
+        shell: bash
+        run: 'echo "$KEY" > cosign.key'
+      - name: sign archives
+        env:
+          COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
+        run: |
+          for f in *.{gz,zip}; do \
+            cosign sign-blob --key cosign.key --output-file "${f}.sig" "${f}"; \
           done
       - uses: release-drafter/release-drafter@v5
         id: release_drafter
@@ -374,3 +389,69 @@ jobs:
           asset_path: kube-linter-darwin.zip
           asset_name: kube-linter-darwin.zip
           asset_content_type: application/zip
+      - name: Upload sig Asset Linux
+        id: upload-release-asset-linux-sig
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-linux.tar.gz.sig
+          asset_name: kube-linter-linux.tar.gz.sig
+          asset_content_type: text/plain
+      - name: Upload sig Asset Windows
+        id: upload-release-asset-windows-sig
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-windows.tar.gz.sig
+          asset_name: kube-linter-windows.tar.gz.sig
+          asset_content_type: text/plain
+      - name: Upload sig Asset Mac
+        id: upload-release-asset-mac-sig
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-darwin.tar.gz.sig
+          asset_name: kube-linter-darwin.tar.gz.sig
+          asset_content_type: text/plain
+      - name: Upload sig Asset Linux ZIP
+        id: upload-release-asset-linux-zip-sig
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-linux.zip.sig
+          asset_name: kube-linter-linux.zip.sig
+          asset_content_type: text/plain
+      - name: Upload sig Asset Windows ZIP
+        id: upload-release-asset-windows-zip-sig
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-windows.zip.sig
+          asset_name: kube-linter-windows.zip.sig
+          asset_content_type: text/plain
+      - name: Upload sig Asset Mac ZIP
+        id: upload-release-asset-mac-zip-sig
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-darwin.zip.sig
+          asset_name: kube-linter-darwin.zip.sig
+          asset_content_type: text/plain
