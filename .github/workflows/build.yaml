@@ -294,6 +294,16 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: bin
+      - name: create archives
+        run: |
+          for os in darwin linux windows; do
+            bin_name="kube-linter"
+            if [[ "${os}" == "windows" ]]; then
+              bin_name="kube-linter.exe"
+            fi
+            tar -C "${os}" -czf "kube-linter-${os}.tar.gz" "${bin_name}"
+            zip --junk-paths "kube-linter-${os}.zip" "${os}/${bin_name}"
+          done
       - uses: release-drafter/release-drafter@v5
         id: release_drafter
         env:
@@ -306,8 +316,8 @@ jobs:
         with:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: linux/kube-linter
-          asset_name: kube-linter-linux
+          asset_path: kube-linter-linux.tar.gz
+          asset_name: kube-linter-linux.tar.gz
           asset_content_type: application/octet-stream
       - name: Upload Release Asset Windows
         id: upload-release-asset-windows
@@ -317,8 +327,8 @@ jobs:
         with:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: windows/kube-linter.exe
-          asset_name: kube-linter-windows
+          asset_path: kube-linter-windows.tar.gz
+          asset_name: kube-linter-windows.tar.gz
           asset_content_type: application/octet-stream
       - name: Upload Release Asset Mac
         id: upload-release-asset-mac
@@ -328,6 +338,39 @@ jobs:
         with:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: darwin/kube-linter
-          asset_name: kube-linter-mac
+          asset_path: kube-linter-darwin.tar.gz
+          asset_name: kube-linter-darwin.tar.gz
           asset_content_type: application/octet-stream
+      - name: Upload Release Asset Linux ZIP
+        id: upload-release-asset-linux-zip
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-linux.zip
+          asset_name: kube-linter-linux.zip
+          asset_content_type: application/zip
+      - name: Upload Release Asset Windows ZIP
+        id: upload-release-asset-windows-zip
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-windows.zip
+          asset_name: kube-linter-windows.zip
+          asset_content_type: application/zip
+      - name: Upload Release Asset Mac ZIP
+        id: upload-release-asset-mac-zip
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-darwin.zip
+          asset_name: kube-linter-darwin.zip
+          asset_content_type: application/zip
