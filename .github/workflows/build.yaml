@@ -455,3 +455,26 @@ jobs:
           asset_path: kube-linter-darwin.zip.sig
           asset_name: kube-linter-darwin.zip.sig
           asset_content_type: text/plain
+
+      - name: Upload sig source code zip
+        id: upload-release-asset-source-zip-sig
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-source.zip.sig
+          asset_name: Source code signature (zip.sig)
+          asset_content_type: text/plain
+      - name: Upload sig source code
+        id: upload-release-asset-source-sig
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-source.zip.sig
+          asset_name: Source code signature (tar.gz.sig)
+          asset_content_type: text/plain

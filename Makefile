@@ -80,7 +80,7 @@ generated-srcs: go-generated-srcs generated-docs
 
 
 .PHONY: build
-build:
+build: source-code-archive
 	@CGO_ENABLED=0 GOOS=darwin scripts/go-build.sh ./cmd/kube-linter
 	@CGO_ENABLED=0 GOOS=linux scripts/go-build.sh ./cmd/kube-linter
 	@CGO_ENABLED=0 GOOS=windows scripts/go-build.sh ./cmd/kube-linter
@@ -96,6 +96,13 @@ image: build
 	@cp bin/linux/kube-linter image/bin
 	@docker build -t "stackrox/kube-linter:$(TAG)" -f image/Dockerfile image/
 	@docker build -t "stackrox/kube-linter:$(TAG)-alpine" -f image/Dockerfile_alpine image/
+
+.PHONY: source-code-archive
+source-code-archive:
+	git archive --prefix="kube-linter-$(TAG)/" HEAD -o "bin/kube-linter-source.tar.gz"
+	git archive --prefix="kube-linter-$(TAG)/" HEAD -o "bin/kube-linter-source.zip"
+
+
 ##########
 ## Test ##
 ##########
