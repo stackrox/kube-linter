@@ -465,7 +465,7 @@ jobs:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
           asset_path: kube-linter-source.zip.sig
-          asset_name: Source code signature (zip.sig)
+          asset_name: kube-linter-source.zip.sig
           asset_content_type: text/plain
       - name: Upload sig source code
         id: upload-release-asset-source-sig
@@ -475,6 +475,6 @@ jobs:
         with:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-source.zip.sig
-          asset_name: Source code signature (tar.gz.sig)
+          asset_path: kube-linter-source.tar.gz.sig
+          asset_name: kube-linter-source.tar.gz.sig
           asset_content_type: text/plain
