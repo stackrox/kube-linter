@@ -6,6 +6,8 @@ on:
   # Uploading Code Scanning results requires write access. Ignore dependabot branches for auto-merge.
   push:
     branches-ignore: "dependabot/**"
+    tags: 
+      - "*"
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -45,7 +47,7 @@ jobs:
         run: make build
 
       - name: Upload binary
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: bin
           path: bin
@@ -84,7 +86,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Download executable
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: bin
 
@@ -103,7 +105,7 @@ jobs:
         run: jq -es 'if . == [] then null else .[] | . end' results.sarif
 
       - name: Upload output file as GitHub artifact for manual investigation
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: results.sarif
           path: results.sarif
@@ -133,7 +135,7 @@ jobs:
           # Checkout all repo history to make tags available for figuring out kube-linter version during build.
           fetch-depth: 0
       - name: Download windows executable
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: bin
           path: tmp/
@@ -150,7 +152,7 @@ jobs:
           tmp/windows/kube-linter.exe lint "tests/checks/access-to-create-pods.yml"
 
   image:
-    if: startsWith(github.ref, 'refs/tags/')
+    if: (github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/'))
     needs: build-and-test
     runs-on: ubuntu-latest
 
@@ -163,7 +165,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Download executable
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: bin
 
@@ -185,7 +187,7 @@ jobs:
 
       # Workaround: https://github.com/docker/build-push-action/issues/461
       - name: Setup Docker buildx
-        uses: docker/setup-buildx-action@79abd3f86f79a9d68a23c75a09a9a85889262adf
+        uses: docker/setup-buildx-action@dc7b9719a96d48369863986a06765841d7ea23f6
 
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
@@ -289,9 +291,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download executables
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: bin
+      - name: create archives
+        run: |
+          for os in darwin linux windows; do
+            bin_name="kube-linter"
+            if [[ "${os}" == "windows" ]]; then
+              bin_name="kube-linter.exe"
+            fi
+            tar -C "${os}" -czf "kube-linter-${os}.tar.gz" "${bin_name}"
+            zip --junk-paths "kube-linter-${os}.zip" "${os}/${bin_name}"
+          done
       - uses: release-drafter/release-drafter@v5
         id: release_drafter
         env:
@@ -304,8 +316,8 @@ jobs:
         with:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: linux/kube-linter
-          asset_name: kube-linter-linux
+          asset_path: kube-linter-linux.tar.gz
+          asset_name: kube-linter-linux.tar.gz
           asset_content_type: application/octet-stream
       - name: Upload Release Asset Windows
         id: upload-release-asset-windows
@@ -315,8 +327,8 @@ jobs:
         with:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: windows/kube-linter.exe
-          asset_name: kube-linter-windows
+          asset_path: kube-linter-windows.tar.gz
+          asset_name: kube-linter-windows.tar.gz
           asset_content_type: application/octet-stream
       - name: Upload Release Asset Mac
         id: upload-release-asset-mac
@@ -326,6 +338,39 @@ jobs:
         with:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: darwin/kube-linter
-          asset_name: kube-linter-mac
+          asset_path: kube-linter-darwin.tar.gz
+          asset_name: kube-linter-darwin.tar.gz
           asset_content_type: application/octet-stream
+      - name: Upload Release Asset Linux ZIP
+        id: upload-release-asset-linux-zip
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-linux.zip
+          asset_name: kube-linter-linux.zip
+          asset_content_type: application/zip
+      - name: Upload Release Asset Windows ZIP
+        id: upload-release-asset-windows-zip
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-windows.zip
+          asset_name: kube-linter-windows.zip
+          asset_content_type: application/zip
+      - name: Upload Release Asset Mac ZIP
+        id: upload-release-asset-mac-zip
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-darwin.zip
+          asset_name: kube-linter-darwin.zip
+          asset_content_type: application/zip

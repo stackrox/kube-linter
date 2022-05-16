@@ -1,7 +1,2 @@
 #!/bin/sh
-
-if [ -n "${CIRCLE_TAG}" ]; then
-  echo "${CIRCLE_TAG}"
-else
-  git describe --long --tags --abbrev=10 --dirty
-fi
+git describe --exact-match HEAD  2>/dev/null || git describe --long --tags --abbrev=10 --dirty
