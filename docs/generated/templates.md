@@ -160,6 +160,15 @@ KubeLinter supports the following templates:
   type: array
 ```
 
+## Dangling Service Monitor
+
+**Key**: `dangling-servicemonitor`
+
+**Description**: Flag service monitors which do not match any service
+
+**Supported Objects**: ServiceMonitor
+
+
 ## Deprecated Service Account Field
 
 **Key**: `deprecated-service-account-field`
