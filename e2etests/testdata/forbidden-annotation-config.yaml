@@ -21,4 +21,4 @@ customChecks:
     params:
       key: "eks.amazonaws.com/role-arn"
       value: |
-        !arn:aws:iam::\d{12}:role\/[\w+=,.@-]{1,64}$
+        !arn:aws:iam::\d{12}:role\/[a-zA-Z_+=,.@-]+$
