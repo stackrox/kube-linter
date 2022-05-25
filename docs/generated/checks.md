@@ -216,7 +216,7 @@ forbiddenServiceTypes:
 
 **Description**: Indicates when a HorizontalPodAutoscaler specifies less than three minReplicas
 
-**Remediation**: Increase be number of replicas in the HorizontalPodAutoscaler to at least three to increase fault tolerance.
+**Remediation**: Increase the number of replicas in the HorizontalPodAutoscaler to at least three to increase fault tolerance.
 
 **Template**: [hpa-minimum-replicas](generated/templates.md#horizontalpodautoscaler-minimum-replicas)
 
@@ -258,7 +258,7 @@ BlockList:
 
 **Description**: Indicates when a deployment uses less than three replicas
 
-**Remediation**: Increase be number of replicas in the deployment to at least three to increase the fault tolerancy of the deployment.
+**Remediation**: Increase the number of replicas in the deployment to at least three to increase the fault tolerance of the deployment.
 
 **Template**: [minimum-replicas](generated/templates.md#minimum-replicas)
 

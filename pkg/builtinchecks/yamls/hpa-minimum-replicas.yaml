@@ -1,7 +1,7 @@
 name: "hpa-minimum-three-replicas"
 description: "Indicates when a HorizontalPodAutoscaler specifies less than three minReplicas"
 remediation: >-
-  Increase be number of replicas in the HorizontalPodAutoscaler to at least three to increase fault tolerance.
+  Increase the number of replicas in the HorizontalPodAutoscaler to at least three to increase fault tolerance.
 scope:
   objectKinds:
     - HorizontalPodAutoscaler
