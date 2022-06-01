@@ -46,6 +46,15 @@ checks:
   addAllBuiltIn: true
 ```
 
+## Ignore paths
+
+To ignore checks on files or direcotry under certain paths, add ignored paths to `ignorePaths`.
+```yaml
+checks:
+  ignorePaths:
+    - ~/foo/bar
+```
+
 > Equivalent CLI flag is `--add-all-built-in`
 
 > [!NOTE]

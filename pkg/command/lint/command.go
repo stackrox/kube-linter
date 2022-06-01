@@ -81,7 +81,12 @@ func Command() *cobra.Command {
 				fmt.Fprintln(os.Stderr, "Warning: no checks enabled.")
 				return nil
 			}
-			lintCtxs, err := lintcontext.CreateContexts(args...)
+			ignorePaths, err := configresolver.GetIgnorepaths(&cfg)
+			if err != nil {
+				return err
+			}
+
+			lintCtxs, err := lintcontext.CreateContexts(ignorePaths, args...)
 			if err != nil {
 				return err
 			}

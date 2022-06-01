@@ -29,13 +29,14 @@ type Options struct {
 // Currently, each directory of Kube YAML files (or Helm charts) are treated as a separate context.
 // TODO: Figure out if it's useful to allow people to specify that files spanning different directories
 // should be treated as being in the same context.
-func CreateContexts(filesOrDirs ...string) ([]LintContext, error) {
-	return CreateContextsWithOptions(Options{}, filesOrDirs...)
+func CreateContexts(ignorePaths []string, filesOrDirs ...string) ([]LintContext, error) {
+	return CreateContextsWithOptions(Options{}, ignorePaths, filesOrDirs...)
 }
 
 // CreateContextsWithOptions creates a context with additional Options
-func CreateContextsWithOptions(options Options, filesOrDirs ...string) ([]LintContext, error) {
+func CreateContextsWithOptions(options Options, ignorePaths []string, filesOrDirs ...string) ([]LintContext, error) {
 	contextsByDir := make(map[string]*lintContextImpl)
+    fileOrDirsLoop:
 	for _, fileOrDir := range filesOrDirs {
 		// Stdin
 		if fileOrDir == "-" {
@@ -49,6 +50,12 @@ func CreateContextsWithOptions(options Options, filesOrDirs ...string) ([]LintCo
 			contextsByDir["-"] = ctx
 			continue
 		}
+
+        for _, path := range ignorePaths {
+            if strings.HasPrefix(fileOrDir, path) {
+                continue fileOrDirsLoop
+            }
+        }
 
 		err := filepath.Walk(fileOrDir, func(currentPath string, info os.FileInfo, walkErr error) error {
 			if walkErr != nil {

@@ -1,6 +1,9 @@
 package configresolver
 
 import (
+	"path/filepath"
+
+	"github.com/mitchellh/go-homedir"
 	"golang.stackrox.io/kube-linter/internal/defaultchecks"
 	"golang.stackrox.io/kube-linter/internal/errorhelpers"
 	"golang.stackrox.io/kube-linter/internal/set"
@@ -54,4 +57,35 @@ func GetEnabledChecksAndValidate(cfg *config.Config, checkRegistry checkregistry
 	return enabledChecks.AsSortedSlice(func(i, j string) bool {
 		return i < j
 	}), nil
+}
+
+// GetIgnorePaths loads the paths from the config into the check registry.
+func GetIgnorepaths(cfg *config.Config) ([]string, error) {
+	errorList := errorhelpers.NewErrorList("check ignore paths")
+	ignorePaths := set.NewStringSet()
+    for _, path := range cfg.Checks.IgnorePaths {
+        if path[0] == '~' {
+            expandedPath, err := homedir.Expand(path)
+            if err != nil {
+                errorList.AddStringf("could not expand path: %q", path)
+                continue
+            } 
+            ignorePaths.Add(expandedPath)
+        } else if !filepath.IsAbs(path) {
+            absolutePath, err := filepath.Abs(path)
+            if err != nil {
+                errorList.AddStringf("could not expand non-absolute path: %q", path)
+                continue
+            } 
+            ignorePaths.Add(absolutePath)
+        } else {
+            ignorePaths.Add(path)
+        }
+    }
+	if err := errorList.ToError(); err != nil {
+		return nil, err
+	}
+    return ignorePaths.AsSortedSlice(func(i, j string) bool {
+        return i < j
+    }), nil
 }
