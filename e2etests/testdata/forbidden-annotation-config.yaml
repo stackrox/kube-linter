@@ -1,13 +1,24 @@
 checks:
   addAllBuiltIn: false
 customChecks:
-  name: "forbid-annotation-reloader-stakater-auto"
-  description: ""
-  remediation: "Remove reloader.stakater.com/auto annotation"
-  scope:
-    objectKinds:
-      - DeploymentLike
-  template: "forbidden-annotation"
-  params:
-    key: "reloader.stakater.com/auto"
-    value: 'true'
+  - name: "forbid-annotation-reloader-stakater-auto"
+    description: ""
+    remediation: "Remove reloader.stakater.com/auto annotation"
+    scope:
+      objectKinds:
+        - DeploymentLike
+    template: "forbidden-annotation"
+    params:
+      key: "reloader.stakater.com/auto"
+      value: 'true'
+  - name: invalid-irsa-role
+    description: "IRSA annotations must have a valid IAM Role ARN value"
+    remediation: "Validate the format of the annotation's value to ensure it is a valid IAM Role ARN"
+    scope:
+      objectKinds:
+        - ServiceAccount
+    template: "forbidden-annotation"
+    params:
+      key: "eks.amazonaws.com/role-arn"
+      value: |
+        !arn:aws:iam::\d{12}:role\/[\w+=,.@-]{1,64}$
