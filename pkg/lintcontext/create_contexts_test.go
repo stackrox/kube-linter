@@ -27,17 +27,17 @@ func TestCreateContextsObjectPaths(t *testing.T) {
 		for _, absolute := range bools {
 			for _, rename := range bools {
 				for _, useFromArchiveFunction := range bools {
-                    for _, useIgnorePaths := range bools {
-                        // CreateContextsFromHelmArchive can only be used with tarballs
-                        if useFromArchiveFunction && !useTarball {
-                            continue
-                        }
+					for _, useIgnorePaths := range bools {
+						// CreateContextsFromHelmArchive can only be used with tarballs
+						if useFromArchiveFunction && !useTarball {
+							continue
+						}
 
-                        testName := fmt.Sprintf("tarball %t, absolute path %t, rename %t, use from archive function %t, ignore paths: %t", useTarball, absolute, rename, useFromArchiveFunction, useIgnorePaths)
-                        t.Run(testName, func(t *testing.T) {
-                            createContextsAndVerifyPaths(t, useTarball, absolute, rename, useFromArchiveFunction, useIgnorePaths)
-                        })
-                    }
+						testName := fmt.Sprintf("tarball %t, absolute path %t, rename %t, use from archive function %t, ignore paths: %t", useTarball, absolute, rename, useFromArchiveFunction, useIgnorePaths)
+						t.Run(testName, func(t *testing.T) {
+							createContextsAndVerifyPaths(t, useTarball, absolute, rename, useFromArchiveFunction, useIgnorePaths)
+						})
+					}
 				}
 			}
 		}
@@ -52,8 +52,8 @@ func createContextsAndVerifyPaths(t *testing.T, useTarball, useAbsolutePath, ren
 	renamedPath := map[bool]string{false: renamedChartDir, true: renamedTarball}[useTarball]
 
 	testPath := relativePath
-    testIgnorePath := mockIgnorePath
-    testIgnorePaths := make([]string, 0)
+	testIgnorePath := mockIgnorePath
+	testIgnorePaths := make([]string, 0)
 
 	if rename {
 		testPath = renamedPath
@@ -70,9 +70,9 @@ func createContextsAndVerifyPaths(t *testing.T, useTarball, useAbsolutePath, ren
 		require.NoError(t, err)
 	}
 
-    if useIgnorePaths {
-        testIgnorePaths = append(testIgnorePaths, testIgnorePath)
-    }
+	if useIgnorePaths {
+		testIgnorePaths = append(testIgnorePaths, testIgnorePath)
+	}
 
 	// Act. The code actually tests either of functions: CreateContextsFromHelmArchive and CreateContexts
 	var lintCtxs []LintContext
@@ -100,16 +100,16 @@ func createContextsAndVerifyPaths(t *testing.T, useTarball, useAbsolutePath, ren
 		expectedPath = path.Join(mockPath, "mychart")
 	}
 
-    // IgnorePaths is only used for non helm cases
-    if useIgnorePaths && !useFromArchiveFunction {
-        checkEmptyLintContext(t, lintCtxs)
-    } else {
-        checkObjectPaths(t, verifyAndGetContext(t, lintCtxs).Objects(), expectedPath)
-    }
+	// IgnorePaths is only used for non helm cases
+	if useIgnorePaths && !useFromArchiveFunction {
+		checkEmptyLintContext(t, lintCtxs)
+	} else {
+		checkObjectPaths(t, verifyAndGetContext(t, lintCtxs).Objects(), expectedPath)
+	}
 }
 
 func checkEmptyLintContext(t *testing.T, lintCtxs []LintContext) {
-    assert.Len(t, lintCtxs, 0, "expecting no lint context")
+	assert.Len(t, lintCtxs, 0, "expecting no lint context")
 }
 
 func verifyAndGetContext(t *testing.T, lintCtxs []LintContext) LintContext {

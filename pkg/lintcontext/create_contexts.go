@@ -36,7 +36,7 @@ func CreateContexts(ignorePaths []string, filesOrDirs ...string) ([]LintContext,
 // CreateContextsWithOptions creates a context with additional Options
 func CreateContextsWithOptions(options Options, ignorePaths []string, filesOrDirs ...string) ([]LintContext, error) {
 	contextsByDir := make(map[string]*lintContextImpl)
-    fileOrDirsLoop:
+fileOrDirsLoop:
 	for _, fileOrDir := range filesOrDirs {
 		// Stdin
 		if fileOrDir == "-" {
@@ -51,11 +51,11 @@ func CreateContextsWithOptions(options Options, ignorePaths []string, filesOrDir
 			continue
 		}
 
-        for _, path := range ignorePaths {
-            if strings.HasPrefix(fileOrDir, path) {
-                continue fileOrDirsLoop
-            }
-        }
+		for _, path := range ignorePaths {
+			if strings.HasPrefix(fileOrDir, path) {
+				continue fileOrDirsLoop
+			}
+		}
 
 		err := filepath.Walk(fileOrDir, func(currentPath string, info os.FileInfo, walkErr error) error {
 			if walkErr != nil {

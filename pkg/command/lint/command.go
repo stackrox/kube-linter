@@ -81,7 +81,7 @@ func Command() *cobra.Command {
 				fmt.Fprintln(os.Stderr, "Warning: no checks enabled.")
 				return nil
 			}
-			ignorePaths, err := configresolver.GetIgnorepaths(&cfg)
+			ignorePaths, err := configresolver.GetIgnorePaths(&cfg)
 			if err != nil {
 				return err
 			}
