@@ -12,12 +12,13 @@ import (
 )
 
 const (
-	chartTarball    = "../../tests/testdata/mychart-0.1.0.tgz"
-	chartDirectory  = "../../tests/testdata/mychart"
-	renamedTarball  = "../../tests/testdata/my-renamed-chart-0.1.0.tgz"
-	renamedChartDir = "../../tests/testdata/my-renamed-chart"
-	mockIgnorePath  = "../../tests/testdata/"
-	mockPath        = "mock path"
+	chartTarball       = "../../tests/testdata/mychart-0.1.0.tgz"
+	chartDirectory     = "../../tests/testdata/mychart"
+	renamedTarball     = "../../tests/testdata/my-renamed-chart-0.1.0.tgz"
+	renamedChartDir    = "../../tests/testdata/my-renamed-chart"
+	mockIgnorePath     = "../../tests/testdata/"
+	mockGlobIgnorePath = "../../tests/**"
+	mockPath           = "mock path"
 )
 
 func TestCreateContextsObjectPaths(t *testing.T) {
@@ -27,16 +28,18 @@ func TestCreateContextsObjectPaths(t *testing.T) {
 		for _, absolute := range bools {
 			for _, rename := range bools {
 				for _, useFromArchiveFunction := range bools {
-					for _, useIgnorePaths := range bools {
-						// CreateContextsFromHelmArchive can only be used with tarballs
-						if useFromArchiveFunction && !useTarball {
-							continue
-						}
+					for _, useGlob := range bools {
+						for _, useIgnorePaths := range bools {
+							// CreateContextsFromHelmArchive can only be used with tarballs
+							if useFromArchiveFunction && !useTarball {
+								continue
+							}
 
-						testName := fmt.Sprintf("tarball %t, absolute path %t, rename %t, use from archive function %t, ignore paths: %t", useTarball, absolute, rename, useFromArchiveFunction, useIgnorePaths)
-						t.Run(testName, func(t *testing.T) {
-							createContextsAndVerifyPaths(t, useTarball, absolute, rename, useFromArchiveFunction, useIgnorePaths)
-						})
+							testName := fmt.Sprintf("tarball %t, absolute path %t, rename %t, use from archive function %t, ignore paths: %t (use glob: %t)", useTarball, absolute, rename, useFromArchiveFunction, useIgnorePaths, useGlob)
+							t.Run(testName, func(t *testing.T) {
+								createContextsAndVerifyPaths(t, useTarball, absolute, rename, useFromArchiveFunction, useIgnorePaths, useGlob)
+							})
+						}
 					}
 				}
 			}
@@ -44,7 +47,7 @@ func TestCreateContextsObjectPaths(t *testing.T) {
 	}
 }
 
-func createContextsAndVerifyPaths(t *testing.T, useTarball, useAbsolutePath, rename, useFromArchiveFunction, useIgnorePaths bool) {
+func createContextsAndVerifyPaths(t *testing.T, useTarball, useAbsolutePath, rename, useFromArchiveFunction, useIgnorePaths, useGlob bool) {
 	var err error
 
 	// Arrange
@@ -61,6 +64,10 @@ func createContextsAndVerifyPaths(t *testing.T, useTarball, useAbsolutePath, ren
 		defer func() {
 			assert.NoError(t, os.Rename(renamedPath, relativePath))
 		}()
+	}
+
+	if useGlob {
+		testIgnorePath = mockGlobIgnorePath
 	}
 
 	if useAbsolutePath {

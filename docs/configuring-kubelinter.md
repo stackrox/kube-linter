@@ -55,6 +55,8 @@ To ignore checks on files or direcotry under certain paths, add ignored paths to
 checks:
   ignorePaths:
     - ~/foo/bar
+    - ../baz
+    - /tmp/*.yaml
 ```
 
 > Equivalent CLI flag is `--add-all-built-in`
