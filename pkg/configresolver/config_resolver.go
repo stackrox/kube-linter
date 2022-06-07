@@ -64,25 +64,25 @@ func GetIgnorePaths(cfg *config.Config) ([]string, error) {
 	errorList := errorhelpers.NewErrorList("check ignore paths")
 	ignorePaths := set.NewStringSet()
 	for _, path := range cfg.Checks.IgnorePaths {
-		switch {
-		case path[0] == '~':
-			expandedPath, err := homedir.Expand(path)
+		if path[0] == '~' {
+			path, err := homedir.Expand(path)
 			if err != nil {
 				errorList.AddStringf("could not expand path: %q", path)
 				continue
 			}
-			ignorePaths.Add(expandedPath)
-		case !filepath.IsAbs(path):
-			absolutePath, err := filepath.Abs(path)
+		}
+
+		if !filepath.IsAbs(path) {
+			path, err := filepath.Abs(path)
 			if err != nil {
 				errorList.AddStringf("could not expand non-absolute path: %q", path)
 				continue
 			}
-			ignorePaths.Add(absolutePath)
-		default:
-			ignorePaths.Add(path)
 		}
+
+		ignorePaths.AddAll(path)
 	}
+
 	if err := errorList.ToError(); err != nil {
 		return nil, err
 	}

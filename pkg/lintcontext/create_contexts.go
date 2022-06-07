@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/bmatcuk/doublestar/v3"
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/set"
 	"helm.sh/helm/v3/pkg/chartutil"
@@ -52,7 +53,10 @@ fileOrDirsLoop:
 		}
 
 		for _, path := range ignorePaths {
-			if strings.HasPrefix(fileOrDir, path) {
+			// Useing doublestar to enable **
+			// See https://github.com/golang/go/issues/11862
+			globMatch, _ := doublestar.PathMatch(path, fileOrDir)
+			if strings.HasPrefix(fileOrDir, path) || globMatch {
 				continue fileOrDirsLoop
 			}
 		}
