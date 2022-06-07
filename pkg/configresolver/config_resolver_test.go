@@ -42,7 +42,7 @@ func TestRelativeIgnorePath(t *testing.T) {
 
 	wd, err := os.Getwd()
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	parent := filepath.Dir(wd)
 	paths, err := GetIgnorePaths(cfg)
@@ -55,7 +55,7 @@ func TestRelativeGlobIgnorePath(t *testing.T) {
 
 	wd, err := os.Getwd()
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 	parent := filepath.Dir(wd)
 	paths, err := GetIgnorePaths(cfg)
