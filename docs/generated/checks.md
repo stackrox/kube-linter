@@ -126,7 +126,7 @@ serviceAccount: ^(|default)$
 
 **Remediation**: Specify dnsconfig options in your pod specification to ensure the expected dns setting on the pod. Refer to https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-dns-config for details.
 
-**Template**: [dnsconfig-options](generated/templates.md#dnsconig-options)
+**Template**: [dnsconfig-options](generated/templates.md#dnsconfig-options)
 
 **Parameters**:
 
