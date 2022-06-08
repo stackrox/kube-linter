@@ -15,7 +15,7 @@ import (
 
 func init() {
 	templates.Register(check.Template{
-		HumanName:   "DnsConig Options",
+		HumanName:   "DnsConfig Options",
 		Key:         "dnsconfig-options",
 		Description: "Flag objects that don't have specified DNSConfig Options",
 		SupportedObjectKinds: config.ObjectKindsDesc{

@@ -122,9 +122,9 @@ serviceAccount: ^(|default)$
 
 **Enabled by default**: No
 
-**Description**: Alert on deployments that have no specified dnsconfig options
+**Description**: Alert on deployments that have no specified dnsConfig options
 
-**Remediation**: Specify dnsconfig options in your pod specification to ensure the expected dns setting on the pod. Refer to https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-dns-config for details.
+**Remediation**: Specify dnsconfig options in your Pod specification to ensure the expected DNS setting on the Pod. Refer to https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-dns-config for details.
 
 **Template**: [dnsconfig-options](generated/templates.md#dnsconfig-options)
 

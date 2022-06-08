@@ -187,7 +187,7 @@ KubeLinter supports the following templates:
   type: string
 ```
 
-## DnsConig Options
+## DnsConfig Options
 
 **Key**: `dnsconfig-options`
 
