@@ -162,6 +162,25 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "dnsconfig-options-ndots" {
+  tmp="tests/checks/dnsconfig-options-ndots.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include dnsconfig-options --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment: DNSConfig Options \"ndots:2\" not found." ]]
+  [[ "${message2}" == "Deployment: Object does not define any DNSConfig Options." ]]
+  [[ "${message3}" == "Deployment: Object does not define any DNSConfig rules." ]]
+  [[ "${count}" == "3" ]]
+}
+
 @test "docker-sock" {
   tmp="tests/checks/docker-sock.yml"
   cmd="${KUBE_LINTER_BIN} lint --include docker-sock --do-not-auto-add-defaults --format json ${tmp}"

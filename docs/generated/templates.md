@@ -187,6 +187,32 @@ KubeLinter supports the following templates:
   type: string
 ```
 
+## DnsConig Options
+
+**Key**: `dnsconfig-options`
+
+**Description**: Flag objects that don't have specified DNSConfig Options
+
+**Supported Objects**: DeploymentLike
+
+
+**Parameters**:
+
+```yaml
+- description: Key of the dnsConfig option.
+  name: key
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
+- description: Value of the dnsConfig option.
+  name: value
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
+```
+
 ## Environment Variables
 
 **Key**: `env-var`
