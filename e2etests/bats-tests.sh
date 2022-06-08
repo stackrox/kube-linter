@@ -162,7 +162,7 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
-@test "dnsconfig-options-ndots" {
+@test "dnsconfig-options" {
   tmp="tests/checks/dnsconfig-options-ndots.yml"
   cmd="${KUBE_LINTER_BIN} lint --include dnsconfig-options --do-not-auto-add-defaults --format json ${tmp}"
   run ${cmd}

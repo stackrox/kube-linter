@@ -28,8 +28,8 @@ spec:
             runAsNonRoot: true
       dnsConfig:
         options:
-        - name: ndots
-          value: "2"
+          - name: ndots
+            value: "2"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -60,8 +60,8 @@ spec:
             runAsNonRoot: true
       dnsConfig:
         options:
-        - name: ndots
-          value: "5"
+          - name: ndots
+            value: "5"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -92,7 +92,7 @@ spec:
             runAsNonRoot: true
       dnsConfig:
         Searches:
-        - foo.bar
+          - foo.bar
 ---
 apiVersion: apps/v1
 kind: Deployment
