@@ -65,11 +65,11 @@ func GetIgnorePaths(cfg *config.Config) ([]string, error) {
 	errorList := errorhelpers.NewErrorList("check ignore paths")
 	ignorePaths := set.NewStringSet()
 	for _, path := range cfg.Checks.IgnorePaths {
-        res, err := getIgnorePath(path)
-        if err != nil {
-            errorList.AddError(err)
-            continue
-        }
+		res, err := getIgnorePath(path)
+		if err != nil {
+			errorList.AddError(err)
+			continue
+		}
 		ignorePaths.AddAll(res)
 	}
 
