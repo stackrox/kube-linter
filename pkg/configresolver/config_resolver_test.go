@@ -7,7 +7,7 @@ import (
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/stretchr/testify/assert"
-	c "golang.stackrox.io/kube-linter/pkg/config"
+	"golang.stackrox.io/kube-linter/pkg/config"
 )
 
 func TestIgnorePaths(t *testing.T) {
@@ -21,7 +21,7 @@ func TestIgnorePaths(t *testing.T) {
 	}
 
 	parent := filepath.Dir(wd)
-	cfg := new(c.Config)
+	c := new(config.Config)
 
 	var tests = []struct {
 		Path         []string
@@ -36,8 +36,8 @@ func TestIgnorePaths(t *testing.T) {
 	}
 
 	for _, e := range tests {
-		cfg.Checks.IgnorePaths = e.Path
-		paths, err := GetIgnorePaths(cfg)
+		c.Checks.IgnorePaths = e.Path
+		paths, err := GetIgnorePaths(c)
 
 		if e.ErrorExpeted {
 			assert.Error(t, err)
