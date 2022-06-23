@@ -50,7 +50,7 @@ checks:
 
 ## Ignore paths
 
-To ignore checks on files or direcotry under certain paths, add ignored paths to `ignorePaths`.
+To ignore checks on files or directories under certain paths, add ignored paths to `ignorePaths`.
 ```yaml
 checks:
   ignorePaths:
