@@ -7,58 +7,43 @@ import (
 
 	"github.com/mitchellh/go-homedir"
 	"github.com/stretchr/testify/assert"
-	"golang.stackrox.io/kube-linter/pkg/config"
+	c "golang.stackrox.io/kube-linter/pkg/config"
 )
 
-var cfg *config.Config = new(config.Config)
-
-func TestHomeIgnorePath(t *testing.T) {
-	cfg.Checks.IgnorePaths = []string{"~/test"}
-
-	home, _ := homedir.Dir()
-	paths, err := GetIgnorePaths(cfg)
-	assert.NoError(t, err)
-	assert.Equal(t, paths[0], home+"/test")
-}
-
-func TestHomeGlobIgnorePath(t *testing.T) {
-	cfg.Checks.IgnorePaths = []string{"~/*.yaml"}
-
-	home, _ := homedir.Dir()
-	paths, err := GetIgnorePaths(cfg)
-	assert.NoError(t, err)
-	assert.Equal(t, paths[0], home+"/*.yaml")
-}
-
-func TestInvalidHomeIgnorePath(t *testing.T) {
-	cfg.Checks.IgnorePaths = []string{"~~/test"}
-
-	_, err := GetIgnorePaths(cfg)
-	assert.Error(t, err)
-}
-
-func TestRelativeIgnorePath(t *testing.T) {
-	cfg.Checks.IgnorePaths = []string{"../test"}
-
-	wd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
+func TestIgnorePaths(t *testing.T) {
+	home, homeErr := homedir.Dir()
+	if homeErr != nil {
+		t.Fatal(homeErr)
 	}
-	parent := filepath.Dir(wd)
-	paths, err := GetIgnorePaths(cfg)
-	assert.NoError(t, err)
-	assert.Equal(t, paths[0], parent+"/test")
-}
-
-func TestRelativeGlobIgnorePath(t *testing.T) {
-	cfg.Checks.IgnorePaths = []string{"../*.yaml"}
-
-	wd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
+	wd, wdErr := os.Getwd()
+	if wdErr != nil {
+		t.Fatal(wdErr)
 	}
+
 	parent := filepath.Dir(wd)
-	paths, err := GetIgnorePaths(cfg)
-	assert.NoError(t, err)
-	assert.Equal(t, paths[0], parent+"/*.yaml")
+	cfg := new(c.Config)
+
+	var tests = []struct {
+		Path         []string
+		Expected     string
+		ErrorExpeted bool
+	}{
+		{[]string{"~/test"}, home + "/test", false},
+		{[]string{"~/*.yaml"}, home + "/*.yaml", false},
+		{[]string{"~~/test"}, "", true},
+		{[]string{"../test"}, parent + "/test", false},
+		{[]string{"../*.yaml"}, parent + "/*.yaml", false},
+	}
+
+	for _, e := range tests {
+		cfg.Checks.IgnorePaths = e.Path
+		paths, err := GetIgnorePaths(cfg)
+
+		if e.ErrorExpeted {
+			assert.Error(t, err)
+		} else {
+			assert.NoError(t, err)
+			assert.Equal(t, paths[0], e.Expected)
+		}
+	}
 }
