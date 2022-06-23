@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 
 	"github.com/mitchellh/go-homedir"
+	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/defaultchecks"
 	"golang.stackrox.io/kube-linter/internal/errorhelpers"
 	"golang.stackrox.io/kube-linter/internal/set"
@@ -64,24 +65,12 @@ func GetIgnorePaths(cfg *config.Config) ([]string, error) {
 	errorList := errorhelpers.NewErrorList("check ignore paths")
 	ignorePaths := set.NewStringSet()
 	for _, path := range cfg.Checks.IgnorePaths {
-		result := path
-		if path[0] == '~' {
-			expandedPath, err := homedir.Expand(path)
-			if err != nil {
-				errorList.AddStringf("could not expand path: %q", expandedPath)
-				continue
-			}
-			result = expandedPath
-		} else if !filepath.IsAbs(path) {
-			absPath, err := filepath.Abs(path)
-			if err != nil {
-				errorList.AddStringf("could not expand non-absolute path: %q", absPath)
-				continue
-			}
-			result = absPath
-		}
-
-		ignorePaths.AddAll(result)
+        res, err := getIgnorePath(path)
+        if err != nil {
+            errorList.AddError(err)
+            continue
+        }
+		ignorePaths.AddAll(res)
 	}
 
 	if err := errorList.ToError(); err != nil {
@@ -90,4 +79,23 @@ func GetIgnorePaths(cfg *config.Config) ([]string, error) {
 	return ignorePaths.AsSortedSlice(func(i, j string) bool {
 		return i < j
 	}), nil
+}
+
+func getIgnorePath(path string) (string, error) {
+	switch {
+	case path[0] == '~':
+		expandedPath, err := homedir.Expand(path)
+		if err != nil {
+			return "", errors.Wrapf(err, "could not expand path: %q", expandedPath)
+		}
+		return expandedPath, nil
+	case !filepath.IsAbs(path):
+		absPath, err := filepath.Abs(path)
+		if err != nil {
+			return "", errors.Wrapf(err, "could not expand non-absolute path: %q", absPath)
+		}
+		return absPath, nil
+	default:
+		return path, nil
+	}
 }
