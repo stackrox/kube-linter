@@ -118,6 +118,22 @@ serviceAccount: ^(|default)$
 **Remediation**: Use the serviceAccountName field instead. If you must specify serviceAccount, ensure values for serviceAccount and serviceAccountName match.
 
 **Template**: [deprecated-service-account-field](generated/templates.md#deprecated-service-account-field)
+## dnsconfig-options
+
+**Enabled by default**: No
+
+**Description**: Alert on deployments that have no specified dnsConfig options
+
+**Remediation**: Specify dnsconfig options in your Pod specification to ensure the expected DNS setting on the Pod. Refer to https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-dns-config for details.
+
+**Template**: [dnsconfig-options](generated/templates.md#dnsconfig-options)
+
+**Parameters**:
+
+```yaml
+Key: ndots
+Value: "2"
+```
 ## docker-sock
 
 **Enabled by default**: Yes

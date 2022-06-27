@@ -1,0 +1,123 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: app
+    spec:
+      containers:
+        - name: app
+          image: app:1.2.3
+          resources:
+            limits:
+              cpu: 1
+              memory: 500Mi
+            requests:
+              cpu: 0.25
+              memory: 100Mi
+          runAsUser: 1001
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "2"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: app
+    spec:
+      containers:
+        - name: app
+          image: app:1.2.3
+          resources:
+            limits:
+              cpu: 1
+              memory: 500Mi
+            requests:
+              cpu: 0.25
+              memory: 100Mi
+          runAsUser: 1001
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+      dnsConfig:
+        options:
+          - name: ndots
+            value: "5"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app2
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: app
+    spec:
+      containers:
+        - name: app
+          image: app:1.2.3
+          resources:
+            limits:
+              cpu: 1
+              memory: 500Mi
+            requests:
+              cpu: 0.25
+              memory: 100Mi
+          runAsUser: 1001
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+      dnsConfig:
+        Searches:
+          - foo.bar
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app3
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: app
+    spec:
+      containers:
+        - name: app
+          image: app:1.2.3
+          resources:
+            limits:
+              cpu: 1
+              memory: 500Mi
+            requests:
+              cpu: 0.25
+              memory: 100Mi
+          runAsUser: 1001
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true

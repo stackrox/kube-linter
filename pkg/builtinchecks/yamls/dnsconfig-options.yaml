@@ -1,0 +1,12 @@
+name: "dnsconfig-options"
+description: "Alert on deployments that have no specified dnsConfig options"
+remediation: >-
+  Specify dnsconfig options in your Pod specification to ensure the expected DNS setting on the Pod.
+  Refer to https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-dns-config for details.
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "dnsconfig-options"
+params:
+  Key: ndots
+  Value: "2"
