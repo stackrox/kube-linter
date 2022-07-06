@@ -31,3 +31,21 @@ Ensure you update the following:
 If you have made the required updates, review the contents once more.
 
 If everything checks out, you can publish the release!
+
+## Troubleshooting
+
+### Wrong tag used
+
+In case a wrong tag was used (i.e. prefixed with `v`, typo etc.), you could do the following:
+- Delete the published release.
+- Delete the existing tag.
+- Tag the main commit with the new tag. After the workflow is run successfully, you can use the newly created draft 
+  release for publishing.
+
+### Issues with kube-linter-action
+
+For some releases, it may happen that there's an issue with the kube-linter action. Most probably, the issue will be
+due to the uploaded assets.
+
+In this case, you could:
+- Remove / re-upload the assets manually, making the required changes for the release as a temporary workaround.
