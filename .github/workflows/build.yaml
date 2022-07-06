@@ -170,7 +170,7 @@ jobs:
           name: bin
 
       - name: Set permissions to file
-        run:  chmod +x linux/kube-linter
+        run: chmod +x linux/kube-linter
 
       - name: Move binary
         run:  mv linux/kube-linter image/bin
@@ -296,6 +296,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: bin
+
+      - name: Set permissions to files
+        run: |
+          chmod +x linux/kube-linter
+          chmod +x darwin/kube-linter
+
       - name: create archives
         run: |
           for os in darwin linux windows; do
@@ -319,6 +325,7 @@ jobs:
           for f in *.{gz,zip}; do \
             cosign sign-blob --key cosign.key --output-file "${f}.sig" "${f}"; \
           done
+
       - uses: release-drafter/release-drafter@v5
         id: release_drafter
         env:
