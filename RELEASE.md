@@ -9,8 +9,8 @@ Decide on the version number of the next release and create a git tag for it:
 ```shell
 $ git pull --tags
 $ git checkout main
-$ git tag <new.release.version> # NOTE: PLEASE TO NOT USE THE PREFIX "v" FOR THE TAG!
-$ git push --tags
+$ git tag <new.release.version> # NOTE: PLEASE DO NOT USE THE PREFIX "v" FOR THE TAG!
+$ git push origin <new.release.version>
 ```
 
 This will trigger a workflow that:
