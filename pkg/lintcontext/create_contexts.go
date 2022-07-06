@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/bmatcuk/doublestar/v3"
+	"github.com/bmatcuk/doublestar/v4"
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/set"
 	"helm.sh/helm/v3/pkg/chartutil"
