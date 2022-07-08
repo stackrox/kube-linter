@@ -75,20 +75,22 @@ func init() {
 				for _, preferred := range preferredAffinity {
 					err := validateAffinityTermMatchesAgainstNodes(preferred.PodAffinityTerm,
 						podTemplateSpec.Namespace, podTemplateSpec.Labels, topologyKeyMatcher)
-					if err != nil {
-						foundIssues = append(foundIssues, diagnostic.Diagnostic{
-							Message: err.Error(),
-						})
+					if err == nil {
+						return nil
 					}
+					foundIssues = append(foundIssues, diagnostic.Diagnostic{
+						Message: err.Error(),
+					})
 				}
 				for _, required := range requiredAffinity {
 					err := validateAffinityTermMatchesAgainstNodes(required, podTemplateSpec.Namespace,
 						podTemplateSpec.Labels, topologyKeyMatcher)
-					if err != nil {
-						foundIssues = append(foundIssues, diagnostic.Diagnostic{
-							Message: err.Error(),
-						})
+					if err == nil {
+						return nil
 					}
+					foundIssues = append(foundIssues, diagnostic.Diagnostic{
+						Message: err.Error(),
+					})
 				}
 				return foundIssues
 			}, nil
