@@ -26,12 +26,14 @@ func TestMarkdownFunctions(t *testing.T) {
 	}
 
 	for _, tt := range templateTests {
-		tpl := common.MustInstantiateMarkdownTemplate(tt.in, nil)
+		t.Run(tt.name, func(t *testing.T) {
+			tpl := common.MustInstantiateMarkdownTemplate(tt.in, nil)
 
-		var b bytes.Buffer
+			var b bytes.Buffer
 
-		require.NoError(t, tpl.Execute(&b, tt.data))
+			require.NoError(t, tpl.Execute(&b, tt.data))
 
-		assert.Equal(t, tt.out, b.String())
+			assert.Equal(t, tt.out, b.String())
+		})
 	}
 }
