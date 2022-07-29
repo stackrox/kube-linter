@@ -1604,8 +1604,8 @@ k8s.io/apimachinery v0.24.2/go.mod h1:82Bi4sCzVBdpYjyI4jY6aHX+YCUchUIrZrXKedjd2U
 k8s.io/apimachinery v0.24.3 h1:hrFiNSA2cBZqllakVYyH/VyEh4B581bQRmqATJSeQTg=
 k8s.io/apimachinery v0.24.3/go.mod h1:82Bi4sCzVBdpYjyI4jY6aHX+YCUchUIrZrXKedjd2UM=
 k8s.io/apiserver v0.24.2/go.mod h1:pSuKzr3zV+L+MWqsEo0kHHYwCo77AT5qXbFXP2jbvFI=
-k8s.io/cli-runtime v0.24.2 h1:KxY6tSgPGsahA6c1/dmR3uF5jOxXPx2QQY6C5ZrLmtE=
-k8s.io/cli-runtime v0.24.2/go.mod h1:1LIhKL2RblkhfG4v5lZEt7FtgFG5mVb8wqv5lE9m5qY=
+k8s.io/cli-runtime v0.24.3 h1:O9YvUHrDSCQUPlsqVmaqDrueqjpJ7IO6Yas9B6xGSoo=
+k8s.io/cli-runtime v0.24.3/go.mod h1:In84wauoMOqa7JDvDSXGbf8lTNlr70fOGpYlYfJtSqA=
 k8s.io/client-go v0.24.2/go.mod h1:zg4Xaoo+umDsfCWr4fCnmLEtQXyCNXCvJuSsglNcV30=
 k8s.io/client-go v0.24.3 h1:Nl1840+6p4JqkFWEW2LnMKU667BUxw03REfLAVhuKQY=
 k8s.io/client-go v0.24.3/go.mod h1:AAovolf5Z9bY1wIg2FZ8LPQlEdKHjLI7ZD4rw920BJw=
