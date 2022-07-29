@@ -81,6 +81,35 @@ func (s *AntiAffinityTestSuite) TestNoAntiAffinity() {
 	})
 }
 
+func (s *AntiAffinityTestSuite) TestEmptyAntiAffinity() {
+	const (
+		oneReplicaDepName  = "one-replica"
+		twoReplicasDepName = "two-replicas"
+	)
+
+	s.addDeploymentWithEmptyAntiAffinity(oneReplicaDepName, 1)
+	s.addDeploymentWithEmptyAntiAffinity(twoReplicasDepName, 2)
+
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{
+				MinReplicas: 1,
+			},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				oneReplicaDepName: {
+					{Message: "object has 1 replica but does not specify preferred or required inter " +
+						"pod anti-affinity during scheduling"},
+				},
+				twoReplicasDepName: {
+					{Message: "object has 2 replicas but does not specify preferred or required inter " +
+						"pod anti-affinity during scheduling"},
+				},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
 func (s *AntiAffinityTestSuite) addDeploymentWithAntiAffinity(name string, replicas int32, topologyKey string,
 	labelName string, namespace string) {
 	s.addDeploymentWithReplicas(name, replicas)
@@ -98,6 +127,18 @@ func (s *AntiAffinityTestSuite) addDeploymentWithAntiAffinity(name string, repli
 						},
 					},
 				},
+			},
+		}
+	})
+}
+
+func (s *AntiAffinityTestSuite) addDeploymentWithEmptyAntiAffinity(name string, replicas int32) {
+	s.addDeploymentWithReplicas(name, replicas)
+	s.ctx.ModifyDeployment(s.T(), name, func(deployment *appsV1.Deployment) {
+		deployment.Spec.Template.Spec.Affinity = &v1.Affinity{
+			PodAntiAffinity: &v1.PodAntiAffinity{
+				PreferredDuringSchedulingIgnoredDuringExecution: []v1.WeightedPodAffinityTerm{},
+				RequiredDuringSchedulingIgnoredDuringExecution:  []v1.PodAffinityTerm{},
 			},
 		}
 	})
