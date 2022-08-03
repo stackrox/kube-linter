@@ -72,23 +72,34 @@ func init() {
 				var foundIssues []diagnostic.Diagnostic
 				preferredAffinity := affinity.PodAntiAffinity.PreferredDuringSchedulingIgnoredDuringExecution
 				requiredAffinity := affinity.PodAntiAffinity.RequiredDuringSchedulingIgnoredDuringExecution
+				// Short-circuit if affinity rule is specified but both preferred and required are empty.
+				if len(preferredAffinity) == 0 && len(requiredAffinity) == 0 {
+					return []diagnostic.Diagnostic{
+						{Message: fmt.Sprintf("object has %d %s but does not specify preferred or required "+
+							"inter pod anti-affinity during scheduling",
+							replicas, stringutils.Ternary(replicas > 1, "replicas", "replica"))},
+					}
+				}
+
 				for _, preferred := range preferredAffinity {
 					err := validateAffinityTermMatchesAgainstNodes(preferred.PodAffinityTerm,
 						podTemplateSpec.Namespace, podTemplateSpec.Labels, topologyKeyMatcher)
-					if err != nil {
-						foundIssues = append(foundIssues, diagnostic.Diagnostic{
-							Message: err.Error(),
-						})
+					if err == nil {
+						return nil
 					}
+					foundIssues = append(foundIssues, diagnostic.Diagnostic{
+						Message: err.Error(),
+					})
 				}
 				for _, required := range requiredAffinity {
 					err := validateAffinityTermMatchesAgainstNodes(required, podTemplateSpec.Namespace,
 						podTemplateSpec.Labels, topologyKeyMatcher)
-					if err != nil {
-						foundIssues = append(foundIssues, diagnostic.Diagnostic{
-							Message: err.Error(),
-						})
+					if err == nil {
+						return nil
 					}
+					foundIssues = append(foundIssues, diagnostic.Diagnostic{
+						Message: err.Error(),
+					})
 				}
 				return foundIssues
 			}, nil
