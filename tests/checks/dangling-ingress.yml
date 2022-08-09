@@ -1,0 +1,68 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dont-fire
+spec:
+  ports:
+    - name: 8080-tcp
+      port: 8080
+  selector:
+    app.kubernetes.io/name: dont-fire
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dont-fire
+spec:
+  rules:
+    - http:
+        paths:
+          - backend:
+              service:
+                name: dont-fire
+                port:
+                  number: 80
+            path: /
+            pathType: "Prefix"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dont-fire-defaultbackend
+spec:
+  defaultBackend:
+    service:
+      name: dont-fire
+      port:
+        number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dont-fire-resource
+spec:
+  rules:
+    - http:
+        paths:
+          - backend:
+              resource:
+                apiGroup: k8s.example.com
+                kind: StorageBucket
+                name: static-assets
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: missing-service
+spec:
+  rules:
+    - http:
+        paths:
+          - backend:
+              service:
+                name: missing
+                port:
+                  number: 80
+            path: /
+            pathType: "Prefix"
