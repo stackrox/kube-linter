@@ -8,6 +8,7 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/lintcontext/mocks"
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	"golang.stackrox.io/kube-linter/pkg/templates/danglingingress/internal/params"
+	v1 "k8s.io/api/core/v1"
 	networkingV1 "k8s.io/api/networking/v1"
 )
 
@@ -74,7 +75,7 @@ func (s *DanglingIngressTestSuite) addService(name string) {
 	s.ctx.AddMockService(s.T(), name)
 }
 
-func (s *DanglingIngressTestSuite) TestIngressWithBackendFails() {
+func (s *DanglingIngressTestSuite) TestIngressWithOutServicesPasses() {
 	s.ctx.AddMockIngress(s.T(), ingressName1)
 	s.ctx.AddMockDeployment(s.T(), "deployment")
 
@@ -82,9 +83,7 @@ func (s *DanglingIngressTestSuite) TestIngressWithBackendFails() {
 		{
 			Param: params.Params{},
 			Diagnostics: map[string][]diagnostic.Diagnostic{
-				ingressName1: {{
-					Message: "ingress has no backend specified",
-				}},
+				ingressName1: {},
 			},
 			ExpectInstantiationError: false,
 		},
@@ -264,6 +263,42 @@ func (s *DanglingIngressTestSuite) TestIngressWithDefaultBackendAndRulesServiceM
 					{Message: "no service found matching ingress labels (service-1)"},
 					{Message: "no service found matching ingress labels (service-2)"},
 				},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+func (s *DanglingIngressTestSuite) TestIngressWithResoucesInsteadofServicesPasses() {
+	s.ctx.AddMockIngress(s.T(), ingressName1)
+	resouceName := "resource"
+	apiGroup := "v2"
+
+	s.ctx.ModifyIngess(s.T(), ingressName1, func(ingress *networkingV1.Ingress) {
+		ingress.Spec.Rules = []networkingV1.IngressRule{{
+			IngressRuleValue: networkingV1.IngressRuleValue{
+				HTTP: &networkingV1.HTTPIngressRuleValue{
+					Paths: []networkingV1.HTTPIngressPath{
+						{
+							Backend: networkingV1.IngressBackend{
+								Resource: &v1.TypedLocalObjectReference{
+									APIGroup: &apiGroup,
+									Kind:     "Pod",
+									Name:     resouceName,
+								},
+							},
+						},
+					},
+				},
+			},
+		}}
+	})
+
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				ingressName1: {},
 			},
 			ExpectInstantiationError: false,
 		},

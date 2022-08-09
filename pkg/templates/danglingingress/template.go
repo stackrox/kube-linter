@@ -70,10 +70,11 @@ func init() {
 				}
 
 				selectors := getSelectorsFromIngress(ingress)
+
+				// if there aren't any service selectors found we assume that the backend's are specified
+				// by resources and will skip over this.
 				if len(selectors) == 0 {
-					return []diagnostic.Diagnostic{{
-						Message: "ingress has no backend specified",
-					}}
+					return nil
 				}
 
 				for _, obj := range lintCtx.Objects() {
@@ -83,11 +84,6 @@ func init() {
 
 					service, ok := obj.K8sObject.(*v1.Service)
 					if !ok {
-						continue
-					}
-
-					// skip external
-					if service.Spec.Type == v1.ServiceTypeExternalName {
 						continue
 					}
 

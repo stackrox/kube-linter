@@ -11,16 +11,16 @@ const (
 )
 
 var (
-	ingresssGVK = v1.SchemeGroupVersion.WithKind(Ingress)
+	ingressGVK = v1.SchemeGroupVersion.WithKind(Ingress)
 )
 
 func init() {
 	registerObjectKind(Ingress, matcherFunc(func(gvk schema.GroupVersionKind) bool {
-		return gvk == ingresssGVK
+		return gvk == ingressGVK
 	}))
 }
 
 // GetIngressAPIVersion returns Ingress's apiversion
 func GetIngressAPIVersion() string {
-	return ingresssGVK.GroupVersion().String()
+	return ingressGVK.GroupVersion().String()
 }
