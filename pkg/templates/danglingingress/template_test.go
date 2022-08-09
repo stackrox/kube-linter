@@ -253,15 +253,15 @@ func (s *DanglingIngressTestSuite) TestIngressWithDefaultBackendServiceMissingFa
 }
 
 func (s *DanglingIngressTestSuite) TestIngressWithDefaultBackendAndRulesServiceMissingFails() {
-	s.addIngressWithDefaultBackend(ingressName1, serviceName1, []string{serviceName2})
+	s.addIngressWithDefaultBackend(ingressName2, serviceName2, []string{serviceName1})
 
 	s.Validate(s.ctx, []templates.TestCase{
 		{
 			Param: params.Params{},
 			Diagnostics: map[string][]diagnostic.Diagnostic{
-				ingressName1: {
-					{Message: "no service found matching ingress labels (service-1)"},
+				ingressName2: {
 					{Message: "no service found matching ingress labels (service-2)"},
+					{Message: "no service found matching ingress labels (service-1)"},
 				},
 			},
 			ExpectInstantiationError: false,
