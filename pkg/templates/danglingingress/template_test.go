@@ -48,7 +48,7 @@ func (s *DanglingIngressTestSuite) addIngress(name string, serviceSelectors []st
 		})
 	}
 
-	s.ctx.ModifyIngess(s.T(), name, func(ingress *networkingV1.Ingress) {
+	s.ctx.ModifyIngress(s.T(), name, func(ingress *networkingV1.Ingress) {
 		ingress.Spec.Rules = []networkingV1.IngressRule{{
 			IngressRuleValue: networkingV1.IngressRuleValue{
 				HTTP: &networkingV1.HTTPIngressRuleValue{
@@ -62,7 +62,7 @@ func (s *DanglingIngressTestSuite) addIngress(name string, serviceSelectors []st
 func (s *DanglingIngressTestSuite) addIngressWithDefaultBackend(name, serviceName string, serviceSelectors []string) {
 	s.addIngress(name, serviceSelectors)
 
-	s.ctx.ModifyIngess(s.T(), name, func(ingress *networkingV1.Ingress) {
+	s.ctx.ModifyIngress(s.T(), name, func(ingress *networkingV1.Ingress) {
 		ingress.Spec.DefaultBackend = &networkingV1.IngressBackend{
 			Service: &networkingV1.IngressServiceBackend{
 				Name: serviceName,
@@ -274,7 +274,7 @@ func (s *DanglingIngressTestSuite) TestIngressWithResoucesInsteadofServicesPasse
 	resouceName := "resource"
 	apiGroup := "v2"
 
-	s.ctx.ModifyIngess(s.T(), ingressName1, func(ingress *networkingV1.Ingress) {
+	s.ctx.ModifyIngress(s.T(), ingressName1, func(ingress *networkingV1.Ingress) {
 		ingress.Spec.Rules = []networkingV1.IngressRule{{
 			IngressRuleValue: networkingV1.IngressRuleValue{
 				HTTP: &networkingV1.HTTPIngressRuleValue{

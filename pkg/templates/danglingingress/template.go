@@ -27,12 +27,12 @@ func getSelectorsFromIngressBackend(b *networkingV1.IngressBackend) string {
 	return service.Name
 }
 
-func getSelectorsFromIngress(ingress *networkingV1.Ingress) map[string]bool {
-	selectors := map[string]bool{}
+func getSelectorsFromIngress(ingress *networkingV1.Ingress) map[string]struct{} {
+	selectors := map[string]struct{}{}
 
 	if defaultBack := ingress.Spec.DefaultBackend; defaultBack != nil {
 		if s := getSelectorsFromIngressBackend(defaultBack); s != "" {
-			selectors[s] = true
+			selectors[s] = struct{}{}
 		}
 	}
 
@@ -44,7 +44,7 @@ func getSelectorsFromIngress(ingress *networkingV1.Ingress) map[string]bool {
 
 		for _, p := range spec.Paths {
 			if s := getSelectorsFromIngressBackend(&p.Backend); s != "" {
-				selectors[s] = true
+				selectors[s] = struct{}{}
 			}
 		}
 	}
@@ -58,7 +58,7 @@ func init() {
 		Key:         templateKey,
 		Description: "Flag ingress which do not match any service",
 		SupportedObjectKinds: config.ObjectKindsDesc{
-			ObjectKinds: []string{objectkinds.Service},
+			ObjectKinds: []string{objectkinds.Ingress},
 		},
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,
@@ -91,7 +91,7 @@ func init() {
 					if _, ok := selectors[serviceName]; ok {
 						delete(selectors, serviceName)
 						if len(selectors) == 0 {
-							// Found the all!
+							// Found them all!
 							return nil
 						}
 					}

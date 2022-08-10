@@ -21,8 +21,8 @@ func (l *MockLintContext) AddMockIngress(t *testing.T, name string) {
 	}
 }
 
-// ModifyIngess modifies a given networkpolicy in the context via the passed function.
-func (l *MockLintContext) ModifyIngess(t *testing.T, name string, f func(ingress *networkingV1.Ingress)) {
+// ModifyIngress modifies a given networkpolicy in the context via the passed function.
+func (l *MockLintContext) ModifyIngress(t *testing.T, name string, f func(ingress *networkingV1.Ingress)) {
 	r, ok := l.objects[name].(*networkingV1.Ingress)
 	require.True(t, ok)
 	f(r)

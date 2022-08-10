@@ -117,7 +117,7 @@ KubeLinter supports the following templates:
 
 **Description**: Flag ingress which do not match any service
 
-**Supported Objects**: Service
+**Supported Objects**: Ingress
 
 
 ## Dangling NetworkPolicies
