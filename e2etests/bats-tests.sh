@@ -90,10 +90,12 @@ get_value_from() {
   [ "$status" -eq 1 ]
 
   message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
   count=$(get_value_from "${lines[0]}" '.Reports | length')
 
-  [[ "${message1}" == "Ingress: no service found matching ingress labels (missing)" ]]
-  [[ "${count}" == "1" ]]
+  [[ "${message1}" == "Ingress: no service found matching ingress label (missing), port 80" ]]
+  [[ "${message2}" == "Ingress: no service found matching ingress label (bad-port), port 8080" ]]
+  [[ "${count}" == "2" ]]
 }
 
 @test "dangling-networkpolicy" {

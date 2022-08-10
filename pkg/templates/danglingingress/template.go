@@ -12,26 +12,42 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/templates/danglingingress/internal/params"
 	v1 "k8s.io/api/core/v1"
 	networkingV1 "k8s.io/api/networking/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 const (
 	templateKey = "dangling-ingress"
 )
 
-func getSelectorsFromIngressBackend(b *networkingV1.IngressBackend) string {
-	service := b.Service
-	if service == nil {
-		return ""
-	}
-
-	return service.Name
+type serviceDescriptor struct {
+	name string
+	port intstr.IntOrString
 }
 
-func getSelectorsFromIngress(ingress *networkingV1.Ingress) map[string]struct{} {
-	selectors := map[string]struct{}{}
+func getSelectorsFromIngressBackend(b *networkingV1.IngressBackend) (serviceDescriptor, bool) {
+	service := b.Service
+	if service == nil {
+		return serviceDescriptor{}, false
+	}
+
+	var port intstr.IntOrString
+	if service.Port.Name != "" {
+		port = intstr.FromString(service.Port.Name)
+	} else {
+		port = intstr.FromInt(int(service.Port.Number))
+	}
+
+	return serviceDescriptor{
+		name: service.Name,
+		port: port,
+	}, true
+}
+
+func getSelectorsFromIngress(ingress *networkingV1.Ingress) map[serviceDescriptor]struct{} {
+	selectors := map[serviceDescriptor]struct{}{}
 
 	if defaultBack := ingress.Spec.DefaultBackend; defaultBack != nil {
-		if s := getSelectorsFromIngressBackend(defaultBack); s != "" {
+		if s, found := getSelectorsFromIngressBackend(defaultBack); found {
 			selectors[s] = struct{}{}
 		}
 	}
@@ -43,7 +59,7 @@ func getSelectorsFromIngress(ingress *networkingV1.Ingress) map[string]struct{} 
 		}
 
 		for _, p := range spec.Paths {
-			if s := getSelectorsFromIngressBackend(&p.Backend); s != "" {
+			if s, found := getSelectorsFromIngressBackend(&p.Backend); found {
 				selectors[s] = struct{}{}
 			}
 		}
@@ -87,9 +103,21 @@ func init() {
 						continue
 					}
 
-					serviceName := service.ObjectMeta.Name
-					if _, ok := selectors[serviceName]; ok {
-						delete(selectors, serviceName)
+					for _, port := range service.Spec.Ports {
+						desc := serviceDescriptor{
+							name: service.ObjectMeta.Name,
+							port: intstr.FromInt(int(port.Port)),
+						}
+						delete(selectors, desc)
+
+						if port.Name != "" {
+							desc := serviceDescriptor{
+								name: service.ObjectMeta.Name,
+								port: intstr.FromString(port.Name),
+							}
+							delete(selectors, desc)
+						}
+
 						if len(selectors) == 0 {
 							// Found them all!
 							return nil
@@ -101,7 +129,7 @@ func init() {
 
 				for k := range selectors {
 					dig = append(dig, diagnostic.Diagnostic{
-						Message: fmt.Sprintf("no service found matching ingress labels (%s)", k),
+						Message: fmt.Sprintf("no service found matching ingress label (%v), port %s", k.name, k.port.String()),
 					})
 				}
 
