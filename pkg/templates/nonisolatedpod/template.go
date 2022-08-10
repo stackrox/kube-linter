@@ -26,7 +26,7 @@ func init() {
 		Key:         templateKey,
 		Description: "Flag Pod that is not selected by any networkPolicy",
 		SupportedObjectKinds: config.ObjectKindsDesc{
-			ObjectKinds: []string{objectkinds.NetworkPolicy},
+			ObjectKinds: []string{objectkinds.NetworkPolicy, objectkinds.DeploymentLike},
 		},
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,

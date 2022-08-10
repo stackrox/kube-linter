@@ -26,7 +26,7 @@ func init() {
 		Key:         "non-existent-service-account",
 		Description: "Flag cases where a pod references a non-existent service account",
 		SupportedObjectKinds: config.ObjectKindsDesc{
-			ObjectKinds: []string{objectkinds.DeploymentLike},
+			ObjectKinds: []string{objectkinds.DeploymentLike, objectkinds.ServiceAccount},
 		},
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,

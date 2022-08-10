@@ -22,7 +22,7 @@ func init() {
 		Key:         "dangling-service",
 		Description: "Flag services which do not match any application",
 		SupportedObjectKinds: config.ObjectKindsDesc{
-			ObjectKinds: []string{objectkinds.DeploymentLike},
+			ObjectKinds: []string{objectkinds.DeploymentLike, objectkinds.Service},
 		},
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,

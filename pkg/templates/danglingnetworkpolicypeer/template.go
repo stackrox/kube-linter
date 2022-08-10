@@ -27,7 +27,7 @@ func init() {
 		Key:         templateKey,
 		Description: "Flag NetworkPolicyPeer in Ingress/Egress rules which their podselector do not match any application. Applied to peers consisting with podSelectors only.",
 		SupportedObjectKinds: config.ObjectKindsDesc{
-			ObjectKinds: []string{objectkinds.DeploymentLike},
+			ObjectKinds: []string{objectkinds.DeploymentLike, objectkinds.NetworkPolicy},
 		},
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,

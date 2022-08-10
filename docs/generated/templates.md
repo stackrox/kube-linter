@@ -108,7 +108,7 @@ KubeLinter supports the following templates:
 
 **Description**: Flag HorizontalPodAutoscalers that target a resource that does not exist
 
-**Supported Objects**: HorizontalPodAutoscaler
+**Supported Objects**: HorizontalPodAutoscaler,DeploymentLike
 
 
 ## Dangling NetworkPolicies
@@ -117,7 +117,7 @@ KubeLinter supports the following templates:
 
 **Description**: Flag NetworkPolicies which do not match any application
 
-**Supported Objects**: DeploymentLike
+**Supported Objects**: DeploymentLike,NetworkPolicy
 
 
 ## Dangling NetworkPolicyPeer PodSelector
@@ -126,7 +126,7 @@ KubeLinter supports the following templates:
 
 **Description**: Flag NetworkPolicyPeer in Ingress/Egress rules which their podselector do not match any application. Applied to peers consisting with podSelectors only.
 
-**Supported Objects**: DeploymentLike
+**Supported Objects**: DeploymentLike,NetworkPolicy
 
 
 ## Dangling Services
@@ -135,7 +135,7 @@ KubeLinter supports the following templates:
 
 **Description**: Flag services which do not match any application
 
-**Supported Objects**: DeploymentLike
+**Supported Objects**: DeploymentLike,Service
 
 
 ## Deprecated Service Account Field
@@ -485,7 +485,7 @@ KubeLinter supports the following templates:
 
 **Description**: Flag cases where a pod references a non-existent service account
 
-**Supported Objects**: DeploymentLike
+**Supported Objects**: DeploymentLike,ServiceAccount
 
 
 ## Non Isolated Pods
@@ -494,7 +494,7 @@ KubeLinter supports the following templates:
 
 **Description**: Flag Pod that is not selected by any networkPolicy
 
-**Supported Objects**: NetworkPolicy
+**Supported Objects**: NetworkPolicy,DeploymentLike
 
 
 ## Ports
@@ -749,7 +749,7 @@ KubeLinter supports the following templates:
 
 **Description**: Flag resources with no namespace specified or using default namespace
 
-**Supported Objects**: DeploymentLike,Service
+**Supported Objects**: DeploymentLike,HorizontalPodAutoscaler,NetworkPolicy,Role,RoleBinding,Service,ServiceAccount
 
 
 ## Verify container capabilities

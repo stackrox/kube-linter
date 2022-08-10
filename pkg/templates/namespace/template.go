@@ -19,7 +19,15 @@ func init() {
 		Key:         "use-namespace",
 		Description: "Flag resources with no namespace specified or using default namespace",
 		SupportedObjectKinds: config.ObjectKindsDesc{
-			ObjectKinds: []string{objectkinds.DeploymentLike, objectkinds.Service},
+			ObjectKinds: []string{
+				objectkinds.DeploymentLike,
+				objectkinds.HorizontalPodAutoscaler,
+				objectkinds.NetworkPolicy,
+				objectkinds.Role,
+				objectkinds.RoleBinding,
+				objectkinds.Service,
+				objectkinds.ServiceAccount,
+			},
 		},
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,

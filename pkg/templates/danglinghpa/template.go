@@ -24,7 +24,7 @@ func init() {
 		Key:         templateKey,
 		Description: "Flag HorizontalPodAutoscalers that target a resource that does not exist",
 		SupportedObjectKinds: config.ObjectKindsDesc{
-			ObjectKinds: []string{objectkinds.HorizontalPodAutoscaler},
+			ObjectKinds: []string{objectkinds.HorizontalPodAutoscaler, objectkinds.DeploymentLike},
 		},
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,

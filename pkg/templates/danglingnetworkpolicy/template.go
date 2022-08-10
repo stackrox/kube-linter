@@ -27,7 +27,7 @@ func init() {
 		Key:         "dangling-networkpolicy",
 		Description: "Flag NetworkPolicies which do not match any application",
 		SupportedObjectKinds: config.ObjectKindsDesc{
-			ObjectKinds: []string{objectkinds.DeploymentLike},
+			ObjectKinds: []string{objectkinds.DeploymentLike, objectkinds.NetworkPolicy},
 		},
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,

@@ -59,28 +59,28 @@ func (l *MockLintContext) AddMockHorizontalPodAutoscaler(t *testing.T, name, ver
 	}
 }
 
-//ModifyHorizontalPodAutoscalerV2Beta1 modifies a given HorizontalPodAutoscaler in the context via the passed function.
+// ModifyHorizontalPodAutoscalerV2Beta1 modifies a given HorizontalPodAutoscaler in the context via the passed function.
 func (l *MockLintContext) ModifyHorizontalPodAutoscalerV2Beta1(t *testing.T, name string, f func(hpa *autoscalingV2Beta1.HorizontalPodAutoscaler)) {
 	r, ok := l.objects[name].(*autoscalingV2Beta1.HorizontalPodAutoscaler)
 	require.True(t, ok)
 	f(r)
 }
 
-//ModifyHorizontalPodAutoscalerV2Beta2 modifies a given HorizontalPodAutoscaler in the context via the passed function.
+// ModifyHorizontalPodAutoscalerV2Beta2 modifies a given HorizontalPodAutoscaler in the context via the passed function.
 func (l *MockLintContext) ModifyHorizontalPodAutoscalerV2Beta2(t *testing.T, name string, f func(hpa *autoscalingV2Beta2.HorizontalPodAutoscaler)) {
 	r, ok := l.objects[name].(*autoscalingV2Beta2.HorizontalPodAutoscaler)
 	require.True(t, ok)
 	f(r)
 }
 
-//ModifyHorizontalPodAutoscalerV2 modifies a given HorizontalPodAutoscaler in the context via the passed function.
+// ModifyHorizontalPodAutoscalerV2 modifies a given HorizontalPodAutoscaler in the context via the passed function.
 func (l *MockLintContext) ModifyHorizontalPodAutoscalerV2(t *testing.T, name string, f func(hpa *autoscalingV2.HorizontalPodAutoscaler)) {
 	r, ok := l.objects[name].(*autoscalingV2.HorizontalPodAutoscaler)
 	require.True(t, ok)
 	f(r)
 }
 
-//ModifyHorizontalPodAutoscalerV1 modifies a given HorizontalPodAutoscaler in the context via the passed function.
+// ModifyHorizontalPodAutoscalerV1 modifies a given HorizontalPodAutoscaler in the context via the passed function.
 func (l *MockLintContext) ModifyHorizontalPodAutoscalerV1(t *testing.T, name string, f func(hpa *autoscalingV1.HorizontalPodAutoscaler)) {
 	r, ok := l.objects[name].(*autoscalingV1.HorizontalPodAutoscaler)
 	require.True(t, ok)
