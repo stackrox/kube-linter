@@ -72,7 +72,7 @@ func init() {
 	templates.Register(check.Template{
 		HumanName:   "Dangling Ingress",
 		Key:         templateKey,
-		Description: "Flag ingress which do not match any service",
+		Description: "Flag ingress which do not match any service and port",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.Ingress},
 		},

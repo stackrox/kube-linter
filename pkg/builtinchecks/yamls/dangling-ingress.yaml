@@ -1,6 +1,6 @@
 name: "dangling-ingress"
 description: "Indicates when ingress do not have any associated services."
-remediation: "Confirm that your ingress's backend correctly matches the name on one of your services."
+remediation: "Confirm that your ingress's backend correctly matches the name and port on one of your services."
 scope:
   objectKinds:
     - Ingress

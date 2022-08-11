@@ -115,7 +115,7 @@ KubeLinter supports the following templates:
 
 **Key**: `dangling-ingress`
 
-**Description**: Flag ingress which do not match any service
+**Description**: Flag ingress which do not match any service and port
 
 **Supported Objects**: Ingress
 
