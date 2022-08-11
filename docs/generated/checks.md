@@ -73,7 +73,7 @@ verbs:
 
 **Description**: Indicates when ingress do not have any associated services.
 
-**Remediation**: Confirm that your ingress's backend correctly matches the name on one of your services.
+**Remediation**: Confirm that your ingress's backend correctly matches the name and port on one of your services.
 
 **Template**: [dangling-ingress](generated/templates.md#dangling-ingress)
 ## dangling-networkpolicy
