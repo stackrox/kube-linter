@@ -1,0 +1,102 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dont-fire
+spec:
+  ports:
+    - name: tcp
+      port: 80
+  selector:
+    app.kubernetes.io/name: dont-fire
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dont-fire
+spec:
+  rules:
+    - http:
+        paths:
+          - backend:
+              service:
+                name: dont-fire
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dont-fire-named-port
+spec:
+  rules:
+    - http:
+        paths:
+          - backend:
+              service:
+                name: dont-fire
+                port:
+                  name: tcp
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dont-fire-defaultbackend
+spec:
+  defaultBackend:
+    service:
+      name: dont-fire
+      port:
+        number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dont-fire-resource
+spec:
+  rules:
+    - http:
+        paths:
+          - backend:
+              resource:
+                apiGroup: k8s.example.com
+                kind: StorageBucket
+                name: static-assets
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: missing-service
+spec:
+  rules:
+    - http:
+        paths:
+          - backend:
+              service:
+                name: missing
+                port:
+                  number: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bad-port
+spec:
+  ports:
+    - port: 80
+  selector:
+    app.kubernetes.io/name: dont-fire
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bad-port
+spec:
+  rules:
+    - http:
+        paths:
+          - backend:
+              service:
+                name: bad-port
+                port:
+                  number: 8080

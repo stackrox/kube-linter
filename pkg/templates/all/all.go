@@ -8,6 +8,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/containercapabilities"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/cpurequirements"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/danglinghpa"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/danglingingress"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/danglingnetworkpolicy"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/danglingnetworkpolicypeer"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/danglingservice"

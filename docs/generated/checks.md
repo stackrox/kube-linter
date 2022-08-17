@@ -67,6 +67,15 @@ verbs:
 **Remediation**: Confirm that your HorizontalPodAutoscaler's scaleTargetRef correctly matches one of your deployments.
 
 **Template**: [dangling-horizontalpodautoscaler](generated/templates.md#dangling-horizontalpodautoscalers)
+## dangling-ingress
+
+**Enabled by default**: No
+
+**Description**: Indicates when ingress do not have any associated services.
+
+**Remediation**: Confirm that your ingress's backend correctly matches the name and port on one of your services.
+
+**Template**: [dangling-ingress](generated/templates.md#dangling-ingress)
 ## dangling-networkpolicy
 
 **Enabled by default**: No

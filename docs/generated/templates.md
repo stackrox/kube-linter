@@ -111,6 +111,15 @@ KubeLinter supports the following templates:
 **Supported Objects**: HorizontalPodAutoscaler
 
 
+## Dangling Ingress
+
+**Key**: `dangling-ingress`
+
+**Description**: Flag ingress which do not match any service and port
+
+**Supported Objects**: Ingress
+
+
 ## Dangling NetworkPolicies
 
 **Key**: `dangling-networkpolicy`
