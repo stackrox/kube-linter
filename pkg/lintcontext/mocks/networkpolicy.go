@@ -22,7 +22,7 @@ func (l *MockLintContext) AddMockNetworkPolicy(t *testing.T, name string) {
 	}
 }
 
-//ModifyNetworkPolicy modifies a given networkpolicy in the context via the passed function.
+// ModifyNetworkPolicy modifies a given networkpolicy in the context via the passed function.
 func (l *MockLintContext) ModifyNetworkPolicy(t *testing.T, name string, f func(networkpolicy *networkingV1.NetworkPolicy)) {
 	r, ok := l.objects[name].(*networkingV1.NetworkPolicy)
 	require.True(t, ok)
