@@ -102,14 +102,14 @@ func (s *TargetPortTestSuite) TestServices() {
 			TargetPort: intstr.FromString(""),
 			ExpectedDiagnostics: []diagnostic.Diagnostic{
 				{Message: "port targetPort \"\" in service \"empty-string\" must contain only alpha-numeric characters (a-z, 0-9), and hyphens (-)"},
-				{Message: "port targetPort \"\" in service \"empty-string\" must contain at least one letter or number (a-z, 0-9)"},
+				{Message: "port targetPort \"\" in service \"empty-string\" must contain at least one letter (a-z)"},
 			},
 		},
 		"capital-string": {
 			TargetPort: intstr.FromString("PORT-NAME"),
 			ExpectedDiagnostics: []diagnostic.Diagnostic{
 				{Message: "port targetPort \"PORT-NAME\" in service \"capital-string\" must contain only alpha-numeric characters (a-z, 0-9), and hyphens (-)"},
-				{Message: "port targetPort \"PORT-NAME\" in service \"capital-string\" must contain at least one letter or number (a-z, 0-9)"},
+				{Message: "port targetPort \"PORT-NAME\" in service \"capital-string\" must contain at least one letter (a-z)"},
 			},
 		},
 		"bad-char-string": {
@@ -121,7 +121,7 @@ func (s *TargetPortTestSuite) TestServices() {
 		"num-string": {
 			TargetPort: intstr.FromString("8080"),
 			ExpectedDiagnostics: []diagnostic.Diagnostic{
-				{Message: "port targetPort \"8080\" in service \"num-string\" must contain at least one letter or number (a-z, 0-9)"},
+				{Message: "port targetPort \"8080\" in service \"num-string\" must contain at least one letter (a-z)"},
 			},
 		},
 		"hyphen-start-string": {
@@ -184,7 +184,7 @@ func (s *TargetPortTestSuite) TestDeployments() {
 			TargetPort: "PORT-NAME",
 			ExpectedDiagnostics: []diagnostic.Diagnostic{
 				{Message: "port name \"PORT-NAME\" in container \"capital-string\" must contain only alpha-numeric characters (a-z, 0-9), and hyphens (-)"},
-				{Message: "port name \"PORT-NAME\" in container \"capital-string\" must contain at least one letter or number (a-z, 0-9)"},
+				{Message: "port name \"PORT-NAME\" in container \"capital-string\" must contain at least one letter (a-z)"},
 			},
 		},
 		"bad-char-string": {
@@ -196,7 +196,7 @@ func (s *TargetPortTestSuite) TestDeployments() {
 		"num-string": {
 			TargetPort: "8080",
 			ExpectedDiagnostics: []diagnostic.Diagnostic{
-				{Message: "port name \"8080\" in container \"num-string\" must contain at least one letter or number (a-z, 0-9)"},
+				{Message: "port name \"8080\" in container \"num-string\" must contain at least one letter (a-z)"},
 			},
 		},
 		"hyphen-start-string": {

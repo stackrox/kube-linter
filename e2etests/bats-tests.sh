@@ -352,7 +352,7 @@ get_value_from() {
   [[ "${actual_messages[0]}" == "Service: port targetPort \"123456\" in service \"invalid-target-ports\" must be between 1 and 65535, inclusive" ]]
   [[ "${actual_messages[1]}" == "Service: port targetPort \"n234567890123456\" in service \"invalid-target-ports\" must be no more than 15 characters" ]]
   [[ "${actual_messages[2]}" == "Deployment: port name \"n234567890123456\" in container \"invalid-target-ports\" must be no more than 15 characters" ]]
-  [[ "${actual_messages[3]}" == "Deployment: port name \"123456\" in container \"invalid-target-ports\" must contain at least one letter or number (a-z, 0-9)" ]]
+  [[ "${actual_messages[3]}" == "Deployment: port name \"123456\" in container \"invalid-target-ports\" must contain at least one letter (a-z)" ]]
 }
 
 @test "latest-tag" {
