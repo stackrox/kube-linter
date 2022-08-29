@@ -9,8 +9,9 @@ type Matcher interface {
 	Matches(gvk schema.GroupVersionKind) bool
 }
 
-type matcherFunc func(gvk schema.GroupVersionKind) bool
+// MatcherFunc takes in a GVK and decides if it matches an object kind
+type MatcherFunc func(gvk schema.GroupVersionKind) bool
 
-func (f matcherFunc) Matches(gvk schema.GroupVersionKind) bool {
+func (f MatcherFunc) Matches(gvk schema.GroupVersionKind) bool {
 	return f(gvk)
 }

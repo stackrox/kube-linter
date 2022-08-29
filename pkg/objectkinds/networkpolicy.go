@@ -15,7 +15,7 @@ var (
 )
 
 func init() {
-	registerObjectKind(NetworkPolicy, matcherFunc(func(gvk schema.GroupVersionKind) bool {
+	RegisterObjectKind(NetworkPolicy, MatcherFunc(func(gvk schema.GroupVersionKind) bool {
 		return gvk == networkpolicyGVK
 	}))
 }

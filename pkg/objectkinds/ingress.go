@@ -15,7 +15,7 @@ var (
 )
 
 func init() {
-	registerObjectKind(Ingress, matcherFunc(func(gvk schema.GroupVersionKind) bool {
+	RegisterObjectKind(Ingress, MatcherFunc(func(gvk schema.GroupVersionKind) bool {
 		return gvk == ingressGVK
 	}))
 }

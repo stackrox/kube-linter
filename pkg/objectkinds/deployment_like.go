@@ -44,5 +44,5 @@ const (
 )
 
 func init() {
-	registerObjectKind(DeploymentLike, matcherFunc(isDeploymentLike))
+	RegisterObjectKind(DeploymentLike, MatcherFunc(isDeploymentLike))
 }
