@@ -16,7 +16,7 @@ var (
 )
 
 func init() {
-	registerObjectKind(Role, matcherFunc(func(gvk schema.GroupVersionKind) bool {
+	RegisterObjectKind(Role, MatcherFunc(func(gvk schema.GroupVersionKind) bool {
 		return gvk == roleGVK
 	}))
 }

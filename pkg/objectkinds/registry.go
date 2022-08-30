@@ -11,7 +11,8 @@ var (
 	allObjectKinds = make(map[string]Matcher)
 )
 
-func registerObjectKind(name string, objectKind Matcher) {
+// RegisterObjectKind allows a matcher function to be registered for a given object kind
+func RegisterObjectKind(name string, objectKind Matcher) {
 	if _, ok := allObjectKinds[name]; ok {
 		panic(fmt.Sprintf("duplicate object kind: %v", name))
 	}

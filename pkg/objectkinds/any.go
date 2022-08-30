@@ -10,7 +10,7 @@ const (
 )
 
 func init() {
-	registerObjectKind(Any, matcherFunc(func(gvk schema.GroupVersionKind) bool {
+	RegisterObjectKind(Any, MatcherFunc(func(gvk schema.GroupVersionKind) bool {
 		return true
 	}))
 }

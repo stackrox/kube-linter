@@ -30,7 +30,7 @@ func isHorizontalPodAutoscaler(gvk schema.GroupVersionKind) bool {
 }
 
 func init() {
-	registerObjectKind(HorizontalPodAutoscaler, matcherFunc(isHorizontalPodAutoscaler))
+	RegisterObjectKind(HorizontalPodAutoscaler, MatcherFunc(isHorizontalPodAutoscaler))
 }
 
 // GetHorizontalPodAutoscalerAPIVersion returns HorizontalPodAutoscaler's APIVersion
