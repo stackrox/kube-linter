@@ -416,11 +416,13 @@ get_value_from() {
 
   message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
   message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " +.Reports[1].Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " +.Reports[2].Diagnostic.Message')
   count=$(get_value_from "${lines[0]}" '.Reports | length')
 
   [[ "${message1}" == "Deployment: object has 3 replicas but does not specify inter pod anti-affinity" ]]
   [[ "${message2}" == "DeploymentConfig: object has 3 replicas but does not specify inter pod anti-affinity" ]]
-  [[ "${count}" == "2" ]]
+  [[ "${message3}" == "Deployment: pod's namespace \"foo\" not found in anti-affinity's namespaces [bar]" ]]
+  [[ "${count}" == "3" ]]
 }
 
 @test "no-extensions-v1beta" {

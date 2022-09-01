@@ -61,6 +61,7 @@ func init() {
 				if !hasPods {
 					return nil
 				}
+				namespace := object.K8sObject.GetNamespace()
 				affinity := podTemplateSpec.Spec.Affinity
 				// Short-circuit if no affinity rule is specified within the pod spec.
 				if affinity == nil || affinity.PodAntiAffinity == nil {
@@ -83,7 +84,7 @@ func init() {
 
 				for _, preferred := range preferredAffinity {
 					err := validateAffinityTermMatchesAgainstNodes(preferred.PodAffinityTerm,
-						podTemplateSpec.Namespace, podTemplateSpec.Labels, topologyKeyMatcher)
+						namespace, podTemplateSpec.Labels, topologyKeyMatcher)
 					if err == nil {
 						return nil
 					}
@@ -92,7 +93,7 @@ func init() {
 					})
 				}
 				for _, required := range requiredAffinity {
-					err := validateAffinityTermMatchesAgainstNodes(required, podTemplateSpec.Namespace,
+					err := validateAffinityTermMatchesAgainstNodes(required, namespace,
 						podTemplateSpec.Labels, topologyKeyMatcher)
 					if err == nil {
 						return nil

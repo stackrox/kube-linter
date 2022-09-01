@@ -71,3 +71,91 @@ spec:
     spec:
       containers:
       - name: app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire-namespaced-without-namespaces-selector
+  namespace: foo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dont-fire
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: dont-fire
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - dont-fire
+              topologyKey: "kubernetes.io/hostname"
+      containers:
+        - name: app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire-namespaced-with-namespaces-selector
+  namespace: foo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dont-fire
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: dont-fire
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - dont-fire
+              topologyKey: "kubernetes.io/hostname"
+              namespaces:
+              - foo
+      containers:
+        - name: app
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fire-namespaced-with-namespaces-selector-not-matching
+  namespace: foo
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: fire
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: fire
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - fire
+              topologyKey: "kubernetes.io/hostname"
+              namespaces:
+              - bar
+      containers:
+        - name: app
