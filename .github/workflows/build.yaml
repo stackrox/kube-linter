@@ -286,7 +286,7 @@ jobs:
           cosign sign ${{ env.IMAGE_NAME }}@${{ steps.build-and-push-alpine.outputs.digest }}
 
   update_release_draft:
-    if: (github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/'))
+    # TODO(dhaus): remove after testingif: (github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/'))
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
@@ -312,24 +312,67 @@ jobs:
             tar -C "${os}" -czf "kube-linter-${os}.tar.gz" "${bin_name}"
             zip --junk-paths "kube-linter-${os}.zip" "${os}/${bin_name}"
           done
-      # Workaround: https://github.com/sigstore/cosign-installer/issues/73
-      - name: Write cosign private key to file
+
+      - name: copy binaries with OS ending
+        run: |
+          for os in darwin linux; do
+            bin_name="kube-linter"
+            cp "${os}/${bin_name}" cp "${os}/${bin_name}-${os}"
+          done
+      - name: sign binaries and archives
         env:
-          KEY: ${{ secrets.COSIGN_KEY }}
-        shell: bash
-        run: 'echo "$KEY" > cosign.key'
-      - name: sign archives
-        env:
-          COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+          COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
         run: |
           for f in *.{gz,zip}; do \
-            cosign sign-blob --key cosign.key --output-file "${f}.sig" "${f}"; \
+            cosign sign-blob --key env://COSIGN_KEY --output-file "${f}.sig" "${f}"; \
+          done
+          
+          for os in darwin linux windows; do
+            bin_name="kube-linter-${os}"
+            if [[ "${os}" == "windows" ]]; then
+              bin_name="kube-linter.exe"
+            fi
+            cosign sign-blob --key env://COSIGN_KEY --output-file "${bin_name}.sig" "${os}/${bin_name}"
           done
 
       - uses: release-drafter/release-drafter@v5
         id: release_drafter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Binary Linux
+        id: upload-binary-linux
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-linux
+          asset_name: kube-linter-linux
+          asset_content_type: application/octet-stream
+      - name: Upload Binary Darwin
+        id: upload-binary-darwin
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-darwin
+          asset_name: kube-linter-darwin
+          asset_content_type: application/octet-stream
+      - name: Upload Binary Windows
+        id: upload-binary-windows
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter.exe
+          asset_name: kube-linter.exe
+          asset_content_type: application/octet-stream
       - name: Upload Release Asset Linux
         id: upload-release-asset-linux
         uses: gfreezy/upload-release-asset@v1.0.2
@@ -396,17 +439,6 @@ jobs:
           asset_path: kube-linter-darwin.zip
           asset_name: kube-linter-darwin.zip
           asset_content_type: application/zip
-      - name: Upload sig Asset Linux
-        id: upload-release-asset-linux-sig
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-linux.tar.gz.sig
-          asset_name: kube-linter-linux.tar.gz.sig
-          asset_content_type: text/plain
       - name: Upload sig Asset Windows
         id: upload-release-asset-windows-sig
         uses: gfreezy/upload-release-asset@v1.0.2
@@ -462,7 +494,39 @@ jobs:
           asset_path: kube-linter-darwin.zip.sig
           asset_name: kube-linter-darwin.zip.sig
           asset_content_type: text/plain
-
+      - name: Upload Binary Sig Linux
+        id: upload-binary-sig-linux
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-linux.sig
+          asset_name: kube-linter-linux.sig
+          asset_content_type: application/octet-stream
+      - name: Upload Binary Sig Darwin
+        id: upload-binary-sig-darwin
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-darwin.sig
+          asset_name: kube-linter-darwin.sig
+          asset_content_type: application/octet-stream
+      - name: Upload Binary Sig Windows
+        id: upload-binary-sig-windows
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter.exe.sig
+          asset_name: kube-linter.exe.sig
+          asset_content_type: application/octet-stream
       - name: Upload sig source code zip
         id: upload-release-asset-source-zip-sig
         uses: gfreezy/upload-release-asset@v1.0.2
