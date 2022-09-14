@@ -291,7 +291,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install cosign
-        uses: sigstore/cosign-installer@v2.6.0
+        uses: sigstore/cosign-installer@v2.5.1
       - name: Download executables
         uses: actions/download-artifact@v3
         with:
@@ -308,6 +308,10 @@ jobs:
             bin_name="kube-linter"
             cp "${os}/${bin_name}" "${os}/${bin_name}-${os}"
           done
+
+      - name: create linux tar archive
+        run: |
+          tar -C linux -czf kube-linter-linux.tar.gz kube-linter
 
       # Workaround: https://github.com/sigstore/cosign-installer/issues/73
       - name: Write cosign private key to file
@@ -340,7 +344,7 @@ jobs:
         with:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-linux
+          asset_path: linux/kube-linter-linux
           asset_name: kube-linter-linux
           asset_content_type: application/octet-stream
       - name: Upload Binary Darwin
@@ -351,7 +355,7 @@ jobs:
         with:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-darwin
+          asset_path: darwin/kube-linter-darwin
           asset_name: kube-linter-darwin
           asset_content_type: application/octet-stream
       - name: Upload Binary Windows
@@ -362,7 +366,7 @@ jobs:
         with:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter.exe
+          asset_path: windows/kube-linter.exe
           asset_name: kube-linter.exe
           asset_content_type: application/octet-stream
       #
