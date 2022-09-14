@@ -6,7 +6,7 @@ on:
   # Uploading Code Scanning results requires write access. Ignore dependabot branches for auto-merge.
   push:
     branches-ignore: "dependabot/**"
-    tags: 
+    tags:
       - "*"
 
 env:
@@ -286,12 +286,12 @@ jobs:
           cosign sign ${{ env.IMAGE_NAME }}@${{ steps.build-and-push-alpine.outputs.digest }}
 
   update_release_draft:
-    if: (github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/'))
+    # TODO(dhaus): remove after testingif: (github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/'))
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
       - name: Install cosign
-        uses: sigstore/cosign-installer@v2.5.1
+        uses: sigstore/cosign-installer@v2.6.0
       - name: Download executables
         uses: actions/download-artifact@v3
         with:
@@ -302,34 +302,74 @@ jobs:
           chmod +x linux/kube-linter
           chmod +x darwin/kube-linter
 
-      - name: create archives
+      - name: copy binaries with OS ending
         run: |
-          for os in darwin linux windows; do
+          for os in darwin linux; do
             bin_name="kube-linter"
-            if [[ "${os}" == "windows" ]]; then
-              bin_name="kube-linter.exe"
-            fi
-            tar -C "${os}" -czf "kube-linter-${os}.tar.gz" "${bin_name}"
-            zip --junk-paths "kube-linter-${os}.zip" "${os}/${bin_name}"
+            cp "${os}/${bin_name}" "${os}/${bin_name}-${os}"
           done
+
       # Workaround: https://github.com/sigstore/cosign-installer/issues/73
       - name: Write cosign private key to file
         env:
           KEY: ${{ secrets.COSIGN_KEY }}
         shell: bash
         run: 'echo "$KEY" > cosign.key'
-      - name: sign archives
+
+      - name: sign binaries
         env:
-          COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          for f in *.{gz,zip}; do \
-            cosign sign-blob --key cosign.key --output-file "${f}.sig" "${f}"; \
-          done
+          for os in darwin linux windows; do
+             bin_name="kube-linter-${os}"
+             if [[ "${os}" == "windows" ]]; then
+               bin_name="kube-linter.exe"
+             fi
+             cosign sign-blob --key cosign.key --output-file "${bin_name}.sig" "${os}/${bin_name}"
+           done
 
       - uses: release-drafter/release-drafter@v5
         id: release_drafter
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Binary Linux
+        id: upload-binary-linux
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-linux
+          asset_name: kube-linter-linux
+          asset_content_type: application/octet-stream
+      - name: Upload Binary Darwin
+        id: upload-binary-darwin
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter-darwin
+          asset_name: kube-linter-darwin
+          asset_content_type: application/octet-stream
+      - name: Upload Binary Windows
+        id: upload-binary-windows
+        uses: gfreezy/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ steps.release_drafter.outputs.id }}
+          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
+          asset_path: kube-linter.exe
+          asset_name: kube-linter.exe
+          asset_content_type: application/octet-stream
+      #
+      # This is kept for backwards compatibility for the kube-linter-action. The action tries to download this specific
+      # archive to get the latest kube-linter version. We cannot add a cosign signature for it, since the action will get
+      # a name clash trying to download this. Once we have met the grace period (say 3 months), we will remove this.
+      #
       - name: Upload Release Asset Linux
         id: upload-release-asset-linux
         uses: gfreezy/upload-release-asset@v1.0.2
@@ -341,128 +381,39 @@ jobs:
           asset_path: kube-linter-linux.tar.gz
           asset_name: kube-linter-linux.tar.gz
           asset_content_type: application/octet-stream
-      - name: Upload Release Asset Windows
-        id: upload-release-asset-windows
+      - name: Upload Binary Sig Linux
+        id: upload-binary-sig-linux
         uses: gfreezy/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-windows.tar.gz
-          asset_name: kube-linter-windows.tar.gz
+          asset_path: kube-linter-linux.sig
+          asset_name: kube-linter-linux.sig
           asset_content_type: application/octet-stream
-      - name: Upload Release Asset Mac
-        id: upload-release-asset-mac
+      - name: Upload Binary Sig Darwin
+        id: upload-binary-sig-darwin
         uses: gfreezy/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-darwin.tar.gz
-          asset_name: kube-linter-darwin.tar.gz
+          asset_path: kube-linter-darwin.sig
+          asset_name: kube-linter-darwin.sig
           asset_content_type: application/octet-stream
-      - name: Upload Release Asset Linux ZIP
-        id: upload-release-asset-linux-zip
+      - name: Upload Binary Sig Windows
+        id: upload-binary-sig-windows
         uses: gfreezy/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-linux.zip
-          asset_name: kube-linter-linux.zip
-          asset_content_type: application/zip
-      - name: Upload Release Asset Windows ZIP
-        id: upload-release-asset-windows-zip
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-windows.zip
-          asset_name: kube-linter-windows.zip
-          asset_content_type: application/zip
-      - name: Upload Release Asset Mac ZIP
-        id: upload-release-asset-mac-zip
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-darwin.zip
-          asset_name: kube-linter-darwin.zip
-          asset_content_type: application/zip
-      - name: Upload sig Asset Linux
-        id: upload-release-asset-linux-sig
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-linux.tar.gz.sig
-          asset_name: kube-linter-linux.tar.gz.sig
-          asset_content_type: text/plain
-      - name: Upload sig Asset Windows
-        id: upload-release-asset-windows-sig
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-windows.tar.gz.sig
-          asset_name: kube-linter-windows.tar.gz.sig
-          asset_content_type: text/plain
-      - name: Upload sig Asset Mac
-        id: upload-release-asset-mac-sig
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-darwin.tar.gz.sig
-          asset_name: kube-linter-darwin.tar.gz.sig
-          asset_content_type: text/plain
-      - name: Upload sig Asset Linux ZIP
-        id: upload-release-asset-linux-zip-sig
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-linux.zip.sig
-          asset_name: kube-linter-linux.zip.sig
-          asset_content_type: text/plain
-      - name: Upload sig Asset Windows ZIP
-        id: upload-release-asset-windows-zip-sig
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-windows.zip.sig
-          asset_name: kube-linter-windows.zip.sig
-          asset_content_type: text/plain
-      - name: Upload sig Asset Mac ZIP
-        id: upload-release-asset-mac-zip-sig
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-darwin.zip.sig
-          asset_name: kube-linter-darwin.zip.sig
-          asset_content_type: text/plain
-
+          asset_path: kube-linter.exe.sig
+          asset_name: kube-linter.exe.sig
+          asset_content_type: application/octet-stream
       - name: Upload sig source code zip
         id: upload-release-asset-source-zip-sig
         uses: gfreezy/upload-release-asset@v1.0.2
