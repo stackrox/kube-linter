@@ -309,17 +309,23 @@ jobs:
             cp "${os}/${bin_name}" "${os}/${bin_name}-${os}"
           done
 
+      # Workaround: https://github.com/sigstore/cosign-installer/issues/73
+      - name: Write cosign private key to file
+        env:
+          KEY: ${{ secrets.COSIGN_KEY }}
+        shell: bash
+        run: 'echo "$KEY" > cosign.key'
+
       - name: sign binaries
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-          COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
         run: |
          for os in darwin linux windows; do
             bin_name="kube-linter-${os}"
             if [[ "${os}" == "windows" ]]; then
               bin_name="kube-linter.exe"
             fi
-            cosign sign-blob --key env://COSIGN_KEY --output-file "${bin_name}.sig" "${os}/${bin_name}"
+            cosign sign-blob --key cosign.key --output-file "${bin_name}.sig" "${os}/${bin_name}"
           done
 
       - uses: release-drafter/release-drafter@v5
