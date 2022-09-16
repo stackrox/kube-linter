@@ -331,6 +331,9 @@ jobs:
              fi
              cosign sign-blob --key cosign.key --output-file "${bin_name}.sig" "${os}/${bin_name}"
            done
+          for f in *.{gz,zip}; do \
+            cosign sign-blob --key cosign.key --output-file "${f}.sig" "${f}"; \
+          done
 
       - uses: release-drafter/release-drafter@v5
         id: release_drafter
