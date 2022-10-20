@@ -121,7 +121,7 @@ jobs:
           ./yajsv -s ./scripts/sarif/sarif-schema-2.1.0.json results.sarif
 
       - name: Upload SARIF output file to GitHub
-        uses: github/codeql-action/upload-sarif@v2
+        uses: github/codeql-action/upload-sarif@v2.1.27
         with:
           sarif_file: results.sarif
 
