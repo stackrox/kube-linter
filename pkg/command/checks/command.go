@@ -44,7 +44,7 @@ KubeLinter includes the following built-in checks:
 
 **Remediation**: {{.Remediation}}
 
-**Template**: [{{.Template}}](generated/templates.md#{{ templateLink . }})
+**Template**: [{{.Template}}](templates.md#{{ templateLink . }})
 {{ if .Params }}
 **Parameters**:
 
