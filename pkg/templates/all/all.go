@@ -36,6 +36,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/privileged"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/privilegedports"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/privilegeescalation"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/probeport"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/readinessprobe"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/readonlyrootfs"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/readsecret"

@@ -25,6 +25,7 @@ var (
 		"non-existent-service-account",
 		"privilege-escalation-container",
 		"privileged-container",
+		"probe-port",
 		"run-as-non-root",
 		"sensitive-host-mounts",
 		"ssh-port",

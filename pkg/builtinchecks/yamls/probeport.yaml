@@ -1,0 +1,7 @@
+name: "probe-port"
+description: "Alert on probe port that does not match a port defined in container ports"
+remediation: "Ensure probe port matches a port defined in container ports."
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "probe-port"

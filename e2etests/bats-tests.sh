@@ -625,6 +625,21 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "probe-port" {
+  tmp="tests/checks/probe-port.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include probe-port --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment: probe port \"bar\" does not match a port in container \"myapp\"." ]]
+  [[ "${count}" == "1" ]]
+}
+
 @test "read-secret-from-env-var" {
   tmp="tests/checks/read-secret-from-env-var.yml"
   cmd="${KUBE_LINTER_BIN} lint --include read-secret-from-env-var --do-not-auto-add-defaults --format json ${tmp}"

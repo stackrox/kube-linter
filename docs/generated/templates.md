@@ -579,6 +579,15 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 
+## Probe Port
+
+**Key**: `probe-port`
+
+**Description**: Flag unknown probe port
+
+**Supported Objects**: DeploymentLike
+
+
 ## Read-only Root Filesystems
 
 **Key**: `read-only-root-fs`

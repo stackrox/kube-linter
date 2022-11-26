@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: no-probe
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: myimage
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: livenessProbe-int
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: myimage
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            port: 1234
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: readinessProbe-int-str
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: myimage
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        readinessProbe:
+          tcpCheck:
+            port: "1234"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: startupProbe-str-container-port-ok
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: myimage
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 1234
+          name: foo
+        startupProbe:
+          httpGet:
+            port: foo
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: startupProbe-str-container-port-ko
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: myimage
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 1234
+          name: foo
+        startupProbe:
+          httpGet:
+            port: bar

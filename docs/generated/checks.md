@@ -437,6 +437,15 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 **Remediation**: Ensure privileged ports [0, 1024] are not mapped within containers.
 
 **Template**: [privileged-ports](templates.md#privileged-ports)
+## probe-port
+
+**Enabled by default**: Yes
+
+**Description**: Alert on probe port that does not match a port defined in container ports
+
+**Remediation**: Ensure probe port matches a port defined in container ports.
+
+**Template**: [probe-port](templates.md#probe-port)
 ## read-secret-from-env-var
 
 **Enabled by default**: No
