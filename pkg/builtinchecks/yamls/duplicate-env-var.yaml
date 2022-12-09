@@ -1,0 +1,7 @@
+name: "duplicate-env-var"
+description: "Check that duplicate named env vars aren't passed to a deployment like."
+remediation: "Confirm that your DeploymentLike doesn't have duplicate env vars names."
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "duplicate-env-var"

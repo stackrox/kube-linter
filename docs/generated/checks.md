@@ -175,6 +175,15 @@ dirs:
 forbiddenCapabilities:
 - NET_RAW
 ```
+## duplicate-env-var
+
+**Enabled by default**: Yes
+
+**Description**: Check that duplicate named env vars aren't passed to a deployment like.
+
+**Remediation**: Confirm that your DeploymentLike doesn't have duplicate env vars names.
+
+**Template**: [duplicate-env-var](templates.md#duplicate-environment-variables)
 ## env-var-secret
 
 **Enabled by default**: Yes

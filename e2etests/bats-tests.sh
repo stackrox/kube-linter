@@ -232,6 +232,23 @@ get_value_from() {
   [[ "${count}" == "4" ]]
 }
 
+@test "duplicate-env-var" {
+  tmp="tests/checks/duplicate-env-var.yaml"
+  cmd="${KUBE_LINTER_BIN} lint --include duplicate-env-var --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment: Duplicate environment variable PORT in container \"fire-deployment\" found" ]]
+  [[ "${message2}" == "StatefulSet: Duplicate environment variable PORT in container \"fire-stateful\" found" ]]
+  [[ "${count}" == "2" ]]
+}
+
 @test "env-var-secret" {
   tmp="tests/checks/env-var-secret.yml"
   cmd="${KUBE_LINTER_BIN} lint --include env-var-secret --do-not-auto-add-defaults --format json ${tmp}"

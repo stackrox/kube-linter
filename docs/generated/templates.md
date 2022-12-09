@@ -222,6 +222,15 @@ KubeLinter supports the following templates:
   type: string
 ```
 
+## Duplicate Environment Variables
+
+**Key**: `duplicate-env-var`
+
+**Description**: Flag Duplicate Env Variables names
+
+**Supported Objects**: DeploymentLike
+
+
 ## Environment Variables
 
 **Key**: `env-var`
