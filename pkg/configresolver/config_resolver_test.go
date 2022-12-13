@@ -24,7 +24,7 @@ func TestIgnorePaths(t *testing.T) {
 	c := new(config.Config)
 
 	var tests = []struct {
-		Path         []string
+		Paths        []string
 		Expected     string
 		ErrorExpeted bool
 	}{
@@ -33,17 +33,20 @@ func TestIgnorePaths(t *testing.T) {
 		{[]string{"~~/test"}, "", true},
 		{[]string{"../test"}, parent + "/test", false},
 		{[]string{"../*.yaml"}, parent + "/*.yaml", false},
+		{[]string{"~/test", "~/test"}, home + "/test", false},
 	}
 
 	for _, e := range tests {
-		c.Checks.IgnorePaths = e.Path
+		c.Checks.IgnorePaths = e.Paths
 		paths, err := GetIgnorePaths(c)
 
 		if e.ErrorExpeted {
 			assert.Error(t, err)
 		} else {
-			assert.NoError(t, err)
-			assert.Equal(t, paths[0], e.Expected)
+			for _, path := range paths {
+				assert.NoError(t, err)
+				assert.Equal(t, path, e.Expected)
+			}
 		}
 	}
 }
