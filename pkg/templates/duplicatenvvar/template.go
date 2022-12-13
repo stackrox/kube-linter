@@ -32,17 +32,17 @@ func init() {
 
 				for _, envVar := range container.Env {
 					// Ensure we only report on error per env var
-					if num, ok := envVarNames[envVar.Name]; ok && num == 1 {
-						results = append(results, diagnostic.Diagnostic{
-							Message: fmt.Sprintf(
-								"Duplicate environment variable %s in container %q found",
-								envVar.Name,
-								container.Name,
-							),
-						})
-					}
-
 					envVarNames[envVar.Name]++
+					if num, ok := envVarNames[envVar.Name]; !ok || num != 2 {
+						continue
+					}
+					results = append(results, diagnostic.Diagnostic{
+						Message: fmt.Sprintf(
+							"Duplicate environment variable %s in container %q found",
+							envVar.Name,
+							container.Name,
+						),
+					})
 				}
 				return results
 			}), nil
