@@ -26,78 +26,52 @@ func (s *DuplicateEnvVarTestSuite) SetupTest() {
 	s.ctx = mocks.NewMockContext()
 }
 
-func (s *DuplicateEnvVarTestSuite) TestDeploymentWithNoDuplicatesPass() {
+func (s *DuplicateEnvVarTestSuite) TestDeploymentWith() {
 	const targetName = "deployment01"
-
-	s.ctx.AddMockDeployment(s.T(), targetName)
-	s.ctx.AddContainerToDeployment(s.T(), targetName, v1.Container{
-		Env: []v1.EnvVar{
-			{
-				Name: "ENV_1",
-			},
-			{
-				Name: "ENV_2",
-			},
-		},
-	})
-
-	s.Validate(s.ctx, []templates.TestCase{
+	testCases := []struct {
+		name      string
+		container v1.Container
+		expected  map[string][]diagnostic.Diagnostic
+	}{
 		{
-			Param: params.Params{},
-			Diagnostics: map[string][]diagnostic.Diagnostic{
-				targetName: nil,
+			name: "WithNoDuplicatesShouldPass",
+			container: v1.Container{
+				Env: []v1.EnvVar{
+					{Name: "ENV_1"},
+					{Name: "ENV_2"},
+				},
 			},
+			expected: nil,
 		},
-	})
-}
-
-func (s *DuplicateEnvVarTestSuite) TestDeploymentWillReportErrorsWithDuplicates() {
-	const targetName = "deployment02"
-
-	s.ctx.AddMockDeployment(s.T(), targetName)
-	s.ctx.AddContainerToDeployment(s.T(), targetName, v1.Container{
-		Name: "containerName",
-		Env: []v1.EnvVar{
-			{
-				Name: "ENV_1",
-			},
-			{
-				Name: "ENV_1",
-			},
-		},
-	})
-
-	s.Validate(s.ctx, []templates.TestCase{
 		{
-			Param: params.Params{},
-			Diagnostics: map[string][]diagnostic.Diagnostic{
+			name: "DuplicatesShouldReportErrors",
+			container: v1.Container{
+				Env: []v1.EnvVar{
+					{Name: "ENV_1"},
+					{Name: "ENV_1"},
+				},
+			},
+			expected: map[string][]diagnostic.Diagnostic{
 				targetName: {
-					{Message: "Duplicate environment variable ENV_1 in container \"containerName\" found"},
+					// Ensure we only get one error for ENV_1
+					{Message: "Duplicate environment variable ENV_1 in container \"\" found"},
 				},
 			},
 		},
-	})
-}
-
-func (s *DuplicateEnvVarTestSuite) TestDeploymentWillReportAllDuplicates() {
-	const targetName = "deployment02"
-
-	s.ctx.AddMockDeployment(s.T(), targetName)
-	s.ctx.AddContainerToDeployment(s.T(), targetName, v1.Container{
-		Name: "container",
-		Env: []v1.EnvVar{
-			{Name: "ENV_1"},
-			{Name: "ENV_1"},
-			{Name: "ENV_1"},
-			{Name: "ENV_2"},
-			{Name: "ENV_2"},
-		},
-	})
-
-	s.Validate(s.ctx, []templates.TestCase{
 		{
-			Param: params.Params{},
-			Diagnostics: map[string][]diagnostic.Diagnostic{
+			name: "MultipleDuplicatesShouldReportThemAllButOnlyOncePerEnv",
+			container: v1.Container{
+				Name: "container",
+				Env: []v1.EnvVar{
+					{Name: "ENV_1"},
+					{Name: "ENV_1"},
+					{Name: "ENV_1"},
+					{Name: "ENV_2"},
+					{Name: "ENV_2"},
+					{Name: "ENV_3"},
+				},
+			},
+			expected: map[string][]diagnostic.Diagnostic{
 				targetName: {
 					// Ensure we only get one error for ENV_1
 					{Message: "Duplicate environment variable ENV_1 in container \"container\" found"},
@@ -105,5 +79,15 @@ func (s *DuplicateEnvVarTestSuite) TestDeploymentWillReportAllDuplicates() {
 				},
 			},
 		},
-	})
+	}
+	for _, tc := range testCases {
+		s.Run(tc.name, func() {
+			s.ctx.AddMockDeployment(s.T(), targetName)
+			s.ctx.AddContainerToDeployment(s.T(), targetName, tc.container)
+			s.Validate(s.ctx, []templates.TestCase{{
+				Param:       params.Params{},
+				Diagnostics: tc.expected,
+			}})
+		})
+	}
 }
