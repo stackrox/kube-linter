@@ -26,7 +26,7 @@ func (s *DuplicateEnvVarTestSuite) SetupTest() {
 	s.ctx = mocks.NewMockContext()
 }
 
-func (s *DuplicateEnvVarTestSuite) TestDeploymentWithNoDuplicatsPass() {
+func (s *DuplicateEnvVarTestSuite) TestDeploymentWithNoDuplicatesPass() {
 	const targetName = "deployment01"
 
 	s.ctx.AddMockDeployment(s.T(), targetName)
