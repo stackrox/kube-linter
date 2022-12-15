@@ -147,6 +147,19 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 
+**Parameters**:
+
+```yaml
+- arrayElemType: string
+  description: A list of labels that will not cause the check to fail. For example,
+    a label that is known to be populated at runtime by Kubernetes.
+  name: ignoredLabels
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: array
+```
+
 ## Deprecated Service Account Field
 
 **Key**: `deprecated-service-account-field`
