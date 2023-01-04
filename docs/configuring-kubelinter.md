@@ -58,13 +58,15 @@ checks:
     - ../baz
     - /tmp/*.yaml
 ```
+> Equivalent CLI flag is `--ignore-paths`
 
-> Equivalent CLI flag is `--add-all-built-in`
 
 > [!NOTE]
 >
 > - If you set both `doNotAutoAddDefaults` and `addAllBuiltIn` to `true`,
 >   `addAllBuiltIn` takes precedence.
+
+> Equivalent CLI flag is `--add-all-built-in`
 
 ## Run specific checks
 
