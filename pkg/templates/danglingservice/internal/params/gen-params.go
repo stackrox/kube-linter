@@ -17,7 +17,24 @@ var (
 	_ = util.MustParseParameterDesc
 	_ = fmt.Sprintf
 
+	ignoredLabelsParamDesc = util.MustParseParameterDesc(`{
+	"Name": "ignoredLabels",
+	"Type": "array",
+	"Description": "A list of labels that will not cause the check to fail. For example, a label that is known to be populated at runtime by Kubernetes.",
+	"Examples": null,
+	"Enum": null,
+	"SubParameters": null,
+	"ArrayElemType": "string",
+	"Required": false,
+	"NoRegex": false,
+	"NotNegatable": false,
+	"XXXStructFieldName": "IgnoredLabels",
+	"XXXIsPointer": false
+}
+`)
+
 	ParamDescs = []check.ParameterDesc{
+		ignoredLabelsParamDesc,
 	}
 )
 

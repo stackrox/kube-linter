@@ -16,17 +16,19 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 )
 
+const templateKey = "dangling-service"
+
 func init() {
 	templates.Register(check.Template{
 		HumanName:   "Dangling Services",
-		Key:         "dangling-service",
+		Key:         templateKey,
 		Description: "Flag services which do not match any application",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,
-		Instantiate: params.WrapInstantiateFunc(func(_ params.Params) (check.Func, error) {
+		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
 			return func(lintCtx lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				service, ok := object.K8sObject.(*v1.Service)
 				if !ok {
@@ -42,6 +44,11 @@ func init() {
 						Message: "service has no selector specified",
 					}}
 				}
+
+				for _, ignoredLabel := range p.IgnoredLabels {
+					delete(selector, ignoredLabel)
+				}
+
 				labelSelector, err := metaV1.LabelSelectorAsSelector(&metaV1.LabelSelector{MatchLabels: selector})
 				if err != nil {
 					return []diagnostic.Diagnostic{{
