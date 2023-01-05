@@ -27,4 +27,8 @@ func AddFlags(c *cobra.Command, v *viper.Viper) {
 	if err := v.BindPFlag("checks.include", c.Flags().Lookup("include")); err != nil {
 		panic(err)
 	}
+	c.Flags().StringSlice("ignore-paths", nil, "IgnorePaths is a list of path to ignore from applying checks")
+	if err := v.BindPFlag("checks.ignorePaths", c.Flags().Lookup("ignore-paths")); err != nil {
+		panic(err)
+	}
 }

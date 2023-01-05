@@ -48,12 +48,25 @@ checks:
   addAllBuiltIn: true
 ```
 
-> Equivalent CLI flag is `--add-all-built-in`
+## Ignore paths
+
+To ignore checks on files or directories under certain paths, add ignored paths to `ignorePaths`.
+```yaml
+checks:
+  ignorePaths:
+    - ~/foo/bar
+    - ../baz
+    - /tmp/*.yaml
+```
+> Equivalent CLI flag is `--ignore-paths`
+
 
 > [!NOTE]
 >
 > - If you set both `doNotAutoAddDefaults` and `addAllBuiltIn` to `true`,
 >   `addAllBuiltIn` takes precedence.
+
+> Equivalent CLI flag is `--add-all-built-in`
 
 ## Run specific checks
 

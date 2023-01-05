@@ -26,6 +26,9 @@ type ChecksConfig struct {
 	// Exclude wins.
 	// +flagName=include
 	Include []string `json:"include"`
+	// IgnorePaths is a list of path to ignore from applying checks
+	// +flagName=ignore-paths
+	IgnorePaths []string `json:"ignorePaths"`
 }
 
 // Config represents the config file format.

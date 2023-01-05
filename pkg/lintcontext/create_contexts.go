@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/bmatcuk/doublestar/v4"
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/set"
 	"helm.sh/helm/v3/pkg/chartutil"
@@ -29,13 +30,14 @@ type Options struct {
 // Currently, each directory of Kube YAML files (or Helm charts) are treated as a separate context.
 // TODO: Figure out if it's useful to allow people to specify that files spanning different directories
 // should be treated as being in the same context.
-func CreateContexts(filesOrDirs ...string) ([]LintContext, error) {
-	return CreateContextsWithOptions(Options{}, filesOrDirs...)
+func CreateContexts(ignorePaths []string, filesOrDirs ...string) ([]LintContext, error) {
+	return CreateContextsWithOptions(Options{}, ignorePaths, filesOrDirs...)
 }
 
 // CreateContextsWithOptions creates a context with additional Options
-func CreateContextsWithOptions(options Options, filesOrDirs ...string) ([]LintContext, error) {
+func CreateContextsWithOptions(options Options, ignorePaths []string, filesOrDirs ...string) ([]LintContext, error) {
 	contextsByDir := make(map[string]*lintContextImpl)
+fileOrDirsLoop:
 	for _, fileOrDir := range filesOrDirs {
 		// Stdin
 		if fileOrDir == "-" {
@@ -48,6 +50,15 @@ func CreateContextsWithOptions(options Options, filesOrDirs ...string) ([]LintCo
 			}
 			contextsByDir["-"] = ctx
 			continue
+		}
+
+		for _, path := range ignorePaths {
+			// Useing doublestar to enable **
+			// See https://github.com/golang/go/issues/11862
+			globMatch, _ := doublestar.PathMatch(path, fileOrDir)
+			if strings.HasPrefix(fileOrDir, path) || globMatch {
+				continue fileOrDirsLoop
+			}
 		}
 
 		err := filepath.Walk(fileOrDir, func(currentPath string, info os.FileInfo, walkErr error) error {
