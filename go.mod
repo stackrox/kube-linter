@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
-	github.com/bmatcuk/doublestar/v4 v4.0.3
+	github.com/bmatcuk/doublestar/v4 v4.6.0
 	github.com/cert-manager/cert-manager v1.11.0
 	github.com/fatih/color v1.13.0
 	github.com/ghodss/yaml v1.0.0
