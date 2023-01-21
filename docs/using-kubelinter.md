@@ -37,20 +37,15 @@ kube-linter lint /path/to/directory/containing/Chart.yaml-file/
 
 If you are using the [pre-commit framework](https://pre-commit.com/) for
 managing Git pre-commit hooks, you can install and use KubeLinter as a
-pre-commit hook. To do this:
+pre-commit hook. To do this, add the following to your `.pre-commit-config.yaml`:
 
-1. Download the [`.pre-commit-hooks.yaml`](https://raw.githubusercontent.com/stackrox/kube-linter/main/.pre-commit-hooks.yaml)
-   file in the Git repository in which you want to install the KubeLinter
-   pre-commit hooks:
-   ```bash
-   curl -O https://raw.githubusercontent.com/stackrox/kube-linter/main/.pre-commit-hooks.yaml
-   ```
-1. Run the `pre-commit install` command:
-   ```bash
-   pre-commit install
-   ```
-1. After installation, the KubeLinter pre-commit hooks run whenever you run the
-   `git commit` command.
+```yaml
+  - repo: https://github.com/stackrox/kube-linter
+    rev: 0.6.0 # kube-linter version 
+    hooks:
+        # You can change this to kube-linter-system or kube-linter-docker
+      - id: kube-linter
+```
 
 The [`.pre-commit-hooks.yaml`](https://raw.githubusercontent.com/stackrox/kube-linter/main/.pre-commit-hooks.yaml)
 includes the following pre-commit hooks:
