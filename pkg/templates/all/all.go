@@ -45,6 +45,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/runasnonroot"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/serviceaccount"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/servicetype"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/startupprobe"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/sysctl"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/targetport"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/unsafeprocmount"

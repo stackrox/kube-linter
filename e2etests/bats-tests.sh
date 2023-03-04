@@ -523,6 +523,23 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "no-startup-probe" {
+  tmp="tests/checks/no-startup-probe.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include no-startup-probe --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment: container \"app\" does not specify a startup probe" ]]
+  [[ "${message2}" == "DeploymentConfig: container \"app\" does not specify a startup probe" ]]
+  [[ "${count}" == "2" ]]
+}
+
 @test "no-rolling-update-strategy" {
   tmp="tests/checks/no-rolling-update-strategy.yml"
   cmd="${KUBE_LINTER_BIN} lint --include no-rolling-update-strategy --do-not-auto-add-defaults --format json ${tmp}"

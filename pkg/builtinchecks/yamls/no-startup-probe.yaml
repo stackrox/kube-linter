@@ -1,0 +1,9 @@
+name: "no-startup-probe"
+description: "Indicates when containers fail to specify a startup probe."
+remediation: >-
+  Specify a startup probe in your container.
+  Refer to https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/ for details.
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "startup-probe"

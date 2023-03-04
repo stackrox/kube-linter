@@ -606,6 +606,15 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 
+## Startup Probe Not Specified
+
+**Key**: `startup-probe`
+
+**Description**: Flag containers that don't specify a startup probe
+
+**Supported Objects**: DeploymentLike
+
+
 ## Required Annotation
 
 **Key**: `required-annotation`

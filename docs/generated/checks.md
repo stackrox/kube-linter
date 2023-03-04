@@ -377,6 +377,15 @@ version: v1beta.+
 **Remediation**: Specify a readiness probe in your container. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/ for details.
 
 **Template**: [readiness-probe](templates.md#readiness-probe-not-specified)
+## no-startup-probe
+
+**Enabled by default**: No
+
+**Description**: Indicates when containers fail to specify a startup probe.
+
+**Remediation**: Specify a startup probe in your container. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-startup-startup-probes/ for details.
+
+**Template**: [startup-probe](templates.md#startup-probe-not-specified)
 ## no-rolling-update-strategy
 
 **Enabled by default**: No
