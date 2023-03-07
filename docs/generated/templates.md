@@ -528,6 +528,24 @@ KubeLinter supports the following templates:
 **Supported Objects**: NetworkPolicy
 
 
+## Pod Disruption Budget Configuration Checks
+
+**Key**: `pdb-max-unavailable`
+
+**Description**: Flag non-optimal PDB configurations
+
+**Supported Objects**: PodDisruptionBudget
+
+
+## Pod Disruption Budget Configuration Checks
+
+**Key**: `pdb-min-available`
+
+**Description**: Flag non-optimal PDB configurations
+
+**Supported Objects**: PodDisruptionBudget
+
+
 ## Ports
 
 **Key**: `ports`

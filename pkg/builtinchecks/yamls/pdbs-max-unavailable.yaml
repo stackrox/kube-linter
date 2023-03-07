@@ -1,0 +1,7 @@
+name: "pdb-max-unavailable"
+description: "Indicates when a DeploymentLike object has a \"Pod Disruption Budget\" specified with a MaxUnavailable value that is too restrictive."
+remediation: "Change the \"Pod Disruption Budget\" to have a \"MaxUnavailableValue\" set greater than 0."
+scope:
+  objectKinds:
+    - PodDisruptionBudget
+template: "pdb-max-unavailable"

@@ -574,6 +574,20 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "pdb-max-unavailable" {
+
+  tmp="tests/checks/pod-disruption-budget.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include pdb-max-unavailable --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}  
+}
+
+@test "pdb-min-available" {
+
+  tmp="tests/checks/pod-disruption-budget.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include pdb-min-available --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}  
+}
+
 @test "privilege-escalation-container" {
   tmp="tests/checks/privilege-escalation-container.yml"
   cmd="${KUBE_LINTER_BIN} lint --include privilege-escalation-container --do-not-auto-add-defaults --format json ${tmp}"
