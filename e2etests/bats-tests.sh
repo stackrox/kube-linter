@@ -871,7 +871,7 @@ get_value_from() {
 
 @test "flag-ignore-paths" {
   tmp="."
-  cmd="${KUBE_LINTER_BIN} lint --ignore-paths tests --ignore-paths e2etests ${tmp}"
+  cmd="${KUBE_LINTER_BIN} lint --ignore-paths \"tests/**\" --ignore-paths \"e2etests/**\" ${tmp}"
   run ${cmd}
   print_info "${status}" "${output}" "${cmd}" "${tmp}"
   [ "$status" -eq 0 ]

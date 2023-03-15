@@ -2,11 +2,12 @@ package lintcontext
 
 import (
 	"fmt"
-	"golang.stackrox.io/kube-linter/pkg/pathutil"
 	"os"
 	"path"
 	"path/filepath"
 	"testing"
+
+	"golang.stackrox.io/kube-linter/pkg/pathutil"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -17,21 +18,22 @@ const (
 	chartDirectory     = "../../tests/testdata/mychart"
 	renamedTarball     = "../../tests/testdata/my-renamed-chart-0.1.0.tgz"
 	renamedChartDir    = "../../tests/testdata/my-renamed-chart"
-	mockIgnorePath     = "../../tests/testdata/"
+	mockIgnorePath     = "../../tests/testdata/**"
 	mockGlobIgnorePath = "../../tests/**"
 	mockPath           = "mock path"
 )
 
 func TestCreateContextsWithIgnorePaths(t *testing.T) {
 	ignoredPaths := []string{
-		"../../.golangci.yml",
-		"../../tests/",
-		"../../e2etests/",
-		"../../pkg/",
-		"../../.pre-commit-hooks",
-		"../../.github/",
+		"../../.golangci?yml",
+		"/**/*/testdata/**/*",
+		"/**/*/checks/**/*",
+		"/**/*/test_helper/**/*",
+		"../../pkg/**/*",
+		"../../.pre-commit-hooks*",
+		"../../.github/**",
 	}
-	ignoredAbsPaths := []string{}
+	ignoredAbsPaths := make([]string, 0, len(ignoredPaths))
 	for _, p := range ignoredPaths {
 		abs, err := pathutil.GetAbsolutPath(p)
 		assert.NoError(t, err)

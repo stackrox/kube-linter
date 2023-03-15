@@ -1,12 +1,13 @@
 package lintcontext
 
 import (
-	"golang.stackrox.io/kube-linter/pkg/pathutil"
 	"io"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"golang.stackrox.io/kube-linter/pkg/pathutil"
 
 	"github.com/bmatcuk/doublestar/v4"
 	"github.com/pkg/errors"
@@ -56,8 +57,11 @@ fileOrDirsLoop:
 		for _, path := range ignorePaths {
 			// Useing doublestar to enable **
 			// See https://github.com/golang/go/issues/11862
-			globMatch, _ := doublestar.PathMatch(path, fileOrDir)
-			if strings.HasPrefix(fileOrDir, path) || globMatch {
+			globMatch, err := doublestar.PathMatch(path, fileOrDir)
+			if err != nil {
+				return nil, errors.Wrapf(err, "could not match pattern %s", path)
+			}
+			if globMatch {
 				continue fileOrDirsLoop
 			}
 		}
@@ -72,14 +76,15 @@ fileOrDirsLoop:
 			}
 
 			for _, path := range ignorePaths {
-				// Useing doublestar to enable **
-				// See https://github.com/golang/go/issues/11862
 				absPath, err := pathutil.GetAbsolutPath(currentPath)
 				if err != nil {
-					walkErr = errors.Wrapf(err, "could not get absolute path for %s", currentPath)
+					return errors.Wrapf(err, "could not get absolute path for %s", currentPath)
 				}
-				globMatch, _ := doublestar.PathMatch(path, absPath)
-				if strings.HasPrefix(absPath, path) || globMatch {
+				globMatch, err := doublestar.PathMatch(path, absPath)
+				if err != nil {
+					return errors.Wrapf(err, "could not match pattern %s", path)
+				}
+				if globMatch {
 					return nil
 				}
 			}

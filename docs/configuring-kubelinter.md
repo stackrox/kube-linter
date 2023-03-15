@@ -51,11 +51,13 @@ checks:
 ## Ignore paths
 
 To ignore checks on files or directories under certain paths, add ignored paths to `ignorePaths`.
+Ignore path uses [`**` match syntax](https://pkg.go.dev/github.com/bmatcuk/doublestar#Match)
 ```yaml
 checks:
   ignorePaths:
-    - ~/foo/bar
-    - ../baz
+    - ~/foo/bar/**
+    - /**/*/foo/**
+    - ../baz/**
     - /tmp/*.yaml
 ```
 > Equivalent CLI flag is `--ignore-paths`

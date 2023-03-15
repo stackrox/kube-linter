@@ -1,9 +1,10 @@
 package pathutil
 
 import (
+	"path/filepath"
+
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
-	"path/filepath"
 )
 
 // GetAbsolutPath returns the absolute representation of given path.
