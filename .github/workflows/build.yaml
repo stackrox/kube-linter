@@ -27,7 +27,7 @@ jobs:
       - name: Read Go version from go.mod
         run: echo "GO_VERSION=$(grep -E "^go\s+[0-9.]+$" go.mod | cut -d " " -f 2)" >> $GITHUB_ENV
       - name: Setup Go environment
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
           go-version: ${{ env.GO_VERSION }}
 
