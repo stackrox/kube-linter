@@ -2,6 +2,7 @@ package lintcontext
 
 import (
 	"fmt"
+	"golang.stackrox.io/kube-linter/pkg/pathutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -20,6 +21,28 @@ const (
 	mockGlobIgnorePath = "../../tests/**"
 	mockPath           = "mock path"
 )
+
+func TestCreateContextsWithIgnorePaths(t *testing.T) {
+	ignoredPaths := []string{
+		"../../.golangci.yml",
+		"../../tests/",
+		"../../e2etests/",
+		"../../pkg/",
+		"../../.pre-commit-hooks",
+		"../../.github/",
+	}
+	ignoredAbsPaths := []string{}
+	for _, p := range ignoredPaths {
+		abs, err := pathutil.GetAbsolutPath(p)
+		assert.NoError(t, err)
+		ignoredAbsPaths = append(ignoredAbsPaths, abs)
+	}
+
+	testPath := "../../"
+	contexts, err := CreateContexts(ignoredAbsPaths, testPath)
+	assert.NoError(t, err)
+	checkEmptyLintContext(t, contexts)
+}
 
 func TestCreateContextsObjectPaths(t *testing.T) {
 	bools := []bool{false, true}
@@ -116,7 +139,7 @@ func createContextsAndVerifyPaths(t *testing.T, useTarball, useAbsolutePath, ren
 }
 
 func checkEmptyLintContext(t *testing.T, lintCtxs []LintContext) {
-	assert.Len(t, lintCtxs, 0, "expecting no lint context")
+	assert.Empty(t, lintCtxs, "expecting no lint context")
 }
 
 func verifyAndGetContext(t *testing.T, lintCtxs []LintContext) LintContext {

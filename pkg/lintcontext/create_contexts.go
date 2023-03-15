@@ -1,6 +1,7 @@
 package lintcontext
 
 import (
+	"golang.stackrox.io/kube-linter/pkg/pathutil"
 	"io"
 	"os"
 	"path/filepath"
@@ -68,6 +69,19 @@ fileOrDirsLoop:
 
 			if _, exists := contextsByDir[currentPath]; exists {
 				return nil
+			}
+
+			for _, path := range ignorePaths {
+				// Useing doublestar to enable **
+				// See https://github.com/golang/go/issues/11862
+				absPath, err := pathutil.GetAbsolutPath(currentPath)
+				if err != nil {
+					walkErr = errors.Wrapf(err, "could not get absolute path for %s", currentPath)
+				}
+				globMatch, _ := doublestar.PathMatch(path, absPath)
+				if strings.HasPrefix(absPath, path) || globMatch {
+					return nil
+				}
 			}
 
 			if !info.IsDir() {

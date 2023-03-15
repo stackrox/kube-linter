@@ -2,7 +2,6 @@ package lintcontext
 
 import (
 	"encoding/json"
-
 	"golang.stackrox.io/kube-linter/internal/stringutils"
 	"golang.stackrox.io/kube-linter/pkg/k8sutil"
 	"k8s.io/apimachinery/pkg/runtime"
