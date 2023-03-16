@@ -263,10 +263,10 @@ jobs:
         env:
           COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
         run: |
-          cosign sign --key cosign.key ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
-          cosign sign --key cosign.key ${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
-          cosign sign --key cosign.key ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push-alpine.outputs.digest }}
-          cosign sign --key cosign.key ${{ env.IMAGE_NAME }}@${{ steps.build-and-push-alpine.outputs.digest }}
+          cosign sign --yes --key cosign.key ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
+          cosign sign --yes --key cosign.key ${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
+          cosign sign --yes --key cosign.key ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push-alpine.outputs.digest }}
+          cosign sign --yes --key cosign.key ${{ env.IMAGE_NAME }}@${{ steps.build-and-push-alpine.outputs.digest }}
 
       # Sign the resulting Docker image digest except on PRs.
       # This will only write to the public Rekor transparency log when the Docker
@@ -280,10 +280,10 @@ jobs:
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: |
-          cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
-          cosign sign ${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
-          cosign sign ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push-alpine.outputs.digest }}
-          cosign sign ${{ env.IMAGE_NAME }}@${{ steps.build-and-push-alpine.outputs.digest }}
+          cosign sign --yes ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
+          cosign sign --yes ${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
+          cosign sign --yes ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push-alpine.outputs.digest }}
+          cosign sign --yes ${{ env.IMAGE_NAME }}@${{ steps.build-and-push-alpine.outputs.digest }}
 
   update_release_draft:
     if: (github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/'))
