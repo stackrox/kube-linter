@@ -7,6 +7,8 @@ import (
 	"sort"
 	"strings"
 
+	"golang.stackrox.io/kube-linter/pkg/pathutil"
+
 	"github.com/bmatcuk/doublestar/v4"
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/set"
@@ -53,10 +55,13 @@ fileOrDirsLoop:
 		}
 
 		for _, path := range ignorePaths {
-			// Useing doublestar to enable **
+			// Using doublestar to enable **
 			// See https://github.com/golang/go/issues/11862
-			globMatch, _ := doublestar.PathMatch(path, fileOrDir)
-			if strings.HasPrefix(fileOrDir, path) || globMatch {
+			globMatch, err := doublestar.PathMatch(path, fileOrDir)
+			if err != nil {
+				return nil, errors.Wrapf(err, "could not match pattern %s", path)
+			}
+			if globMatch {
 				continue fileOrDirsLoop
 			}
 		}
@@ -68,6 +73,20 @@ fileOrDirsLoop:
 
 			if _, exists := contextsByDir[currentPath]; exists {
 				return nil
+			}
+
+			for _, path := range ignorePaths {
+				absPath, err := pathutil.GetAbsolutPath(currentPath)
+				if err != nil {
+					return errors.Wrapf(err, "could not get absolute path for %s", currentPath)
+				}
+				globMatch, err := doublestar.PathMatch(path, absPath)
+				if err != nil {
+					return errors.Wrapf(err, "could not match pattern %s", path)
+				}
+				if globMatch {
+					return nil
+				}
 			}
 
 			if !info.IsDir() {

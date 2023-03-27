@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"golang.stackrox.io/kube-linter/pkg/pathutil"
+
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -16,10 +18,33 @@ const (
 	chartDirectory     = "../../tests/testdata/mychart"
 	renamedTarball     = "../../tests/testdata/my-renamed-chart-0.1.0.tgz"
 	renamedChartDir    = "../../tests/testdata/my-renamed-chart"
-	mockIgnorePath     = "../../tests/testdata/"
+	mockIgnorePath     = "../../tests/testdata/**"
 	mockGlobIgnorePath = "../../tests/**"
 	mockPath           = "mock path"
 )
+
+func TestCreateContextsWithIgnorePaths(t *testing.T) {
+	ignoredPaths := []string{
+		"../../.golangci?yml",
+		"/**/*/testdata/**/*",
+		"/**/*/checks/**/*",
+		"/**/*/test_helper/**/*",
+		"../../pkg/**/*",
+		"../../.pre-commit-hooks*",
+		"../../.github/**",
+	}
+	ignoredAbsPaths := make([]string, 0, len(ignoredPaths))
+	for _, p := range ignoredPaths {
+		abs, err := pathutil.GetAbsolutPath(p)
+		assert.NoError(t, err)
+		ignoredAbsPaths = append(ignoredAbsPaths, abs)
+	}
+
+	testPath := "../../"
+	contexts, err := CreateContexts(ignoredAbsPaths, testPath)
+	assert.NoError(t, err)
+	checkEmptyLintContext(t, contexts)
+}
 
 func TestCreateContextsObjectPaths(t *testing.T) {
 	bools := []bool{false, true}
@@ -116,7 +141,7 @@ func createContextsAndVerifyPaths(t *testing.T, useTarball, useAbsolutePath, ren
 }
 
 func checkEmptyLintContext(t *testing.T, lintCtxs []LintContext) {
-	assert.Len(t, lintCtxs, 0, "expecting no lint context")
+	assert.Empty(t, lintCtxs, "expecting no lint context")
 }
 
 func verifyAndGetContext(t *testing.T, lintCtxs []LintContext) LintContext {
