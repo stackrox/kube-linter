@@ -55,7 +55,7 @@ fileOrDirsLoop:
 		}
 
 		for _, path := range ignorePaths {
-			// Useing doublestar to enable **
+			// Using doublestar to enable **
 			// See https://github.com/golang/go/issues/11862
 			globMatch, err := doublestar.PathMatch(path, fileOrDir)
 			if err != nil {
