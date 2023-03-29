@@ -22,7 +22,7 @@ require (
 	k8s.io/api v0.26.3
 	k8s.io/apimachinery v0.26.3
 	k8s.io/cli-runtime v0.26.2
-	k8s.io/client-go v0.26.2
+	k8s.io/client-go v0.26.3
 	k8s.io/gengo v0.0.0-20220902162205-c0856e24416d
 )
 
