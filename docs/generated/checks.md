@@ -416,7 +416,7 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 
 **Description**: Indicates when a DeploymentLike object has a "Pod Disruption Budget" specified with a MaxUnavailable value that is too restrictive.
 
-**Remediation**: Change the "Pod Disruption Budget" to have a "MaxUnavailableValue" set greater than 0.
+**Remediation**: Change the "Pod Disruption Budget" to have a "MaxUnavailableValue" set greater than 0. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more information.
 
 **Template**: [pdb-max-unavailable](templates.md#pod-disruption-budget-configuration-checks)
 ## pdb-min-available
@@ -425,7 +425,7 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 
 **Description**: Indicates when a DeploymentLike object has a "Pod Disruption Budget" specified with a MinAvailable value that is too restrictive.
 
-**Remediation**: Change the "Pod Disruption Budget" to have a "MinAvailableValue" set to number lower than the Replica count in the related DeploymentLike.
+**Remediation**: Change the "Pod Disruption Budget" to have a "MinAvailableValue" set to number lower than the Replica count in the related DeploymentLike. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more information.
 
 **Template**: [pdb-min-available](templates.md#pod-disruption-budget-configuration-checks)
 ## privilege-escalation-container

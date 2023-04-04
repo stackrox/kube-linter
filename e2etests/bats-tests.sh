@@ -576,16 +576,25 @@ get_value_from() {
 
 @test "pdb-max-unavailable" {
 
-  tmp="tests/checks/pod-disruption-budget.yml"
+  tmp="tests/checks/pdb-max-unavailable.yaml"
   cmd="${KUBE_LINTER_BIN} lint --include pdb-max-unavailable --do-not-auto-add-defaults --format json ${tmp}"
-  run ${cmd}  
+  run ${cmd}
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  
+  [[ "${message1}" == "PodDisruptionBudget: MaxUnavailable is set to 0" ]]
+
 }
 
 @test "pdb-min-available" {
 
-  tmp="tests/checks/pod-disruption-budget.yml"
+  tmp="tests/checks/pdb-min-available.yaml"
   cmd="${KUBE_LINTER_BIN} lint --include pdb-min-available --do-not-auto-add-defaults --format json ${tmp}"
-  run ${cmd}  
+  run ${cmd}
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+
+  [[ "${message1}" == "PodDisruptionBudget: Deployment foo has replicas less than or equal to the minimum available replicas set by its PDB." ]]
 }
 
 @test "privilege-escalation-container" {
