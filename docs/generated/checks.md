@@ -414,20 +414,20 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 
 **Enabled by default**: Yes
 
-**Description**: Indicates when a DeploymentLike object has a "Pod Disruption Budget" specified with a MaxUnavailable value that is too restrictive.
+**Description**: Indicates when a PodDisruptionBudget has a maxUnavailable value that will always prevent disruptions of pods created by related deployment-like objects.
 
-**Remediation**: Change the "Pod Disruption Budget" to have a "MaxUnavailableValue" set greater than 0. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more information.
+**Remediation**: Change the PodDisruptionBudget to have maxUnavailable set to a value greater than 0. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more information.
 
-**Template**: [pdb-max-unavailable](templates.md#pod-disruption-budget-configuration-checks)
+**Template**: [pdb-max-unavailable](templates.md#no-pod-disruptions-allowed---maxunavailable)
 ## pdb-min-available
 
 **Enabled by default**: Yes
 
-**Description**: Indicates when a DeploymentLike object has a "Pod Disruption Budget" specified with a MinAvailable value that is too restrictive.
+**Description**: Indicates when a PodDisruptionBudget sets a minAvailable value that will always prevent disruptions of pods created by related deployment-like objects.
 
-**Remediation**: Change the "Pod Disruption Budget" to have a "MinAvailableValue" set to number lower than the Replica count in the related DeploymentLike. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more information.
+**Remediation**: Change the PodDisruptionBudget to have minAvailable set to a number lower than the number of replicas in the related deployment-like objects. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more information.
 
-**Template**: [pdb-min-available](templates.md#pod-disruption-budget-configuration-checks)
+**Template**: [pdb-min-available](templates.md#no-pod-disruptions-allowed---minavailable)
 ## privilege-escalation-container
 
 **Enabled by default**: Yes

@@ -1,6 +1,6 @@
 name: "pdb-min-available"
-description: "Indicates when a DeploymentLike object has a \"Pod Disruption Budget\" specified with a MinAvailable value that is too restrictive."
-remediation: "Change the \"Pod Disruption Budget\" to have a \"MinAvailableValue\" set to number lower than the Replica count in the related DeploymentLike. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more information."
+description: "Indicates when a PodDisruptionBudget sets a minAvailable value that will always prevent disruptions of pods created by related deployment-like objects."
+remediation: "Change the PodDisruptionBudget to have minAvailable set to a number lower than the number of replicas in the related deployment-like objects. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more information."
 scope:
   objectKinds:
     - PodDisruptionBudget

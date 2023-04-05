@@ -592,9 +592,10 @@ get_value_from() {
   cmd="${KUBE_LINTER_BIN} lint --include pdb-min-available --do-not-auto-add-defaults --format json ${tmp}"
   run ${cmd}
 
+  
   message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
 
-  [[ "${message1}" == "PodDisruptionBudget: Deployment foo has replicas less than or equal to the minimum available replicas set by its PDB." ]]
+  [[ "${message1}" == "PodDisruptionBudget: The current number of replicas for deployment foo is equal to or lower than the minimum number of replicas specified by its PDB." ]]
 }
 
 @test "privilege-escalation-container" {

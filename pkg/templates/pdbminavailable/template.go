@@ -26,9 +26,9 @@ const (
 
 func init() {
 	templates.Register(check.Template{
-		HumanName:   "Pod Disruption Budget Configuration Checks",
+		HumanName:   "No pod disruptions allowed - minAvailable",
 		Key:         templateKey,
-		Description: "Flag non-optimal PDB configurations",
+		Description: "Flag PodDisruptionBudgets whose minAvailable value will always prevent pod disruptions.",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{
 				objectkinds.PodDisruptionBudget},
@@ -85,7 +85,7 @@ func minAvailableCheck(lintCtx lintcontext.LintContext, object lintcontext.Objec
 	if err != nil {
 		return []diagnostic.Diagnostic{
 			{
-				Message: fmt.Sprintf("PDB has invalid label selector: %v", err),
+				Message: fmt.Sprintf("PDB has invalid label selector: %s", err),
 			},
 		}
 	}
@@ -95,7 +95,7 @@ func minAvailableCheck(lintCtx lintcontext.LintContext, object lintcontext.Objec
 	if err != nil {
 		return []diagnostic.Diagnostic{
 			{
-				Message: fmt.Sprintf("Failed to retrieve deployments matching the PDB's label selector within namespace %s: %v", pdb.Namespace, err.Error()),
+				Message: fmt.Sprintf("Failed to retrieve deployments matching the PDB's label selector within namespace %s: %s", pdb.Namespace, err),
 			},
 		}
 	}
@@ -105,11 +105,11 @@ func minAvailableCheck(lintCtx lintcontext.LintContext, object lintcontext.Objec
 		replicas, _ := extract.Replicas(dl)
 		if isPercent {
 			// Calulate the actual value of the MinAvailable with respect to the Replica count if a percentage is set
-			pdbMinAvailable = int(math.Floor(float64(replicas) * (float64(value) / float64(100))))
+			pdbMinAvailable = int(math.Ceil(float64(replicas) * (float64(value) / float64(100))))
 		}
 		if replicas <= int32(pdbMinAvailable) {
 			results = append(results, diagnostic.Diagnostic{
-				Message: fmt.Sprintf("Deployment %s has replicas less than or equal to the minimum available replicas set by its PDB.", dl.GetName()),
+				Message: fmt.Sprintf("The current number of replicas for deployment %s is equal to or lower than the minimum number of replicas specified by its PDB.", dl.GetName()),
 			})
 		}
 	}
@@ -167,7 +167,7 @@ func getIntOrPercentValueSafelyFromString(intOrStr string) (int, bool, error) {
 	s = strings.TrimSuffix(s, "%")
 	v, err := strconv.Atoi(s)
 	if err != nil {
-		return 0, false, fmt.Errorf("invalid value %q: %v", intOrStr, err)
+		return 0, false, fmt.Errorf("invalid value %q: %w", intOrStr, err)
 	}
 	return v, true, nil
 }

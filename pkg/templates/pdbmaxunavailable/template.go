@@ -18,9 +18,9 @@ const (
 
 func init() {
 	templates.Register(check.Template{
-		HumanName:   "Pod Disruption Budget Configuration Checks",
+		HumanName:   "No pod disruptions allowed - maxUnavailable",
 		Key:         templateKey,
-		Description: "Flag non-optimal PDB configurations",
+		Description: "Flag PodDisruptionBudgets whose maxUnavailable value will always prevent pod disruptions.",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{
 				objectkinds.PodDisruptionBudget},

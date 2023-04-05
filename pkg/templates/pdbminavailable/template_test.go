@@ -81,7 +81,7 @@ func (p *PDBTestSuite) TestPDBMinAvailableReplicasEqual() {
 			Param: params.Params{},
 			Diagnostics: map[string][]diagnostic.Diagnostic{
 				"test-pdb": {
-					{Message: "Deployment test-deploy has replicas less than or equal to the minimum available replicas set by its PDB."},
+					{Message: "The current number of replicas for deployment test-deploy is equal to or lower than the minimum number of replicas specified by its PDB."},
 				},
 			},
 			ExpectInstantiationError: false,
@@ -94,7 +94,7 @@ func (p *PDBTestSuite) TestPDBMinAvailableFiftyPercent() {
 	p.ctx.AddMockDeployment(p.T(), "test-deploy")
 	p.ctx.ModifyDeployment(p.T(), "test-deploy", func(deployment *appsV1.Deployment) {
 		deployment.Namespace = "test"
-		deployment.Spec.Replicas = pointers.Int32(1)
+		deployment.Spec.Replicas = pointers.Int32(2)
 		deployment.Spec.Selector = &metaV1.LabelSelector{}
 		deployment.Spec.Selector.MatchLabels = map[string]string{"foo": "bar"}
 	})
