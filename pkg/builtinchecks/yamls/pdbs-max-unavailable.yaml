@@ -1,0 +1,7 @@
+name: "pdb-max-unavailable"
+description: "Indicates when a PodDisruptionBudget has a maxUnavailable value that will always prevent disruptions of pods created by related deployment-like objects."
+remediation: "Change the PodDisruptionBudget to have maxUnavailable set to a value greater than 0. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more information."
+scope:
+  objectKinds:
+    - PodDisruptionBudget
+template: "pdb-max-unavailable"

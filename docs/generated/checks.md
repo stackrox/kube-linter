@@ -410,6 +410,24 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 **Remediation**: Ensure pod does not accept unsafe traffic by isolating it with a NetworkPolicy. See https://cloud.redhat.com/blog/guide-to-kubernetes-ingress-network-policies for more details.
 
 **Template**: [non-isolated-pod](templates.md#non-isolated-pods)
+## pdb-max-unavailable
+
+**Enabled by default**: Yes
+
+**Description**: Indicates when a PodDisruptionBudget has a maxUnavailable value that will always prevent disruptions of pods created by related deployment-like objects.
+
+**Remediation**: Change the PodDisruptionBudget to have maxUnavailable set to a value greater than 0. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more information.
+
+**Template**: [pdb-max-unavailable](templates.md#no-pod-disruptions-allowed---maxunavailable)
+## pdb-min-available
+
+**Enabled by default**: Yes
+
+**Description**: Indicates when a PodDisruptionBudget sets a minAvailable value that will always prevent disruptions of pods created by related deployment-like objects.
+
+**Remediation**: Change the PodDisruptionBudget to have minAvailable set to a number lower than the number of replicas in the related deployment-like objects. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more information.
+
+**Template**: [pdb-min-available](templates.md#no-pod-disruptions-allowed---minavailable)
 ## privilege-escalation-container
 
 **Enabled by default**: Yes

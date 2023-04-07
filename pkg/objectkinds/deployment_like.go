@@ -33,7 +33,7 @@ var (
 	}()
 )
 
-func isDeploymentLike(gvk schema.GroupVersionKind) bool {
+func IsDeploymentLike(gvk schema.GroupVersionKind) bool {
 	_, ok := deploymentLikeGroupKinds[gvk.GroupKind()]
 	return ok
 }
@@ -44,5 +44,5 @@ const (
 )
 
 func init() {
-	RegisterObjectKind(DeploymentLike, MatcherFunc(isDeploymentLike))
+	RegisterObjectKind(DeploymentLike, MatcherFunc(IsDeploymentLike))
 }

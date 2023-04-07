@@ -7,15 +7,19 @@ import (
 	"github.com/stretchr/testify/require"
 	appsV1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
+	pdbV1 "k8s.io/api/policy/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
 // AddMockDeployment adds a mock Deployment to LintContext
 func (l *MockLintContext) AddMockDeployment(t *testing.T, name string) {
 	require.NotEmpty(t, name)
-	l.objects[name] = &appsV1.Deployment{
+	deployment := &appsV1.Deployment{
 		ObjectMeta: metaV1.ObjectMeta{Name: name},
 	}
+	deployment.SetGroupVersionKind(schema.GroupVersionKind{Group: appsV1.GroupName, Kind: "Deployment"})
+	l.objects[name] = deployment
 }
 
 // ModifyDeployment modifies a given deployment in the context via the passed function.
@@ -53,6 +57,19 @@ func (l *MockLintContext) ModifyDeploymentConfig(t *testing.T, name string, f fu
 	dep, ok := l.objects[name].(*ocsAppsV1.DeploymentConfig)
 	require.True(t, ok)
 	f(dep)
+}
+
+func (l *MockLintContext) AddMockPodDisruptionBudget(t *testing.T, name string) {
+	require.NotEmpty(t, name)
+	l.objects[name] = &pdbV1.PodDisruptionBudget{
+		ObjectMeta: metaV1.ObjectMeta{Name: name},
+	}
+}
+
+func (l *MockLintContext) ModifyPodDisruptionBudget(t *testing.T, name string, f func(pdb *pdbV1.PodDisruptionBudget)) {
+	p, ok := l.objects[name].(*pdbV1.PodDisruptionBudget)
+	require.True(t, ok)
+	f(p)
 }
 
 // AddSecurityContextToDeployment adds a security context to the deployment specified by name

@@ -1,0 +1,22 @@
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: baz
+  namespace: bar
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      name: cloud-ingress-operator
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: foo
+  namespace: bar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: cloud-ingress-operator

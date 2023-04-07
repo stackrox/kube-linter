@@ -23,6 +23,8 @@ var (
 		"no-extensions-v1beta",
 		"no-read-only-root-fs",
 		"non-existent-service-account",
+		"pdb-max-unavailable",
+		"pdb-min-available",
 		"privilege-escalation-container",
 		"privileged-container",
 		"run-as-non-root",

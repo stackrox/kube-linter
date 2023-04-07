@@ -574,6 +574,30 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "pdb-max-unavailable" {
+
+  tmp="tests/checks/pdb-max-unavailable.yaml"
+  cmd="${KUBE_LINTER_BIN} lint --include pdb-max-unavailable --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  
+  [[ "${message1}" == "PodDisruptionBudget: MaxUnavailable is set to 0" ]]
+
+}
+
+@test "pdb-min-available" {
+
+  tmp="tests/checks/pdb-min-available.yaml"
+  cmd="${KUBE_LINTER_BIN} lint --include pdb-min-available --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+
+  [[ "${message1}" == "PodDisruptionBudget: The current number of replicas for deployment foo is equal to or lower than the minimum number of replicas specified by its PDB." ]]
+}
+
 @test "privilege-escalation-container" {
   tmp="tests/checks/privilege-escalation-container.yml"
   cmd="${KUBE_LINTER_BIN} lint --include privilege-escalation-container --do-not-auto-add-defaults --format json ${tmp}"
