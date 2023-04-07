@@ -37,12 +37,12 @@ func init() {
 					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q has AllowPrivilegeEscalation set to true.", container.Name)}}
 				}
 				if securityContext.Privileged != nil && *securityContext.Privileged {
-					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q is Privileged and allows privilege escalation.", container.Name)}}
+					return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q is Privileged hence allows privilege escalation.", container.Name)}}
 				}
 				if securityContext.Capabilities != nil {
-					for _, cap := range securityContext.Capabilities.Add {
-						if cap == v1.Capability(sysAdminCapability) {
-							return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q has SYS_ADMIN capability and allows privilege escalation.", container.Name)}}
+					for _, capability := range securityContext.Capabilities.Add {
+						if capability == sysAdminCapability {
+							return []diagnostic.Diagnostic{{Message: fmt.Sprintf("container %q has SYS_ADMIN capability hence allows privilege escalation.", container.Name)}}
 						}
 					}
 				}
