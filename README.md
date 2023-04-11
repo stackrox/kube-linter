@@ -192,7 +192,7 @@ The following are tutorials on KubeLinter written by users. If you have one that
 
 ## Community
 
-If you would like to engage with the KubeLinter community, including maintainers and other users, you can join the Slack workspace [here](https://join.slack.com/t/kube-linter/shared_invite/zt-kla9qvyo-Tk~wynTSbr9EE3AjHcv4BQ).
+If you would like to engage with the KubeLinter community, including maintainers and other users, you can join the Github discussions [here](https://github.com/stackrox/kube-linter/discussions).
 
 To contribute, check out our [contributing guide](./CONTRIBUTING.md).
 
