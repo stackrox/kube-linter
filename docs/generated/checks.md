@@ -434,7 +434,7 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 
 **Description**: Alert on containers of allowing privilege escalation that could gain more privileges than its parent process.
 
-**Remediation**: Ensure containers do not allow privilege escalation by setting allowPrivilegeEscalation=false." See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for more details.
+**Remediation**: Ensure containers do not allow privilege escalation by setting allowPrivilegeEscalation=false, privileged=false and removing CAP_SYS_ADMIN capability. See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for more details.
 
 **Template**: [privilege-escalation-container](templates.md#privilege-escalation-on-containers)
 ## privileged-container
