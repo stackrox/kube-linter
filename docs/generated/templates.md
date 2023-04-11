@@ -407,6 +407,36 @@ KubeLinter supports the following templates:
 
 ## Latest Tag
 
+**Key**: `image-sha`
+
+**Description**: Flag applications running container images that do not satisfies "allowList" & "blockList" parameters criteria.
+
+**Supported Objects**: DeploymentLike
+
+
+**Parameters**:
+
+```yaml
+- arrayElemType: string
+  description: list of regular expressions specifying pattern(s) for container images
+    that will be blocked. */
+  name: blockList
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: array
+- arrayElemType: string
+  description: list of regular expressions specifying pattern(s) for container images
+    that will be allowed.
+  name: allowList
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: array
+```
+
+## Latest Tag
+
 **Key**: `latest-tag`
 
 **Description**: Flag applications running container images that do not satisfies "allowList" & "blockList" parameters criteria.

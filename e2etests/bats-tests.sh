@@ -389,6 +389,23 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "image-sha" {
+  tmp="tests/checks/image-sha.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include image-sha --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment: The container \"app\" is using an invalid container image, \"app:v1\". Please reference the image using a SHA256 tag." ]]
+  [[ "${message2}" == "DeploymentConfig: The container \"app\" is using an invalid container image, \"app:v1\". Please reference the image using a SHA256 tag." ]]
+  [[ "${count}" == "2" ]]  
+}
+
 @test "minimum-three-replicas" {
   tmp="tests/checks/minimum-three-replicas.yml"
   cmd="${KUBE_LINTER_BIN} lint --include minimum-three-replicas --do-not-auto-add-defaults --format json ${tmp}"

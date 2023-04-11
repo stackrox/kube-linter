@@ -259,6 +259,22 @@ forbiddenServiceTypes:
 ```yaml
 minReplicas: 3
 ```
+## image-sha
+
+**Enabled by default**: No
+
+**Description**: Indicates if there are any image references that are not references by sha256 tags
+
+**Remediation**: Reference all images using their sha256 tags.
+
+**Template**: [image-sha](templates.md#latest-tag)
+
+**Parameters**:
+
+```yaml
+AllowList:
+- .*:[a-fA-F0-9]{64}$
+```
 ## invalid-target-ports
 
 **Enabled by default**: Yes
