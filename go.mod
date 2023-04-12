@@ -11,7 +11,7 @@ require (
 	github.com/golangci/golangci-lint v1.52.2
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
-	github.com/openshift/api v0.0.0-20230406152840-ce21e3fe5da2
+	github.com/openshift/api v3.9.0+incompatible
 	github.com/owenrumney/go-sarif/v2 v2.1.3
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.7.0
