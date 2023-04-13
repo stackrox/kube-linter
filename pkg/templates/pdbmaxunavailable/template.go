@@ -1,6 +1,8 @@
 package pdbmaxunavailable
 
 import (
+	"fmt"
+
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
@@ -9,11 +11,11 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	"golang.stackrox.io/kube-linter/pkg/templates/pdbmaxunavailable/internal/params"
 	pdbV1 "k8s.io/api/policy/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 const (
-	templateKey           = "pdb-max-unavailable"
-	maxUnavailableZeroMsg = "MaxUnavailable is set to 0"
+	templateKey = "pdb-max-unavailable"
 )
 
 func init() {
@@ -29,24 +31,30 @@ func init() {
 		ParseAndValidateParams: params.ParseAndValidate,
 		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
 			return func(lintCtx lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
-
 				// Get the PDB provided
 				pdb, ok := object.K8sObject.(*pdbV1.PodDisruptionBudget)
 				if !ok {
 					return nil
 				}
 
-				// If MaxUnavailable is set to 0 (both int and string)
-				// return as no other checks will uniquely apply
-				if pdb.Spec.MaxUnavailable != nil && pdb.Spec.MaxUnavailable.IntVal == 0 {
+				if pdb.Spec.MaxUnavailable == nil {
+					return []diagnostic.Diagnostic{}
+				}
+
+				maxUnavailable, err := intstr.GetScaledValueFromIntOrPercent(pdb.Spec.MaxUnavailable, 100, false)
+				if err != nil {
 					return []diagnostic.Diagnostic{{
-						Message: maxUnavailableZeroMsg,
-					},
-					}
+						Message: fmt.Sprintf("maxUnavailable has invalid value [%s]", pdb.Spec.MaxUnavailable),
+					}}
+				}
+
+				if maxUnavailable == 0 {
+					return []diagnostic.Diagnostic{{
+						Message: "MaxUnavailable is set to 0",
+					}}
 				}
 
 				return []diagnostic.Diagnostic{}
-
 			}, nil
 		}),
 	})
