@@ -17,4 +17,4 @@
   description: This hook runs kube-linter using the project's official docker image
   language: docker_image
   types: [yaml]
-  entry: stackrox/kube-linter:0.2.6 lint 
+  entry: stackrox/kube-linter:0.6.3 lint 
