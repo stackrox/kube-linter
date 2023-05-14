@@ -25,7 +25,7 @@ func init() {
 		Key:         templateKey,
 		Description: "Flag applications running container images that do not satisfies \"allowList\" & \"blockList\" parameters criteria.",
 		SupportedObjectKinds: config.ObjectKindsDesc{
-			ObjectKinds: []string{objectkinds.DeploymentLike},
+			ObjectKinds: []string{objectkinds.Any},
 		},
 		Parameters:             params.ParamDescs,
 		ParseAndValidateParams: params.ParseAndValidate,

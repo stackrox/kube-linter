@@ -3,7 +3,7 @@ description: "Indicates if there are any image references that are not reference
 remediation: "Reference all images using their sha256 tags."
 scope:
   objectKinds:
-    - DeploymentLike
+    - "Any"
 template: "image-sha"
 params:
   AllowList: [".*:[a-fA-F0-9]{64}$"] 
