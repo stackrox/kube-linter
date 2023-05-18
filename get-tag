@@ -1,2 +1,2 @@
 #!/bin/sh
-git describe --exact-match HEAD  2>/dev/null || git describe --long --tags --abbrev=10 --dirty
+git describe --tags --abbrev=10 --dirty
