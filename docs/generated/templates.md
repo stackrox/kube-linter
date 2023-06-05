@@ -411,7 +411,7 @@ KubeLinter supports the following templates:
 
 **Description**: Flag applications running container images that do not satisfies "allowList" & "blockList" parameters criteria.
 
-**Supported Objects**: DeploymentLike
+**Supported Objects**: Any
 
 
 **Parameters**:
