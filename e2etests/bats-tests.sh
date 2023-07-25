@@ -66,6 +66,18 @@ get_value_from() {
   [[ "${count}" == "1" ]]
 }
 
+@test "cronjob-ttl-seconds-after-finished" {
+  tmp="tests/checks/cronjob-ttl-seconds-after-finished.yaml"
+  cmd="${KUBE_LINTER_BIN} lint --include job-ttl-seconds-after-finished --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  message=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  [[ "${message}" == "CronJob: Managed Job specifies ttlSecondsAfterFinished which might conflict with successfulJobsHistoryLimit and failedJobsHistoryLimit from CronJob. Final behaviour is determined by the stricktier" ]]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "1" ]]
+}
+
 @test "dangling-horizontalpodautoscaler" {
   tmp="tests/checks/dangling-hpa.yml"
   cmd="${KUBE_LINTER_BIN} lint --include dangling-horizontalpodautoscaler --do-not-auto-add-defaults --format json ${tmp}"
@@ -392,6 +404,18 @@ get_value_from() {
   [[ "${actual_messages[1]}" == "Service: port targetPort \"n234567890123456\" in service \"invalid-target-ports\" must be no more than 15 characters" ]]
   [[ "${actual_messages[2]}" == "Deployment: port name \"n234567890123456\" in container \"invalid-target-ports\" must be no more than 15 characters" ]]
   [[ "${actual_messages[3]}" == "Deployment: port name \"123456\" in container \"invalid-target-ports\" must contain at least one letter (a-z)" ]]
+}
+
+@test "job-ttl-seconds-after-finished" {
+  tmp="tests/checks/job-ttl-seconds-after-finished.yaml"
+  cmd="${KUBE_LINTER_BIN} lint --include job-ttl-seconds-after-finished --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  message=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  [[ "${message}" == "Job: Standalone Job does not specify ttlSecondsAfterFinished" ]]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "1" ]]
 }
 
 @test "latest-tag" {
