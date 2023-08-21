@@ -144,7 +144,7 @@ With custom checks, you can control the checks to run only on specific Kubernete
 
 For example,
 
-- To make sure that a specific annotation exists on all deployments, you can use the [`required-label`](generated/templates?id=required-label) template and specify a `scope`
+- To make sure that a specific annotation or label exists on all deployments, you can use the respective template e.g. [`required-annotation`](generated/templates?id=required-annotation) and specify a `scope`
 
   ```yaml
   customChecks:
