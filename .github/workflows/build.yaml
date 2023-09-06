@@ -19,7 +19,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # Checkout all repo history to make tags available for figuring out kube-linter version during build.
           fetch-depth: 0
@@ -83,7 +83,7 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Download executable
         uses: actions/download-artifact@v3
@@ -130,7 +130,7 @@ jobs:
     needs: build-and-test
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           # Checkout all repo history to make tags available for figuring out kube-linter version during build.
           fetch-depth: 0
@@ -162,7 +162,7 @@ jobs:
       id-token: write # needed for signing the images with GitHub OIDC Token **not production ready**
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Download executable
         uses: actions/download-artifact@v3
