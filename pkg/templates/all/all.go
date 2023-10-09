@@ -12,6 +12,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/danglingnetworkpolicy"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/danglingnetworkpolicypeer"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/danglingservice"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/danglingservicemonitor"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/deprecatedserviceaccount"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/disallowedgvk"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/dnsconfigoptions"

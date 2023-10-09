@@ -1,0 +1,7 @@
+name: "dangling-servicemonitor"
+description: "Indicates when a service monitor's selectors don't match any service. ServiceMonitors are a custom resource only used by the Prometheus operator (https://prometheus-operator.dev/docs/operator/design/#servicemonitor)."
+remediation: "Check selectors and your services."
+scope:
+  objectKinds:
+    - ServiceMonitor
+template: "dangling-servicemonitor"

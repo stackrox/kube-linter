@@ -103,6 +103,15 @@ verbs:
 **Remediation**: Confirm that your service's selector correctly matches the labels on one of your deployments.
 
 **Template**: [dangling-service](templates.md#dangling-services)
+## dangling-servicemonitor
+
+**Enabled by default**: No
+
+**Description**: Indicates when a service monitor's selectors don't match any service. ServiceMonitors are a custom resource only used by the Prometheus operator (https://prometheus-operator.dev/docs/operator/design/#servicemonitor).
+
+**Remediation**: Check selectors and your services.
+
+**Template**: [dangling-servicemonitor](templates.md#dangling-service-monitor)
 ## default-service-account
 
 **Enabled by default**: No

@@ -145,6 +145,28 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "dangling-servicemonitor" {
+  tmp="tests/checks/dangling-servicemonitor.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include dangling-servicemonitor --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
+  message4=$(get_value_from "${lines[0]}" '.Reports[3].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[3].Diagnostic.Message')
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "ServiceMonitor: no services found matching the service monitor's label selector (app.kubernetes.io/name=app) and namespace selector ([])" ]]
+  [[ "${message2}" == "ServiceMonitor: no services found matching the service monitor's label selector (app.kubernetes.io/name=app) and namespace selector ([])" ]]
+  [[ "${message3}" == "ServiceMonitor: no services found matching the service monitor's label selector () and namespace selector ([test2])" ]]
+  [[ "${message4}" == "ServiceMonitor: no services found matching the service monitor's label selector (app.kubernetes.io/name=app1) and namespace selector ([test2])" ]]
+  [[ "${count}" == "4" ]]
+}
+
 @test "default-service-account" {
   tmp="tests/checks/default-service-account.yml"
   cmd="${KUBE_LINTER_BIN} lint --include default-service-account --do-not-auto-add-defaults --format json ${tmp}"
