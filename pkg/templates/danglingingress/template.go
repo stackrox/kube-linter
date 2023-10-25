@@ -59,6 +59,7 @@ func getSelectorsFromIngress(ingress *networkingV1.Ingress) map[serviceDescripto
 		}
 
 		for _, p := range spec.Paths {
+			p := p
 			if s, found := getSelectorsFromIngressBackend(&p.Backend); found {
 				selectors[s] = struct{}{}
 			}
