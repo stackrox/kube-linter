@@ -519,7 +519,7 @@ key: owner
 
 **Description**: Indicates when allowPrivilegedContainer SSC set to True
 
-**Remediation**: SecurityContextConstraints has AllowPrivilegedContainer set to "true". Using this option is dangerous, please consider using allowedCapabilities instead
+**Remediation**: SecurityContextConstraints has AllowPrivilegedContainer set to "true". Using this option is dangerous, please consider using allowedCapabilities instead.
 
 **Template**: [scc-deny-privileged-container](templates.md#securitycontextconstraints-allowprivilegedcontainer)
 
