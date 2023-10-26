@@ -934,6 +934,6 @@ get_value_from() {
   message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
   count=$(get_value_from "${lines[0]}" '.Reports | length')
 
-  [[ "${message1}" == "SecurityContextConstraints: SCC has allowPrivilegedContainer set to true" ]]
+  [[ "${message1}" == "SecurityContextConstraints: Indicates when allowPrivilegedContainer SSC set to True" ]]
   [[ "${count}" == "1" ]]
 }
