@@ -1,0 +1,10 @@
+name: "scc-deny-privileged-container"
+description: "Indicates when allowPrivilegedContainer SSC set to True"
+remediation: >-
+  SecurityContextConstraints has AllowPrivilegedContainer set to "true". Using this option is dangerous, please consider using allowedCapabilities instead
+scope:
+  objectKinds:
+    - SecurityContextConstraints
+template: "scc-deny-privileged-container"
+params:
+  AllowPrivilegedContainer: true

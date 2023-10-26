@@ -922,3 +922,18 @@ get_value_from() {
   print_info "${status}" "${output}" "${cmd}" "${tmp}"
   [ "$status" -eq 0 ]
 }
+
+@test "scc-deny-privileged-container" {
+  tmp="tests/checks/scc-deny-privileged-container.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include scc-deny-privileged-container --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "SecurityContextConstraints: SCC has allowPrivilegedContainer set to true" ]]
+  [[ "${count}" == "1" ]]
+}
