@@ -513,6 +513,21 @@ key: owner
 **Remediation**: Set runAsUser to a non-zero number and runAsNonRoot to true in your pod or container securityContext. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for details.
 
 **Template**: [run-as-non-root](templates.md#run-as-non-root-user)
+## scc-deny-privileged-container
+
+**Enabled by default**: No
+
+**Description**: Indicates when allowPrivilegedContainer SSC set to True
+
+**Remediation**: SecurityContextConstraints has AllowPrivilegedContainer set to "true". Using this option is dangerous, please consider using allowedCapabilities instead
+
+**Template**: [scc-deny-privileged-container](templates.md#securitycontextconstraints-allowprivilegedcontainer)
+
+**Parameters**:
+
+```yaml
+AllowPrivilegedContainer: true
+```
 ## sensitive-host-mounts
 
 **Enabled by default**: Yes

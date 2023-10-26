@@ -694,6 +694,24 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 
+## SecurityContextConstraints allowPrivilegedContainer
+
+**Key**: `scc-deny-privileged-container`
+
+**Description**: Flag SCC with allowPrivilegedContainer set to true
+
+**Supported Objects**: SecurityContextConstraints
+
+
+**Parameters**:
+
+```yaml
+- description: allowPrivilegedContainer value
+  name: allowPrivilegedContainer
+  required: false
+  type: boolean
+```
+
 ## Service Account
 
 **Key**: `service-account`
