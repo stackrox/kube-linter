@@ -28,7 +28,7 @@ var (
 	"Required": false,
 	"NoRegex": false,
 	"NotNegatable": false,
-	"XXXStructFieldName": "allowPrivilegedContainer",
+	"XXXStructFieldName": "AllowPrivilegedContainer",
 	"XXXIsPointer": false
 }
 `)
