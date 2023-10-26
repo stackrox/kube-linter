@@ -4,7 +4,7 @@ allowHostNetwork: false
 allowHostPID: false
 allowHostPorts: false
 allowPrivilegeEscalation: false
-allowPrivilegedContainer: false
+allowPrivilegedContainer: true
 allowedCapabilities: null
 apiVersion: security.openshift.io/v1
 defaultAddCapabilities: null
@@ -16,7 +16,7 @@ metadata:
   labels:
     owner: owner
     app: app1
-  name: dont-fire
+  name: app1
 priority: null
 readOnlyRootFilesystem: false
 requiredDropCapabilities:
@@ -48,7 +48,7 @@ allowHostNetwork: false
 allowHostPID: false
 allowHostPorts: false
 allowPrivilegeEscalation: false
-allowPrivilegedContainer: true
+allowPrivilegedContainer: false
 allowedCapabilities: null
 apiVersion: security.openshift.io/v1
 defaultAddCapabilities: null
@@ -60,7 +60,7 @@ metadata:
   labels:
     owner: owner
     app: app1
-  name: app1
+  name: dont-fire
 priority: null
 readOnlyRootFilesystem: false
 requiredDropCapabilities:
