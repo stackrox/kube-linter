@@ -5,10 +5,9 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/k8sutil"
 )
 
-// SCC extracts allowPrivilegedContainer from the given object, if available.
+// SCCallowPrivilegedContainer extracts allowPrivilegedContainer from the given object, if available.
 func SCCallowPrivilegedContainer(obj k8sutil.Object) (bool, bool) {
-	switch scc := obj.(type) {
-	case *ocpSecV1.SecurityContextConstraints:
+	if scc, ok := obj.(*ocpSecV1.SecurityContextConstraints); ok {
 		return scc.AllowPrivilegedContainer, true
 	}
 	return false, false

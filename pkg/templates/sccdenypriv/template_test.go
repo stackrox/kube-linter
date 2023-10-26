@@ -25,8 +25,8 @@ func (s *SCCPrivTestSuite) SetupTest() {
 	s.ctx = mocks.NewMockContext()
 }
 
-func (s *SCCPrivTestSuite) addSCCWithPriv(name string, allow_flag bool, version string) {
-	s.ctx.AddMockSecurityContextConstraints(s.T(), name, allow_flag)
+func (s *SCCPrivTestSuite) addSCCWithPriv(name string, allowFlag bool) {
+	s.ctx.AddMockSecurityContextConstraints(s.T(), name, allowFlag)
 }
 
 func (s *SCCPrivTestSuite) TestPrivFalse() {
@@ -34,7 +34,7 @@ func (s *SCCPrivTestSuite) TestPrivFalse() {
 		acceptableScc = "scc-priv-false"
 	)
 
-	s.addSCCWithPriv(acceptableScc, false, "v1")
+	s.addSCCWithPriv(acceptableScc, false)
 
 	s.Validate(s.ctx, []templates.TestCase{
 		{
@@ -54,7 +54,7 @@ func (s *SCCPrivTestSuite) TestPrivTrue() {
 		unacceptableScc = "scc-priv-true"
 	)
 
-	s.addSCCWithPriv(unacceptableScc, true, "v1")
+	s.addSCCWithPriv(unacceptableScc, true)
 
 	s.Validate(s.ctx, []templates.TestCase{
 		{

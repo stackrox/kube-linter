@@ -10,7 +10,7 @@ import (
 )
 
 // AddMockSecurityContextConstraints adds a mock SecurityContextConstraints to LintContext
-func (l *MockLintContext) AddMockSecurityContextConstraints(t *testing.T, name string, allow_flag bool) {
+func (l *MockLintContext) AddMockSecurityContextConstraints(t *testing.T, name string, allowFlag bool) {
 	require.NotEmpty(t, name)
 	l.objects[name] = &ocpSecV1.SecurityContextConstraints{
 		TypeMeta: metaV1.TypeMeta{
@@ -18,6 +18,6 @@ func (l *MockLintContext) AddMockSecurityContextConstraints(t *testing.T, name s
 			APIVersion: objectkinds.GetSCCAPIVersion(),
 		},
 		ObjectMeta:               metaV1.ObjectMeta{Name: name},
-		AllowPrivilegedContainer: allow_flag,
+		AllowPrivilegedContainer: allowFlag,
 	}
 }
