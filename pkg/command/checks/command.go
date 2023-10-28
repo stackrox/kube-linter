@@ -55,7 +55,7 @@ KubeLinter includes the following built-in checks:
 `
 )
 
-const TemplateURLFormat = "templates.md/generated/templates?id=%s"
+const TemplateURLFormat = "generated/templates?id=%s"
 
 var (
 	checksFuncMap = template.FuncMap{
