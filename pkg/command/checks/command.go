@@ -118,5 +118,5 @@ func GetTemplateLink(check *config.Check) (string, error) {
 	if !found {
 		return "", errors.Errorf("unexpected: check %v references non-existent template?", check)
 	}
-	return fmt.Sprintf("generated/templates?id=%s", strings.Join(strings.Fields(strings.ToLower(t.HumanName)), "-")), nil
+	return fmt.Sprintf("https://docs.kubelinter.io/#/generated/templates.md?id=%s", strings.Join(strings.Fields(strings.ToLower(t.HumanName)), "-")), nil
 }
