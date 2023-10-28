@@ -55,8 +55,6 @@ KubeLinter includes the following built-in checks:
 `
 )
 
-const TemplateURLFormat = "/generated/templates?id=%s"
-
 var (
 	checksFuncMap = template.FuncMap{
 		"isDefault": func(check config.Check) bool {
@@ -120,5 +118,5 @@ func GetTemplateLink(check *config.Check) (string, error) {
 	if !found {
 		return "", errors.Errorf("unexpected: check %v references non-existent template?", check)
 	}
-	return fmt.Sprintf(TemplateURLFormat, strings.Join(strings.Fields(strings.ToLower(t.HumanName)), "-")), nil
+	return fmt.Sprintf("generated/templates?id=%s", strings.Join(strings.Fields(strings.ToLower(t.HumanName)), "-")), nil
 }
