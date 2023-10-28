@@ -10,7 +10,7 @@ KubeLinter includes the following built-in checks:
 
 **Remediation**: Where possible, remove create access to pod objects in the cluster.
 
-**Template**: [access-to-resources](templates.md#access-to-resources)
+**Template**: [access-to-resources](generated/templates.md#access-to-resources)
 
 **Parameters**:
 
