@@ -34,7 +34,7 @@ verbs:
 
 **Remediation**: Where possible, remove get, list and watch access to secret objects in the cluster.
 
-**Template**: [access-to-resources](templates.md#access-to-resources)
+**Template**: [access-to-resources](generated/templates.md#access-to-resources)
 
 **Parameters**:
 
@@ -57,7 +57,7 @@ verbs:
 
 **Remediation**: Create and assign a separate role that has access to specific resources/actions needed for the service account.
 
-**Template**: [cluster-admin-role-binding](templates.md#cluster-admin-role-binding)
+**Template**: [cluster-admin-role-binding](generated/templates.md#cluster-admin-role-binding)
 ## dangling-horizontalpodautoscaler
 
 **Enabled by default**: No
@@ -66,7 +66,7 @@ verbs:
 
 **Remediation**: Confirm that your HorizontalPodAutoscaler's scaleTargetRef correctly matches one of your deployments.
 
-**Template**: [dangling-horizontalpodautoscaler](templates.md#dangling-horizontalpodautoscalers)
+**Template**: [dangling-horizontalpodautoscaler](generated/templates.md#dangling-horizontalpodautoscalers)
 ## dangling-ingress
 
 **Enabled by default**: No
@@ -75,7 +75,7 @@ verbs:
 
 **Remediation**: Confirm that your ingress's backend correctly matches the name and port on one of your services.
 
-**Template**: [dangling-ingress](templates.md#dangling-ingress)
+**Template**: [dangling-ingress](generated/templates.md#dangling-ingress)
 ## dangling-networkpolicy
 
 **Enabled by default**: No
@@ -84,7 +84,7 @@ verbs:
 
 **Remediation**: Confirm that your networkPolicy's podselector correctly matches the labels on one of your deployments.
 
-**Template**: [dangling-networkpolicy](templates.md#dangling-networkpolicies)
+**Template**: [dangling-networkpolicy](generated/templates.md#dangling-networkpolicies)
 ## dangling-networkpolicypeer-podselector
 
 **Enabled by default**: No
@@ -93,7 +93,7 @@ verbs:
 
 **Remediation**: Confirm that your NetworkPolicy's Ingress/Egress peer's podselector correctly matches the labels on one of your deployments.
 
-**Template**: [dangling-networkpolicypeer-podselector](templates.md#dangling-networkpolicypeer-podselector)
+**Template**: [dangling-networkpolicypeer-podselector](generated/templates.md#dangling-networkpolicypeer-podselector)
 ## dangling-service
 
 **Enabled by default**: Yes
@@ -102,7 +102,7 @@ verbs:
 
 **Remediation**: Confirm that your service's selector correctly matches the labels on one of your deployments.
 
-**Template**: [dangling-service](templates.md#dangling-services)
+**Template**: [dangling-service](generated/templates.md#dangling-services)
 ## dangling-servicemonitor
 
 **Enabled by default**: No
@@ -111,7 +111,7 @@ verbs:
 
 **Remediation**: Check selectors and your services.
 
-**Template**: [dangling-servicemonitor](templates.md#dangling-service-monitor)
+**Template**: [dangling-servicemonitor](generated/templates.md#dangling-service-monitor)
 ## default-service-account
 
 **Enabled by default**: No
@@ -120,7 +120,7 @@ verbs:
 
 **Remediation**: Create a dedicated service account for your pod. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/ for details.
 
-**Template**: [service-account](templates.md#service-account)
+**Template**: [service-account](generated/templates.md#service-account)
 
 **Parameters**:
 
@@ -135,7 +135,7 @@ serviceAccount: ^(|default)$
 
 **Remediation**: Use the serviceAccountName field instead. If you must specify serviceAccount, ensure values for serviceAccount and serviceAccountName match.
 
-**Template**: [deprecated-service-account-field](templates.md#deprecated-service-account-field)
+**Template**: [deprecated-service-account-field](generated/templates.md#deprecated-service-account-field)
 ## dnsconfig-options
 
 **Enabled by default**: No
@@ -144,7 +144,7 @@ serviceAccount: ^(|default)$
 
 **Remediation**: Specify dnsconfig options in your Pod specification to ensure the expected DNS setting on the Pod. Refer to https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-dns-config for details.
 
-**Template**: [dnsconfig-options](templates.md#dnsconfig-options)
+**Template**: [dnsconfig-options](generated/templates.md#dnsconfig-options)
 
 **Parameters**:
 
@@ -160,7 +160,7 @@ Value: "2"
 
 **Remediation**: Ensure the Docker socket is not mounted inside any containers by removing the associated  Volume and VolumeMount in deployment yaml specification. If the Docker socket is mounted inside a container it could allow processes running within  the container to execute Docker commands which would effectively allow for full control of the host.
 
-**Template**: [host-mounts](templates.md#host-mounts)
+**Template**: [host-mounts](generated/templates.md#host-mounts)
 
 **Parameters**:
 
@@ -176,7 +176,7 @@ dirs:
 
 **Remediation**: NET_RAW makes it so that an application within the container is able to craft raw packets, use raw sockets, and bind to any address. Remove this capability in the containers under containers security contexts.
 
-**Template**: [verify-container-capabilities](templates.md#verify-container-capabilities)
+**Template**: [verify-container-capabilities](generated/templates.md#verify-container-capabilities)
 
 **Parameters**:
 
@@ -192,7 +192,7 @@ forbiddenCapabilities:
 
 **Remediation**: Confirm that your DeploymentLike doesn't have duplicate env vars names.
 
-**Template**: [duplicate-env-var](templates.md#duplicate-environment-variables)
+**Template**: [duplicate-env-var](generated/templates.md#duplicate-environment-variables)
 ## env-var-secret
 
 **Enabled by default**: Yes
@@ -201,7 +201,7 @@ forbiddenCapabilities:
 
 **Remediation**: Do not use raw secrets in environment variables. Instead, either mount the secret as a file or use a secretKeyRef. Refer to https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets for details.
 
-**Template**: [env-var](templates.md#environment-variables)
+**Template**: [env-var](generated/templates.md#environment-variables)
 
 **Parameters**:
 
@@ -217,7 +217,7 @@ value: .+
 
 **Remediation**: Ensure containers are not exposed through a forbidden service type such as NodePort or LoadBalancer.
 
-**Template**: [forbidden-service-types](templates.md#forbidden-service-types)
+**Template**: [forbidden-service-types](generated/templates.md#forbidden-service-types)
 
 **Parameters**:
 
@@ -234,7 +234,7 @@ forbiddenServiceTypes:
 
 **Remediation**: Ensure the host's IPC namespace is not shared.
 
-**Template**: [host-ipc](templates.md#host-ipc)
+**Template**: [host-ipc](generated/templates.md#host-ipc)
 ## host-network
 
 **Enabled by default**: Yes
@@ -243,7 +243,7 @@ forbiddenServiceTypes:
 
 **Remediation**: Ensure the host's network namespace is not shared.
 
-**Template**: [host-network](templates.md#host-network)
+**Template**: [host-network](generated/templates.md#host-network)
 ## host-pid
 
 **Enabled by default**: Yes
@@ -252,7 +252,7 @@ forbiddenServiceTypes:
 
 **Remediation**: Ensure the host's process namespace is not shared.
 
-**Template**: [host-pid](templates.md#host-pid)
+**Template**: [host-pid](generated/templates.md#host-pid)
 ## hpa-minimum-three-replicas
 
 **Enabled by default**: No
@@ -261,7 +261,7 @@ forbiddenServiceTypes:
 
 **Remediation**: Increase the number of replicas in the HorizontalPodAutoscaler to at least three to increase fault tolerance.
 
-**Template**: [hpa-minimum-replicas](templates.md#horizontalpodautoscaler-minimum-replicas)
+**Template**: [hpa-minimum-replicas](generated/templates.md#horizontalpodautoscaler-minimum-replicas)
 
 **Parameters**:
 
@@ -276,7 +276,7 @@ minReplicas: 3
 
 **Remediation**: Ensure that port naming is in conjunction with the specification. For more information, please look at the Kubernetes Service specification on this page: https://kubernetes.io/docs/reference/_print/#ServiceSpec. And additional information about IANA Service naming can be found on the following page: https://www.rfc-editor.org/rfc/rfc6335.html#section-5.1.
 
-**Template**: [target-port](templates.md#target-port)
+**Template**: [target-port](generated/templates.md#target-port)
 ## latest-tag
 
 **Enabled by default**: Yes
@@ -285,7 +285,7 @@ minReplicas: 3
 
 **Remediation**: Use a container image with a specific tag other than latest.
 
-**Template**: [latest-tag](templates.md#latest-tag)
+**Template**: [latest-tag](generated/templates.md#latest-tag)
 
 **Parameters**:
 
@@ -303,7 +303,7 @@ BlockList:
 
 **Remediation**: Increase the number of replicas in the deployment to at least three to increase the fault tolerance of the deployment.
 
-**Template**: [minimum-replicas](templates.md#minimum-replicas)
+**Template**: [minimum-replicas](generated/templates.md#minimum-replicas)
 
 **Parameters**:
 
@@ -318,7 +318,7 @@ minReplicas: 3
 
 **Remediation**: Confirm that your deployment selector correctly matches the labels in its pod template.
 
-**Template**: [mismatching-selector](templates.md#mismatching-selector)
+**Template**: [mismatching-selector](generated/templates.md#mismatching-selector)
 ## no-anti-affinity
 
 **Enabled by default**: Yes
@@ -327,7 +327,7 @@ minReplicas: 3
 
 **Remediation**: Specify anti-affinity in your pod specification to ensure that the orchestrator attempts to schedule replicas on different nodes. Using podAntiAffinity, specify a labelSelector that matches pods for the deployment, and set the topologyKey to kubernetes.io/hostname. Refer to https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity for details.
 
-**Template**: [anti-affinity](templates.md#anti-affinity-not-specified)
+**Template**: [anti-affinity](generated/templates.md#anti-affinity-not-specified)
 
 **Parameters**:
 
@@ -342,7 +342,7 @@ minReplicas: 2
 
 **Remediation**: Migrate using the apps/v1 API versions for the objects. Refer to https://kubernetes.io/blog/2019/07/18/api-deprecations-in-1-16/ for details.
 
-**Template**: [disallowed-api-obj](templates.md#disallowed-api-objects)
+**Template**: [disallowed-api-obj](generated/templates.md#disallowed-api-objects)
 
 **Parameters**:
 
@@ -358,7 +358,7 @@ version: v1beta.+
 
 **Remediation**: Specify a liveness probe in your container. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/ for details.
 
-**Template**: [liveness-probe](templates.md#liveness-probe-not-specified)
+**Template**: [liveness-probe](generated/templates.md#liveness-probe-not-specified)
 ## no-node-affinity
 
 **Enabled by default**: No
@@ -367,7 +367,7 @@ version: v1beta.+
 
 **Remediation**: Specify node-affinity in your pod specification to ensure that the orchestrator attempts to schedule replicas on specified nodes. Refer to https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity for details.
 
-**Template**: [no-node-affinity](templates.md#node-affinity)
+**Template**: [no-node-affinity](generated/templates.md#node-affinity)
 ## no-read-only-root-fs
 
 **Enabled by default**: Yes
@@ -376,7 +376,7 @@ version: v1beta.+
 
 **Remediation**: Set readOnlyRootFilesystem to true in the container securityContext.
 
-**Template**: [read-only-root-fs](templates.md#read-only-root-filesystems)
+**Template**: [read-only-root-fs](generated/templates.md#read-only-root-filesystems)
 ## no-readiness-probe
 
 **Enabled by default**: No
@@ -385,7 +385,7 @@ version: v1beta.+
 
 **Remediation**: Specify a readiness probe in your container. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/ for details.
 
-**Template**: [readiness-probe](templates.md#readiness-probe-not-specified)
+**Template**: [readiness-probe](generated/templates.md#readiness-probe-not-specified)
 ## no-rolling-update-strategy
 
 **Enabled by default**: No
@@ -394,7 +394,7 @@ version: v1beta.+
 
 **Remediation**: Use a rolling update strategy to avoid service disruption during an update. A rolling update strategy allows for pods to be systematicaly replaced in a controlled fashion to ensure no service disruption.
 
-**Template**: [update-configuration](templates.md#update-configuration)
+**Template**: [update-configuration](generated/templates.md#update-configuration)
 
 **Parameters**:
 
@@ -409,7 +409,7 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 
 **Remediation**: Create the missing service account, or refer to an existing service account.
 
-**Template**: [non-existent-service-account](templates.md#non-existent-service-account)
+**Template**: [non-existent-service-account](generated/templates.md#non-existent-service-account)
 ## non-isolated-pod
 
 **Enabled by default**: No
@@ -418,7 +418,7 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 
 **Remediation**: Ensure pod does not accept unsafe traffic by isolating it with a NetworkPolicy. See https://cloud.redhat.com/blog/guide-to-kubernetes-ingress-network-policies for more details.
 
-**Template**: [non-isolated-pod](templates.md#non-isolated-pods)
+**Template**: [non-isolated-pod](generated/templates.md#non-isolated-pods)
 ## pdb-max-unavailable
 
 **Enabled by default**: Yes
@@ -427,7 +427,7 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 
 **Remediation**: Change the PodDisruptionBudget to have maxUnavailable set to a value greater than 0. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more information.
 
-**Template**: [pdb-max-unavailable](templates.md#no-pod-disruptions-allowed---maxunavailable)
+**Template**: [pdb-max-unavailable](generated/templates.md#no-pod-disruptions-allowed---maxunavailable)
 ## pdb-min-available
 
 **Enabled by default**: Yes
@@ -436,7 +436,7 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 
 **Remediation**: Change the PodDisruptionBudget to have minAvailable set to a number lower than the number of replicas in the related deployment-like objects. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more information.
 
-**Template**: [pdb-min-available](templates.md#no-pod-disruptions-allowed---minavailable)
+**Template**: [pdb-min-available](generated/templates.md#no-pod-disruptions-allowed---minavailable)
 ## privilege-escalation-container
 
 **Enabled by default**: Yes
@@ -445,7 +445,7 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 
 **Remediation**: Ensure containers do not allow privilege escalation by setting allowPrivilegeEscalation=false, privileged=false and removing CAP_SYS_ADMIN capability. See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for more details.
 
-**Template**: [privilege-escalation-container](templates.md#privilege-escalation-on-containers)
+**Template**: [privilege-escalation-container](generated/templates.md#privilege-escalation-on-containers)
 ## privileged-container
 
 **Enabled by default**: Yes
@@ -454,7 +454,7 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 
 **Remediation**: Do not run your container as privileged unless it is required.
 
-**Template**: [privileged](templates.md#privileged-containers)
+**Template**: [privileged](generated/templates.md#privileged-containers)
 ## privileged-ports
 
 **Enabled by default**: No
@@ -463,7 +463,7 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 
 **Remediation**: Ensure privileged ports [0, 1024] are not mapped within containers.
 
-**Template**: [privileged-ports](templates.md#privileged-ports)
+**Template**: [privileged-ports](generated/templates.md#privileged-ports)
 ## read-secret-from-env-var
 
 **Enabled by default**: No
@@ -472,7 +472,7 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 
 **Remediation**: If possible, rewrite application code to read secrets from mounted secret files, rather than from environment variables. Refer to https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets for details.
 
-**Template**: [read-secret-from-env-var](templates.md#read-secret-from-environment-variables)
+**Template**: [read-secret-from-env-var](generated/templates.md#read-secret-from-environment-variables)
 ## required-annotation-email
 
 **Enabled by default**: No
@@ -481,7 +481,7 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 
 **Remediation**: Add an email annotation to your object with the email address of the object's owner.
 
-**Template**: [required-annotation](templates.md#required-annotation)
+**Template**: [required-annotation](generated/templates.md#required-annotation)
 
 **Parameters**:
 
@@ -497,7 +497,7 @@ value: '[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'
 
 **Remediation**: Add an email annotation to your object with the name of the object's owner.
 
-**Template**: [required-label](templates.md#required-label)
+**Template**: [required-label](generated/templates.md#required-label)
 
 **Parameters**:
 
@@ -512,7 +512,7 @@ key: owner
 
 **Remediation**: Set runAsUser to a non-zero number and runAsNonRoot to true in your pod or container securityContext. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for details.
 
-**Template**: [run-as-non-root](templates.md#run-as-non-root-user)
+**Template**: [run-as-non-root](generated/templates.md#run-as-non-root-user)
 ## sensitive-host-mounts
 
 **Enabled by default**: Yes
@@ -521,7 +521,7 @@ key: owner
 
 **Remediation**: Ensure sensitive host system directories are not mounted in containers by removing those Volumes and VolumeMounts.
 
-**Template**: [host-mounts](templates.md#host-mounts)
+**Template**: [host-mounts](generated/templates.md#host-mounts)
 
 **Parameters**:
 
@@ -544,7 +544,7 @@ dirs:
 
 **Remediation**: Ensure that non-SSH services are not using port 22. Confirm that any actual SSH servers have been vetted.
 
-**Template**: [ports](templates.md#ports)
+**Template**: [ports](generated/templates.md#ports)
 
 **Parameters**:
 
@@ -560,7 +560,7 @@ protocol: TCP
 
 **Remediation**: Ensure container does not unsafely exposes parts of /proc by setting procMount=Default.  Unmasked ProcMount bypasses the default masking behavior of the container runtime. See https://kubernetes.io/docs/concepts/security/pod-security-standards/ for more details.
 
-**Template**: [unsafe-proc-mount](templates.md#unsafe-proc-mount)
+**Template**: [unsafe-proc-mount](generated/templates.md#unsafe-proc-mount)
 ## unsafe-sysctls
 
 **Enabled by default**: Yes
@@ -569,7 +569,7 @@ protocol: TCP
 
 **Remediation**: Ensure container does not allow unsafe allocation of system resources by removing unsafe sysctls configurations. For more details see https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/ https://docs.docker.com/engine/reference/commandline/run/#configure-namespaced-kernel-parameters-sysctls-at-runtime.
 
-**Template**: [unsafe-sysctls](templates.md#unsafe-sysctls)
+**Template**: [unsafe-sysctls](generated/templates.md#unsafe-sysctls)
 
 **Parameters**:
 
@@ -589,7 +589,7 @@ unsafeSysCtls:
 
 **Remediation**: Set CPU requests and limits for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.
 
-**Template**: [cpu-requirements](templates.md#cpu-requirements)
+**Template**: [cpu-requirements](generated/templates.md#cpu-requirements)
 
 **Parameters**:
 
@@ -606,7 +606,7 @@ upperBoundMillis: 0
 
 **Remediation**: Set memory requests and limits for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.
 
-**Template**: [memory-requirements](templates.md#memory-requirements)
+**Template**: [memory-requirements](generated/templates.md#memory-requirements)
 
 **Parameters**:
 
@@ -623,7 +623,7 @@ upperBoundMB: 0
 
 **Remediation**: Create namespaces for objects in your deployment.
 
-**Template**: [use-namespace](templates.md#use-namespaces-for-administrative-boundaries-between-resources)
+**Template**: [use-namespace](generated/templates.md#use-namespaces-for-administrative-boundaries-between-resources)
 ## wildcard-in-rules
 
 **Enabled by default**: No
@@ -632,7 +632,7 @@ upperBoundMB: 0
 
 **Remediation**: Where possible replace any use of wildcards in clusterroles and roles with specific objects or actions.
 
-**Template**: [wildcard-in-rules](templates.md#wildcard-use-in-role-and-clusterrole-rules)
+**Template**: [wildcard-in-rules](generated/templates.md#wildcard-use-in-role-and-clusterrole-rules)
 ## writable-host-mount
 
 **Enabled by default**: No
@@ -641,4 +641,4 @@ upperBoundMB: 0
 
 **Remediation**: Set containers to mount host paths as readOnly, if you need to access files on the host.
 
-**Template**: [writable-host-mount](templates.md#writable-host-mounts)
+**Template**: [writable-host-mount](generated/templates.md#writable-host-mounts)
