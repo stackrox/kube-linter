@@ -45,7 +45,7 @@ KubeLinter includes the following built-in checks:
 
 **Remediation**: {{.Remediation}}
 
-**Template**: [{{.Template}}](templates.md#{{ templateLink . }})
+**Template**: [{{.Template}}](generated/templates.md#{{ templateLink . }})
 {{ if .Params }}
 **Parameters**:
 
@@ -55,7 +55,7 @@ KubeLinter includes the following built-in checks:
 `
 )
 
-const TemplateURLFormat = "generated/templates?id=%s"
+const TemplateURLFormat = "/generated/templates?id=%s"
 
 var (
 	checksFuncMap = template.FuncMap{
