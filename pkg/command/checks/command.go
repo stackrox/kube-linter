@@ -5,6 +5,7 @@ import (
 	"sort"
 	"strings"
 	"text/template"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
@@ -14,6 +15,7 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/command/common"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/templates"
+	"golang.stackrox.io/kube-linter/internal/consts"
 )
 
 const (
@@ -116,5 +118,5 @@ func GetTemplateLink(check *config.Check) (string, error) {
 	if !found {
 		return "", errors.Errorf("unexpected: check %v references non-existent template?", check)
 	}
-	return strings.Join(strings.Fields(strings.ToLower(t.HumanName)), "-"), nil
+	return fmt.Sprintf(consts.TemplateURLFormat, strings.Join(strings.Fields(strings.ToLower(t.HumanName)), "-")), nil
 }
