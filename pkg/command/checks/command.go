@@ -9,7 +9,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"golang.stackrox.io/kube-linter/internal/consts"
 	"golang.stackrox.io/kube-linter/internal/defaultchecks"
 	"golang.stackrox.io/kube-linter/internal/flagutil"
 	"golang.stackrox.io/kube-linter/pkg/builtinchecks"
@@ -55,6 +54,8 @@ KubeLinter includes the following built-in checks:
 {{ end -}}
 `
 )
+
+const TemplateURLFormat = "templates.md/generated/templates?id=%s"
 
 var (
 	checksFuncMap = template.FuncMap{
@@ -113,10 +114,11 @@ func Command() *cobra.Command {
 // GetTemplateLink returns html anchor string for the template corresponding to the given check so that it can be used
 // to reference the template section in a rendered markdown.
 // E.g. template name "Deprecated Service Account Field" becomes "deprecated-service-account-field" html anchor.
+
 func GetTemplateLink(check *config.Check) (string, error) {
 	t, found := templates.Get(check.Template)
 	if !found {
 		return "", errors.Errorf("unexpected: check %v references non-existent template?", check)
 	}
-	return fmt.Sprintf(consts.TemplateURLFormat, strings.Join(strings.Fields(strings.ToLower(t.HumanName)), "-")), nil
+	return fmt.Sprintf(TemplateURLFormat, strings.Join(strings.Fields(strings.ToLower(t.HumanName)), "-")), nil
 }
