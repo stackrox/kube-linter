@@ -30,9 +30,7 @@ func (s *SCCPrivTestSuite) addSCCWithPriv(name string, allowFlag bool) {
 }
 
 func (s *SCCPrivTestSuite) TestPrivFalse() {
-	const (
-		acceptableScc = "scc-priv-false"
-	)
+	const acceptableScc = "scc-priv-false"
 
 	s.addSCCWithPriv(acceptableScc, false)
 

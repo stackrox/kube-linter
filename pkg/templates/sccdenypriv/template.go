@@ -30,10 +30,7 @@ func init() {
 		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
 			return func(_ lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				state, found := extract.SCCallowPrivilegedContainer(object.K8sObject)
-				if !found {
-					return nil
-				}
-				if state == p.AllowPrivilegedContainer {
+				if found && state == p.AllowPrivilegedContainer {
 					return []diagnostic.Diagnostic{
 						{Message: fmt.Sprintf("SCC has allowPrivilegedContainer set to %v", state)},
 					}

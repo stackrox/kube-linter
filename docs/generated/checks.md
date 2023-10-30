@@ -517,9 +517,9 @@ key: owner
 
 **Enabled by default**: No
 
-**Description**: Indicates when allowPrivilegedContainer SSC set to True
+**Description**: Indicates when allowPrivilegedContainer SecurityContextConstraints set to true
 
-**Remediation**: SecurityContextConstraints has AllowPrivilegedContainer set to "true". Using this option is dangerous, please consider using allowedCapabilities instead.
+**Remediation**: SecurityContextConstraints has AllowPrivilegedContainer set to "true". Using this option is dangerous, please consider using allowedCapabilities instead. Refer to https://docs.openshift.com/container-platform/4.12/authentication/managing-security-context-constraints.html#scc-settings_configuring-internal-oauth for details.
 
 **Template**: [scc-deny-privileged-container](templates.md#securitycontextconstraints-allowprivilegedcontainer)
 
