@@ -509,8 +509,8 @@ get_value_from() {
   message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
   count=$(get_value_from "${lines[0]}" '.Reports | length')
 
-  [[ "${message1}" == "Deployment: container \"fire-deployment-name\" does not have an open port 8080" ]]
-  [[ "${message2}" == "StatefulSet: container \"fire-deployment-int\" does not have an open port heath" ]]
+  [[ "${message1}" == "Deployment: container \"fire-deployment-name\" does not have an open port http" ]]
+  [[ "${message2}" == "Deployment: container \"fire-deployment-int\" does not have an open port 8080" ]]
   [[ "${message3}" == "StatefulSet: container \"fire-stateful-name\" does not have an open port healthcheck" ]]
   [[ "${count}" == "3" ]]
 }
