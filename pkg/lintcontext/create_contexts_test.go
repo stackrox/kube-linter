@@ -46,6 +46,33 @@ func TestCreateContextsWithIgnorePaths(t *testing.T) {
 	checkEmptyLintContext(t, contexts)
 }
 
+func TestIgnoreSubchartManifests(t *testing.T) {
+	ignorePaths := []string{
+		"../../tests/testdata/mychart/charts/**",
+	}
+	dir := "../../tests/testdata/mychart"
+
+	lintCtxs, err := CreateContexts(ignorePaths, dir)
+	require.NoError(t, err)
+	lintCtx := lintCtxs[0]
+	objects := lintCtx.Objects()
+
+	actualPaths := make([]string, 0, len(objects))
+	for _, obj := range objects {
+		actualPaths = append(actualPaths, obj.Metadata.FilePath)
+	}
+
+	expectedPaths := []string{
+		"../../tests/testdata/mychart/templates/serviceaccount.yaml",
+		"../../tests/testdata/mychart/templates/service.yaml",
+		"../../tests/testdata/mychart/templates/hpa.yaml",
+		"../../tests/testdata/mychart/templates/deployment.yaml",
+		"../../tests/testdata/mychart/templates/tests/test-connection.yaml",
+	}
+
+	assert.ElementsMatch(t, expectedPaths, actualPaths)
+}
+
 func TestCreateContextsObjectPaths(t *testing.T) {
 	bools := []bool{false, true}
 
@@ -165,6 +192,7 @@ func checkObjectPaths(t *testing.T, objects []Object, expectedPrefix string) {
 		path.Join(expectedPrefix, "templates/service.yaml"),
 		path.Join(expectedPrefix, "templates/serviceaccount.yaml"),
 		path.Join(expectedPrefix, "templates/tests/test-connection.yaml"),
+		path.Join(expectedPrefix, "charts/subchart/templates/deployment.yaml"),
 	}
 	assert.ElementsMatchf(t, expectedPaths, actualPaths, "expected and actual template paths don't match")
 }

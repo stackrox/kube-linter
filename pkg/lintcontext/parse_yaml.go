@@ -268,12 +268,7 @@ nextFile:
 		pathToTemplate := filepath.Join(chartPath, path)
 
 		for _, path := range ignorePaths {
-			absPathToTemplate, err := filepath.Abs(pathToTemplate)
-			if err != nil {
-				return errors.Wrapf(err, "could not get absolute path of %s", path)
-			}
-
-			ignoreMatch, err := doublestar.PathMatch(path, absPathToTemplate)
+			ignoreMatch, err := doublestar.PathMatch(path, pathToTemplate)
 			if err != nil {
 				return errors.Wrapf(err, "could not match pattern %s", path)
 			}

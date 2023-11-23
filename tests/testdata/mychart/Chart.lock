@@ -1,0 +1,6 @@
+dependencies:
+- name: subchart
+  repository: file://../subchart
+  version: 0.1.0
+digest: sha256:f8645a52640009a9d8905d929d3362e04720964c71e37af357b8b5e2852c365d
+generated: "2023-11-23T15:35:33.69184771+01:00"
