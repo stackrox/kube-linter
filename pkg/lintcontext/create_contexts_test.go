@@ -117,7 +117,7 @@ func createContextsAndVerifyPaths(t *testing.T, useTarball, useAbsolutePath, ren
 			require.NoError(t, file.Close())
 		}()
 
-		lintCtxs, err = CreateContextsFromHelmArchive(mockPath, file)
+		lintCtxs, err = CreateContextsFromHelmArchive(testIgnorePaths, mockPath, file)
 	} else {
 		lintCtxs, err = CreateContexts(testIgnorePaths, testPath)
 	}

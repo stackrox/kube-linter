@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/bmatcuk/doublestar/v4"
 	y "github.com/ghodss/yaml"
 	ocsAppsV1 "github.com/openshift/api/apps/v1"
 	ocpSecV1 "github.com/openshift/api/security/v1"
@@ -122,23 +123,24 @@ func (l *lintContextImpl) renderValues(chrt *chart.Chart, values map[string]inte
 	return rendered, nil
 }
 
-func (l *lintContextImpl) loadObjectsFromHelmChart(dir string) {
+func (l *lintContextImpl) loadObjectsFromHelmChart(dir string, ignorePaths []string) error {
 	renderedFiles, err := l.renderHelmChart(dir)
 	if err != nil {
 		l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: dir}, LoadErr: err})
-		return
+		return nil
 	}
+
 	// Paths returned by helm include redundant directory in front, therefore we strip it out.
-	l.loadHelmRenderedTemplates(dir, normalizeDirectoryPaths(renderedFiles))
+	return l.loadHelmRenderedTemplates(dir, normalizeDirectoryPaths(renderedFiles), ignorePaths)
 }
 
-func (l *lintContextImpl) loadObjectsFromTgzHelmChart(tgzFile string) {
+func (l *lintContextImpl) loadObjectsFromTgzHelmChart(tgzFile string, ignorePaths []string) error {
 	renderedFiles, err := l.renderTgzHelmChart(tgzFile)
 	if err != nil {
 		l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: tgzFile}, LoadErr: err})
-		return
+		return nil
 	}
-	l.loadHelmRenderedTemplates(tgzFile, renderedFiles)
+	return l.loadHelmRenderedTemplates(tgzFile, renderedFiles, ignorePaths)
 }
 
 func (l *lintContextImpl) renderTgzHelmChart(tgzFile string) (map[string]string, error) {
@@ -251,18 +253,34 @@ func (l *lintContextImpl) renderTgzHelmChartReader(fileName string, tgzReader io
 	return l.renderChart(fileName, chrt)
 }
 
-func (l *lintContextImpl) readObjectsFromTgzHelmChart(fileName string, tgzReader io.Reader) {
+func (l *lintContextImpl) readObjectsFromTgzHelmChart(fileName string, tgzReader io.Reader, ignoredPaths []string) error {
 	renderedFiles, err := l.renderTgzHelmChartReader(fileName, tgzReader)
 	if err != nil {
 		l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: fileName}, LoadErr: err})
-		return
+		return nil
 	}
-	l.loadHelmRenderedTemplates(fileName, renderedFiles)
+	return l.loadHelmRenderedTemplates(fileName, renderedFiles, ignoredPaths)
 }
 
-func (l *lintContextImpl) loadHelmRenderedTemplates(chartPath string, renderedFiles map[string]string) {
+func (l *lintContextImpl) loadHelmRenderedTemplates(chartPath string, renderedFiles map[string]string, ignorePaths []string) error {
+nextFile:
 	for path, contents := range renderedFiles {
 		pathToTemplate := filepath.Join(chartPath, path)
+
+		for _, path := range ignorePaths {
+			absPathToTemplate, err := filepath.Abs(pathToTemplate)
+			if err != nil {
+				return errors.Wrapf(err, "could not get absolute path of %s", path)
+			}
+
+			ignoreMatch, err := doublestar.PathMatch(path, absPathToTemplate)
+			if err != nil {
+				return errors.Wrapf(err, "could not match pattern %s", path)
+			}
+			if ignoreMatch {
+				continue nextFile
+			}
+		}
 
 		// Skip NOTES.txt file that may be present among templates but is not a kubernetes resource.
 		if strings.HasSuffix(pathToTemplate, string(filepath.Separator)+chartutil.NotesName) {
@@ -274,6 +292,8 @@ func (l *lintContextImpl) loadHelmRenderedTemplates(chartPath string, renderedFi
 			l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: pathToTemplate}, LoadErr: loadErr})
 		}
 	}
+
+	return nil
 }
 
 // normalizeDirectoryPaths removes the first element of the path that gets added by the Helm library.

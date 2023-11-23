@@ -92,7 +92,10 @@ fileOrDirsLoop:
 			if !info.IsDir() {
 				if strings.HasSuffix(strings.ToLower(currentPath), ".tgz") {
 					ctx := newCtx(options)
-					ctx.loadObjectsFromTgzHelmChart(currentPath)
+					if err := ctx.loadObjectsFromTgzHelmChart(currentPath, ignorePaths); err != nil {
+						return errors.Wrapf(err, "loading helm chart %s", currentPath)
+					}
+
 					contextsByDir[currentPath] = ctx
 					return nil
 				}
@@ -118,7 +121,9 @@ fileOrDirsLoop:
 				}
 				ctx := newCtx(options)
 				contextsByDir[currentPath] = ctx
-				ctx.loadObjectsFromHelmChart(currentPath)
+				if err := ctx.loadObjectsFromHelmChart(currentPath, ignorePaths); err != nil {
+					return errors.Wrap(err, "loading helm chart")
+				}
 				return filepath.SkipDir
 			}
 			return nil
@@ -142,9 +147,11 @@ fileOrDirsLoop:
 // CreateContextsFromHelmArchive creates a context from TGZ reader of Helm Chart.
 // Note: although this function is not used in CLI, it is exposed from kube-linter library and therefore should stay.
 // See https://github.com/stackrox/kube-linter/pull/173
-func CreateContextsFromHelmArchive(fileName string, tgzReader io.Reader) ([]LintContext, error) {
+func CreateContextsFromHelmArchive(ignorePaths []string, fileName string, tgzReader io.Reader) ([]LintContext, error) {
 	ctx := newCtx(Options{})
-	ctx.readObjectsFromTgzHelmChart(fileName, tgzReader)
+	if err := ctx.readObjectsFromTgzHelmChart(fileName, tgzReader, ignorePaths); err != nil {
+		return nil, err
+	}
 
 	return []LintContext{ctx}, nil
 }
