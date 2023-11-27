@@ -18,6 +18,7 @@ var (
 		"host-pid",
 		"invalid-target-ports",
 		"latest-tag",
+		"liveness-port",
 		"mismatching-selector",
 		"no-anti-affinity",
 		"no-extensions-v1beta",

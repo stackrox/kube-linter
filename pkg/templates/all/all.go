@@ -26,6 +26,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/hpareplicas"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/imagepullpolicy"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/latesttag"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/livenessport"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/livenessprobe"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/memoryrequirements"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/mismatchingselector"

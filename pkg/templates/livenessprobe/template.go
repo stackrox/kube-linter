@@ -21,7 +21,8 @@ func init() {
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
-		Parameters:             params.ParamDescs,
+		Parameters: params.ParamDescs,
+
 		ParseAndValidateParams: params.ParseAndValidate,
 		Instantiate: params.WrapInstantiateFunc(func(_ params.Params) (check.Func, error) {
 			return util.PerNonInitContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {

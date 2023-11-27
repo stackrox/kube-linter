@@ -496,6 +496,25 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "liveness-port" {
+  tmp="tests/checks/liveness-port.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include liveness-port --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment: container \"fire-deployment-name\" does not have an open port 8080" ]]
+  [[ "${message2}" == "StatefulSet: container \"fire-deployment-int\" does not have an open port heath" ]]
+  [[ "${message3}" == "StatefulSet: container \"fire-stateful-name\" does not have an open port healthcheck" ]]
+  [[ "${count}" == "3" ]]
+}
+
 @test "no-node-affinity" {
   tmp="tests/checks/no-node-affinity.yml"
   cmd="${KUBE_LINTER_BIN} lint --include no-node-affinity --do-not-auto-add-defaults --format json ${tmp}"
@@ -603,7 +622,7 @@ get_value_from() {
   run ${cmd}
 
   message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
-  
+
   [[ "${message1}" == "PodDisruptionBudget: MaxUnavailable is set to 0" ]]
 
 }
@@ -614,7 +633,7 @@ get_value_from() {
   cmd="${KUBE_LINTER_BIN} lint --include pdb-min-available --do-not-auto-add-defaults --format json ${tmp}"
   run ${cmd}
 
-  
+
   message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
 
   [[ "${message1}" == "PodDisruptionBudget: The current number of replicas for deployment foo is equal to or lower than the minimum number of replicas specified by its PDB." ]]

@@ -295,6 +295,15 @@ BlockList:
 - ^[^:]*$
 - (.*/[^:]+)$
 ```
+## liveness-port
+
+**Enabled by default**: Yes
+
+**Description**: Indicates when containers have a liveness probe to a port the container didn't open.
+
+**Remediation**: Check which ports you've opened and ensure they match what you have specified in the liveness probe.
+
+**Template**: [liveness-http-port](templates.md#liveness-port-not-open)
 ## minimum-three-replicas
 
 **Enabled by default**: No
