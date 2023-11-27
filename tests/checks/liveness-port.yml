@@ -8,7 +8,6 @@ spec:
           ports:
           - containerPort: 8080
             name: http
-            protocol: TCP
           livenessProbe:
             httpGet:
               path: "/"
@@ -36,6 +35,14 @@ spec:
             httpGet:
               path: "/"
               port: 8080
+        - name: fire-deployment-udp
+          ports:
+          - containerPort: 9999
+            name: udp
+            protocol: UDP
+          livenessProbe:
+            tcpSocket:
+              port: udp
 ---
 apiVersion: apps/v1
 kind: StatefulSet

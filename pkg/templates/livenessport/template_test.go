@@ -40,12 +40,24 @@ func (s *MissingLivenessPort) TestDeploymentWith() {
 			expected:  nil,
 		},
 		{
+			name: "NoLivenessProbeExecIgnored",
+			container: v1.Container{
+				LivenessProbe: &v1.Probe{
+					ProbeHandler: v1.ProbeHandler{
+						Exec: &v1.ExecAction{},
+					},
+				},
+			},
+			expected: nil,
+		},
+		{
 			name: "MatchinPortInt",
 			container: v1.Container{
 				Ports: []v1.ContainerPort{
 					{
 						Name:          "http",
 						ContainerPort: 8080,
+						Protocol:      v1.ProtocolTCP,
 					},
 				},
 				LivenessProbe: &v1.Probe{
@@ -78,6 +90,25 @@ func (s *MissingLivenessPort) TestDeploymentWith() {
 			expected: nil,
 		},
 		{
+			name: "MatchinPortStrTCPSSocket",
+			container: v1.Container{
+				Ports: []v1.ContainerPort{
+					{
+						Name:          "http",
+						ContainerPort: 8080,
+					},
+				},
+				LivenessProbe: &v1.Probe{
+					ProbeHandler: v1.ProbeHandler{
+						TCPSocket: &v1.TCPSocketAction{
+							Port: intstr.FromString("http"),
+						},
+					},
+				},
+			},
+			expected: nil,
+		},
+		{
 			name: "MismaptchPort",
 			container: v1.Container{
 				Name: "container",
@@ -97,8 +128,7 @@ func (s *MissingLivenessPort) TestDeploymentWith() {
 			},
 			expected: map[string][]diagnostic.Diagnostic{
 				targetName: {
-					// Ensure we only get one error for ENV_1
-					{Message: "container \"container\" does not have an open port 9999"},
+					{Message: "container \"container\" does not expose port 9999 for the HTTPGet"},
 				},
 			},
 		},
@@ -122,8 +152,56 @@ func (s *MissingLivenessPort) TestDeploymentWith() {
 			},
 			expected: map[string][]diagnostic.Diagnostic{
 				targetName: {
-					// Ensure we only get one error for ENV_1
-					{Message: "container \"container\" does not have an open port healthcheck"},
+					{Message: "container \"container\" does not expose port healthcheck for the HTTPGet"},
+				},
+			},
+		},
+		{
+			name: "MatchinPortUDP",
+			container: v1.Container{
+				Name: "container",
+				Ports: []v1.ContainerPort{
+					{
+						Name:          "http",
+						ContainerPort: 8080,
+						Protocol:      v1.ProtocolUDP,
+					},
+				},
+				LivenessProbe: &v1.Probe{
+					ProbeHandler: v1.ProbeHandler{
+						HTTPGet: &v1.HTTPGetAction{
+							Port: intstr.FromInt(8080),
+						},
+					},
+				},
+			},
+			expected: map[string][]diagnostic.Diagnostic{
+				targetName: {
+					{Message: "container \"container\" does not expose port 8080 for the HTTPGet"},
+				},
+			},
+		},
+		{
+			name: "MismaptchPortTCPSocket",
+			container: v1.Container{
+				Name: "container",
+				Ports: []v1.ContainerPort{
+					{
+						Name:          "http",
+						ContainerPort: 8080,
+					},
+				},
+				LivenessProbe: &v1.Probe{
+					ProbeHandler: v1.ProbeHandler{
+						TCPSocket: &v1.TCPSocketAction{
+							Port: intstr.FromString("socket"),
+						},
+					},
+				},
+			},
+			expected: map[string][]diagnostic.Diagnostic{
+				targetName: {
+					{Message: "container \"container\" does not expose port socket for the TCPSocket"},
 				},
 			},
 		},

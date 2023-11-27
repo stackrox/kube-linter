@@ -16,13 +16,13 @@ import (
 
 const templateKey = "liveness-http-port"
 
-var sentinal = struct{}{}
+var sentinel = struct{}{}
 
 func init() {
 	templates.Register(check.Template{
 		HumanName:   "Liveness Port Not Open",
 		Key:         templateKey,
-		Description: "Flag containers have a http liveness prop with a port they didn't open.",
+		Description: "Flag containers with an HTTP liveness probe to not exposed port.",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
@@ -34,21 +34,29 @@ func init() {
 					return nil
 				}
 
-				httpProbe := container.LivenessProbe.ProbeHandler.HTTPGet
-				if httpProbe == nil {
-					return nil
-				}
-
 				ports := map[intstr.IntOrString]struct{}{}
 				for _, port := range container.Ports {
-					ports[intstr.FromInt(int(port.ContainerPort))] = sentinal
-					ports[intstr.FromString(port.Name)] = sentinal
+					if port.Protocol != "" && port.Protocol != v1.ProtocolTCP {
+						continue
+					}
+					ports[intstr.FromInt32(port.ContainerPort)] = sentinel
+					ports[intstr.FromString(port.Name)] = sentinel
 				}
 
-				if _, ok := ports[httpProbe.Port]; !ok {
-					return []diagnostic.Diagnostic{{
-						Message: fmt.Sprintf("container %q does not have an open port %s", container.Name, httpProbe.Port.String()),
-					}}
+				if httpProbe := container.LivenessProbe.ProbeHandler.HTTPGet; httpProbe != nil {
+					if _, ok := ports[httpProbe.Port]; !ok {
+						return []diagnostic.Diagnostic{{
+							Message: fmt.Sprintf("container %q does not expose port %s for the HTTPGet", container.Name, httpProbe.Port.String()),
+						}}
+					}
+				}
+
+				if tcpProbe := container.LivenessProbe.ProbeHandler.TCPSocket; tcpProbe != nil {
+					if _, ok := ports[tcpProbe.Port]; !ok {
+						return []diagnostic.Diagnostic{{
+							Message: fmt.Sprintf("container %q does not expose port %s for the TCPSocket", container.Name, tcpProbe.Port.String()),
+						}}
+					}
 				}
 				return nil
 			}), nil

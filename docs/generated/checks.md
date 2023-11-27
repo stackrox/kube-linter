@@ -299,7 +299,7 @@ BlockList:
 
 **Enabled by default**: Yes
 
-**Description**: Indicates when containers have a liveness probe to a port the container didn't open.
+**Description**: Indicates when containers have a liveness probe to a not exposed port.
 
 **Remediation**: Check which ports you've opened and ensure they match what you have specified in the liveness probe.
 

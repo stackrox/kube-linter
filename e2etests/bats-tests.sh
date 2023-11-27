@@ -507,12 +507,14 @@ get_value_from() {
   message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
   message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
   message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
+  message4=$(get_value_from "${lines[0]}" '.Reports[3].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[3].Diagnostic.Message')
   count=$(get_value_from "${lines[0]}" '.Reports | length')
 
-  [[ "${message1}" == "Deployment: container \"fire-deployment-name\" does not have an open port http" ]]
-  [[ "${message2}" == "Deployment: container \"fire-deployment-int\" does not have an open port 8080" ]]
-  [[ "${message3}" == "StatefulSet: container \"fire-stateful-name\" does not have an open port healthcheck" ]]
-  [[ "${count}" == "3" ]]
+  [[ "${message1}" == "Deployment: container \"fire-deployment-name\" does not expose port http for the HTTPGet" ]]
+  [[ "${message2}" == "Deployment: container \"fire-deployment-int\" does not expose port 8080 for the HTTPGet" ]]
+  [[ "${message3}" == "Deployment: container \"fire-deployment-udp\" does not expose port udp for the TCPSocket" ]]
+  [[ "${message4}" == "StatefulSet: container \"fire-stateful-name\" does not expose port healthcheck for the HTTPGet" ]]
+  [[ "${count}" == "4" ]]
 }
 
 @test "no-node-affinity" {

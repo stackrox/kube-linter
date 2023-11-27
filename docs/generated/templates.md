@@ -448,7 +448,7 @@ KubeLinter supports the following templates:
 
 **Key**: `liveness-http-port`
 
-**Description**: Flag containers have a http liveness prop with a port they didn't open.
+**Description**: Flag containers with an HTTP liveness probe to not exposed port.
 
 **Supported Objects**: DeploymentLike
 
