@@ -411,6 +411,28 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "liveness-port" {
+  tmp="tests/checks/liveness-port.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include liveness-port --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
+  message4=$(get_value_from "${lines[0]}" '.Reports[3].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[3].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment: container \"fire-deployment-name\" does not expose port http for the HTTPGet" ]]
+  [[ "${message2}" == "Deployment: container \"fire-deployment-int\" does not expose port 8080 for the HTTPGet" ]]
+  [[ "${message3}" == "Deployment: container \"fire-deployment-udp\" does not expose port udp for the TCPSocket" ]]
+  [[ "${message4}" == "StatefulSet: container \"fire-stateful-name\" does not expose port healthcheck for the HTTPGet" ]]
+  [[ "${count}" == "4" ]]
+}
+
+
 @test "minimum-three-replicas" {
   tmp="tests/checks/minimum-three-replicas.yml"
   cmd="${KUBE_LINTER_BIN} lint --include minimum-three-replicas --do-not-auto-add-defaults --format json ${tmp}"
@@ -494,27 +516,6 @@ get_value_from() {
   [[ "${message1}" == "Deployment: container \"app1\" does not specify a liveness probe" ]]
   [[ "${message2}" == "DeploymentConfig: container \"app2\" does not specify a liveness probe" ]]
   [[ "${count}" == "2" ]]
-}
-
-@test "liveness-port" {
-  tmp="tests/checks/liveness-port.yml"
-  cmd="${KUBE_LINTER_BIN} lint --include liveness-port --do-not-auto-add-defaults --format json ${tmp}"
-  run ${cmd}
-
-  print_info "${status}" "${output}" "${cmd}" "${tmp}"
-  [ "$status" -eq 1 ]
-
-  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
-  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
-  message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
-  message4=$(get_value_from "${lines[0]}" '.Reports[3].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[3].Diagnostic.Message')
-  count=$(get_value_from "${lines[0]}" '.Reports | length')
-
-  [[ "${message1}" == "Deployment: container \"fire-deployment-name\" does not expose port http for the HTTPGet" ]]
-  [[ "${message2}" == "Deployment: container \"fire-deployment-int\" does not expose port 8080 for the HTTPGet" ]]
-  [[ "${message3}" == "Deployment: container \"fire-deployment-udp\" does not expose port udp for the TCPSocket" ]]
-  [[ "${message4}" == "StatefulSet: container \"fire-stateful-name\" does not expose port healthcheck for the HTTPGet" ]]
-  [[ "${count}" == "4" ]]
 }
 
 @test "no-node-affinity" {
