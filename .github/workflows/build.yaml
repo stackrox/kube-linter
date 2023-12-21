@@ -47,7 +47,7 @@ jobs:
         run: make build
 
       - name: Upload binary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: bin
           path: bin
@@ -86,7 +86,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Download executable
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: bin
 
@@ -105,7 +105,7 @@ jobs:
         run: jq -es 'if . == [] then null else .[] | . end' results.sarif
 
       - name: Upload output file as GitHub artifact for manual investigation
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: results.sarif
           path: results.sarif
@@ -135,7 +135,7 @@ jobs:
           # Checkout all repo history to make tags available for figuring out kube-linter version during build.
           fetch-depth: 0
       - name: Download windows executable
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: bin
           path: tmp/
@@ -165,7 +165,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Download executable
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: bin
 
@@ -293,7 +293,7 @@ jobs:
       - name: Install cosign
         uses: sigstore/cosign-installer@v3.3.0
       - name: Download executables
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: bin
 
