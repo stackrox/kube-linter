@@ -20,10 +20,10 @@ require (
 	github.com/spf13/viper v1.18.2
 	github.com/stretchr/testify v1.8.4
 	helm.sh/helm/v3 v3.13.3
-	k8s.io/api v0.28.4
-	k8s.io/apimachinery v0.28.4
-	k8s.io/cli-runtime v0.28.4
-	k8s.io/client-go v0.28.4
+	k8s.io/api v0.29.0
+	k8s.io/apimachinery v0.29.0
+	k8s.io/cli-runtime v0.29.0
+	k8s.io/client-go v0.29.0
 	k8s.io/gengo v0.0.0-20230829151522-9cce18d56c01
 )
 
@@ -271,7 +271,7 @@ require (
 	honnef.co/go/tools v0.4.6 // indirect
 	k8s.io/apiextensions-apiserver v0.28.4 // indirect
 	k8s.io/klog/v2 v2.110.1 // indirect
-	k8s.io/kube-openapi v0.0.0-20230905202853-d090da108d2f // indirect
+	k8s.io/kube-openapi v0.0.0-20231010175941-2dd684a91f00 // indirect
 	k8s.io/utils v0.0.0-20231127182322-b307cd553661 // indirect
 	mvdan.cc/gofumpt v0.5.0 // indirect
 	mvdan.cc/interfacer v0.0.0-20180901003855-c20040233aed // indirect
