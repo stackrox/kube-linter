@@ -16,3 +16,7 @@ updates:
     open-pull-requests-limit: 3
     reviewers:
       - "janisz"
+    groups:
+      k8s.io:
+        patterns:
+          - "k8s.io/*"
