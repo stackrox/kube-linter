@@ -444,6 +444,15 @@ KubeLinter supports the following templates:
   type: array
 ```
 
+## Liveness Port Not Open
+
+**Key**: `liveness-http-port`
+
+**Description**: Flag containers with an HTTP liveness probe to not exposed port.
+
+**Supported Objects**: DeploymentLike
+
+
 ## Liveness Probe Not Specified
 
 **Key**: `liveness-probe`

@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+spec:
+  template:
+    spec:
+      containers:
+        - name: dont-fire-deployment
+          ports:
+          - containerPort: 8080
+            name: http
+          livenessProbe:
+            httpGet:
+              path: "/"
+              port: http
+        - name: dont-fire-deployment
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: "/"
+              port: 8080
+        - name: fire-deployment-name
+          livenessProbe:
+            httpGet:
+              path: "/"
+              port: http
+        - name: fire-deployment-int
+          ports:
+          - containerPort: 9999
+            name: http
+            protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: "/"
+              port: 8080
+        - name: fire-deployment-udp
+          ports:
+          - containerPort: 9999
+            name: udp
+            protocol: UDP
+          livenessProbe:
+            tcpSocket:
+              port: udp
+---
+apiVersion: apps/v1
+kind: StatefulSet
+spec:
+  template:
+    spec:
+      containers:
+        - name: dont-fire-stateful
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+        - name: fire-stateful-name
+          ports:
+          - containerPort: 9999
+            name: http
+            protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: "/"
+              port: healthcheck
