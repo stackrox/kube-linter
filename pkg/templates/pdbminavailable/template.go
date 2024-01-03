@@ -103,6 +103,11 @@ func minAvailableCheck(lintCtx lintcontext.LintContext, object lintcontext.Objec
 	for _, dl := range deploymentLikes {
 		pdbMinAvailable := value
 		replicas, _ := extract.Replicas(dl)
+		replicasHpa, found := extract.HPAMinReplicas(object.K8sObject)
+		// if replicas is 0, then use the value from the HPA if it exists
+		if replicas == 0 && found {
+			replicas = replicasHpa
+		}
 		if isPercent {
 			// Calulate the actual value of the MinAvailable with respect to the Replica count if a percentage is set
 			pdbMinAvailable = int(math.Ceil(float64(replicas) * (float64(value) / float64(100))))

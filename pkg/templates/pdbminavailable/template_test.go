@@ -9,6 +9,7 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/lintcontext/mocks"
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	appsV1 "k8s.io/api/apps/v1"
+	autoscalingV2 "k8s.io/api/autoscaling/v2"
 	v1 "k8s.io/api/policy/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -176,4 +177,42 @@ func (p *PDBTestSuite) TestPDBMinAvailableOneHundredPercent() {
 			ExpectInstantiationError: false,
 		},
 	})
+}
+
+// test that the check run with a deployment that has no replicas and a HPA that has a minReplicas
+func (p *PDBTestSuite) TestPDBMinAvailableHPA() {
+	p.ctx.AddMockDeployment(p.T(), "test-deploy")
+	p.ctx.ModifyDeployment(p.T(), "test-deploy", func(deployment *appsV1.Deployment) {
+		deployment.Namespace = "test"
+		deployment.Spec.Selector = &metaV1.LabelSelector{}
+		deployment.Spec.Selector.MatchLabels = map[string]string{"foo": "bar"}
+		// set deployment to have no replicas
+		deployment.Spec.Replicas = pointers.Int32(0)
+	})
+	p.ctx.AddMockHorizontalPodAutoscaler(p.T(), "test-hpa", "v2")
+	p.ctx.ModifyHorizontalPodAutoscalerV2(p.T(), "test-hpa", func(hpa *autoscalingV2.HorizontalPodAutoscaler) {
+		hpa.Spec.MinReplicas = pointers.Int32(0)
+		hpa.Spec.ScaleTargetRef = autoscalingV2.CrossVersionObjectReference{
+			Kind:       "Deployment",
+			Name:       "test-deploy",
+			APIVersion: "apps/v1",
+		}
+	})
+	p.ctx.AddMockPodDisruptionBudget(p.T(), "test-pdb")
+	p.ctx.ModifyPodDisruptionBudget(p.T(), "test-pdb", func(pdb *v1.PodDisruptionBudget) {
+		pdb.Spec.MinAvailable = &intstr.IntOrString{StrVal: "50%", Type: intstr.String}
+		pdb.Spec.Selector = &metaV1.LabelSelector{}
+		pdb.Spec.Selector.MatchLabels = map[string]string{"foo": "bar"}
+	})
+
+	p.Validate(p.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				"test-pdb": {},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+
 }
