@@ -102,7 +102,7 @@ func minAvailableCheck(lintCtx lintcontext.LintContext, object lintcontext.Objec
 	}
 
 	// If there are no Replicas set on the Deployment Like, check if there is an HPA with a minReplicas set, and use that value, Else fail
-	if _, ok := extract.Replicas(object.K8sObject); ok {
+	if _, ok := extract.Replicas(object.K8sObject); !ok {
 		// Get the HPA provided
 		hpa, ok := object.K8sObject.(*autoscalingV2.HorizontalPodAutoscaler)
 		if !ok {
