@@ -101,32 +101,30 @@ func minAvailableCheck(lintCtx lintcontext.LintContext, object lintcontext.Objec
 		}
 	}
 
-	// If there are no Replicas set on the Deployment Like, check if there is an HPA with a minReplicas set, and use that value, Else fail
-	if _, ok := extract.Replicas(object.K8sObject); !ok {
-		// Get the HPA provided
-		hpa, ok := object.K8sObject.(*autoscalingV2.HorizontalPodAutoscaler)
-		if !ok {
-			return nil
-		}
-		// Ensure that the hpa scaleTargetRef is the deployment name
-		if hpa.Spec.ScaleTargetRef.Name != object.GetK8sObjectName().Name {
-			return nil
-		}
-		// If the HPA has a minReplicas set, use that value, else fail
-		if hpa.Spec.MinReplicas != nil {
-			value = int(*hpa.Spec.MinReplicas)
-		} else {
-			return []diagnostic.Diagnostic{
-				{
-					Message: fmt.Sprintf("Deployment %s has no replicas set, and the HPA %s has no minReplicas set", object.GetK8sObjectName().Name, hpa.GetName()),
-				},
-			}
-		}
-	}
-
 	for _, dl := range deploymentLikes {
 		pdbMinAvailable := value
 		replicas, _ := extract.Replicas(dl)
+		if replicas <= 1 {
+			// Get the HPA provided
+			hpa, ok := object.K8sObject.(*autoscalingV2.HorizontalPodAutoscaler)
+			if !ok {
+				return nil
+			}
+			// Ensure that the hpa scaleTargetRef is the deployment name
+			if hpa.Spec.ScaleTargetRef.Name != object.GetK8sObjectName().Name {
+				return nil
+			}
+			// If the HPA has a minReplicas set, use that value as the deployment replica, else fail
+			if hpa.Spec.MinReplicas != nil {
+				replicas = *hpa.Spec.MinReplicas
+			} else {
+				return []diagnostic.Diagnostic{
+					{
+						Message: fmt.Sprintf("Deployment %s has no replicas set, and the HPA %s has no minReplicas set", object.GetK8sObjectName().Name, hpa.GetName()),
+					},
+				}
+			}
+		}
 		if isPercent {
 			// Calulate the actual value of the MinAvailable with respect to the Replica count if a percentage is set
 			pdbMinAvailable = int(math.Ceil(float64(replicas) * (float64(value) / float64(100))))
