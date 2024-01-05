@@ -91,7 +91,7 @@ func minAvailableCheck(lintCtx lintcontext.LintContext, object lintcontext.Objec
 		}
 	}
 
-	// Evaluate Deploymet Likes in the lintContext to see if they have MinAvailable set too low
+	// Evaluate Deployment Likes in the lintContext to see if they have MinAvailable set too low
 	deploymentLikes, err := getDeploymentLikeObjects(lintCtx, labelSelector, pdb.Namespace)
 	if err != nil {
 		return []diagnostic.Diagnostic{
@@ -125,7 +125,7 @@ func minAvailableCheck(lintCtx lintcontext.LintContext, object lintcontext.Objec
 				} else {
 					return []diagnostic.Diagnostic{
 						{
-							Message: fmt.Sprintf("Deployment %s has no replicas set, and the HPA %s has no minReplicas set", dl.GetName(), hpa.GetName()),
+							Message: fmt.Sprintf("Deployment %s has no replicas set, and the HPA has no minReplicas set or doesn't exist", dl.GetName()),
 						},
 					}
 				}

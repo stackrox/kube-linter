@@ -180,36 +180,39 @@ func (p *PDBTestSuite) TestPDBMinAvailableOneHundredPercent() {
 }
 
 // test that the check run with a deployment that has no replicas and a HPA that has a minReplicas
-func (p *PDBTestSuite) TestPDBMinAvailableHPA() {
+func (p *PDBTestSuite) TestPDBWithMinAvailableHPA() {
 	p.ctx.AddMockDeployment(p.T(), "test-deploy")
 	p.ctx.ModifyDeployment(p.T(), "test-deploy", func(deployment *appsV1.Deployment) {
 		deployment.Namespace = "test"
+		deployment.Spec.Replicas = nil
 		deployment.Spec.Selector = &metaV1.LabelSelector{}
 		deployment.Spec.Selector.MatchLabels = map[string]string{"foo": "bar"}
-		// set deployment to have no replicas
-		deployment.Spec.Replicas = pointers.Int32(0)
 	})
 	p.ctx.AddMockHorizontalPodAutoscaler(p.T(), "test-hpa", "v2")
 	p.ctx.ModifyHorizontalPodAutoscalerV2(p.T(), "test-hpa", func(hpa *autoscalingV2.HorizontalPodAutoscaler) {
-		hpa.Spec.MinReplicas = pointers.Int32(0)
+		hpa.Namespace = "test"
 		hpa.Spec.ScaleTargetRef = autoscalingV2.CrossVersionObjectReference{
 			Kind:       "Deployment",
 			Name:       "test-deploy",
 			APIVersion: "apps/v1",
 		}
+		hpa.Spec.MinReplicas = nil
 	})
 	p.ctx.AddMockPodDisruptionBudget(p.T(), "test-pdb")
 	p.ctx.ModifyPodDisruptionBudget(p.T(), "test-pdb", func(pdb *v1.PodDisruptionBudget) {
-		pdb.Spec.MinAvailable = &intstr.IntOrString{StrVal: "50%", Type: intstr.String}
+		pdb.Namespace = "test"
 		pdb.Spec.Selector = &metaV1.LabelSelector{}
 		pdb.Spec.Selector.MatchLabels = map[string]string{"foo": "bar"}
+		pdb.Spec.MinAvailable = &intstr.IntOrString{StrVal: "50%", Type: intstr.String}
 	})
 
 	p.Validate(p.ctx, []templates.TestCase{
 		{
 			Param: params.Params{},
 			Diagnostics: map[string][]diagnostic.Diagnostic{
-				"test-pdb": {},
+				"test-pdb": {
+					{Message: "Deployment test-deploy has no replicas set, and the HPA has no minReplicas set or doesn't exist"},
+				},
 			},
 			ExpectInstantiationError: false,
 		},
