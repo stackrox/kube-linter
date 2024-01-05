@@ -301,9 +301,9 @@ BlockList:
 
 **Description**: Indicates when containers have a liveness probe to a not exposed port.
 
-**Remediation**: Check which ports you've opened and ensure they match what you have specified in the liveness probe.
+**Remediation**: Check which ports you've exposed and ensure they match what you have specified in the liveness probe.
 
-**Template**: [liveness-http-port](templates.md#liveness-port-not-open)
+**Template**: [liveness-port](templates.md#liveness-port-exposed)
 ## minimum-three-replicas
 
 **Enabled by default**: No
@@ -482,6 +482,15 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 **Remediation**: If possible, rewrite application code to read secrets from mounted secret files, rather than from environment variables. Refer to https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets for details.
 
 **Template**: [read-secret-from-env-var](templates.md#read-secret-from-environment-variables)
+## readiness-port
+
+**Enabled by default**: Yes
+
+**Description**: Indicates when containers have a readiness probe to a not exposed port.
+
+**Remediation**: Check which ports you've exposed and ensure they match what you have specified in the readiness probe.
+
+**Template**: [readiness-port](templates.md#readiness-port-not-exposed)
 ## required-annotation-email
 
 **Enabled by default**: No
@@ -576,6 +585,15 @@ dirs:
 port: 22
 protocol: TCP
 ```
+## startup-port
+
+**Enabled by default**: Yes
+
+**Description**: Indicates when containers have a liveness probe to a not exposed port.
+
+**Remediation**: Check which ports you've exposed and ensure they match what you have specified in the liveness probe.
+
+**Template**: [startup-port](templates.md#startup-port-exposed)
 ## unsafe-proc-mount
 
 **Enabled by default**: No

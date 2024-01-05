@@ -710,6 +710,27 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "readiness-port" {
+  tmp="tests/checks/readiness-port.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include readiness-port --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
+  message4=$(get_value_from "${lines[0]}" '.Reports[3].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[3].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment: container \"fire-deployment-name\" does not expose port http for the HTTPGet" ]]
+  [[ "${message2}" == "Deployment: container \"fire-deployment-int\" does not expose port 8080 for the HTTPGet" ]]
+  [[ "${message3}" == "Deployment: container \"fire-deployment-udp\" does not expose port udp for the TCPSocket" ]]
+  [[ "${message4}" == "Deployment: container \"fire-deployment-grpc\" does not expose port 8080 for the GRPC check" ]]
+  [[ "${count}" == "4" ]]
+}
+
 @test "required-annotation-email" {
   tmp="tests/checks/required-annotation-email.yml"
   cmd="${KUBE_LINTER_BIN} lint --include required-annotation-email --do-not-auto-add-defaults --format json ${tmp}"
@@ -810,6 +831,27 @@ get_value_from() {
   [[ "${message2}" == "DeploymentConfig: port 22 and protocol TCP in container \"app\" found" ]]
   [[ "${message3}" == "DeploymentConfig: port 22 and protocol TCP in container \"app-no-protocol\" found" ]]
   [[ "${count}" == "3" ]]
+}
+
+@test "startup-port" {
+  tmp="tests/checks/startup-port.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include startup-port --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
+  message4=$(get_value_from "${lines[0]}" '.Reports[3].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[3].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment: container \"fire-deployment-name\" does not expose port http for the HTTPGet" ]]
+  [[ "${message2}" == "Deployment: container \"fire-deployment-int\" does not expose port 8080 for the HTTPGet" ]]
+  [[ "${message3}" == "Deployment: container \"fire-deployment-udp\" does not expose port udp for the TCPSocket" ]]
+  [[ "${message4}" == "Deployment: container \"fire-deployment-grpc\" does not expose port 8080 for the GRPC check" ]]
+  [[ "${count}" == "4" ]]
 }
 
 @test "unsafe-proc-mount" {

@@ -205,6 +205,49 @@ func (s *MissingLivenessPort) TestDeploymentWith() {
 				},
 			},
 		},
+		{
+			name: "GrpcCheckWillPass",
+			container: v1.Container{
+				Name: "container",
+				Ports: []v1.ContainerPort{
+					{
+						Name:          "http",
+						ContainerPort: 8080,
+					},
+				},
+				LivenessProbe: &v1.Probe{
+					ProbeHandler: v1.ProbeHandler{
+						GRPC: &v1.GRPCAction{
+							Port: 8080,
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "GrpcPortMissmatch",
+			container: v1.Container{
+				Name: "container",
+				Ports: []v1.ContainerPort{
+					{
+						Name:          "http",
+						ContainerPort: 8080,
+					},
+				},
+				LivenessProbe: &v1.Probe{
+					ProbeHandler: v1.ProbeHandler{
+						GRPC: &v1.GRPCAction{
+							Port: 9999,
+						},
+					},
+				},
+			},
+			expected: map[string][]diagnostic.Diagnostic{
+				targetName: {
+					{Message: "container \"container\" does not expose port 9999 for the GRPC check"},
+				},
+			},
+		},
 	}
 	for _, tc := range testCases {
 		s.Run(tc.name, func() {

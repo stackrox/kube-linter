@@ -444,11 +444,11 @@ KubeLinter supports the following templates:
   type: array
 ```
 
-## Liveness Port Not Open
+## Liveness Port Exposed
 
-**Key**: `liveness-http-port`
+**Key**: `liveness-port`
 
-**Description**: Flag containers with an HTTP liveness probe to not exposed port.
+**Description**: Flag containers with an liveness probe to not exposed port.
 
 **Supported Objects**: DeploymentLike
 
@@ -633,6 +633,15 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 
+## Readiness Port Not Exposed
+
+**Key**: `readiness-port`
+
+**Description**: Flag containers with an Readiness probe to not exposed port.
+
+**Supported Objects**: DeploymentLike
+
+
 ## Readiness Probe Not Specified
 
 **Key**: `readiness-probe`
@@ -740,6 +749,15 @@ KubeLinter supports the following templates:
   required: true
   type: string
 ```
+
+## Startup Port Exposed
+
+**Key**: `startup-port`
+
+**Description**: Flag containers with an Startup probe to not exposed port.
+
+**Supported Objects**: DeploymentLike
+
 
 ## Target Port
 

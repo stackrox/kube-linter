@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+spec:
+  template:
+    spec:
+      containers:
+        - name: dont-fire-deployment-grpc
+          ports:
+          - containerPort: 8080
+            name: http
+          startupProbe:
+            grpc:
+              port: 8080
+        - name: dont-fire-deployment
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          startupProbe:
+            httpGet:
+              path: "/"
+              port: 8080
+        - name: fire-deployment-name
+          startupProbe:
+            httpGet:
+              path: "/"
+              port: http
+        - name: fire-deployment-int
+          ports:
+          - containerPort: 9999
+            name: http
+            protocol: TCP
+          startupProbe:
+            httpGet:
+              path: "/"
+              port: 8080
+        - name: fire-deployment-udp
+          ports:
+          - containerPort: 9999
+            name: udp
+            protocol: UDP
+          startupProbe:
+            tcpSocket:
+              port: udp
+        - name: fire-deployment-grpc
+          ports:
+          - containerPort: 9999
+            name: grpc
+            protocol: TCP
+          startupProbe:
+            grpc:
+              port: 8080
+---
