@@ -107,9 +107,7 @@ func minAvailableCheck(lintCtx lintcontext.LintContext, object lintcontext.Objec
 		if int(replicas) == 1 {
 			hpaList, err := getHorizontalPodAutoscalers(lintCtx, pdb.Namespace)
 			if err != nil {
-				return []diagnostic.Diagnostic{
-					{},
-				}
+				break
 			}
 			for _, hpa := range hpaList {
 				// Select from the list of HPAs one that have scaleTargetRef that matches the deployment name
