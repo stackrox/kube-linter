@@ -15,6 +15,7 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	"golang.stackrox.io/kube-linter/pkg/templates/pdbminavailable/internal/params"
+	autoscalingV2 "k8s.io/api/autoscaling/v2"
 	pdbV1 "k8s.io/api/policy/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -100,14 +101,32 @@ func minAvailableCheck(lintCtx lintcontext.LintContext, object lintcontext.Objec
 		}
 	}
 
+	// If there are no Replicas set on the Deployment Like, check if there is an HPA with a minReplicas set, and use that value, Else fail
+	if _, ok := extract.Replicas(object.K8sObject); ok {
+		// Get the HPA provided
+		hpa, ok := object.K8sObject.(*autoscalingV2.HorizontalPodAutoscaler)
+		if !ok {
+			return nil
+		}
+		// Ensure that the hpa scaleTargetRef is the deployment name
+		if hpa.Spec.ScaleTargetRef.Name != object.GetK8sObjectName().Name {
+			return nil
+		}
+		// If the HPA has a minReplicas set, use that value, else fail
+		if hpa.Spec.MinReplicas != nil {
+			value = int(*hpa.Spec.MinReplicas)
+		} else {
+			return []diagnostic.Diagnostic{
+				{
+					Message: fmt.Sprintf("Deployment %s has no replicas set, and the HPA %s has no minReplicas set", object.GetK8sObjectName().Name, hpa.GetName()),
+				},
+			}
+		}
+	}
+
 	for _, dl := range deploymentLikes {
 		pdbMinAvailable := value
 		replicas, _ := extract.Replicas(dl)
-		replicasHpa, found := extract.HPAMinReplicas(object.K8sObject)
-		// if replicas is 0, then use the value from the HPA if it exists
-		if replicas == 0 && found {
-			replicas = replicasHpa
-		}
 		if isPercent {
 			// Calulate the actual value of the MinAvailable with respect to the Replica count if a percentage is set
 			pdbMinAvailable = int(math.Ceil(float64(replicas) * (float64(value) / float64(100))))
@@ -142,10 +161,11 @@ func getDeploymentLikeObjects(lintCtx lintcontext.LintContext, labelSelector lab
 		if !exists {
 			continue
 		}
-		// If there are no Replicas set on the Deployment Like, it's not possible to compare to a PDB
-		if _, ok := extract.Replicas(obj.K8sObject); !ok {
-			continue
-		}
+
+		// // If there are no Replicas set on the Deployment Like, it's not possible to compare to a PDB
+		// if _, ok := extract.Replicas(obj.K8sObject); !ok {
+		// 	continue
+		// }
 
 		objLabelSelector, err := metaV1.LabelSelectorAsSelector(selectors)
 		if err != nil {
