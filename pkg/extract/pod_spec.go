@@ -104,7 +104,7 @@ func Replicas(obj k8sutil.Object) (int32, bool) {
 			return *numReplicas, true
 		}
 		// If numReplicas is a `nil` pointer, then it defaults to 1.
-		return 1, false
+		return 1, true
 	}
 	return 0, false
 }
