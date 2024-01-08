@@ -105,31 +105,7 @@ func minAvailableCheck(lintCtx lintcontext.LintContext, object lintcontext.Objec
 		pdbMinAvailable := value
 		replicas, _ := extract.Replicas(dl)
 		if int(replicas) == 1 {
-			hpaList, err := getHorizontalPodAutoscalers(lintCtx, pdb.Namespace)
-			if err != nil {
-				break
-			}
-			for _, hpa := range hpaList {
-				// Select from the list of HPAs one that have scaleTargetRef that matches the deployment name
-				hpa, ok := hpa.(*autoscalingV2.HorizontalPodAutoscaler)
-				if !ok {
-					return nil
-				}
-				// Ensure that the hpa scaleTargetRef is the deployment name
-				if hpa.Spec.ScaleTargetRef.Name != dl.GetName() {
-					continue
-				}
-				// If the HPA has a minReplicas set, use that value as the deployment replica, else fail
-				if hpa.Spec.MinReplicas != nil {
-					replicas = *hpa.Spec.MinReplicas
-				} else {
-					return []diagnostic.Diagnostic{
-						{
-							Message: fmt.Sprintf("Deployment %s has no replicas set, and the HPA has no minReplicas set or doesn't exist", dl.GetName()),
-						},
-					}
-				}
-			}
+			replicas = transformReplicaIntoMinReplicas(lintCtx, pdb.Namespace, dl, replicas)
 		}
 		if isPercent {
 			// Calulate the actual value of the MinAvailable with respect to the Replica count if a percentage is set
@@ -165,11 +141,6 @@ func getDeploymentLikeObjects(lintCtx lintcontext.LintContext, labelSelector lab
 		if !exists {
 			continue
 		}
-
-		// // If there are no Replicas set on the Deployment Like, it's not possible to compare to a PDB
-		// if _, ok := extract.Replicas(obj.K8sObject); !ok {
-		// 	continue
-		// }
 
 		objLabelSelector, err := metaV1.LabelSelectorAsSelector(selectors)
 		if err != nil {
@@ -208,7 +179,7 @@ func getIntOrPercentValueSafelyFromString(intOrStr string) (int, bool, error) {
 }
 
 // Function to get the list of HPA's provided
-func getHorizontalPodAutoscalers(lintCtx lintcontext.LintContext, namespace string) ([]k8sutil.Object, error) {
+func getHorizontalPodAutoscalers(lintCtx lintcontext.LintContext, namespace string) []k8sutil.Object {
 
 	objectList := make([]k8sutil.Object, 0, len(lintCtx.Objects()))
 
@@ -218,10 +189,6 @@ func getHorizontalPodAutoscalers(lintCtx lintcontext.LintContext, namespace stri
 			continue
 		}
 
-		// if obj.K8sObject.GetObjectKind() == "HorizontalPodAutoscaler" {
-		// 	continue
-		// }
-
 		// Ensure that only HPAs are in the same namespaces as the PDB
 		if obj.GetK8sObjectName().Namespace != namespace {
 			continue
@@ -230,5 +197,27 @@ func getHorizontalPodAutoscalers(lintCtx lintcontext.LintContext, namespace stri
 		objectList = append(objectList, obj.K8sObject)
 	}
 
-	return objectList, nil
+	return objectList
+}
+
+// Function to transform the replica count into the minReplicas count if the deployment has a HPA with a minReplicas set
+func transformReplicaIntoMinReplicas(lintCtx lintcontext.LintContext, namespace string, dl k8sutil.Object, replicas int32) int32 {
+	hpaList := getHorizontalPodAutoscalers(lintCtx, namespace)
+	for _, hpa := range hpaList {
+		// Select from the list of HPAs one that have scaleTargetRef that matches the deployment name
+		hpa, ok := hpa.(*autoscalingV2.HorizontalPodAutoscaler)
+		if !ok {
+			continue
+		}
+		// Ensure that the hpa scaleTargetRef is the deployment name
+		if hpa.Spec.ScaleTargetRef.Name != dl.GetName() {
+			continue
+		}
+		// If the HPA has a minReplicas set, use that value as the deployment replica, else fail
+		if hpa.Spec.MinReplicas != nil {
+			replicas = *hpa.Spec.MinReplicas
+			continue
+		}
+	}
+	return replicas
 }

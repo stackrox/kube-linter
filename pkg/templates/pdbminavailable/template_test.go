@@ -211,7 +211,7 @@ func (p *PDBTestSuite) TestPDBWithMinAvailableHPA() {
 			Param: params.Params{},
 			Diagnostics: map[string][]diagnostic.Diagnostic{
 				"test-pdb": {
-					{Message: "Deployment test-deploy has no replicas set, and the HPA has no minReplicas set or doesn't exist"},
+					{Message: "The current number of replicas for deployment test-deploy is equal to or lower than the minimum number of replicas specified by its PDB."},
 				},
 			},
 			ExpectInstantiationError: false,
