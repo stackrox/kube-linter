@@ -124,7 +124,7 @@ fileOrDirsLoop:
 			return nil
 		})
 		if err != nil {
-			return nil, errors.Wrapf(err, "loading from path %q", fileOrDir)
+			return nil, errors.Wrapf(err, "loading from path %q", fileOrDir) //consider using Go's native error wrapping using %w in fmt.Error, you'll have an easier error unwrapping/type assertions
 		}
 	}
 	dirs := make([]string, 0, len(contextsByDir))
