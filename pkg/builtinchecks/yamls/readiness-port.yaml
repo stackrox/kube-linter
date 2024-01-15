@@ -1,0 +1,9 @@
+name: "readiness-port"
+description: "Indicates when containers have a readiness probe to a not exposed port."
+remediation: >-
+  Check which ports you've exposed and ensure they match what you have specified
+  in the readiness probe.
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "readiness-port"

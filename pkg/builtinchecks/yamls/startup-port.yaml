@@ -1,4 +1,4 @@
-name: "liveness-port"
+name: "startup-port"
 description: "Indicates when containers have a liveness probe to a not exposed port."
 remediation: >-
   Check which ports you've exposed and ensure they match what you have specified
@@ -6,4 +6,4 @@ remediation: >-
 scope:
   objectKinds:
     - DeploymentLike
-template: "liveness-port"
+template: "startup-port"
