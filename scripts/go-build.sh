@@ -49,8 +49,9 @@ fi
 ldflags=(-s -w "${x_defs[@]}")
 
 [[ -n "${GOOS}" ]] || die "GOOS must be set"
+[[ -n "${GOARCH}" ]] || die "GOARCH must be set"
 bin_name="$(basename "$main_srcdir")"
-output_file="bin/${GOOS}/${bin_name}"
+output_file="bin/${GOOS}/${bin_name}-${GOARCH}"
 if [[ "$GOOS" == "windows" ]]; then
   output_file="${output_file}.exe"
 fi

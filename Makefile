@@ -80,16 +80,22 @@ generated-srcs: go-generated-srcs generated-docs
 ## Compile ##
 #############
 
+cli-linux: cli_linux-amd64 cli_linux-arm64
+cli-darwin: cli_darwin-amd64 cli_darwin-arm64
+cli-windows: cli_windows-amd64
+
+cli_%: build-prep
+	$(eval    w := $(subst -, ,$*))
+	$(eval   os := $(firstword $(w)))
+	$(eval arch := $(lastword  $(w)))
+	@CGO_ENABLED=0 GOARCH=$(arch) GOOS=$(os) scripts/go-build.sh ./cmd/kube-linter
+
+build-prep:
+	@mkdir -p "$(GOBIN)"
+
 
 .PHONY: build
-build: source-code-archive
-	@CGO_ENABLED=0 GOARCH=amd64 GOOS=darwin scripts/go-build.sh ./cmd/kube-linter
-	@CGO_ENABLED=0 GOARCH=arm64 GOOS=darwin scripts/go-build.sh ./cmd/kube-linter
-	@CGO_ENABLED=0 GOARCH=amd64 GOOS=linux scripts/go-build.sh ./cmd/kube-linter
-	@CGO_ENABLED=0 GOARCH=arm64 GOOS=linux scripts/go-build.sh ./cmd/kube-linter
-	@CGO_ENABLED=0 GOARCH=amd64 GOOS=windows scripts/go-build.sh ./cmd/kube-linter
-	@CGO_ENABLED=0 GOARCH=arm64 GOOS=windows scripts/go-build.sh ./cmd/kube-linter
-	@mkdir -p "$(GOBIN)"
+build: source-code-archive cli-linux cli-darwin cli-windows
 	@cp "bin/$(HOST_OS)/$(ARCH)/kube-linter" "$(GOBIN)/kube-linter"
 	@chmod u+w "$(GOBIN)/kube-linter"
 
