@@ -18,6 +18,8 @@ ifeq ($(UNAME_S),Darwin)
     HOST_OS := darwin
 endif
 
+ARCH := $(shell go env GOARCH)
+
 TAG := $(shell ./get-tag)
 
 GOBIN := $(CURDIR)/.gobin
@@ -81,11 +83,14 @@ generated-srcs: go-generated-srcs generated-docs
 
 .PHONY: build
 build: source-code-archive
-	@CGO_ENABLED=0 GOOS=darwin scripts/go-build.sh ./cmd/kube-linter
-	@CGO_ENABLED=0 GOOS=linux scripts/go-build.sh ./cmd/kube-linter
-	@CGO_ENABLED=0 GOOS=windows scripts/go-build.sh ./cmd/kube-linter
+	@CGO_ENABLED=0 GOARCH=amd64 GOOS=darwin scripts/go-build.sh ./cmd/kube-linter
+	@CGO_ENABLED=0 GOARCH=arm64 GOOS=darwin scripts/go-build.sh ./cmd/kube-linter
+	@CGO_ENABLED=0 GOARCH=amd64 GOOS=linux scripts/go-build.sh ./cmd/kube-linter
+	@CGO_ENABLED=0 GOARCH=arm64 GOOS=linux scripts/go-build.sh ./cmd/kube-linter
+	@CGO_ENABLED=0 GOARCH=amd64 GOOS=windows scripts/go-build.sh ./cmd/kube-linter
+	@CGO_ENABLED=0 GOARCH=arm64 GOOS=windows scripts/go-build.sh ./cmd/kube-linter
 	@mkdir -p "$(GOBIN)"
-	@cp "bin/$(HOST_OS)/kube-linter" "$(GOBIN)/kube-linter"
+	@cp "bin/$(HOST_OS)/$(ARCH)/kube-linter" "$(GOBIN)/kube-linter"
 	@chmod u+w "$(GOBIN)/kube-linter"
 
 $(KUBE_LINTER_BIN):
