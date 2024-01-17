@@ -554,8 +554,8 @@ github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 h1:Jamvg5psRI
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/polyfloyd/go-errorlint v1.4.5 h1:70YWmMy4FgRHehGNOUask3HtSFSOLKgmDn7ryNe7LqI=
 github.com/polyfloyd/go-errorlint v1.4.5/go.mod h1:sIZEbFoDOCnTYYZoVkjc4hTnM459tuWA9H/EkdXwsKk=
-github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.70.0 h1:CFTvpkpVP4EXXZuaZuxpikAoma8xVha/IZKMDc9lw+Y=
-github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.70.0/go.mod h1:npfc20mPOAu7ViOVnATVMbI7PoXvW99EzgJVqkAomIQ=
+github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.71.0 h1:et+XkusxWLz+XNqZiyMom9tv9ACvNAUyLXti2LTiV7o=
+github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.71.0/go.mod h1:3RiUkFmR9kmPZi9r/8a5jw0a9yg+LMmr7qa0wjqvSiI=
 github.com/prometheus/client_golang v0.9.1/go.mod h1:7SWBe2y4D6OKWSNQJUaRYU/AaXPKyh/dDVn+NZz0KFw=
 github.com/prometheus/client_golang v1.0.0/go.mod h1:db9x61etRT2tGnBNRi70OPL5FsnadC4Ky3P0J6CfImo=
 github.com/prometheus/client_golang v1.1.0/go.mod h1:I1FGZT9+L76gKKOs5djB6ezCbFQP1xR9D75/vuwEF3g=
@@ -1189,5 +1189,5 @@ sigs.k8s.io/kustomize/kyaml v0.14.3-0.20230601165947-6ce0bf390ce3/go.mod h1:JWP1
 sigs.k8s.io/structured-merge-diff/v4 v4.4.1 h1:150L+0vs/8DA78h1u02ooW1/fFq/Lwr+sGiqlzvrtq4=
 sigs.k8s.io/structured-merge-diff/v4 v4.4.1/go.mod h1:N8hJocpFajUSSeSJ9bOZ77VzejKZaXsTtZo4/u7Io08=
 sigs.k8s.io/yaml v1.2.0/go.mod h1:yfXDCHCao9+ENCvLSE62v9VSji2MKu5jeNfTrofGhJc=
-sigs.k8s.io/yaml v1.3.0 h1:a2VclLzOGrwOHDiV8EfBGhvjHvP46CtW5j6POvhYGGo=
-sigs.k8s.io/yaml v1.3.0/go.mod h1:GeOyir5tyXNByN85N/dRIT9es5UQNerPYEKK56eTBm8=
+sigs.k8s.io/yaml v1.4.0 h1:Mk1wCc2gy/F0THH0TAp1QYyJNzRm2KCLy3o5ASXVI5E=
+sigs.k8s.io/yaml v1.4.0/go.mod h1:Ejl7/uTz7PSA4eKMyQCUTnhZYNmLIl+5c2lQPGR2BPY=
