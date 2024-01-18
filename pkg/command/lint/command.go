@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
+	"golang.stackrox.io/kube-linter/pkg/pathutil"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	"golang.stackrox.io/kube-linter/internal/flagutil"
@@ -86,7 +87,16 @@ func Command() *cobra.Command {
 				return err
 			}
 
-			lintCtxs, err := lintcontext.CreateContexts(ignorePaths, args...)
+			absArgs := []string{}
+			for _, arg := range args {
+				absArg, err := pathutil.GetAbsolutPath(arg)
+				if err != nil {
+					return err
+				}
+				absArgs = append(absArgs, absArg)
+			}
+
+			lintCtxs, err := lintcontext.CreateContexts(ignorePaths, absArgs...)
 			if err != nil {
 				return err
 			}
