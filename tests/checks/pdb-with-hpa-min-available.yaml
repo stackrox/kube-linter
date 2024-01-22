@@ -1,0 +1,41 @@
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: baz
+  namespace: bar
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      name: cloud-ingress-operator
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: app
+  namespace: bar
+spec:
+  minReplicas: 1
+  maxReplicas: 100
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: foo
+    namespace: bar
+  targetCPUUtilizationPercentage: 85
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: foo
+  namespace: bar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: cloud-ingress-operator
+  template:
+    metadata:
+      labels:
+        name: cloud-ingress-operator

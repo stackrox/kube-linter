@@ -31,3 +31,19 @@ func checkReplicas(minReplicas *int32) (int32, bool) {
 	// If numReplicas is a `nil` pointer, then it defaults to 1.
 	return 1, true
 }
+
+// HPAScaleTargetRefName extracts Spec.ScaleTargetRef.Name
+func HPAScaleTargetRefName(obj k8sutil.Object) (string, bool) {
+	switch hpa := obj.(type) {
+	case *autoscalingV2Beta1.HorizontalPodAutoscaler:
+		return hpa.Spec.ScaleTargetRef.Name, true
+	case *autoscalingV2Beta2.HorizontalPodAutoscaler:
+		return hpa.Spec.ScaleTargetRef.Name, true
+	case *autoscalingV2.HorizontalPodAutoscaler:
+		return hpa.Spec.ScaleTargetRef.Name, true
+	case *autoscalingV1.HorizontalPodAutoscaler:
+		return hpa.Spec.ScaleTargetRef.Name, true
+	default:
+		return "", false
+	}
+}
