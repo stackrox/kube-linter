@@ -642,7 +642,7 @@ get_value_from() {
   count=$(get_value_from "${lines[0]}" '.Reports | length')
 
   [[ "${message1}" == "PodDisruptionBudget: The current number of replicas for deployment foo is equal to or lower than the minimum number of replicas specified by its PDB." ]]
-  [[ "${message2}" == "PodDisruptionBudget: The current number of replicas for deployment foo is equal to or lower than the minimum number of replicas specified by its PDB." ]]
+  [[ "${message2}" == "PodDisruptionBudget: The current number of replicas for deployment foo2 is equal to or lower than the minimum number of replicas specified by its PDB." ]]
   [[ "${count}" == "2" ]]
 }
 
