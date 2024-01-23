@@ -638,8 +638,12 @@ get_value_from() {
 
 
   message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
 
   [[ "${message1}" == "PodDisruptionBudget: The current number of replicas for deployment foo is equal to or lower than the minimum number of replicas specified by its PDB." ]]
+  [[ "${message2}" == "PodDisruptionBudget: The current number of replicas for deployment foo2 is equal to or lower than the minimum number of replicas specified by its PDB." ]]
+  [[ "${count}" == "2" ]]
 }
 
 @test "privilege-escalation-container" {

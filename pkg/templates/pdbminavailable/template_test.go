@@ -9,6 +9,7 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/lintcontext/mocks"
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	appsV1 "k8s.io/api/apps/v1"
+	autoscalingV2 "k8s.io/api/autoscaling/v2"
 	v1 "k8s.io/api/policy/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -176,4 +177,45 @@ func (p *PDBTestSuite) TestPDBMinAvailableOneHundredPercent() {
 			ExpectInstantiationError: false,
 		},
 	})
+}
+
+// test that the check run with a deployment that has no replicas and a HPA that has a minReplicas
+func (p *PDBTestSuite) TestPDBWithMinAvailableHPA() {
+	p.ctx.AddMockDeployment(p.T(), "test-deploy")
+	p.ctx.ModifyDeployment(p.T(), "test-deploy", func(deployment *appsV1.Deployment) {
+		deployment.Namespace = "test"
+		deployment.Spec.Replicas = nil
+		deployment.Spec.Selector = &metaV1.LabelSelector{}
+		deployment.Spec.Selector.MatchLabels = map[string]string{"foo": "bar"}
+	})
+	p.ctx.AddMockHorizontalPodAutoscaler(p.T(), "test-hpa", "v2")
+	p.ctx.ModifyHorizontalPodAutoscalerV2(p.T(), "test-hpa", func(hpa *autoscalingV2.HorizontalPodAutoscaler) {
+		hpa.Namespace = "test"
+		hpa.Spec.ScaleTargetRef = autoscalingV2.CrossVersionObjectReference{
+			Kind:       "Deployment",
+			Name:       "test-deploy",
+			APIVersion: "apps/v1",
+		}
+		hpa.Spec.MinReplicas = nil
+	})
+	p.ctx.AddMockPodDisruptionBudget(p.T(), "test-pdb")
+	p.ctx.ModifyPodDisruptionBudget(p.T(), "test-pdb", func(pdb *v1.PodDisruptionBudget) {
+		pdb.Namespace = "test"
+		pdb.Spec.Selector = &metaV1.LabelSelector{}
+		pdb.Spec.Selector.MatchLabels = map[string]string{"foo": "bar"}
+		pdb.Spec.MinAvailable = &intstr.IntOrString{StrVal: "50%", Type: intstr.String}
+	})
+
+	p.Validate(p.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				"test-pdb": {
+					{Message: "The current number of replicas for deployment test-deploy is equal to or lower than the minimum number of replicas specified by its PDB."},
+				},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+
 }
