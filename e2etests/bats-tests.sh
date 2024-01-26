@@ -1005,3 +1005,7 @@ get_value_from() {
   print_info "${status}" "${output}" "${cmd}" "${tmp}"
   [ "$status" -eq 0 ]
 }
+
+@test "flag-read-from-stdin" {
+  echo "---" | ${KUBE_LINTER_BIN} lint -
+}
