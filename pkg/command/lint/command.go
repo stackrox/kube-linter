@@ -87,8 +87,12 @@ func Command() *cobra.Command {
 				return err
 			}
 
-			absArgs := []string{}
+			absArgs := make([]string, 0, len(args))
 			for _, arg := range args {
+				if arg == lintcontext.ReadFromStdin {
+					absArgs = append(absArgs, lintcontext.ReadFromStdin)
+					continue
+				}
 				absArg, err := pathutil.GetAbsolutPath(arg)
 				if err != nil {
 					return err

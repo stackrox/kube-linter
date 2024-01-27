@@ -16,6 +16,9 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
+// ReadFromStdin is a path used to indicate reading from os.Stdin
+const ReadFromStdin = "-"
+
 var (
 	knownYAMLExtensions = set.NewFrozenStringSet(".yaml", ".yml")
 )
@@ -41,16 +44,15 @@ func CreateContextsWithOptions(options Options, ignorePaths []string, filesOrDir
 	contextsByDir := make(map[string]*lintContextImpl)
 fileOrDirsLoop:
 	for _, fileOrDir := range filesOrDirs {
-		// Stdin
-		if fileOrDir == "-" {
-			if _, alreadyExists := contextsByDir["-"]; alreadyExists {
+		if fileOrDir == ReadFromStdin {
+			if _, alreadyExists := contextsByDir[ReadFromStdin]; alreadyExists {
 				continue
 			}
 			ctx := newCtx(options)
 			if err := ctx.loadObjectsFromReader("<standard input>", os.Stdin); err != nil {
 				return nil, err
 			}
-			contextsByDir["-"] = ctx
+			contextsByDir[ReadFromStdin] = ctx
 			continue
 		}
 
