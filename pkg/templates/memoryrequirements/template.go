@@ -48,9 +48,6 @@ func init() {
 				if p.RequirementsType == "request" || p.RequirementsType == "any" {
 					process(&results, container.Name, "request", container.Resources.Requests.Memory(), lowerBoundBytes, upperBoundBytes)
 				}
-				if p.RequirementsType == "limit" || p.RequirementsType == "any" {
-					process(&results, container.Name, "limit", container.Resources.Limits.Memory(), lowerBoundBytes, upperBoundBytes)
-				}
 				return results
 			}), nil
 		}),

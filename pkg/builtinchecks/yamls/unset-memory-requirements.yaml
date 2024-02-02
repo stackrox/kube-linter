@@ -1,7 +1,7 @@
 name: "unset-memory-requirements"
-description: "Indicates when containers do not have memory requests and limits set."
+description: "Indicates when containers do not have memory requests set."
 remediation: >-
-  Set memory requests and limits for your container based on its requirements.
+  Set memory requests for your container based on its requirements.
   Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.
 scope:
   objectKinds:

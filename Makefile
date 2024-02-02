@@ -109,6 +109,7 @@ source-code-archive:
 
 .PHONY: test
 test:
+	echo $(TAG)
 	go test ./...
 
 .PHONY: e2e-test

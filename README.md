@@ -126,14 +126,10 @@ Running KubeLinter to Lint your YAML files only requires two steps in its most b
 
 ### Example
 
-Consider the following sample pod specification file `pod.yaml`. This file has two production readiness issues and one security issue:
+Consider the following sample pod specification file `pod.yaml`. This file has one security issue:
 
 **Security Issue:**
 1. The container in this pod is not running as a read only file system, which could allow it to write to the root filesystem.
-
-**Production readiness:**
-1. The container's CPU limits are not set, which could allow it to consume excessive CPU.
-1. The container's memory limits are not set, which could allow it to consume excessive memory
 
    ```yaml
    apiVersion: v1
@@ -172,12 +168,8 @@ Consider the following sample pod specification file `pod.yaml`. This file has t
 
    ```
    pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" does not have a read-only root file system (check: no-read-only-root-fs, remediation: Set readOnlyRootFilesystem to true in your container's securityContext.)
-
-   pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" has cpu limit 0 (check: unset-cpu-requirements, remediation: Set    your container's CPU requests and limits depending on its requirements. See    https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/   #requests-and-limits for more details.)
    
-   pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" has memory limit 0 (check: unset-memory-requirements, remediation:    Set your container's memory requests and limits depending on its requirements.    See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/   #requests-and-limits for more details.)
-   
-   Error: found 3 lint errors
+   Error: found 1 lint error
    ```
 To learn more about using and configuring KubeLinter, visit the [documentation](./docs) page.
 

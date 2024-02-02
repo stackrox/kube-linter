@@ -39,9 +39,6 @@ func init() {
 				if p.RequirementsType == "request" || p.RequirementsType == "any" {
 					process(&results, container.Name, "request", container.Resources.Requests.Cpu(), p.LowerBoundMillis, p.UpperBoundMillis)
 				}
-				if p.RequirementsType == "limit" || p.RequirementsType == "any" {
-					process(&results, container.Name, "limit", container.Resources.Limits.Cpu(), p.LowerBoundMillis, p.UpperBoundMillis)
-				}
 				return results
 			}), nil
 		}),

@@ -627,9 +627,9 @@ unsafeSysCtls:
 
 **Enabled by default**: Yes
 
-**Description**: Indicates when containers do not have CPU requests and limits set.
+**Description**: Indicates when containers do not have CPU requests set.
 
-**Remediation**: Set CPU requests and limits for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.
+**Remediation**: Set CPU requests for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.
 
 **Template**: [cpu-requirements](templates.md#cpu-requirements)
 
@@ -644,9 +644,9 @@ upperBoundMillis: 0
 
 **Enabled by default**: Yes
 
-**Description**: Indicates when containers do not have memory requests and limits set.
+**Description**: Indicates when containers do not have memory requests set.
 
-**Remediation**: Set memory requests and limits for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.
+**Remediation**: Set memory requests for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.
 
 **Template**: [memory-requirements](templates.md#memory-requirements)
 
