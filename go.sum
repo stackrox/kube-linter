@@ -129,8 +129,8 @@ github.com/catenacyber/perfsprint v0.2.0/go.mod h1:/wclWYompEyjUD2FuIIDVKNkqz7Ig
 github.com/ccojocar/zxcvbn-go v1.0.1 h1:+sxrANSCj6CdadkcMnvde/GWU1vZiiXRbqYSCalV4/4=
 github.com/ccojocar/zxcvbn-go v1.0.1/go.mod h1:g1qkXtUSvHP8lhHp5GrSmTz6uWALGRMQdw6Qnz/hi60=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
-github.com/cert-manager/cert-manager v1.14.0 h1:vb4I5hn5LY6XgL5mOyzNA6pxHNRiFL5YzIEFXQhHI/E=
-github.com/cert-manager/cert-manager v1.14.0/go.mod h1:pik7K6jXfgh++lfVJ/i1HzEnDluSUtTVLXSHikj8Lho=
+github.com/cert-manager/cert-manager v1.14.1 h1:i5sJHfEucqpAfVjkCe3n4sO5S+6YBaN2Yu18+l/1ZMw=
+github.com/cert-manager/cert-manager v1.14.1/go.mod h1:pik7K6jXfgh++lfVJ/i1HzEnDluSUtTVLXSHikj8Lho=
 github.com/cespare/xxhash/v2 v2.1.1/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cespare/xxhash/v2 v2.1.2/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cespare/xxhash/v2 v2.2.0 h1:DC2CZ1Ep5Y4k3ZQ899DldepgrayRUGE6BBZ/cd9Cj44=
