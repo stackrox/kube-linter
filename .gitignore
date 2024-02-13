@@ -11,3 +11,4 @@
 /deps
 
 e2etests/test_helper
+dist/
