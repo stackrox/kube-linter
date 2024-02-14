@@ -79,11 +79,15 @@ metadata:
   name: app3
   namespace: bar3
 spec:
-  minReplicas: 1
-  maxReplicas: 100
+  maxReplicaCount: 2
+  minReplicaCount: 1
   scaleTargetRef:
     name: foo3
-  targetCPUUtilizationPercentage: 85
+  triggers:
+  - type: cpu
+    metricType: Utilization
+    metadata:
+      value: "50"
 ---
 apiVersion: apps/v1
 kind: Deployment
