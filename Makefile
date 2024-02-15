@@ -70,9 +70,9 @@ go-generated-srcs: deps
 	go generate ./...
 
 .PHONY: generated-docs
-generated-docs: go-generated-srcs build
-	kube-linter templates list --format markdown > docs/generated/templates.md
-	kube-linter checks list --format markdown > docs/generated/checks.md
+generated-docs: go-generated-srcs $(KUBE_LINTER_BIN)
+	$(KUBE_LINTER_BIN) templates list --format markdown > docs/generated/templates.md
+	$(KUBE_LINTER_BIN) checks list --format markdown > docs/generated/checks.md
 
 .PHONY: generated-srcs
 generated-srcs: go-generated-srcs generated-docs
