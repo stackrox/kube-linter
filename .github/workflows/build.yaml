@@ -201,4 +201,5 @@ jobs:
           version: latest
           args: release --clean
         env:
+          COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
