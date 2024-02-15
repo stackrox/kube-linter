@@ -10,7 +10,7 @@ before:
     - go mod tidy
     - go generate ./...
 
-dist: bin
+dist: .gobin
 
 builds:
   - env:

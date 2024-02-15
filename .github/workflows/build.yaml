@@ -53,13 +53,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: kube-linter
-          path: bin/kube-linter_linux_amd64_v1/kube-linter
+          path: .gobin/kube-linter_linux_amd64_v1/kube-linter
 
       - name: Upload binary
         uses: actions/upload-artifact@v4
         with:
           name: kube-linter.exe
-          path: bin/kube-linter_windows_amd64_v1/kube-linter.exe
+          path: .gobin/kube-linter_windows_amd64_v1/kube-linter.exe
 
   test-sarif:
     needs: build-and-test
