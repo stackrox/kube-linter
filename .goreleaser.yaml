@@ -45,10 +45,8 @@ dockers:
     ids:
       - kube-linter
     image_templates:
-      - "stackrox/kube-linter:latest"
-      - "stackrox/kube-linter:{{ .Tag }}"
-      - "ghcr.io/stackrox/kube-linter:latest"
-      - "ghcr.io/stackrox/kube-linter:{{ .Tag }}"
+      - "ghcr.io/janisz/kube-linter:latest"
+      - "ghcr.io/janisz/kube-linter:{{ .Tag }}"
     build_flag_templates:
       - "--pull"
       - "--platform=linux/amd64"
@@ -67,10 +65,8 @@ dockers:
     ids:
       - kube-linter
     image_templates:
-      - "stackrox/kube-linter:latest-alpine"
-      - "stackrox/kube-linter:{{ .Tag }}-alpine"
-      - "ghcr.io/stackrox/kube-linter:latest-alpine"
-      - "ghcr.io/stackrox/kube-linter:{{ .Tag }}-alpine"
+      - "ghcr.io/janisz/kube-linter:latest-alpine"
+      - "ghcr.io/janisz/kube-linter:{{ .Tag }}-alpine"
     build_flag_templates:
       - "--pull"
       - "--platform=linux/amd64"
