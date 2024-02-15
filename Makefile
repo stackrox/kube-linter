@@ -18,8 +18,6 @@ ifeq ($(UNAME_S),Darwin)
     HOST_OS := darwin
 endif
 
-TAG := $(shell ./get-tag)
-
 GOBIN := $(CURDIR)/.gobin
 PATH := $(GOBIN):$(PATH)
 
