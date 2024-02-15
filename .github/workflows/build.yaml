@@ -89,13 +89,13 @@ jobs:
           name: bin
 
       - name: Set permissions to file
-        run:  chmod +x linux/amd64/kube-linter
+        run:  chmod +x linux/kube-linter-amd64
 
       - name: Print kube-linter version
-        run:  linux/amd64/kube-linter version
+        run:  linux/kube-linter version-amd64
 
       - name: Run kube-linter on a sample file with SARIF output
-        run:  linux/amd64/kube-linter lint --format=sarif tests/testdata/splunk.yaml > results.sarif
+        run:  linux/kube-linter-amd64 lint --format=sarif tests/testdata/splunk.yaml > results.sarif
         continue-on-error: true
 
       - name: Dump output file and check it is not empty
@@ -141,13 +141,13 @@ jobs:
         run: |
           # In Windows, the workspace is attached relative to the current directory.
           tag="$(./get-tag)"
-          version_from_bin="$(tmp/windows/amd64/kube-linter.exe version)"
+          version_from_bin="$(tmp/windows/kube-linter-amd64.exe version)"
           echo "Expected tag ${tag}, got ${version_from_bin}"
           [[ "${tag}" == "${version_from_bin}" ]]
 
           # Make sure the lint command can run without errors.
           # TODO: run the full suite of E2E tests on Windows.
-          tmp/windows/amd64/kube-linter.exe lint "tests/checks/access-to-create-pods.yml"
+          tmp/windows/kube-linter-amd64.exe lint "tests/checks/access-to-create-pods.yml"
 
   image:
     if: (github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/'))
@@ -168,10 +168,10 @@ jobs:
           name: bin
 
       - name: Set permissions to file
-        run: chmod +x linux/amd64/kube-linter
+        run: chmod +x linux/kube-linter-amd64
 
       - name: Move binary
-        run:  mv linux/amd64/kube-linter image/bin
+        run:  mv linux/kube-linter-amd64 image/bin/kube-linter
 
       - name: Print kube-linter version
         run:  image/bin/kube-linter version
@@ -297,17 +297,17 @@ jobs:
 
       - name: Set permissions to files
         run: |
-          chmod +x linux/amd64/kube-linter
-          chmod +x linux/arm64/kube-linter
-          chmod +x darwin/amd64/kube-linter
-          chmod +x darwin/arm64/kube-linter
+          chmod +x linux/kube-linter-amd64
+          chmod +x linux/kube-linter-arm64
+          chmod +x darwin/kube-linter-amd64
+          chmod +x darwin/kube-linter-arm64
 
       - name: copy binaries with OS ending
         run: |
           bin_name="kube-linter"
           for os in darwin linux; do
             for arch in amd64 arm64; do
-              cp "${os}/${arch}/${bin_name}" "${os}/${bin_name}-${os}-${arch}"
+              cp "${os}/${bin_name}-${arch}" "${os}/${bin_name}-${os}-${arch}"
             done
           done
 
@@ -332,7 +332,11 @@ jobs:
               if [[ "${os}" == "windows" ]]; then
                 bin_name="kube-linter-${arch}.exe"
               fi
-              cosign sign-blob --yes --key cosign.key --output-file "${bin_name}.sig" "${os}/${bin_name}"
+              file_path="${os}/${bin_name}"
+              if ! test -f "${file_path}"; then
+                continue
+              fi
+              cosign sign-blob --yes --key cosign.key --output-file "${bin_name}.sig" "${file_path}"
              done
            done
           for f in *.{gz,zip}; do \
@@ -351,8 +355,9 @@ jobs:
         with:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: linux/amd64/kube-linter-linux-amd64
-          asset_name: kube-linter-linux-amd64
+          asset_path: linux/kube-linter-linux-amd64
+          # Leaving the old name for backwards compatibility
+          asset_name: kube-linter-linux
           asset_content_type: application/octet-stream
       - name: Upload Binary Linux Arm64
         id: upload-binary-linux-arm64
@@ -362,7 +367,7 @@ jobs:
         with:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: linux/arm64/kube-linter-linux-arm64
+          asset_path: linux/kube-linter-linux-arm64
           asset_name: kube-linter-linux-arm64
           asset_content_type: application/octet-stream
       - name: Upload Binary Darwin Amd64
@@ -373,8 +378,9 @@ jobs:
         with:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: darwin/amd64/kube-linter-darwin-amd64
-          asset_name: kube-linter-darwin-amd64
+          asset_path: darwin/kube-linter-darwin-amd64
+          # Leaving the old name for backwards compatibility
+          asset_name: kube-linter-darwin
           asset_content_type: application/octet-stream
       - name: Upload Binary Darwin Arm64
         id: upload-binary-darwin-arm64
@@ -384,7 +390,7 @@ jobs:
         with:
           release_id: ${{ steps.release_drafter.outputs.id }}
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: darwin/arm64/kube-linter-darwin-arm64
+          asset_path: darwin/kube-linter-darwin-arm64
           asset_name: kube-linter-darwin-arm64
       - name: Upload Binary Windows
         id: upload-binary-windows
@@ -445,17 +451,6 @@ jobs:
           upload_url: ${{ steps.release_drafter.outputs.upload_url }}
           asset_path: kube-linter-amd64.exe.sig
           asset_name: kube-linter-amd64.exe.sig
-          asset_content_type: application/octet-stream
-      - name: Upload Binary Sig Windows Arm64
-        id: upload-binary-sig-windows
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-arm64.exe.sig
-          asset_name: kube-linter-arm64.exe.sig
           asset_content_type: application/octet-stream
       - name: Upload sig source code zip
         id: upload-release-asset-source-zip-sig

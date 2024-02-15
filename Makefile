@@ -90,13 +90,14 @@ cli_%: build-prep
 	$(eval arch := $(lastword  $(w)))
 	@CGO_ENABLED=0 GOARCH=$(arch) GOOS=$(os) scripts/go-build.sh ./cmd/kube-linter
 
+.PHONY: build-prep
 build-prep:
 	@mkdir -p "$(GOBIN)"
 
 
 .PHONY: build
 build: source-code-archive cli-linux cli-darwin cli-windows
-	@cp "bin/$(HOST_OS)/$(ARCH)/kube-linter" "$(GOBIN)/kube-linter"
+	@cp "bin/$(HOST_OS)/kube-linter-$(ARCH)" "$(GOBIN)/kube-linter"
 	@chmod u+w "$(GOBIN)/kube-linter"
 
 $(KUBE_LINTER_BIN):
