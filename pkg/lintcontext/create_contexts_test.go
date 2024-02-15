@@ -25,13 +25,15 @@ const (
 
 func TestCreateContextsWithIgnorePaths(t *testing.T) {
 	ignoredPaths := []string{
+		"../../.github/**",
 		"../../.golangci?yml",
-		"/**/*/testdata/**/*",
+		"../../.goreleaser.yaml",
+		"../../.pre-commit-hooks*",
+		"../../dist/**/*",
+		"../../pkg/**/*",
 		"/**/*/checks/**/*",
 		"/**/*/test_helper/**/*",
-		"../../pkg/**/*",
-		"../../.pre-commit-hooks*",
-		"../../.github/**",
+		"/**/*/testdata/**/*",
 	}
 	ignoredAbsPaths := make([]string, 0, len(ignoredPaths))
 	for _, p := range ignoredPaths {
