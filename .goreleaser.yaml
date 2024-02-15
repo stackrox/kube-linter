@@ -10,8 +10,6 @@ before:
     - go mod tidy
     - go generate ./...
 
-dist: bin
-
 builds:
   - env:
       - CGO_ENABLED=0
