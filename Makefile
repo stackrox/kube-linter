@@ -18,7 +18,7 @@ ifeq ($(UNAME_S),Darwin)
     HOST_OS := darwin
 endif
 
-GOBIN := $(CURDIR)/.gobin
+GOBIN := $(CURDIR)/bin
 PATH := $(GOBIN):$(PATH)
 
 # Makefile on Mac doesn't pass the updated PATH and GOBIN to the shell
