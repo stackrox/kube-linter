@@ -19,8 +19,8 @@ ifeq ($(UNAME_S),Darwin)
 endif
 
 GOBIN := $(CURDIR)/.gobin
-BIN := $(CURDIR)/bin
-PATH := $(BIN):$(GOBIN):$(PATH)
+DIST := $(CURDIR)/dist
+PATH := $(DIST):$(GOBIN):$(PATH)
 
 # Makefile on Mac doesn't pass the updated PATH and GOBIN to the shell
 # and so, without the following line, the shell does not end up
@@ -43,6 +43,7 @@ GORELEASER_BIN := $(GOBIN)/goreleaser
 $(GORELEASER_BIN): deps
 	@echo "+ $@"
 	go install github.com/goreleaser/goreleaser
+	goreleaser healthcheck
 
 ###########
 ## Lint ##
@@ -88,7 +89,7 @@ build: $(GORELEASER_BIN)
 	goreleaser build --snapshot --clean
 
 $(KUBE_LINTER_BIN): build
-	@cp "$(BIN)/kube-linter_$(HOST_OS)_amd64_v1/kube-linter" "$(GOBIN)/kube-linter"
+	@cp "$(DIST)/kube-linter_$(HOST_OS)_amd64_v1/kube-linter" "$(GOBIN)/kube-linter"
 	@chmod u+w "$(GOBIN)/kube-linter"
 
 ##########
