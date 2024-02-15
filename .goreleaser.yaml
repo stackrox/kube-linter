@@ -91,15 +91,17 @@ signs:
     stdin: "{{ .Env.COSIGN_PASSWORD }}"
     args:
       - "sign-blob"
-      - "--key=cosign.key"
+      - "--key=env://COSIGN_KEY"
       - "--output-signature=${signature}"
       - "${artifact}"
       - "--yes"
     artifacts: all
 
 docker_signs:
-  - artifacts: all
+  - cmd: cosign
     stdin: '{{ .Env.COSIGN_PASSWORD }}'
+    args: [ "sign", "--key=env://COSIGN_KEY", "${artifact}@${digest}", "--yes" ]
+    artifacts: all
   - id: keyless
     artifacts: all
     args: [ "sign", "--oidc-issuer=https://token.actions.githubusercontent.com", "${artifact}@${digest}", "--yes" ]
