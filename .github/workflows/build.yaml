@@ -29,34 +29,6 @@ jobs:
         with:
           go-version-file: go.mod
 
-      - name: Go Build Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache
-          key: ${{ runner.os }}-go-build-${{ hashFiles('**/go.sum') }}
-
-      - name: Go Mod Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
-
-      - name: Build binaries
-        run: make build
-
-      - name: Upload binary
-        uses: actions/upload-artifact@v4
-        with:
-          name: bin
-          path: bin
-
-      - name: Verify the binary version
-        run: |
-          expected_version="$(./get-tag)"
-          version_from_binary="$(.gobin/kube-linter version)"
-          echo "Version from kube-linter binary: ${version_from_binary}. Expected version: ${expected_version}"
-          [[ "${version_from_binary}" == "${expected_version}" ]]
-
       - name: Run lint checks
         run: make lint
 
@@ -77,6 +49,18 @@ jobs:
       - name: Run bats tests
         run: make e2e-bats
 
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: kube-linter
+          path: bin/kube-linter_linux_amd64_v1/kube-linter
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: kube-linter.exe
+          path: bin/kube-linter_windows_amd64_v1/kube-linter.exe
+
   test-sarif:
     needs: build-and-test
     runs-on: ubuntu-latest
@@ -86,16 +70,16 @@ jobs:
       - name: Download executable
         uses: actions/download-artifact@v4
         with:
-          name: bin
+          name: kube-linter
 
       - name: Set permissions to file
-        run:  chmod +x linux/kube-linter
+        run:  chmod +x kube-linter
 
       - name: Print kube-linter version
-        run:  linux/kube-linter version
+        run:  kube-linter version
 
       - name: Run kube-linter on a sample file with SARIF output
-        run:  linux/kube-linter lint --format=sarif tests/testdata/splunk.yaml > results.sarif
+        run:  kube-linter lint --format=sarif tests/testdata/splunk.yaml > results.sarif
         continue-on-error: true
 
       - name: Dump output file and check it is not empty
@@ -135,19 +119,15 @@ jobs:
       - name: Download windows executable
         uses: actions/download-artifact@v4
         with:
-          name: bin
+          name: kube-linter.exe
           path: tmp/
       - shell: bash
         run: |
-          # In Windows, the workspace is attached relative to the current directory.
-          tag="$(./get-tag)"
-          version_from_bin="$(tmp/windows/kube-linter.exe version)"
-          echo "Expected tag ${tag}, got ${version_from_bin}"
-          [[ "${tag}" == "${version_from_bin}" ]]
+          tmp/kube-linter.exe version
 
           # Make sure the lint command can run without errors.
           # TODO: run the full suite of E2E tests on Windows.
-          tmp/windows/kube-linter.exe lint "tests/checks/access-to-create-pods.yml"
+          tmp/kube-linter.exe lint "tests/checks/access-to-create-pods.yml"
 
   image:
     if: (github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/'))
@@ -160,22 +140,6 @@ jobs:
       id-token: write # needed for signing the images with GitHub OIDC Token **not production ready**
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Download executable
-        uses: actions/download-artifact@v4
-        with:
-          name: bin
-
-      - name: Set permissions to file
-        run: chmod +x linux/kube-linter
-
-      - name: Move binary
-        run:  mv linux/kube-linter image/bin
-
-      - name: Print kube-linter version
-        run:  image/bin/kube-linter version
-
       # Install the cosign tool except on PR
       # https://github.com/sigstore/cosign-installer
       - name: Install cosign
@@ -206,110 +170,11 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Extract metadata (tags, labels) for Docker
-      # https://github.com/docker/metadata-action
-      - name: Extract Docker metadata
-        id: meta
-        uses: docker/metadata-action@v5.5.1
-        with:
-          images: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-            ${{ env.IMAGE_NAME }}
-
-      # Build and push Docker image with Buildx (don't push on PR)
-      # https://github.com/docker/build-push-action
-      - name: Build and push Docker image
-        id: build-and-push
-        uses: docker/build-push-action@v5.1.0
-        with:
-          context: image
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Extract Alpine Docker metadata
-        id: meta-alpine
-        uses: docker/metadata-action@v5.5.1
-        with:
-          flavor: |
-            latest=auto
-            suffix=-alpine,onlatest=true
-          images: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-            ${{ env.IMAGE_NAME }}
-
-      - name: Build and push Alpine Docker image
-        id: build-and-push-alpine
-        uses: docker/build-push-action@v5.1.0
-        with:
-          context: image
-          file: image/Dockerfile_alpine
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta-alpine.outputs.tags }}
-          labels: ${{ steps.meta-alpine.outputs.labels }}
-
-      # Workaround: https://github.com/sigstore/cosign-installer/issues/73
-      - name: Write cosign private key to file
-        env:
-          KEY: ${{ secrets.COSIGN_KEY }}
-        shell: bash
-        run: 'echo "$KEY" > cosign.key'
-
-      # Sign the resulting Docker image digest except on PRs.
-      - name: Sign the published Docker image with cosign
-        if: ${{ github.event_name != 'pull_request' }}
-        env:
-          COSIGN_PASSWORD: ${{secrets.COSIGN_PASSWORD}}
-        run: |
-          cosign sign --yes --key cosign.key ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
-          cosign sign --yes --key cosign.key ${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
-          cosign sign --yes --key cosign.key ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push-alpine.outputs.digest }}
-          cosign sign --yes --key cosign.key ${{ env.IMAGE_NAME }}@${{ steps.build-and-push-alpine.outputs.digest }}
-
-      # Sign the resulting Docker image digest except on PRs.
-      # This will only write to the public Rekor transparency log when the Docker
-      # repository is public to avoid leaking data.  If you would like to publish
-      # transparency data even for private images, pass --force to cosign below.
-      # https://github.com/sigstore/cosign
-      - name: Sign the published Docker image with cosign keyless
-        if: ${{ github.event_name != 'pull_request' }}
-        env:
-          COSIGN_EXPERIMENTAL: "true"
-        # This step uses the identity token to provision an ephemeral certificate
-        # against the sigstore community Fulcio instance.
-        run: |
-          cosign sign --yes ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
-          cosign sign --yes ${{ env.IMAGE_NAME }}@${{ steps.build-and-push.outputs.digest }}
-          cosign sign --yes ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.build-and-push-alpine.outputs.digest }}
-          cosign sign --yes ${{ env.IMAGE_NAME }}@${{ steps.build-and-push-alpine.outputs.digest }}
-
-  update_release_draft:
-    if: (github.ref == 'refs/heads/main') || (startsWith(github.ref, 'refs/tags/'))
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    steps:
+      # Install the cosign tool except on PR
+      # https://github.com/sigstore/cosign-installer
       - name: Install cosign
-        uses: sigstore/cosign-installer@v3.4.0
-      - name: Download executables
-        uses: actions/download-artifact@v4
-        with:
-          name: bin
-
-      - name: Set permissions to files
-        run: |
-          chmod +x linux/kube-linter
-          chmod +x darwin/kube-linter
-
-      - name: copy binaries with OS ending
-        run: |
-          for os in darwin linux; do
-            bin_name="kube-linter"
-            cp "${os}/${bin_name}" "${os}/${bin_name}-${os}"
-          done
-
-      - name: create linux tar archive
-        run: |
-          tar -C linux -czf kube-linter-linux.tar.gz kube-linter
+        if: github.event_name != 'pull_request'
+        uses: sigstore/cosign-installer@v3.3.0
 
       # Workaround: https://github.com/sigstore/cosign-installer/issues/73
       - name: Write cosign private key to file
@@ -318,126 +183,22 @@ jobs:
         shell: bash
         run: 'echo "$KEY" > cosign.key'
 
-      - name: sign binaries
-        env:
-          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
-        run: |
-          for os in darwin linux windows; do
-             bin_name="kube-linter-${os}"
-             if [[ "${os}" == "windows" ]]; then
-               bin_name="kube-linter.exe"
-             fi
-             cosign sign-blob --yes --key cosign.key --output-file "${bin_name}.sig" "${os}/${bin_name}"
-           done
-          for f in *.{gz,zip}; do \
-            cosign sign-blob --yes --key cosign.key --output-file "${f}.sig" "${f}"; \
-          done
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - uses: release-drafter/release-drafter@v6
-        id: release_drafter
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Upload Binary Linux
-        id: upload-binary-linux
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Go
+        uses: actions/setup-go@v4
         with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: linux/kube-linter-linux
-          asset_name: kube-linter-linux
-          asset_content_type: application/octet-stream
-      - name: Upload Binary Darwin
-        id: upload-binary-darwin
-        uses: gfreezy/upload-release-asset@v1.0.2
+          go-version: stable
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v5
+        with:
+          # either 'goreleaser' (default) or 'goreleaser-pro'
+          distribution: goreleaser
+          version: latest
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: darwin/kube-linter-darwin
-          asset_name: kube-linter-darwin
-          asset_content_type: application/octet-stream
-      - name: Upload Binary Windows
-        id: upload-binary-windows
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: windows/kube-linter.exe
-          asset_name: kube-linter.exe
-          asset_content_type: application/octet-stream
-      #
-      # This is kept for backwards compatibility for the kube-linter-action. The action tries to download this specific
-      # archive to get the latest kube-linter version. We cannot add a cosign signature for it, since the action will get
-      # a name clash trying to download this. Once we have met the grace period (say 3 months), we will remove this.
-      #
-      - name: Upload Release Asset Linux
-        id: upload-release-asset-linux
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-linux.tar.gz
-          asset_name: kube-linter-linux.tar.gz
-          asset_content_type: application/octet-stream
-      - name: Upload Binary Sig Linux
-        id: upload-binary-sig-linux
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-linux.sig
-          asset_name: kube-linter-linux.sig
-          asset_content_type: application/octet-stream
-      - name: Upload Binary Sig Darwin
-        id: upload-binary-sig-darwin
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-darwin.sig
-          asset_name: kube-linter-darwin.sig
-          asset_content_type: application/octet-stream
-      - name: Upload Binary Sig Windows
-        id: upload-binary-sig-windows
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter.exe.sig
-          asset_name: kube-linter.exe.sig
-          asset_content_type: application/octet-stream
-      - name: Upload sig source code zip
-        id: upload-release-asset-source-zip-sig
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-source.zip.sig
-          asset_name: kube-linter-source.zip.sig
-          asset_content_type: text/plain
-      - name: Upload sig source code
-        id: upload-release-asset-source-sig
-        uses: gfreezy/upload-release-asset@v1.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          release_id: ${{ steps.release_drafter.outputs.id }}
-          upload_url: ${{ steps.release_drafter.outputs.upload_url }}
-          asset_path: kube-linter-source.tar.gz.sig
-          asset_name: kube-linter-source.tar.gz.sig
-          asset_content_type: text/plain

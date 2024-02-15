@@ -1,6 +1,3 @@
-# This is an example .goreleaser.yml file with some sensible defaults.
-# Make sure to check the documentation at https://goreleaser.com
-
 # The lines below are called `modelines`. See `:help modeline`
 # Feel free to remove those if you don't want/need to use them.
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
@@ -13,7 +10,7 @@ before:
     - go mod tidy
     - go generate ./...
 
-dist: .gobin
+dist: bin
 
 builds:
   - env:
@@ -22,30 +19,92 @@ builds:
       - linux
       - windows
       - darwin
+    goarch:
+      - amd64
     main: ./cmd/kube-linter
     ldflags:
-      - -s -w -X golang.stackrox.io/kube-linter/internal/version.version={{.Version}}"
+      - -s -w -X golang.stackrox.io/kube-linter/internal/version.version={{.Version}}
     mod_timestamp: "{{ .CommitTimestamp }}"
 
 
 archives:
-  - format: tar.gz
-    # this name template makes the OS and Arch compatible with the results of `uname`.
+  - format: binary
     name_template: >-
-      {{ .ProjectName }}_
-      {{- title .Os }}_
-      {{- if eq .Arch "amd64" }}x86_64
-      {{- else if eq .Arch "386" }}i386
-      {{- else }}{{ .Arch }}{{ end }}
-      {{- if .Arm }}v{{ .Arm }}{{ end }}
+      {{ .ProjectName }}-{{ .Os }}
+  - id: archive
+    format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}-{{ .Os }}
     # use zip for windows archives
     format_overrides:
       - goos: windows
         format: zip
 
+dockers:
+  - dockerfile: image/Dockerfile
+    ids:
+      - kube-linter
+    image_templates:
+      - "stackrox/kube-linter:latest"
+      - "stackrox/kube-linter:{{ .Tag }}"
+      - "ghcr.io/stackrox/kube-linter:latest"
+      - "ghcr.io/stackrox/kube-linter:{{ .Tag }}"
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.vendor=RedHat"
+      - "--label=org.opencontainers.image.description=Kube-Linter {{ .Version }}"
+      - "--label=org.opencontainers.image.url=https://kubelinter.io"
+      - "--label=org.opencontainers.image.documentation=https://docs.kubelinter.io/"
+      - "--label=org.opencontainers.image.source={{ .GitURL }}"
+      - "--label=org.opencontainers.image.licenses=Apache"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.created={{ .CommitDate }}"
+
+  - dockerfile: image/Dockerfile_alpine
+    ids:
+      - kube-linter
+    image_templates:
+      - "stackrox/kube-linter:latest-alpine"
+      - "stackrox/kube-linter:{{ .Tag }}-alpine"
+      - "ghcr.io/stackrox/kube-linter:latest-alpine"
+      - "ghcr.io/stackrox/kube-linter:{{ .Tag }}-alpine"
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.vendor=RedHat"
+      - "--label=org.opencontainers.image.description=Kube-Linter {{ .Version }}"
+      - "--label=org.opencontainers.image.url=https://kubelinter.io"
+      - "--label=org.opencontainers.image.documentation=https://docs.kubelinter.io/"
+      - "--label=org.opencontainers.image.source={{ .GitURL }}"
+      - "--label=org.opencontainers.image.licenses=Apache"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.created={{ .CommitDate }}"
+
+checksum:
+  disable: true
+
+signs:
+  - cmd: cosign
+    stdin: "{{ .Env.COSIGN_PASSWORD }}"
+    args:
+      - "sign-blob"
+      - "--key=cosign.key"
+      - "--output-signature=${signature}"
+      - "${artifact}"
+      - "--yes"
+    artifacts: all
+
+docker_signs:
+  - artifacts: all
+    stdin: '{{ .Env.COSIGN_PASSWORD }}'
+  - id: keyless
+    artifacts: all
+    args: [ "sign", "--oidc-issuer=https://token.actions.githubusercontent.com", "${artifact}@${digest}", "--yes" ]
+
 changelog:
-  sort: asc
-  filters:
-    exclude:
-      - "^docs:"
-      - "^test:"
+  use: github-native

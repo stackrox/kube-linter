@@ -1,2 +1,0 @@
-#!/bin/sh
-git describe --tags --abbrev=10 --dirty

@@ -40,6 +40,11 @@ $(GOLANGCILINT_BIN): deps
 	@echo "+ $@"
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint
 
+GORELEASER_BIN := $(GOBIN)/goreleaser
+$(GORELEASER_BIN): deps
+	@echo "+ $@"
+	go install github.com/goreleaser/goreleaser
+
 ###########
 ## Lint ##
 ###########
@@ -80,28 +85,12 @@ generated-srcs: go-generated-srcs generated-docs
 
 
 .PHONY: build
-build: source-code-archive
-	@CGO_ENABLED=0 GOOS=darwin scripts/go-build.sh ./cmd/kube-linter
-	@CGO_ENABLED=0 GOOS=linux scripts/go-build.sh ./cmd/kube-linter
-	@CGO_ENABLED=0 GOOS=windows scripts/go-build.sh ./cmd/kube-linter
-	@mkdir -p "$(GOBIN)"
-	@cp "bin/$(HOST_OS)/kube-linter" "$(GOBIN)/kube-linter"
+build: $(GORELEASER_BIN)
+	goreleaser build --snapshot --clean
+
+$(KUBE_LINTER_BIN): build
+	@cp "$(GOBIN)/kube-linter_$(HOST_OS)_amd64_v1/kube-linter" "$(GOBIN)/kube-linter"
 	@chmod u+w "$(GOBIN)/kube-linter"
-
-$(KUBE_LINTER_BIN):
-	@$(MAKE) build
-
-.PHONY: image
-image: build
-	@cp bin/linux/kube-linter image/bin
-	@docker build -t "stackrox/kube-linter:$(TAG)" -f image/Dockerfile image/
-	@docker build -t "stackrox/kube-linter:$(TAG)-alpine" -f image/Dockerfile_alpine image/
-
-.PHONY: source-code-archive
-source-code-archive:
-	git archive --prefix="kube-linter-$(TAG)/" HEAD -o "bin/kube-linter-source.tar.gz"
-	git archive --prefix="kube-linter-$(TAG)/" HEAD -o "bin/kube-linter-source.zip"
-
 
 ##########
 ## Test ##
