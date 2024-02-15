@@ -43,7 +43,6 @@ GORELEASER_BIN := $(GOBIN)/goreleaser
 $(GORELEASER_BIN): deps
 	@echo "+ $@"
 	go install github.com/goreleaser/goreleaser
-	goreleaser healthcheck
 
 ###########
 ## Lint ##
