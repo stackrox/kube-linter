@@ -84,10 +84,10 @@ generated-srcs: go-generated-srcs generated-docs
 
 
 .PHONY: build
-build: $(GORELEASER_BIN)
-	goreleaser build --snapshot --clean
+build: $(KUBE_LINTER_BIN)
 
-$(KUBE_LINTER_BIN): build
+$(KUBE_LINTER_BIN): $(GORELEASER_BIN) $(shell find . -type f -name '*.go')
+	goreleaser build --snapshot --clean
 	@cp "$(DIST)/kube-linter_$(HOST_OS)_amd64_v1/kube-linter" "$(GOBIN)/kube-linter"
 	@chmod u+w "$(GOBIN)/kube-linter"
 
