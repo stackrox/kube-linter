@@ -83,6 +83,11 @@ dockers:
       - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
       - "--label=org.opencontainers.image.created={{ .CommitDate }}"
 
+docker_manifests:
+  - name_template: "ghcr.io/janisz/kube-linter:{{ .Tag }}"
+    image_templates:
+      - "ghcr.io/janisz/kube-linter:{{ .Tag }}"
+
 checksum:
   disable: true
 
@@ -91,7 +96,8 @@ signs:
     stdin: "{{ .Env.COSIGN_PASSWORD }}"
     args:
       - "sign-blob"
-      - "--key=env://COSIGN_KEY"
+      - "--key"
+      - "env://KEY"
       - "--output-signature=${signature}"
       - "${artifact}"
       - "--yes"
@@ -99,12 +105,22 @@ signs:
 
 docker_signs:
   - cmd: cosign
-    stdin: '{{ .Env.COSIGN_PASSWORD }}'
-    args: [ "sign", "--key=env://COSIGN_KEY", "${artifact}@${digest}", "--yes" ]
+    env:
+      - COSIGN_EXPERIMENTAL=1
     artifacts: all
-  - id: keyless
+    args:
+      - 'sign'
+      - '${artifact}'
+      - '--yes'
+  - id: key
+    cmd: cosign
     artifacts: all
-    args: [ "sign", "--oidc-issuer=https://token.actions.githubusercontent.com", "${artifact}@${digest}", "--yes" ]
+    args:
+      - 'sign'
+      - "--key"
+      - "env://KEY"
+      - '${artifact}'
+      - '--yes'
 
 changelog:
   use: github-native
