@@ -11,3 +11,5 @@
 /deps
 
 e2etests/test_helper
+
+coverage.out
