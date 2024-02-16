@@ -31,6 +31,8 @@ SHELL := env GOBIN=$(GOBIN) PATH=$(PATH) /bin/bash
 
 KUBE_LINTER_BIN := $(GOBIN)/kube-linter
 
+COVFILES := $(shell mktemp -d)
+
 ########################################
 ###### Binaries we depend on ###########
 ########################################
@@ -67,9 +69,9 @@ go-generated-srcs: deps
 	go generate ./...
 
 .PHONY: generated-docs
-generated-docs: go-generated-srcs build
-	kube-linter templates list --format markdown > docs/generated/templates.md
-	kube-linter checks list --format markdown > docs/generated/checks.md
+generated-docs: go-generated-srcs $(KUBE_LINTER_BIN)
+	$(KUBE_LINTER_BIN) templates list --format markdown > docs/generated/templates.md
+	$(KUBE_LINTER_BIN) checks list --format markdown > docs/generated/checks.md
 
 .PHONY: generated-srcs
 generated-srcs: go-generated-srcs generated-docs
@@ -84,12 +86,9 @@ build: source-code-archive
 	@CGO_ENABLED=0 GOOS=darwin scripts/go-build.sh ./cmd/kube-linter
 	@CGO_ENABLED=0 GOOS=linux scripts/go-build.sh ./cmd/kube-linter
 	@CGO_ENABLED=0 GOOS=windows scripts/go-build.sh ./cmd/kube-linter
-	@mkdir -p "$(GOBIN)"
-	@cp "bin/$(HOST_OS)/kube-linter" "$(GOBIN)/kube-linter"
-	@chmod u+w "$(GOBIN)/kube-linter"
 
 $(KUBE_LINTER_BIN):
-	@$(MAKE) build
+	CGO_ENABLED=0 go build -cover -o $(GOBIN)/kube-linter ./cmd/kube-linter
 
 .PHONY: image
 image: build
@@ -121,5 +120,6 @@ e2e-bats: $(KUBE_LINTER_BIN)
 	@command -v diff &> /dev/null || { echo >&2 'ERROR: diff not installed; See: https://www.baeldung.com/linux/diff-command - Aborting'; exit 1; }
 	@command -v bats &> /dev/null || { echo >&2 'ERROR: bats not installed; See: https://bats-core.readthedocs.io/en/stable/installation.html - Aborting'; exit 1; }
 
-	KUBE_LINTER_BIN="$(KUBE_LINTER_BIN)" e2etests/bats-tests.sh
-	KUBE_LINTER_BIN="$(KUBE_LINTER_BIN)" e2etests/check-bats-tests.sh
+	GOCOVERDIR=$(COVFILES) KUBE_LINTER_BIN="$(KUBE_LINTER_BIN)" e2etests/bats-tests.sh
+	GOCOVERDIR=$(COVFILES) KUBE_LINTER_BIN="$(KUBE_LINTER_BIN)" e2etests/check-bats-tests.sh
+	go tool covdata textfmt -i=$(COVFILES) -o coverage.out
