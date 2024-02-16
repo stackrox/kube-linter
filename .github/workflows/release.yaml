@@ -67,13 +67,6 @@ jobs:
         with:
           go-version: stable
 
-      # Workaround: https://github.com/sigstore/cosign-installer/issues/73
-      - name: Write cosign private key to file
-        env:
-          KEY: ${{ secrets.COSIGN_KEY }}
-        shell: bash
-        run: 'echo "$KEY" > /tmp/cosign.key'
-
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v5
         with:
