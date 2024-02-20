@@ -12,3 +12,4 @@
 
 e2etests/test_helper
 dist/
+coverage.out

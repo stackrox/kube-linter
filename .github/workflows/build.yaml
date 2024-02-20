@@ -50,6 +50,12 @@ jobs:
       - name: Run unit tests
         run: make test
 
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        env:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: stackrox/kube-linter
+
       - name: Run E2E tests
         run: make e2e-test
 

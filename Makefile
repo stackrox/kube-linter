@@ -97,7 +97,7 @@ $(KUBE_LINTER_BIN): $(GORELEASER_BIN) $(shell find . -type f -name '*.go')
 
 .PHONY: test
 test:
-	go test ./...
+	go test ./... -race -covermode=atomic -coverprofile=coverage.out
 
 .PHONY: e2e-test
 e2e-test: $(KUBE_LINTER_BIN)
