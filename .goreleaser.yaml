@@ -20,6 +20,9 @@ builds:
     goarch:
       - amd64
     main: ./cmd/kube-linter
+    flags:
+      - "-mod=readonly"
+      - "-trimpath"
     ldflags:
       - -s -w -X golang.stackrox.io/kube-linter/internal/version.version={{.Version}}
     mod_timestamp: "{{ .CommitTimestamp }}"
@@ -83,10 +86,6 @@ dockers:
       - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
       - "--label=org.opencontainers.image.created={{ .CommitDate }}"
 
-docker_manifests:
-  - name_template: "ghcr.io/janisz/kube-linter:{{ .Tag }}"
-    image_templates:
-      - "ghcr.io/janisz/kube-linter:{{ .Tag }}"
 
 checksum:
   disable: true
@@ -105,8 +104,6 @@ signs:
 
 docker_signs:
   - cmd: cosign
-    env:
-      - COSIGN_EXPERIMENTAL=1
     artifacts: all
     args:
       - 'sign'

@@ -62,7 +62,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Go
+      - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version: stable
