@@ -19,6 +19,7 @@ builds:
       - darwin
     goarch:
       - amd64
+      - arm64
     main: ./cmd/kube-linter
     flags:
       - "-mod=readonly"
@@ -31,11 +32,17 @@ builds:
 archives:
   - format: binary
     name_template: >-
-      {{ .ProjectName }}-{{ .Os }}
+      {{ .ProjectName }}
+      {{- if eq .Os "windows" }}
+      {{- else }}-{{ .Os }}{{ end }}
+      {{- if eq .Arch "amd64" }}
+      {{- else }}_{{ .Arch }}{{ end }}
   - id: archive
     format: tar.gz
     name_template: >-
       {{ .ProjectName }}-{{ .Os }}
+      {{- if eq .Arch "amd64" }}
+      {{- else }}_{{ .Arch }}{{ end }}
     # use zip for windows archives
     format_overrides:
       - goos: windows
