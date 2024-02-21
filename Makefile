@@ -30,6 +30,8 @@ SHELL := env GOBIN=$(GOBIN) PATH=$(PATH) /bin/bash
 
 KUBE_LINTER_BIN := $(GOBIN)/kube-linter
 
+COVFILES := $(shell mktemp -d)
+
 ########################################
 ###### Binaries we depend on ###########
 ########################################
@@ -109,5 +111,6 @@ e2e-bats: $(KUBE_LINTER_BIN)
 	@command -v diff &> /dev/null || { echo >&2 'ERROR: diff not installed; See: https://www.baeldung.com/linux/diff-command - Aborting'; exit 1; }
 	@command -v bats &> /dev/null || { echo >&2 'ERROR: bats not installed; See: https://bats-core.readthedocs.io/en/stable/installation.html - Aborting'; exit 1; }
 
-	KUBE_LINTER_BIN="$(KUBE_LINTER_BIN)" e2etests/bats-tests.sh
-	KUBE_LINTER_BIN="$(KUBE_LINTER_BIN)" e2etests/check-bats-tests.sh
+	GOCOVERDIR=$(COVFILES) KUBE_LINTER_BIN="$(KUBE_LINTER_BIN)" e2etests/bats-tests.sh
+	GOCOVERDIR=$(COVFILES) KUBE_LINTER_BIN="$(KUBE_LINTER_BIN)" e2etests/check-bats-tests.sh
+	go tool covdata textfmt -i=$(COVFILES) -o coverage.out

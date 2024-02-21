@@ -41,6 +41,15 @@ jobs:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-mod-${{ hashFiles('**/go.sum') }}
 
+      - name: Build binaries
+        run: make build
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: bin
+          path: bin
+
       - name: Run lint checks
         run: make lint
 
@@ -55,6 +64,7 @@ jobs:
         env:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: stackrox/kube-linter
+          flags: unit
 
       - name: Run E2E tests
         run: make e2e-test
@@ -66,6 +76,13 @@ jobs:
 
       - name: Run bats tests
         run: make e2e-bats
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        env:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: stackrox/kube-linter
+          flags: bats
 
       - name: Upload Linux binary
         uses: actions/upload-artifact@v4
