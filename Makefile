@@ -3,7 +3,7 @@
 none:
 
 
-deps: go.mod
+deps: go.mod go.sum
 	@echo "+ $@"
 	@go mod tidy
 ifdef CI
@@ -18,10 +18,9 @@ ifeq ($(UNAME_S),Darwin)
     HOST_OS := darwin
 endif
 
-TAG := $(shell ./get-tag)
-
 GOBIN := $(CURDIR)/.gobin
-PATH := $(GOBIN):$(PATH)
+DIST := $(CURDIR)/dist
+PATH := $(DIST):$(GOBIN):$(PATH)
 
 # Makefile on Mac doesn't pass the updated PATH and GOBIN to the shell
 # and so, without the following line, the shell does not end up
@@ -41,6 +40,11 @@ GOLANGCILINT_BIN := $(GOBIN)/golangci-lint
 $(GOLANGCILINT_BIN): deps
 	@echo "+ $@"
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint
+
+GORELEASER_BIN := $(GOBIN)/goreleaser
+$(GORELEASER_BIN): deps
+	@echo "+ $@"
+	go install github.com/goreleaser/goreleaser
 
 ###########
 ## Lint ##
@@ -82,25 +86,12 @@ generated-srcs: go-generated-srcs generated-docs
 
 
 .PHONY: build
-build: source-code-archive
-	@CGO_ENABLED=0 GOOS=darwin scripts/go-build.sh ./cmd/kube-linter
-	@CGO_ENABLED=0 GOOS=linux scripts/go-build.sh ./cmd/kube-linter
-	@CGO_ENABLED=0 GOOS=windows scripts/go-build.sh ./cmd/kube-linter
+build: $(KUBE_LINTER_BIN)
 
-$(KUBE_LINTER_BIN):
-	CGO_ENABLED=0 go build -cover -o $(GOBIN)/kube-linter ./cmd/kube-linter
-
-.PHONY: image
-image: build
-	@cp bin/linux/kube-linter image/bin
-	@docker build -t "stackrox/kube-linter:$(TAG)" -f image/Dockerfile image/
-	@docker build -t "stackrox/kube-linter:$(TAG)-alpine" -f image/Dockerfile_alpine image/
-
-.PHONY: source-code-archive
-source-code-archive:
-	git archive --prefix="kube-linter-$(TAG)/" HEAD -o "bin/kube-linter-source.tar.gz"
-	git archive --prefix="kube-linter-$(TAG)/" HEAD -o "bin/kube-linter-source.zip"
-
+$(KUBE_LINTER_BIN): $(GORELEASER_BIN) $(shell find . -type f -name '*.go')
+	goreleaser build --snapshot --clean
+	@cp "$(DIST)/kube-linter_$(HOST_OS)_amd64_v1/kube-linter" "$(GOBIN)/kube-linter"
+	@chmod u+w "$(GOBIN)/kube-linter"
 
 ##########
 ## Test ##

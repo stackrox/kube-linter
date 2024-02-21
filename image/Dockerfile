@@ -1,5 +1,5 @@
 FROM scratch
 
-COPY ./bin/kube-linter /
+COPY kube-linter /
 
 ENTRYPOINT ["/kube-linter"]

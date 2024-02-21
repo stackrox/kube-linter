@@ -1,0 +1,123 @@
+# The lines below are called `modelines`. See `:help modeline`
+# Feel free to remove those if you don't want/need to use them.
+# yaml-language-server: $schema=https://goreleaser.com/static/schema.json
+# vim: set ts=2 sw=2 tw=0 fo=cnqoj
+
+version: 1
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+    main: ./cmd/kube-linter
+    flags:
+      - "-mod=readonly"
+      - "-trimpath"
+    ldflags:
+      - -s -w -X golang.stackrox.io/kube-linter/internal/version.version={{.Version}}
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
+
+archives:
+  - format: binary
+    name_template: >-
+      {{ .ProjectName }}-{{ .Os }}
+  - id: archive
+    format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}-{{ .Os }}
+    # use zip for windows archives
+    format_overrides:
+      - goos: windows
+        format: zip
+
+dockers:
+  - dockerfile: image/Dockerfile
+    ids:
+      - kube-linter
+    image_templates:
+      - "ghcr.io/stackrox/kube-linter:latest"
+      - "ghcr.io/stackrox/kube-linter:{{ .Tag }}"
+      - "stackrox/kube-linter:latest"
+      - "stackrox/kube-linter:{{ .Tag }}"
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.vendor=RedHat"
+      - "--label=org.opencontainers.image.description=Kube-Linter {{ .Version }}"
+      - "--label=org.opencontainers.image.url=https://kubelinter.io"
+      - "--label=org.opencontainers.image.documentation=https://docs.kubelinter.io/"
+      - "--label=org.opencontainers.image.source={{ .GitURL }}"
+      - "--label=org.opencontainers.image.licenses=Apache"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.created={{ .CommitDate }}"
+
+  - dockerfile: image/Dockerfile_alpine
+    ids:
+      - kube-linter
+    image_templates:
+      - "ghcr.io/stackrox/kube-linter:latest-alpine"
+      - "ghcr.io/stackrox/kube-linter:{{ .Tag }}-alpine"
+      - "stackrox/kube-linter:latest-alpine"
+      - "stackrox/kube-linter:{{ .Tag }}-alpine"
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.vendor=RedHat"
+      - "--label=org.opencontainers.image.description=Kube-Linter {{ .Version }}"
+      - "--label=org.opencontainers.image.url=https://kubelinter.io"
+      - "--label=org.opencontainers.image.documentation=https://docs.kubelinter.io/"
+      - "--label=org.opencontainers.image.source={{ .GitURL }}"
+      - "--label=org.opencontainers.image.licenses=Apache"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.created={{ .CommitDate }}"
+
+
+checksum:
+  disable: true
+
+signs:
+  - cmd: cosign
+    stdin: "{{ .Env.COSIGN_PASSWORD }}"
+    args:
+      - "sign-blob"
+      - "--key"
+      - "env://KEY"
+      - "--output-signature=${signature}"
+      - "${artifact}"
+      - "--yes"
+    artifacts: all
+
+docker_signs:
+  - cmd: cosign
+    artifacts: all
+    args:
+      - 'sign'
+      - '${artifact}'
+      - '--yes'
+  - id: key
+    cmd: cosign
+    artifacts: all
+    args:
+      - 'sign'
+      - "--key"
+      - "env://KEY"
+      - '${artifact}'
+      - '--yes'
+
+changelog:
+  use: github-native

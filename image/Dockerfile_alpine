@@ -1,5 +1,5 @@
 FROM alpine:latest
 
-COPY ./bin/kube-linter /
+COPY kube-linter /
 
 ENTRYPOINT ["/kube-linter"]
