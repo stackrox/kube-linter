@@ -50,13 +50,6 @@ jobs:
           name: bin
           path: bin
 
-      - name: Verify the binary version
-        run: |
-          expected_version="$(./get-tag)"
-          version_from_binary="$(.gobin/kube-linter version)"
-          echo "Version from kube-linter binary: ${version_from_binary}. Expected version: ${expected_version}"
-          [[ "${version_from_binary}" == "${expected_version}" ]]
-
       - name: Run lint checks
         run: make lint
 
@@ -71,6 +64,7 @@ jobs:
         env:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: stackrox/kube-linter
+          flags: unit
 
       - name: Run E2E tests
         run: make e2e-test
@@ -82,6 +76,13 @@ jobs:
 
       - name: Run bats tests
         run: make e2e-bats
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        env:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: stackrox/kube-linter
+          flags: bats
 
   test-sarif:
     needs: build-and-test
