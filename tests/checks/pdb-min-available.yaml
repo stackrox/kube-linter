@@ -61,3 +61,45 @@ spec:
     metadata:
       labels:
         name: cloud-ingress-operator2
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: baz3
+  namespace: bar3
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      name: cloud-ingress-operator3
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: app3
+  namespace: bar3
+spec:
+  maxReplicaCount: 2
+  minReplicaCount: 1
+  scaleTargetRef:
+    name: foo3
+  triggers:
+  - type: cpu
+    metricType: Utilization
+    metadata:
+      value: "50"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: foo3
+  namespace: bar3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: cloud-ingress-operator3
+  template:
+    metadata:
+      labels:
+        name: cloud-ingress-operator3

@@ -3,6 +3,7 @@ package pdbminavailable
 import (
 	"testing"
 
+	kedaV1Alpha1 "github.com/kedacore/keda/v2/apis/keda/v1alpha1"
 	"github.com/stretchr/testify/suite"
 	"golang.stackrox.io/kube-linter/internal/pointers"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
@@ -218,4 +219,80 @@ func (p *PDBTestSuite) TestPDBWithMinAvailableHPA() {
 		},
 	})
 
+}
+
+// test that the check run with a deployment that has no replicas and a Keda ScaledObject that don't has a minReplicas
+func (p *PDBTestSuite) TestPDBWithMinAvailableAndKedaScaledObjectDoNotHasMinReplicas() {
+	p.ctx.AddMockDeployment(p.T(), "test-deploy")
+	p.ctx.ModifyDeployment(p.T(), "test-deploy", func(deployment *appsV1.Deployment) {
+		deployment.Namespace = "test"
+		deployment.Spec.Replicas = nil
+		deployment.Spec.Selector = &metaV1.LabelSelector{}
+		deployment.Spec.Selector.MatchLabels = map[string]string{"foo": "bar"}
+	})
+	p.ctx.AddMockScaledObject(p.T(), "test-scaledobject", "v1alpha1")
+	p.ctx.ModifyScaledObjectV1Alpha1(p.T(), "test-scaledobject", func(scaledobject *kedaV1Alpha1.ScaledObject) {
+		scaledobject.Namespace = "test"
+		scaledobject.Spec.ScaleTargetRef = &kedaV1Alpha1.ScaleTarget{
+			Kind:       "Deployment",
+			Name:       "test-deploy",
+			APIVersion: "apps/v1",
+		}
+		scaledobject.Spec.MinReplicaCount = nil
+	})
+	p.ctx.AddMockPodDisruptionBudget(p.T(), "test-pdb")
+	p.ctx.ModifyPodDisruptionBudget(p.T(), "test-pdb", func(pdb *v1.PodDisruptionBudget) {
+		pdb.Namespace = "test"
+		pdb.Spec.Selector = &metaV1.LabelSelector{}
+		pdb.Spec.Selector.MatchLabels = map[string]string{"foo": "bar"}
+		pdb.Spec.MinAvailable = &intstr.IntOrString{StrVal: "50%", Type: intstr.String}
+	})
+	p.Validate(p.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				"test-pdb": {
+					{Message: "The current number of replicas for deployment test-deploy is equal to or lower than the minimum number of replicas specified by its PDB."},
+				},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+// test that the check run with a deployment that has no replicas and a Keda ScaledObject that has a minReplicas
+func (p *PDBTestSuite) TestPDBWithMinAvailableAndKedaScaledObjectHasMinReplicas() {
+	p.ctx.AddMockDeployment(p.T(), "test-deploy")
+	p.ctx.ModifyDeployment(p.T(), "test-deploy", func(deployment *appsV1.Deployment) {
+		deployment.Namespace = "test"
+		deployment.Spec.Replicas = nil
+		deployment.Spec.Selector = &metaV1.LabelSelector{}
+		deployment.Spec.Selector.MatchLabels = map[string]string{"foo": "bar"}
+	})
+	p.ctx.AddMockScaledObject(p.T(), "test-scaledobject", "v1alpha1")
+	p.ctx.ModifyScaledObjectV1Alpha1(p.T(), "test-scaledobject", func(scaledobject *kedaV1Alpha1.ScaledObject) {
+		scaledobject.Namespace = "test"
+		scaledobject.Spec.ScaleTargetRef = &kedaV1Alpha1.ScaleTarget{
+			Kind:       "Deployment",
+			Name:       "test-deploy",
+			APIVersion: "apps/v1",
+		}
+		scaledobject.Spec.MinReplicaCount = pointers.Int32(4)
+	})
+	p.ctx.AddMockPodDisruptionBudget(p.T(), "test-pdb")
+	p.ctx.ModifyPodDisruptionBudget(p.T(), "test-pdb", func(pdb *v1.PodDisruptionBudget) {
+		pdb.Namespace = "test"
+		pdb.Spec.Selector = &metaV1.LabelSelector{}
+		pdb.Spec.Selector.MatchLabels = map[string]string{"foo": "bar"}
+		pdb.Spec.MinAvailable = &intstr.IntOrString{StrVal: "50%", Type: intstr.String}
+	})
+	p.Validate(p.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				"test-pdb": {},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
 }

@@ -181,22 +181,23 @@ func getIntOrPercentValueSafelyFromString(intOrStr string) (int, bool, error) {
 	return v, true, nil
 }
 
-// Function to get the list of HPA's provided
+// Function to get the list of HPA's/ScaledObject's provided
 func getHorizontalPodAutoscalers(lintCtx lintcontext.LintContext, namespace string) map[string]k8sutil.Object {
 
 	m := make(map[string]k8sutil.Object, len(lintCtx.Objects()))
 
 	for _, obj := range lintCtx.Objects() {
-		// Ensure that only HPA objects are processed
-		if obj.GetK8sObjectName().GroupVersionKind.Kind != objectkinds.HorizontalPodAutoscaler {
+		// Ensure that HPA/ScaledObject objects are processed
+		kind := obj.GetK8sObjectName().GroupVersionKind.Kind
+		if kind != objectkinds.HorizontalPodAutoscaler && kind != objectkinds.ScaledObject {
 			continue
 		}
 
-		// Ensure that only HPAs are in the same namespaces as the PDB
+		// Ensure that only HPAs/ScaledObject are in the same namespaces as the PDB
 		if obj.GetK8sObjectName().Namespace != namespace {
 			continue
 		}
-		// validate object with HPA versions using the HPAScaleTargetRefName extractor package function and add to map
+		// validate object with HPA/ScaledObject versions using the HPAScaleTargetRefName extractor package function and add to map
 		hpaSpecScaleTargetRefName, ok := extract.HPAScaleTargetRefName(obj.K8sObject)
 		if !ok {
 			continue

@@ -12,6 +12,7 @@ import (
 
 	"github.com/bmatcuk/doublestar/v4"
 	y "github.com/ghodss/yaml"
+	kedaV1Alpha1 "github.com/kedacore/keda/v2/apis/keda/v1alpha1"
 	ocsAppsV1 "github.com/openshift/api/apps/v1"
 	ocpSecV1 "github.com/openshift/api/security/v1"
 	"github.com/pkg/errors"
@@ -44,7 +45,7 @@ func init() {
 	clientScheme := scheme.Scheme
 
 	// Add OpenShift and Autoscaling schema
-	schemeBuilder := runtime.NewSchemeBuilder(ocsAppsV1.AddToScheme, autoscalingV2Beta1.AddToScheme, k8sMonitoring.AddToScheme, ocpSecV1.AddToScheme)
+	schemeBuilder := runtime.NewSchemeBuilder(ocsAppsV1.AddToScheme, autoscalingV2Beta1.AddToScheme, k8sMonitoring.AddToScheme, ocpSecV1.AddToScheme, kedaV1Alpha1.AddToScheme)
 	if err := schemeBuilder.AddToScheme(clientScheme); err != nil {
 		panic(fmt.Sprintf("Can not add OpenShift schema %v", err))
 	}
