@@ -43,10 +43,6 @@ archives:
       {{ .ProjectName }}-{{ .Os }}
       {{- if eq .Arch "amd64" }}
       {{- else }}_{{ .Arch }}{{ end }}
-    # use zip for windows archives
-    format_overrides:
-      - goos: windows
-        format: zip
 
 dockers:
   - dockerfile: image/Dockerfile
@@ -107,7 +103,7 @@ signs:
       - "--output-signature=${signature}"
       - "${artifact}"
       - "--yes"
-    artifacts: all
+    artifacts: binary
 
 docker_signs:
   - cmd: cosign
