@@ -11,8 +11,7 @@ spec:
       - name: app
         requests:
           memory: 1Gi
-        limits:
-          memory: 1Gi
+
 ---
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
@@ -25,6 +24,4 @@ spec:
       containers:
       - name: app
         requests:
-          memory: 1Gi
-        limits:
           memory: 1Gi

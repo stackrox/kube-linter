@@ -5,11 +5,11 @@
 
 # What is KubeLinter?
 
-KubeLinter analyzes Kubernetes YAML files and Helm charts, and checks them against a variety of best practices, with a focus on production readiness and security. 
+KubeLinter analyzes Kubernetes YAML files and Helm charts, and checks them against a variety of best practices, with a focus on production readiness and security.
 
 KubeLinter runs sensible default checks, designed to give you useful information about your Kubernetes YAML files and Helm charts. This is to help teams check early and often for security misconfigurations and DevOps best practices. Some common examples of these include running containers as a non-root user, enforcing least privilege, and storing sensitive information only in secrets.
 
-KubeLinter is configurable, so you can enable and disable checks, as well as create your own custom checks, depending on the policies you want to follow within your organization. 
+KubeLinter is configurable, so you can enable and disable checks, as well as create your own custom checks, depending on the policies you want to follow within your organization.
 
 When a lint check fails, KubeLinter reports recommendations for how to resolve any potential issues and returns a non-zero exit code.
 
@@ -50,13 +50,13 @@ Installing KubeLinter from source is as simple as following these steps:
    ```bash
    git clone git@github.com:stackrox/kube-linter.git
    ```
-   
+
 1. Then, compile the source code. This will create the kube-linter binary files for each platform and places them in the `.gobin` folder.
-   
+
    ```bash
    make build
    ```
-   
+
 1. Finally, you are ready to start using KubeLinter. Verify your version to ensure you've successfully installed KubeLinter.
 
    ```bash
@@ -162,7 +162,7 @@ Consider the following sample pod specification file `pod.yaml`. This file has t
        securityContext:
          allowPrivilegeEscalation: false
    ```
-  
+
 1. Copy the YAML above to pod.yaml and lint this file by running the following command:
 
    ```bash
@@ -205,7 +205,7 @@ the future to the command usage, flags, and configuration file formats. However,
 we encourage you to use KubeLinter to test your environment YAML files, see what
 breaks, and [contribute](./CONTRIBUTING.md).
 
-## LICENSE 
+## LICENSE
 
 KubeLinter is licensed under the [Apache License 2.0](./LICENSE).
 
