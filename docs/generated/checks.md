@@ -629,7 +629,7 @@ unsafeSysCtls:
 
 **Description**: Indicates when containers do not have CPU requests and limits set.
 
-**Remediation**: Set CPU requests and limits for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.
+**Remediation**: Set CPU requests for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.
 
 **Template**: [cpu-requirements](templates.md#cpu-requirements)
 
@@ -637,7 +637,7 @@ unsafeSysCtls:
 
 ```yaml
 lowerBoundMillis: 0
-requirementsType: any
+requirementsType: request
 upperBoundMillis: 0
 ```
 ## unset-memory-requirements
@@ -646,7 +646,7 @@ upperBoundMillis: 0
 
 **Description**: Indicates when containers do not have memory requests and limits set.
 
-**Remediation**: Set memory requests and limits for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.
+**Remediation**: Set memory limits for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.
 
 **Template**: [memory-requirements](templates.md#memory-requirements)
 
@@ -654,7 +654,7 @@ upperBoundMillis: 0
 
 ```yaml
 lowerBoundMB: 0
-requirementsType: any
+requirementsType: limit
 upperBoundMB: 0
 ```
 ## use-namespace

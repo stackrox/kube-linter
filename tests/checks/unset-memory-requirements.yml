@@ -9,9 +9,7 @@ spec:
     spec:
       containers:
       - name: app
-        requests:
-          cpu: 1
-        limits:
+        limit:
           cpu: 1
 ---
 apiVersion: apps.openshift.io/v1
@@ -24,7 +22,5 @@ spec:
     spec:
       containers:
       - name: app
-        requests:
-          cpu: 1
-        limits:
+        limit:
           cpu: 1
