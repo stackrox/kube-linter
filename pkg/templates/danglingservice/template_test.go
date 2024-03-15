@@ -15,6 +15,7 @@ import (
 )
 
 const (
+	endpoint1   = "endpoint1"
 	pod1        = "pod1"
 	pod2        = "pod2"
 	serviceNone = "service-matches-none"
@@ -52,6 +53,10 @@ func (s *DanglingServiceTestSuite) AddService(name string, podLabels map[string]
 	})
 }
 
+func (s *DanglingServiceTestSuite) AddEndpoints(name string) {
+	s.ctx.AddMockEndpoints(s.T(), name)
+}
+
 func (s *DanglingServiceTestSuite) AddDeploymentWithLabels(name string, labels map[string]string) {
 	s.ctx.AddMockDeployment(s.T(), name)
 	s.ctx.ModifyDeployment(s.T(), name, func(deployment *appsV1.Deployment) {
@@ -87,6 +92,21 @@ func (s *DanglingServiceTestSuite) TestNoDanglingServices() {
 			Diagnostics: map[string][]diagnostic.Diagnostic{
 				service1: {},
 				service2: {},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+func (s *DanglingServiceTestSuite) TestNoDanglingServiceWithEndpoints() {
+	s.AddService(endpoint1, nil)
+	s.AddEndpoints(endpoint1)
+
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				endpoint1: {},
 			},
 			ExpectInstantiationError: false,
 		},

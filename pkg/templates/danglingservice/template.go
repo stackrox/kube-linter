@@ -43,6 +43,19 @@ func init() {
 					return []diagnostic.Diagnostic{{
 						Message: "service has no selector specified",
 					}}
+				} else {
+					for _, obj := range lintCtx.Objects() {
+						if obj.(type) = *batchV1Beta1.Endpoints {
+							continue
+						}
+						if service.Namespace != obj.K8sObject.GetNamespace() {
+							continue
+						}
+						if service.Spec.Name == endpointTemplateSpec.Spec.Name {
+							// Found!
+							return nil
+						}
+					}
 				}
 
 				for _, ignoredLabel := range p.IgnoredLabels {
