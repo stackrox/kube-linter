@@ -44,14 +44,17 @@ func init() {
 						Message: "service has no selector specified",
 					}}
 				} else {
+					// Check if Service is linked to Endpoints
 					for _, obj := range lintCtx.Objects() {
-						if obj.(type) = *batchV1Beta1.Endpoints {
+
+						endpoints, ok := object.K8sObject.(*v1.Endpoints)
+						if !ok {
 							continue
 						}
-						if service.Namespace != obj.K8sObject.GetNamespace() {
+						if endpoints.Namespace != obj.K8sObject.GetNamespace() {
 							continue
 						}
-						if service.Spec.Name == endpointTemplateSpec.Spec.Name {
+						if endpoints.Name == obj.GetK8sObjectName().Name {
 							// Found!
 							return nil
 						}
