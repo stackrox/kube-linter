@@ -113,6 +113,21 @@ func (s *DanglingServiceTestSuite) TestNoDanglingServiceWithEndpoints() {
 	})
 }
 
+func (s *DanglingServiceTestSuite) TestDanglingServiceWithNoMatchingEndpoints() {
+	s.AddService(service1, nil)
+	s.AddEndpoints(service2)
+
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				service1: {{Message: "service has no selector specified"}},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
 func (s *DanglingServiceTestSuite) TestOneServiceIsDangling() {
 	s.AddDeploymentWithLabels(pod2, labelselector2)
 	s.AddService(service1, labelselector1)
