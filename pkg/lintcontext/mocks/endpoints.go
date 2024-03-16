@@ -8,7 +8,7 @@ import (
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// AddMockEndpoint adds a mock Endpoint to LintContext
+// AddMockEndpoints adds a mock Endpoint to LintContext
 func (l *MockLintContext) AddMockEndpoints(t *testing.T, name string) {
 	require.NotEmpty(t, name)
 	l.objects[name] = &coreV1.Endpoints{
