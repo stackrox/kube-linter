@@ -40,14 +40,9 @@ func init() {
 				}
 				selector := service.Spec.Selector
 				if len(selector) == 0 {
-					return []diagnostic.Diagnostic{{
-						Message: "service has no selector specified",
-					}}
-				} else {
 					// Check if Service is linked to Endpoints
 					for _, obj := range lintCtx.Objects() {
-
-						endpoints, ok := object.K8sObject.(*v1.Endpoints)
+						endpoints, ok := obj.K8sObject.(*v1.Endpoints)
 						if !ok {
 							continue
 						}
@@ -59,6 +54,10 @@ func init() {
 							return nil
 						}
 					}
+
+					return []diagnostic.Diagnostic{{
+						Message: "service has no selector specified",
+					}}
 				}
 
 				for _, ignoredLabel := range p.IgnoredLabels {
