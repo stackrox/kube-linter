@@ -46,15 +46,14 @@ func init() {
 						if !ok {
 							continue
 						}
-						if endpoints.Namespace != obj.K8sObject.GetNamespace() {
+						if endpoints.Namespace != object.K8sObject.GetNamespace() {
 							continue
 						}
-						if endpoints.Name == obj.GetK8sObjectName().Name {
+						if endpoints.Name == object.GetK8sObjectName().Name {
 							// Found!
 							return nil
 						}
 					}
-
 					return []diagnostic.Diagnostic{{
 						Message: "service has no selector specified",
 					}}

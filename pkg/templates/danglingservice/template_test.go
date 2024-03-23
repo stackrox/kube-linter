@@ -115,7 +115,7 @@ func (s *DanglingServiceTestSuite) TestNoDanglingServiceWithEndpoints() {
 
 func (s *DanglingServiceTestSuite) TestDanglingServiceWithNoMatchingEndpoints() {
 	s.AddService(service1, nil)
-	s.AddEndpoints(service2)
+	s.AddEndpoints(endpoint1)
 
 	s.Validate(s.ctx, []templates.TestCase{
 		{
