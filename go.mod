@@ -18,7 +18,7 @@ require (
 	github.com/openshift/api v0.0.0-20230406152840-ce21e3fe5da2
 	github.com/owenrumney/go-sarif/v2 v2.3.1
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.72.0
+	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.73.0
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.18.2
@@ -436,11 +436,11 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	honnef.co/go/tools v0.4.7 // indirect
-	k8s.io/apiextensions-apiserver v0.29.2 // indirect
-	k8s.io/component-base v0.29.2 // indirect
+	k8s.io/apiextensions-apiserver v0.29.3 // indirect
+	k8s.io/component-base v0.29.3 // indirect
 	k8s.io/klog/v2 v2.120.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20240103051144-eec4567ac022 // indirect
-	k8s.io/utils v0.0.0-20240102154912-e7106e64919e // indirect
+	k8s.io/utils v0.0.0-20240310230437-4693a0247e57 // indirect
 	knative.dev/pkg v0.0.0-20240116073220-b488e7be5902 // indirect
 	mvdan.cc/gofumpt v0.6.0 // indirect
 	mvdan.cc/unparam v0.0.0-20240104100049-c549a3470d14 // indirect
