@@ -103,12 +103,12 @@ example,
 
 To ignore violations for specific objects, users can add an annotation with the key
 `ignore-check.kube-linter.io/<check-name>`. We strongly encourage adding an explanation as the value for the annotation.
-For example, to ignore a check named "privileged" for a specific deployment, you can add an annotation like that:
+For example, to ignore a check named "privileged-container" for a specific deployment, you can add an annotation like that:
 
 ```yaml
 metadata:
   annotations:
-    ignore-check.kube-linter.io/privileged: "This deployment needs to run as privileged because it needs kernel access"
+    ignore-check.kube-linter.io/privileged-container: "This deployment needs to run as privileged because it needs kernel access"
 ```
 
 To ignore _all_ checks for a specific object, you can use the special annotation key `kube-linter.io/ignore-all`.
