@@ -279,6 +279,36 @@ KubeLinter supports the following templates:
   type: string
 ```
 
+## Ephemeral Storage Requirements
+
+**Key**: `ephemeral-storage-requirements`
+
+**Description**: Flag containers with ephemeral storage requirements in the given range
+
+**Supported Objects**: DeploymentLike
+
+
+**Parameters**:
+
+```yaml
+- description: The type of requirement. Use any to apply to both requests and limits.
+  name: requirementsType
+  negationAllowed: true
+  regexAllowed: true
+  required: true
+  type: string
+- description: The lower bound of the requirement (inclusive), specified as a number
+    of GB.
+  name: lowerBoundGB
+  required: false
+  type: integer
+- description: The upper bound of the requirement (inclusive), specified as a number
+    of GB. If not specified, it is treated as "no upper bound".
+  name: upperBoundGB
+  required: false
+  type: integer
+```
+
 ## Forbidden Annotation
 
 **Key**: `forbidden-annotation`

@@ -93,6 +93,14 @@ $(KUBE_LINTER_BIN): $(GORELEASER_BIN) $(shell find . -type f -name '*.go')
 	@cp "$(DIST)/kube-linter_$(HOST_OS)_amd64_v1/kube-linter" "$(GOBIN)/kube-linter"
 	@chmod u+w "$(GOBIN)/kube-linter"
 
+# -- Kivra Changes
+# The binaries are built with goreleaser, and they are available in the dist directory.
+# Look at 'dist/<kube-linter_OS_ARCH_v1>/kube-linter'
+.PHONY: build-local
+build-local: $(GORELEASER_BIN) $(shell find . -type f -name '*.go')
+	goreleaser build --snapshot --clean
+# -- Kivra Changes
+
 ##########
 ## Test ##
 ##########

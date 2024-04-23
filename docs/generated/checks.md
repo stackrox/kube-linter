@@ -640,6 +640,23 @@ lowerBoundMillis: 0
 requirementsType: request
 upperBoundMillis: 0
 ```
+## unset-ephemeral-storage-requirements
+
+**Enabled by default**: No
+
+**Description**: Indicates when containers do not have ephemeral-storage requests and limits set.
+
+**Remediation**: Set ephemeral-storage limits for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.
+
+**Template**: [ephemeral-storage-requirements](templates.md#ephemeral-storage-requirements)
+
+**Parameters**:
+
+```yaml
+lowerBoundGB: 0
+requirementsType: limit
+upperBoundGB: 0
+```
 ## unset-memory-requirements
 
 **Enabled by default**: Yes
