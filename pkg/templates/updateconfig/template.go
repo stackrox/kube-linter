@@ -49,8 +49,8 @@ func parseIntOrString(data string) (*intstr.IntOrString, error) {
 
 }
 
-func compareIntOrString(max, min, actual *intstr.IntOrString) bool {
-	if max == nil && min == nil {
+func compareIntOrString(maximal, minimal, actual *intstr.IntOrString) bool {
+	if maximal == nil && minimal == nil {
 		return true
 	}
 	if actual == nil {
@@ -61,12 +61,12 @@ func compareIntOrString(max, min, actual *intstr.IntOrString) bool {
 		return false
 	}
 	actualIsPercent := strings.Contains(actual.String(), "%")
-	if max != nil {
-		maxIsPercent := strings.Contains(max.String(), "%")
+	if maximal != nil {
+		maxIsPercent := strings.Contains(maximal.String(), "%")
 		if actualIsPercent != maxIsPercent {
 			return false
 		}
-		maxVal, err := intstr.GetValueFromIntOrPercent(max, 100, false)
+		maxVal, err := intstr.GetValueFromIntOrPercent(maximal, 100, false)
 		if err != nil {
 			return false
 		}
@@ -74,12 +74,12 @@ func compareIntOrString(max, min, actual *intstr.IntOrString) bool {
 			return false
 		}
 	}
-	if min != nil {
-		minIsPercent := strings.Contains(min.String(), "%")
+	if minimal != nil {
+		minIsPercent := strings.Contains(minimal.String(), "%")
 		if actualIsPercent != minIsPercent {
 			return false
 		}
-		minVal, err := intstr.GetValueFromIntOrPercent(min, 100, false)
+		minVal, err := intstr.GetValueFromIntOrPercent(minimal, 100, false)
 		if err != nil {
 			return false
 		}
