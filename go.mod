@@ -10,7 +10,7 @@ require (
 	github.com/cert-manager/cert-manager v1.14.5
 	github.com/fatih/color v1.17.0
 	github.com/ghodss/yaml v1.0.0
-	github.com/golangci/golangci-lint v1.58.2
+	github.com/golangci/golangci-lint v1.59.0
 	github.com/goreleaser/goreleaser v1.24.0
 	github.com/kedacore/keda/v2 v2.13.1
 	github.com/mitchellh/go-homedir v1.1.0
@@ -47,7 +47,7 @@ require (
 	github.com/AlekSi/pointer v1.2.0 // indirect
 	github.com/Antonboom/errname v0.1.13 // indirect
 	github.com/Antonboom/nilnil v0.1.9 // indirect
-	github.com/Antonboom/testifylint v1.2.0 // indirect
+	github.com/Antonboom/testifylint v1.3.0 // indirect
 	github.com/Azure/azure-sdk-for-go v68.0.0+incompatible // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.10.0 // indirect
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.5.1 // indirect
@@ -66,7 +66,7 @@ require (
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/AzureAD/microsoft-authentication-library-for-go v1.2.2 // indirect
-	github.com/BurntSushi/toml v1.3.2 // indirect
+	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/Crocmagnon/fatcontext v0.2.2 // indirect
 	github.com/Djarvur/go-err113 v0.0.0-20210108212216-aea10b59be24 // indirect
 	github.com/GaijinEntertainment/go-exhaustruct/v3 v3.2.0 // indirect
@@ -175,7 +175,7 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/fzipp/gocyclo v0.6.0 // indirect
 	github.com/ghostiam/protogetter v0.3.6 // indirect
-	github.com/go-critic/go-critic v0.11.3 // indirect
+	github.com/go-critic/go-critic v0.11.4 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
 	github.com/go-fed/httpsig v1.1.0 // indirect
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
@@ -248,7 +248,7 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.5 // indirect
-	github.com/hashicorp/go-version v1.6.0 // indirect
+	github.com/hashicorp/go-version v1.7.0 // indirect
 	github.com/hashicorp/hcl v1.0.1-vault-5 // indirect
 	github.com/hexops/gotextdiff v1.0.3 // indirect
 	github.com/huandu/xstrings v1.4.0 // indirect
@@ -344,7 +344,7 @@ require (
 	github.com/sashamelentyev/interfacebloat v1.1.0 // indirect
 	github.com/sashamelentyev/usestdlibvars v1.25.0 // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.8.0 // indirect
-	github.com/securego/gosec/v2 v2.20.0 // indirect
+	github.com/securego/gosec/v2 v2.20.1-0.20240525090044-5f0084eb01a9 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/shazow/go-diff v0.0.0-20160112020656-b6b7b6733b8c // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
@@ -395,7 +395,7 @@ require (
 	gitlab.com/bosi/decorder v0.4.2 // indirect
 	gitlab.com/digitalxero/go-conventional-commit v1.0.7 // indirect
 	go-simpler.org/musttag v0.12.2 // indirect
-	go-simpler.org/sloglint v0.6.0 // indirect
+	go-simpler.org/sloglint v0.7.0 // indirect
 	go.mongodb.org/mongo-driver v1.14.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
