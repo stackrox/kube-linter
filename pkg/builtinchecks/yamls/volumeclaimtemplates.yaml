@@ -1,0 +1,7 @@
+name: "volumeclaimtemplates"
+description: "Checks StatefulSets for the presence of a specified annotation in their VolumeClaimTemplate."
+remediation: "Add an specified annotation to volumeClaimTemplate."
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "volumeclaimtemplates"
