@@ -855,8 +855,8 @@ github.com/polyfloyd/go-errorlint v1.5.2 h1:SJhVik3Umsjh7mte1vE0fVZ5T1gznasQG3PV
 github.com/polyfloyd/go-errorlint v1.5.2/go.mod h1:sH1QC1pxxi0fFecsVIzBmxtrgd9IF/SkJpA6wqyKAJs=
 github.com/prashantv/gostub v1.1.0 h1:BTyx3RfQjRHnUWaGF9oQos79AlQ5k8WNktv7VGvVH4g=
 github.com/prashantv/gostub v1.1.0/go.mod h1:A5zLQHz7ieHGG7is6LLXLz7I8+3LZzsrV0P1IAHhP5U=
-github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.75.0 h1:62MgqpTrtjNd8cc0RJSFJ1OHqgSrThgHehGVuQaF/fc=
-github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.75.0/go.mod h1:XYrdZw5dW12Cjkt4ndbeNZZTBp4UCHtW0ccR9+sTtPU=
+github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.75.1 h1:+iiljhJV6niK7MuifJs/n3NeLxikd85nrQfn53sLJkU=
+github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.75.1/go.mod h1:XYrdZw5dW12Cjkt4ndbeNZZTBp4UCHtW0ccR9+sTtPU=
 github.com/prometheus/client_golang v0.9.1/go.mod h1:7SWBe2y4D6OKWSNQJUaRYU/AaXPKyh/dDVn+NZz0KFw=
 github.com/prometheus/client_golang v1.0.0/go.mod h1:db9x61etRT2tGnBNRi70OPL5FsnadC4Ky3P0J6CfImo=
 github.com/prometheus/client_golang v1.1.0/go.mod h1:I1FGZT9+L76gKKOs5djB6ezCbFQP1xR9D75/vuwEF3g=
