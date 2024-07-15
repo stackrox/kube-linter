@@ -30,7 +30,7 @@ for resolving any potential issues and returns a non-zero exit code.
 To install by using [Go](https://golang.org/), run the following command:
 
 ```bash
-go install golang.stackrox.io/kube-linter/cmd/kube-linter
+go install golang.stackrox.io/kube-linter/cmd/kube-linter@latest
 ```
 Otherwise, download the latest binary from
 [Releases](https://github.com/stackrox/kube-linter/releases) and add it to your
