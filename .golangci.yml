@@ -1,5 +1,6 @@
 run:
   timeout: 5m
+  go: "1.22"
 
 issues:
   exclude-use-default: false
@@ -45,23 +46,19 @@ linters-settings:
     excludes:
       - G101
   gosimple:
-    go: "1.16"
     checks: ["all"]
   nolintlint:
-    allow-leading-space: false # require machine-readable nolint directives (i.e. with no leading space)
     allow-unused: false # report any unused nolint directives
     require-explanation: false # don't require an explanation for nolint directives
     require-specific: true # require nolint directives to be specific about which linter is being skipped
   revive:
-    min-confidence: 0
+    confidence: 0
     # Due to https://github.com/golangci/golangci-lint/issues/2355 on MacOS the linter is failing with the error
     # message too many files. Set the max-open-files explicitly.
     max-open-files: 2048
   staticcheck:
-    go: "1.16"
     checks: ["all"]
   stylecheck:
-    go: "1.16"
     checks: ["all", "-ST1000"]
 
 linters:
