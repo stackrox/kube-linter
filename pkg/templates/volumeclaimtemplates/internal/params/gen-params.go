@@ -17,10 +17,10 @@ var (
 	_ = util.MustParseParameterDesc
 	_ = fmt.Sprintf
 
-	volumeClaimTemplateParamDesc = util.MustParseParameterDesc(`{
-	"Name": "Annotation",
+	annotationParamDesc = util.MustParseParameterDesc(`{
+	"Name": "annotation",
 	"Type": "string",
-	"Description": " ",
+	"Description": "Annotation specifies the required annotation to match.",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
@@ -34,7 +34,7 @@ var (
 `)
 
 	ParamDescs = []check.ParameterDesc{
-		volumeClaimTemplateParamDesc,
+		annotationParamDesc,
 	}
 )
 
