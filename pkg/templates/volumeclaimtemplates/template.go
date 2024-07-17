@@ -31,12 +31,9 @@ func init() {
             return func(_ lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
                 sts, ok := extract.StatefulSetSpec(object.K8sObject)
                 if !ok {
-                    fmt.Println("failed to extract StatefulSet spec")
                     return nil
                 }
-
                 var diagnostics []diagnostic.Diagnostic
-
                 for _, vct := range sts.VolumeClaimTemplates {
                     if vct.Annotations == nil || vct.Annotations[p.Annotation] == "" {
                         diagnostics = append(diagnostics, diagnostic.Diagnostic{
@@ -44,7 +41,6 @@ func init() {
                         })
                     }
                 }
-
                 return diagnostics
             }, nil
         }),
