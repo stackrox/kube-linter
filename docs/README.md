@@ -30,7 +30,7 @@ for resolving any potential issues and returns a non-zero exit code.
 To install by using [Go](https://golang.org/), run the following command:
 
 ```bash
-GO111MODULE=on go install golang.stackrox.io/kube-linter/cmd/kube-linter
+go install golang.stackrox.io/kube-linter/cmd/kube-linter@latest
 ```
 Otherwise, download the latest binary from
 [Releases](https://github.com/stackrox/kube-linter/releases) and add it to your
@@ -45,11 +45,18 @@ run the following command:
 brew install kube-linter
 ```
 
+### Using nix-shell
+To install by using [nix](https://nixos.org/) on macOS, Linux, and [Windows Subsystem for Linux (WSL)](https://docs.microsoft.com/en-us/windows/wsl/about),
+run the following command:
+```bash
+nix-shell -p kube-linter
+```
+
 ### Using Docker
 
 1. Get the latest KubeLinter Docker image:
    ```bash
-   docker pull stackrox/kube-linter:0.1.4
+   docker pull stackrox/kube-linter:latest
    ```
    > [!NOTE] While we provide the `:latest` tag for convenience and ease of experimentation,
    > we recommend using a tag corresponding to a specific release
@@ -79,7 +86,10 @@ The KubeLinter Github Action accepts the following inputs:
 |:--|:--|
 |`directory`|(Mandatory) A directory path that contains the Kubernetes YAML files or `Chart.yaml` file.|
 |`config`|(Optional) A path to your custom [KubeLinter configuration file](configuring-kubelinter.md).
-## Building from source
+
+## Development
+
+### Building from source
 
 > [!NOTE] Before you build, make sure that you have [installed Go](https://golang.org/doc/install).
 
@@ -173,10 +183,10 @@ COSIGN_EXPERIMENTAL=1 cosign verify $IMAGE_NAME
    > **Security issue**
    > - The container in this pod is not running as a read-only file system,
    >   allowing it to write to the root filesystem.
-   > 
+   >
    > **Production readiness issue**
    > - The configuration doesn't specify the container's CPU limits,
-   >   allowing it to consume excessive CPU. 
+   >   allowing it to consume excessive CPU.
    > - The configuration doesn't specify the container's memory limits,
    >   allowing it to consume excessive memory.
 
@@ -189,9 +199,9 @@ COSIGN_EXPERIMENTAL=1 cosign verify $IMAGE_NAME
    pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" does not have a read-only root file system (check: no-read-only-root-fs, remediation: Set readOnlyRootFilesystem to true in your container's securityContext.)
 
    pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" has cpu limit 0 (check: unset-cpu-requirements, remediation: Set your container's CPU requests and limits depending on its requirements. See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for more details.)
-   
+
    pod.yaml: (object: <no namespace>/security-context-demo /v1, Kind=Pod) container "sec-ctx-demo" has memory limit 0 (check: unset-memory-requirements, remediation: Set your container's memory requests and limits depending on its requirements.    See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for more details.)
-   
+
    Error: found 3 lint errors
    ```
 
@@ -217,7 +227,7 @@ chart:
    helm-chart-sample/helm-chart-sample/templates/tests/test-connection.yaml: (object: <no namespace>/test-release-helm-chart-sample-test-connection /v1, Kind=Pod) container "wget" is not set to runAsNonRoot (check: run-as-non-root, remediation: Set runAsUser to a non-zero number, and runAsNonRoot to true, in your pod or container securityContext. See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for more details.)
 
    helm-chart-sample/helm-chart-sample/templates/tests/test-connection.yaml: (object: <no namespace>/test-release-helm-chart-sample-test-connection /v1, Kind=Pod) container "wget" has cpu request 0 (check: unset-cpu-requirements, remediation: Set your container's CPU requests and limits depending on its requirements. See https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for more details.)
-   
+
    ...
 
    Error: found 12 lint errors
@@ -240,6 +250,6 @@ To contribute, see the [contributing guide](https://github.com/stackrox/kube-lin
 > [!ATTENTION]
 > Our [code of conduct](https://github.com/stackrox/kube-linter/blob/main/CODE_OF_CONDUCT.md) governs all participation in the KubeLinter community.
 
-# License 
+# License
 
 KubeLinter is licensed under the [Apache License 2.0](https://github.com/stackrox/kube-linter/blob/main/LICENSE).
