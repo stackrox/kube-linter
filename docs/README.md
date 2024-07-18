@@ -56,7 +56,7 @@ nix-shell -p kube-linter
 
 1. Get the latest KubeLinter Docker image:
    ```bash
-   docker pull stackrox/kube-linter:v0.6.8
+   docker pull stackrox/kube-linter:latest
    ```
    > [!NOTE] While we provide the `:latest` tag for convenience and ease of experimentation,
    > we recommend using a tag corresponding to a specific release

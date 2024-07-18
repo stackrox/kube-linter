@@ -47,7 +47,7 @@ nix-shell -p kube-linter
 ### Using docker
 
 ```
-docker pull stackrox/kube-linter:v0.6.8
+docker pull stackrox/kube-linter:latest
 ```
 
 
