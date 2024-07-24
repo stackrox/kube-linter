@@ -20,3 +20,11 @@ updates:
       k8s.io:
         patterns:
           - "k8s.io/*"
+  - package-ecosystem: 'gomod'
+    directory: 'tools-import'
+    schedule:
+      interval: 'weekly'
+      day: 'wednesday'
+    open-pull-requests-limit: 3
+    reviewers:
+      - "janisz"
