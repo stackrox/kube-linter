@@ -8,7 +8,7 @@ require (
 	github.com/cert-manager/cert-manager v1.15.2
 	github.com/fatih/color v1.17.0
 	github.com/ghodss/yaml v1.0.0
-	github.com/kedacore/keda/v2 v2.13.1
+	github.com/kedacore/keda/v2 v2.15.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/openshift/api v0.0.0-20230406152840-ce21e3fe5da2
@@ -23,7 +23,7 @@ require (
 	k8s.io/api v0.30.3
 	k8s.io/apimachinery v0.30.3
 	k8s.io/client-go v0.30.3
-	k8s.io/gengo v0.0.0-20230829151522-9cce18d56c01
+	k8s.io/gengo v0.0.0-20240129211411-f967bbeff4b4
 )
 
 require (
@@ -34,6 +34,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.2.1 // indirect
 	github.com/Microsoft/hcsshim v0.11.4 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
+	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/containerd/containerd v1.7.12 // indirect
 	github.com/containerd/log v0.1.0 // indirect
@@ -49,7 +50,7 @@ require (
 	github.com/emicklei/go-restful/v3 v3.12.0 // indirect
 	github.com/evanphx/json-patch v5.9.0+incompatible // indirect
 	github.com/evanphx/json-patch/v5 v5.9.0 // indirect
-	github.com/expr-lang/expr v1.15.8 // indirect
+	github.com/expr-lang/expr v1.16.5 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
@@ -76,7 +77,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/klauspost/compress v1.17.5 // indirect
+	github.com/klauspost/compress v1.17.7 // indirect
 	github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
@@ -97,11 +98,10 @@ require (
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/prometheus/client_golang v1.19.0 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
-	github.com/prometheus/common v0.51.1 // indirect
+	github.com/prometheus/common v0.53.0 // indirect
 	github.com/prometheus/procfs v0.15.0 // indirect
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
-	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
@@ -131,7 +131,7 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240515191416-fc5f0ca64291 // indirect
 	google.golang.org/grpc v1.64.1 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
-	gopkg.in/evanphx/json-patch.v5 v5.8.1 // indirect
+	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -141,13 +141,13 @@ require (
 	k8s.io/klog/v2 v2.130.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20240430033511-f0e62f92d13f // indirect
 	k8s.io/utils v0.0.0-20240502163921-fe8a2dddb1d0 // indirect
-	knative.dev/pkg v0.0.0-20240116073220-b488e7be5902 // indirect
+	knative.dev/pkg v0.0.0-20240423132823-3c6badc82748 // indirect
 	oras.land/oras-go v1.2.5 // indirect
 	sigs.k8s.io/controller-runtime v0.18.4 // indirect
 	sigs.k8s.io/gateway-api v1.1.0 // indirect
 	sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd // indirect
-	sigs.k8s.io/kustomize/api v0.16.0 // indirect
-	sigs.k8s.io/kustomize/kyaml v0.16.0 // indirect
+	sigs.k8s.io/kustomize/api v0.17.1 // indirect
+	sigs.k8s.io/kustomize/kyaml v0.17.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.4.1 // indirect
 	sigs.k8s.io/yaml v1.4.0 // indirect
 )
