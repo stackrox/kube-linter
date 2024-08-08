@@ -18,6 +18,8 @@ Visit https://docs.kubelinter.io for detailed documentation on installing, using
 
 ## Installing KubeLinter
 
+Kube-linter binaries could be found here: https://github.com/stackrox/kube-linter/releases/latest
+
 ### Using Go
 
 To install using [Go](https://golang.org/), run the following command:
@@ -36,7 +38,20 @@ To install using Homebrew or LinuxBrew, run the following command:
 brew install kube-linter
 ```
 
-### Building from source
+### Using nix-shell
+
+```
+nix-shell -p kube-linter
+```
+
+### Using docker
+
+```
+docker pull stackrox/kube-linter:latest
+```
+
+
+## Development
 
 ### Prerequisites
 - Make sure that you have [installed Go](https://golang.org/doc/install) prior to building from source.

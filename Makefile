@@ -1,5 +1,7 @@
-.PHONY: deps
-deps: go.mod go.sum
+deps: go.mod go.sum tool-imports/go.sum tool-imports/go.mod
+	@touch deps
+
+%.sum: %.mod
 	@echo "+ $@"
 	@go mod tidy
 ifdef CI
@@ -29,11 +31,13 @@ COVFILES := $(shell mktemp -d)
 GOLANGCILINT_BIN := $(GOBIN)/golangci-lint
 $(GOLANGCILINT_BIN): deps
 	@echo "+ $@"
+	cd tool-imports; \
 	GOBIN=$(GOBIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint
 
 GORELEASER_BIN := $(GOBIN)/goreleaser
 $(GORELEASER_BIN): deps
 	@echo "+ $@"
+	cd tool-imports; \
 	GOBIN=$(GOBIN) go install github.com/goreleaser/goreleaser
 
 ###########
