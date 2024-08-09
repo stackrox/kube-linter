@@ -14,6 +14,8 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
+const templateKey = "run-as-non-root"
+
 func effectiveRunAsNonRoot(podSC *v1.PodSecurityContext, containerSC *v1.SecurityContext) bool {
 	if containerSC != nil && containerSC.RunAsNonRoot != nil {
 		return *containerSC.RunAsNonRoot
@@ -44,10 +46,14 @@ func effectiveRunAsGroup(podSC *v1.PodSecurityContext, containerSC *v1.SecurityC
 	return nil
 }
 
+func isNonZero(number *int64) bool {
+	return number != nil && *number > 0
+}
+
 func init() {
 	templates.Register(check.Template{
 		HumanName:   "Run as non-root",
-		Key:         "run-as-non-root",
+		Key:         templateKey,
 		Description: "Flag containers set to run as a root user or group",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
@@ -65,7 +71,7 @@ func init() {
 					runAsUser := effectiveRunAsUser(podSpec.SecurityContext, container.SecurityContext)
 					runAsGroup := effectiveRunAsGroup(podSpec.SecurityContext, container.SecurityContext)
 					// runAsUser and runAsGroup explicitly set to non-root. All good.
-					if (runAsUser != nil && *runAsUser > 0) && (runAsGroup != nil && *runAsGroup > 0) {
+					if isNonZero(runAsUser) && isNonZero(runAsGroup) {
 						continue
 					}
 
