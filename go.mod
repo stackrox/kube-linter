@@ -5,7 +5,7 @@ go 1.22.5
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/bmatcuk/doublestar/v4 v4.6.1
-	github.com/cert-manager/cert-manager v1.15.2
+	github.com/cert-manager/cert-manager v1.15.3
 	github.com/fatih/color v1.17.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/kedacore/keda/v2 v2.15.0
