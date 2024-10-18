@@ -564,6 +564,15 @@ KubeLinter supports the following templates:
 **Supported Objects**: PodDisruptionBudget
 
 
+## .spec.unhealthyPodEvictionPolicy in PDB is set to default
+
+**Key**: `pdb-unhealthy-pod-eviction-policy`
+
+**Description**: Flag PodDisruptionBudget objects that do not explicitly set unhealthyPodEvictionPolicy.
+
+**Supported Objects**: PodDisruptionBudget
+
+
 ## Ports
 
 **Key**: `ports`

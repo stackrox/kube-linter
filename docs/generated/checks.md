@@ -446,6 +446,15 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 **Remediation**: Change the PodDisruptionBudget to have minAvailable set to a number lower than the number of replicas in the related deployment-like objects. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more information.
 
 **Template**: [pdb-min-available](templates.md#no-pod-disruptions-allowed---minavailable)
+## pdb-unhealthy-pod-eviction-policy
+
+**Enabled by default**: Yes
+
+**Description**: Indicates when a PodDisruptionBudget does not explicitly set the unhealthyPodEvictionPolicy filed.
+
+**Remediation**: Set unhealthyPodEvictionPolicy to AlwaysAllow. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/#unhealthy-pod-eviction-policy for more information.
+
+**Template**: [pdb-unhealthy-pod-eviction-policy](templates.md#.spec.unhealthypodevictionpolicy-in-pdb-is-set-to-default)
 ## privilege-escalation-container
 
 **Enabled by default**: Yes

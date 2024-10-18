@@ -1,0 +1,32 @@
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: fire
+spec:
+  selector:
+    matchLabels:
+      app: app1
+  maxUnavailable: 1
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: dont-fire-1
+spec:
+  selector:
+    matchLabels:
+      app: app2
+  maxUnavailable: 1
+  unhealthyPodEvictionPolicy: AlwaysAllow
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: dont-fire-2
+spec:
+  selector:
+    matchLabels:
+      app: app2
+  maxUnavailable: 1
+  unhealthyPodEvictionPolicy: IfHealthyBudget

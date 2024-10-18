@@ -1000,6 +1000,20 @@ get_value_from() {
   [ "$status" -eq 0 ]
 }
 
+@test "pdb-unhealthy-pod-eviction-policy" {
+
+  tmp="tests/checks/pdb-unhealthy-pod-eviction-policy.yaml"
+  cmd="${KUBE_LINTER_BIN} lint --include pdb-unhealthy-pod-eviction-policy --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+
+  [[ "${message1}" == "PodDisruptionBudget: unhealthyPodEvictionPolicy is not explicitly set" ]]
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "1" ]]
+
+}
+
 @test "flag-read-from-stdin" {
   echo "---" | ${KUBE_LINTER_BIN} lint -
 }
