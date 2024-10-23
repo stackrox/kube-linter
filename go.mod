@@ -1,6 +1,7 @@
 module golang.stackrox.io/kube-linter
 
 go 1.22.5
+toolchain go1.23.2
 
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
@@ -14,7 +15,7 @@ require (
 	github.com/openshift/api v0.0.0-20230406152840-ce21e3fe5da2
 	github.com/owenrumney/go-sarif/v2 v2.3.3
 	github.com/pkg/errors v0.9.1
-	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.76.2
+	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.77.2
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.19.0
