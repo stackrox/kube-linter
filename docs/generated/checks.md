@@ -450,7 +450,7 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 
 **Enabled by default**: Yes
 
-**Description**: Indicates when a PodDisruptionBudget does not explicitly set the unhealthyPodEvictionPolicy filed.
+**Description**: Indicates when a PodDisruptionBudget does not explicitly set the unhealthyPodEvictionPolicy field.
 
 **Remediation**: Set unhealthyPodEvictionPolicy to AlwaysAllow. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/#unhealthy-pod-eviction-policy for more information.
 
