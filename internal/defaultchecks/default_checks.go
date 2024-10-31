@@ -36,5 +36,6 @@ var (
 		"unsafe-sysctls",
 		"unset-cpu-requirements",
 		"unset-memory-requirements",
+		"pdb-unhealthy-pod-eviction-policy",
 	)
 )
