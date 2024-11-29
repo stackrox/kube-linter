@@ -219,7 +219,7 @@ files, see what breaks, and [contribute](./CONTRIBUTING.md).
 As a reminder, all participation in the KubeLinter community is governed by our
 [code of conduct](./CODE_OF_CONDUCT.md).
 
-##
+---
 
 KubeLinter is created with ❤️ by [StackRox](https://www.stackrox.io/) and is now powered
 by [Red Hat](https://stackrox.com/).
