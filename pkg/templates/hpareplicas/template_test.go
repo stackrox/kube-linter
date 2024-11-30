@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/stretchr/testify/suite"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext/mocks"
@@ -54,7 +52,7 @@ func (s *HPAReplicaTestSuite) addHPAWithReplicas(name string, replicas int32, ve
 			hpa.Spec.MinReplicas = &replicas
 		})
 	default:
-		require.FailNow(s.T(), fmt.Sprintf("Unknown autoscaling version %s", version))
+		s.Require().FailNow(fmt.Sprintf("Unknown autoscaling version %s", version))
 	}
 }
 

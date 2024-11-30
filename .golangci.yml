@@ -60,6 +60,10 @@ linters-settings:
     checks: ["all"]
   stylecheck:
     checks: ["all", "-ST1000"]
+  testifylint:
+    disable:
+      - require-error
+    enable-all: true
 
 linters:
   # please, do not use `enable-all`: it's deprecated and will be removed soon.
@@ -107,6 +111,7 @@ linters:
     # - structcheck
     - stylecheck
     # - testpackage
+    - testifylint
     # - typecheck
     - unconvert
     - unparam
