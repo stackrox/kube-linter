@@ -45,7 +45,7 @@ func TestIgnorePaths(t *testing.T) {
 		} else {
 			for _, path := range paths {
 				assert.NoError(t, err)
-				assert.Equal(t, path, e.Expected)
+				assert.Equal(t, e.Expected, path)
 			}
 		}
 	}
