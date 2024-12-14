@@ -11,8 +11,9 @@ spec:
     spec:
       containers:
         - name: app
-          runAsUser: 1001
           securityContext:
+            runAsUser: 1001
+            runAsGroup: 1001
             runAsNonRoot: true
 ---
 apiVersion: apps.openshift.io/v1
@@ -26,8 +27,9 @@ spec:
     spec:
       containers:
         - name: app2
-          runAsUser: 1001
           securityContext:
+            runAsUser: 1001
+            runAsGroup: 1001
             runAsNonRoot: true
 ---
 apiVersion: apps/v1
@@ -42,7 +44,9 @@ spec:
     spec:
       containers:
         - name: app
-          runAsUser: 0
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
 ---
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
@@ -55,4 +59,6 @@ spec:
     spec:
       containers:
       - name: app2
-        runAsUser: 0
+        securityContext:
+          runAsUser: 0
+          runAsGroup: 0
