@@ -1,8 +1,8 @@
 name: "startup-port"
-description: "Indicates when containers have a liveness probe to a not exposed port."
+description: "Indicates when containers have a startup probe to a not exposed port."
 remediation: >-
   Check which ports you've exposed and ensure they match what you have specified
-  in the liveness probe.
+  in the startup probe.
 scope:
   objectKinds:
     - DeploymentLike
