@@ -82,7 +82,6 @@ linters:
     # - gochecknoinits
     # - gocognit
     # - goconst
-    - exportloopref
     - gocritic
     # - gocyclo
     # - godot
