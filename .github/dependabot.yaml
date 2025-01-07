@@ -21,7 +21,7 @@ updates:
         patterns:
           - "k8s.io/*"
   - package-ecosystem: 'gomod'
-    directory: 'tools-import'
+    directory: 'tool-imports'
     schedule:
       interval: 'weekly'
       day: 'wednesday'
