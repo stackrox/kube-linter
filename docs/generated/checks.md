@@ -598,9 +598,9 @@ protocol: TCP
 
 **Enabled by default**: Yes
 
-**Description**: Indicates when containers have a liveness probe to a not exposed port.
+**Description**: Indicates when containers have a startup probe to a not exposed port.
 
-**Remediation**: Check which ports you've exposed and ensure they match what you have specified in the liveness probe.
+**Remediation**: Check which ports you've exposed and ensure they match what you have specified in the startup probe.
 
 **Template**: [startup-port](templates.md#startup-port-exposed)
 ## unsafe-proc-mount
