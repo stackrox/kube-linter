@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/ghodss/yaml"
 	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/checkregistry"
 	"golang.stackrox.io/kube-linter/pkg/config"
+	"sigs.k8s.io/yaml"
 )
 
 var (

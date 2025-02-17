@@ -4,7 +4,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/ghodss/yaml"
+	"sigs.k8s.io/yaml"
 
 	"github.com/Masterminds/sprig/v3"
 	"github.com/fatih/color"

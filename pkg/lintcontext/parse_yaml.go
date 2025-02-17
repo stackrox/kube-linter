@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/bmatcuk/doublestar/v4"
-	y "github.com/ghodss/yaml"
 	kedaV1Alpha1 "github.com/kedacore/keda/v2/apis/keda/v1alpha1"
 	ocsAppsV1 "github.com/openshift/api/apps/v1"
 	ocpSecV1 "github.com/openshift/api/security/v1"
@@ -29,6 +28,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/kubernetes/scheme"
+	y "sigs.k8s.io/yaml"
 )
 
 const (
