@@ -7,7 +7,6 @@ require (
 	github.com/bmatcuk/doublestar/v4 v4.8.1
 	github.com/cert-manager/cert-manager v1.17.0
 	github.com/fatih/color v1.18.0
-	github.com/ghodss/yaml v1.0.0
 	github.com/kedacore/keda/v2 v2.16.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
@@ -24,6 +23,7 @@ require (
 	k8s.io/apimachinery v0.32.1
 	k8s.io/client-go v0.32.1
 	k8s.io/gengo v0.0.0-20240404160639-a0386bf69313
+	sigs.k8s.io/yaml v1.4.0
 )
 
 require (
@@ -146,7 +146,6 @@ require (
 	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	k8s.io/apiextensions-apiserver v0.32.0 // indirect
 	k8s.io/cli-runtime v0.32.0 // indirect
@@ -163,5 +162,4 @@ require (
 	sigs.k8s.io/kustomize/api v0.18.0 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.18.1 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.5.0 // indirect
-	sigs.k8s.io/yaml v1.4.0 // indirect
 )
