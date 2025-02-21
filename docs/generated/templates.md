@@ -712,6 +712,15 @@ KubeLinter supports the following templates:
   type: string
 ```
 
+## Restart policy
+
+**Key**: `restart-policy`
+
+**Description**: Flag applications running without the restart policy.
+
+**Supported Objects**: DeploymentLike
+
+
 ## Run as non-root user
 
 **Key**: `run-as-non-root`
