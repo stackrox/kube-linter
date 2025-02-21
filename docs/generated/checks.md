@@ -531,6 +531,15 @@ value: '[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'
 ```yaml
 key: owner
 ```
+## restart-policy
+
+**Enabled by default**: No
+
+**Description**: Indicates when a object deployment's like doesn't use a restart policy
+
+**Remediation**: Set up the restart policy for your object to 'Always' or 'OnFailure' to increase the fault tolerance.
+
+**Template**: [restart-policy](templates.md#restart-policy)
 ## run-as-non-root
 
 **Enabled by default**: Yes

@@ -1,0 +1,189 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire-deployment-always
+spec:
+  template:
+    spec:
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dont-fire-pod-always
+spec:
+  restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dont-fire-daemonset-always
+spec:
+  template:
+    spec:
+      restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: dont-fire-replicaset-always
+spec:
+  template:
+    spec:
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: dont-fire-replicationcontroller-always
+spec:
+  template:
+    spec:
+      restartPolicy: Always
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dont-fire-job-always
+spec:
+  template:
+    spec:
+      restartPolicy: Always
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: dont-fire-cronjob-always
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire-deployment-on-failure
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dont-fire-pod-on-failure
+spec:
+  restartPolicy: OnFailure
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dont-fire-daemonset-on-failure
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: dont-fire-replicaset-on-failure
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: dont-fire-replicationcontroller-on-failure
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dont-fire-job-on-failure
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: dont-fire-cronjob-on-failure
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fire-deployment-never
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fire-pod-never
+spec:
+  restartPolicy: Never
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fire-daemonset-never
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: fire-replicaset-never
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: fire-replicationcontroller-never
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fire-job-never
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: fire-cronjob-never
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never

@@ -48,6 +48,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/replicas"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/requiredannotation"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/requiredlabel"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/restartpolicy"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/runasnonroot"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/sccdenypriv"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/serviceaccount"
