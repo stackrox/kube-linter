@@ -5,7 +5,7 @@ go 1.23.4
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/bmatcuk/doublestar/v4 v4.8.1
-	github.com/cert-manager/cert-manager v1.17.0
+	github.com/cert-manager/cert-manager v1.17.1
 	github.com/fatih/color v1.18.0
 	github.com/kedacore/keda/v2 v2.16.1
 	github.com/mitchellh/go-homedir v1.1.0
