@@ -790,22 +790,22 @@ get_value_from() {
   cmd="${KUBE_LINTER_BIN} lint --include restart-policy --do-not-auto-add-defaults --format json ${tmp}"
   run ${cmd}
 
-  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
-  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
-  message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
-  message4=$(get_value_from "${lines[0]}" '.Reports[3].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[3].Diagnostic.Message')
-  message5=$(get_value_from "${lines[0]}" '.Reports[4].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[4].Diagnostic.Message')
-  message6=$(get_value_from "${lines[0]}" '.Reports[5].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[5].Diagnostic.Message')
-  message7=$(get_value_from "${lines[0]}" '.Reports[6].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[6].Diagnostic.Message')
+  message1=$(get_value_from "${lines[0]}" '.Reports[0] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[2] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message4=$(get_value_from "${lines[0]}" '.Reports[3] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message5=$(get_value_from "${lines[0]}" '.Reports[4] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message6=$(get_value_from "${lines[0]}" '.Reports[5] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message7=$(get_value_from "${lines[0]}" '.Reports[6] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
   count=$(get_value_from "${lines[0]}" '.Reports | length')
 
-  [[ "${message1}" == "Deployment: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
-  [[ "${message2}" == "Pod: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
-  [[ "${message3}" == "DaemonSet: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
-  [[ "${message4}" == "ReplicaSet: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
-  [[ "${message5}" == "ReplicationController: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
-  [[ "${message6}" == "Job: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
-  [[ "${message7}" == "CronJob: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
+  [[ "${message1}" == "Deployment fire-deployment-never: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
+  [[ "${message2}" == "Pod fire-pod-never: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
+  [[ "${message3}" == "DaemonSet fire-daemonset-never: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
+  [[ "${message4}" == "ReplicaSet fire-replicaset-never: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
+  [[ "${message5}" == "ReplicationController fire-replicationcontroller-never: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
+  [[ "${message6}" == "Job fire-job-never: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
+  [[ "${message7}" == "CronJob fire-cronjob-never: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
   [[ "${count}" == "7" ]]
 }
 

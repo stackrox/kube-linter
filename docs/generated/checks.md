@@ -535,7 +535,7 @@ key: owner
 
 **Enabled by default**: No
 
-**Description**: Indicates when a object deployment's like doesn't use a restart policy
+**Description**: Indicates when a deployment-like object does not use a restart policy
 
 **Remediation**: Set up the restart policy for your object to 'Always' or 'OnFailure' to increase the fault tolerance.
 
