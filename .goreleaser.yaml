@@ -124,3 +124,8 @@ docker_signs:
 
 changelog:
   use: github-native
+
+source:
+  enabled: true
+  files:
+    - vendor
