@@ -597,6 +597,27 @@ KubeLinter supports the following templates:
   type: string
 ```
 
+## Priority class name
+
+**Key**: `priority-class-name`
+
+**Description**: Flag applications running with invalid priority class name.
+
+**Supported Objects**: DeploymentLike
+
+
+**Parameters**:
+
+```yaml
+- arrayElemType: string
+  description: Array of all priority class names that are accepted.
+  name: acceptedPriorityClassNames
+  negationAllowed: false
+  regexAllowed: false
+  required: false
+  type: array
+```
+
 ## Privilege Escalation on Containers
 
 **Key**: `privilege-escalation-container`
