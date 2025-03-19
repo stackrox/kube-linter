@@ -6,7 +6,6 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
-	"golang.stackrox.io/kube-linter/pkg/extract"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	"golang.stackrox.io/kube-linter/pkg/templates"
@@ -79,10 +78,6 @@ func init() {
 					return nil
 				}
 				for _, obj := range lintCtx.Objects() {
-					_, hasPods := extract.PodTemplateSpec(obj.K8sObject)
-					if !hasPods {
-						continue
-					}
 					k8sObj := obj.K8sObject
 					gvk := k8sObj.GetObjectKind().GroupVersionKind()
 					if target.Name == obj.GetK8sObjectName().Name && target.Kind == gvk.Kind && target.APIVersion == gvk.Group+"/"+gvk.Version {
