@@ -38,6 +38,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/pdbminavailable"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/pdbunhealthypodevictionpolicy"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/ports"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/priorityclassname"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/privileged"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/privilegedports"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/privilegeescalation"
