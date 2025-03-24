@@ -1,0 +1,126 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire-deployment
+spec:
+  template:
+    spec:
+      priorityClassName: system-cluster-critical
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dont-fire-pod
+spec:
+  priorityClassName: system-cluster-critical
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dont-fire-daemonset
+spec:
+  template:
+    spec:
+      priorityClassName: system-cluster-critical
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: dont-fire-replicaset
+spec:
+  template:
+    spec:
+      priorityClassName: system-cluster-critical
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: dont-fire-replicationcontroller
+spec:
+  template:
+    spec:
+      priorityClassName: system-cluster-critical
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dont-fire-job
+spec:
+  template:
+    spec:
+      priorityClassName: system-cluster-critical
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: dont-fire-cronjob
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          priorityClassName: system-cluster-critical
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fire-deployment
+spec:
+  template:
+    spec:
+      priorityClassName: fire
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fire-pod
+spec:
+  priorityClassName: fire
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fire-daemonset
+spec:
+  template:
+    spec:
+      priorityClassName: fire
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: fire-replicaset
+spec:
+  template:
+    spec:
+      priorityClassName: fire
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: fire-replicationcontroller
+spec:
+  template:
+    spec:
+      priorityClassName: fire
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: fire-job
+spec:
+  template:
+    spec:
+      priorityClassName: fire
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: fire-cronjob
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          priorityClassName: fire

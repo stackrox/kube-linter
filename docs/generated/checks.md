@@ -455,6 +455,23 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 **Remediation**: Set unhealthyPodEvictionPolicy to AlwaysAllow. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/#unhealthy-pod-eviction-policy for more information.
 
 **Template**: [pdb-unhealthy-pod-eviction-policy](templates.md#.spec.unhealthypodevictionpolicy-in-pdb-is-set-to-default)
+## priority-class-name
+
+**Enabled by default**: No
+
+**Description**: Indicates when a deployment-like object does not use a valid priority class name
+
+**Remediation**: Set up the priority class name for your object to any accepted values.
+
+**Template**: [priority-class-name](templates.md#priority-class-name)
+
+**Parameters**:
+
+```yaml
+acceptedPriorityClassNames:
+- system-cluster-critical
+- system-node-critical
+```
 ## privilege-escalation-container
 
 **Enabled by default**: Yes
