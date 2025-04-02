@@ -2,6 +2,8 @@ module golang.stackrox.io/kube-linter
 
 go 1.23.4
 
+toolchain go1.24.1
+
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/bmatcuk/doublestar/v4 v4.8.1
@@ -17,7 +19,7 @@ require (
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.79.2
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.6
-	github.com/spf13/viper v1.20.0
+	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
 	helm.sh/helm/v3 v3.17.2
 	k8s.io/api v0.32.3
