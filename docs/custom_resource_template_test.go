@@ -53,7 +53,7 @@ var CertLifetime = check.Template{
 				return []diagnostic.Diagnostic{{Message: "Invalid certificate"}}
 			}
 
-			if cert.Spec.Duration.Duration.Hours() > 8760 {
+			if cert.Spec.Duration.Hours() > 8760 {
 				return []diagnostic.Diagnostic{{Message: "Certificates with lifetimes longer than one year are not allowed"}}
 			}
 			return nil

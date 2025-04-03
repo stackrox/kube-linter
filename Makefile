@@ -32,7 +32,7 @@ GOLANGCILINT_BIN := $(GOBIN)/golangci-lint
 $(GOLANGCILINT_BIN): deps
 	@echo "+ $@"
 	cd tool-imports; \
-	GOBIN=$(GOBIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint
+	GOBIN=$(GOBIN) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint
 
 GORELEASER_BIN := $(GOBIN)/goreleaser
 $(GORELEASER_BIN): deps
