@@ -24,7 +24,7 @@ func CheckProbePort(container *v1.Container, probe *v1.Probe) []diagnostic.Diagn
 		ports[intstr.FromString(port.Name)] = sentinel
 	}
 
-	if httpProbe := probe.ProbeHandler.HTTPGet; httpProbe != nil {
+	if httpProbe := probe.HTTPGet; httpProbe != nil {
 		if _, ok := ports[httpProbe.Port]; !ok {
 			return []diagnostic.Diagnostic{{
 				Message: fmt.Sprintf("container %q does not expose port %s for the HTTPGet", container.Name, httpProbe.Port.String()),
@@ -32,7 +32,7 @@ func CheckProbePort(container *v1.Container, probe *v1.Probe) []diagnostic.Diagn
 		}
 	}
 
-	if tcpProbe := probe.ProbeHandler.TCPSocket; tcpProbe != nil {
+	if tcpProbe := probe.TCPSocket; tcpProbe != nil {
 		if _, ok := ports[tcpProbe.Port]; !ok {
 			return []diagnostic.Diagnostic{{
 				Message: fmt.Sprintf("container %q does not expose port %s for the TCPSocket", container.Name, tcpProbe.Port.String()),
@@ -40,7 +40,7 @@ func CheckProbePort(container *v1.Container, probe *v1.Probe) []diagnostic.Diagn
 		}
 	}
 
-	if grpcProbe := probe.ProbeHandler.GRPC; grpcProbe != nil {
+	if grpcProbe := probe.GRPC; grpcProbe != nil {
 		if _, ok := ports[intstr.FromInt32(grpcProbe.Port)]; !ok {
 			return []diagnostic.Diagnostic{{
 				Message: fmt.Sprintf("container %q does not expose port %d for the GRPC check", container.Name, grpcProbe.Port),

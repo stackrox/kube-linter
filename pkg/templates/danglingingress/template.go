@@ -53,7 +53,7 @@ func getSelectorsFromIngress(ingress *networkingV1.Ingress) map[serviceDescripto
 	}
 
 	for _, r := range ingress.Spec.Rules {
-		spec := r.IngressRuleValue.HTTP
+		spec := r.HTTP
 		if spec == nil {
 			continue
 		}
@@ -106,14 +106,14 @@ func init() {
 
 					for _, port := range service.Spec.Ports {
 						desc := serviceDescriptor{
-							name: service.ObjectMeta.Name,
+							name: service.Name,
 							port: intstr.FromInt(int(port.Port)),
 						}
 						delete(selectors, desc)
 
 						if port.Name != "" {
 							desc := serviceDescriptor{
-								name: service.ObjectMeta.Name,
+								name: service.Name,
 								port: intstr.FromString(port.Name),
 							}
 							delete(selectors, desc)

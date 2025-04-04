@@ -1,74 +1,13 @@
-run:
-  timeout: 5m
-  go: "1.22"
-
-issues:
-  exclude-use-default: false
-
-linters-settings:
-  govet:
-    enable-all: true
-    disable:
-      - shadow
-      - fieldalignment
-    settings:
-      printf: # analyzer name, run `go tool vet help` to see all analyzers
-        funcs: # run `go tool vet help printf` to see available settings for `printf` analyzer
-          - Print
-          - Printf
-          - Println
-          - Debug
-          - Debugf
-          - Info
-          - Infof
-          - Warn
-          - Warnf
-          - Error
-          - Errorf
-  gocritic:
-    enabled-tags:
-      - diagnostic
-      - experimental
-      - opinionated
-      - performance
-      - style
-    disabled-checks:
-      - dupImport # https://github.com/go-critic/go-critic/issues/845
-      - commentFormatting
-      - octalLiteral
-      - unnamedResult
-      - unnecessaryDefer
-      - importShadow
-      - emptyStringTest
-      - hugeParam
-      - rangeValCopy
-  gosec:
-    excludes:
-      - G101
-  gosimple:
-    checks: ["all"]
-  nolintlint:
-    allow-unused: false # report any unused nolint directives
-    require-explanation: false # don't require an explanation for nolint directives
-    require-specific: true # require nolint directives to be specific about which linter is being skipped
-  revive:
-    confidence: 0
-    # Due to https://github.com/golangci/golangci-lint/issues/2355 on MacOS the linter is failing with the error
-    # message too many files. Set the max-open-files explicitly.
-    max-open-files: 2048
-  staticcheck:
-    checks: ["all"]
-  stylecheck:
-    checks: ["all", "-ST1000"]
-  testifylint:
-    disable:
-      - require-error
-    enable-all: true
+formatters:
+  enable:
+    - gofmt
+    - goimports
 
 linters:
   # please, do not use `enable-all`: it's deprecated and will be removed soon.
   # inverted configuration with `enable-all` and `disable` is not scalable during updates of golangci-lint
-  disable-all: true
+  default: none
+
   enable:
     - asciicheck
     # - bodyclose
@@ -87,12 +26,9 @@ linters:
     # - godot
     # - godox
     # - goerr113
-    - gofmt
-    - goimports
     # - gomnd
     # - goprintffuncname
     - gosec
-    - gosimple
     - govet
     - ineffassign
     # - interfacer
@@ -108,7 +44,6 @@ linters:
     # - scopelint
     - staticcheck
     # - structcheck
-    - stylecheck
     # - testpackage
     - testifylint
     # - typecheck
@@ -118,3 +53,87 @@ linters:
     # - varcheck
     # - whitespace
     # - wsl
+
+  settings:
+    gocritic:
+      disabled-checks:
+        - dupImport # https://github.com/go-critic/go-critic/issues/845
+        - commentFormatting
+        - octalLiteral
+        - unnamedResult
+        - unnecessaryDefer
+        - importShadow
+        - emptyStringTest
+        - hugeParam
+        - rangeValCopy
+
+      enabled-tags:
+        - diagnostic
+        - experimental
+        - opinionated
+        - performance
+        - style
+
+    gosec:
+      excludes:
+        - G101
+
+    govet:
+      disable:
+        - shadow
+        - fieldalignment
+
+      enable-all: true
+
+      settings:
+        printf: # analyzer name, run `go tool vet help` to see all analyzers
+          funcs: # run `go tool vet help printf` to see available settings for `printf` analyzer
+            - Print
+            - Printf
+            - Println
+            - Debug
+            - Debugf
+            - Info
+            - Infof
+            - Warn
+            - Warnf
+            - Error
+            - Errorf
+
+    nolintlint:
+      # report any unused nolint directives
+      allow-unused: false
+
+      # don't require an explanation for nolint directives
+      require-explanation: false
+
+      # require nolint directives to be specific about which linter is being skipped
+      require-specific: true
+
+    revive:
+      confidence: 0
+
+      # Due to https://github.com/golangci/golangci-lint/issues/2355 on MacOS the linter is failing with the error
+      # message too many files. Set the max-open-files explicitly.
+      max-open-files: 2048
+
+    staticcheck:
+      checks:
+        - all
+        - -ST1000
+
+    testifylint:
+      disable:
+        - require-error
+
+      enable-all: true
+
+output:
+  show-stats: false
+
+run:
+  go: "1.22"
+
+  timeout: 5m
+
+version: "2"
