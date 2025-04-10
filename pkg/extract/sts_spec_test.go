@@ -30,16 +30,16 @@ func TestStatefulSetSpec(t *testing.T) {
 			expectedFound: true,
 		},
 		{
-			name:          "Non-StatefulSet object (Deployment)",
-			obj:           &appsV1.Deployment{}, // Geçerli bir objeyi başka bir türde veriyoruz
+			name:           "Non-StatefulSet object (Deployment)",
+			obj:            &appsV1.Deployment{}, // Geçerli bir objeyi başka bir türde veriyoruz
 			expectedResult: appsV1.StatefulSetSpec{},
-			expectedFound: false,
+			expectedFound:  false,
 		},
 		{
-			name:          "Nil object",
-			obj:           nil, // Nil obje durumu
+			name:           "Nil object",
+			obj:            nil, // Nil obje durumu
 			expectedResult: appsV1.StatefulSetSpec{},
-			expectedFound: false,
+			expectedFound:  false,
 		},
 	}
 

@@ -9,9 +9,9 @@ import (
 
 func TestValidate(t *testing.T) {
 	tests := []struct {
-		name           string
-		params         Params
-		expectedError  error
+		name          string
+		params        Params
+		expectedError error
 	}{
 		{
 			name: "valid annotation",
