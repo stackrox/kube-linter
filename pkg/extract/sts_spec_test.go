@@ -31,13 +31,24 @@ func TestStatefulSetSpec(t *testing.T) {
 		},
 		{
 			name:           "Non-StatefulSet object (Deployment)",
-			obj:            &appsV1.Deployment{}, // Geçerli bir objeyi başka bir türde veriyoruz
+			obj:            &appsV1.Deployment{},
 			expectedResult: appsV1.StatefulSetSpec{},
 			expectedFound:  false,
 		},
 		{
 			name:           "Nil object",
-			obj:            nil, // Nil obje durumu
+			obj:            nil,
+			expectedResult: appsV1.StatefulSetSpec{},
+			expectedFound:  false,
+		},
+		{
+			name: "Non-StatefulSet object with Spec (Deployment)",
+			obj: &appsV1.Deployment{
+				ObjectMeta: metav1.ObjectMeta{Name: "test-deployment"},
+				Spec: appsV1.DeploymentSpec{
+					Replicas: new(int32),
+				},
+			},
 			expectedResult: appsV1.StatefulSetSpec{},
 			expectedFound:  false,
 		},
