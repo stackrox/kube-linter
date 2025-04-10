@@ -1,7 +1,6 @@
 module golang.stackrox.io/kube-linter
 
-go 1.23.4
-toolchain go1.24.1
+go 1.24.1
 
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
