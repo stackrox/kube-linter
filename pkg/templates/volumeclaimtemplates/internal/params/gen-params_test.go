@@ -27,6 +27,13 @@ func TestValidate(t *testing.T) {
 			},
 			expectedError: errors.Errorf("invalid parameters: required param annotation not found"),
 		},
+		{
+			name: "valid annotation but with additional invalid param",
+			params: Params{
+				Annotation: "",
+			},
+			expectedError: errors.Errorf("invalid parameters: required param annotation not found"),
+		},
 	}
 
 	for _, tt := range tests {
