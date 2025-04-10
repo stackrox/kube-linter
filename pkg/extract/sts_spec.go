@@ -8,11 +8,14 @@ import (
 )
 
 func StatefulSetSpec(obj k8sutil.Object) (appsV1.StatefulSetSpec, bool) {
+	if obj == nil {
+		return appsV1.StatefulSetSpec{}, false
+	}
+
 	switch obj := obj.(type) {
 	case *appsV1.StatefulSet:
 		return obj.Spec, true
 	default:
-
 		kind := obj.GetObjectKind().GroupVersionKind().Kind
 		if kind != "StatefulSet" {
 			return appsV1.StatefulSetSpec{}, false
