@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"golang.stackrox.io/kube-linter/pkg/check"
-	"golang.stackrox.io/kube-linter/pkg/lintcontext"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
+	"golang.stackrox.io/kube-linter/pkg/lintcontext"
 )
 
 func TestValidate(t *testing.T) {
