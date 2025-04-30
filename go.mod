@@ -5,7 +5,7 @@ go 1.24.1
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/bmatcuk/doublestar/v4 v4.8.1
-	github.com/cert-manager/cert-manager v1.17.1
+	github.com/cert-manager/cert-manager v1.17.2
 	github.com/fatih/color v1.18.0
 	github.com/go-viper/mapstructure/v2 v2.2.1
 	github.com/kedacore/keda/v2 v2.17.0
