@@ -662,6 +662,30 @@ get_value_from() {
 
 }
 
+@test "priority-class-name" {
+  tmp="tests/checks/priority-class-name.yaml"
+  cmd="${KUBE_LINTER_BIN} lint --include priority-class-name --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[2] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message4=$(get_value_from "${lines[0]}" '.Reports[3] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message5=$(get_value_from "${lines[0]}" '.Reports[4] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message6=$(get_value_from "${lines[0]}" '.Reports[5] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message7=$(get_value_from "${lines[0]}" '.Reports[6] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment fire-deployment: object has a priority class name defined with 'fire' but the only accepted priority class names are '[system-cluster-critical system-node-critical]'" ]]
+  [[ "${message2}" == "Pod fire-pod: object has a priority class name defined with 'fire' but the only accepted priority class names are '[system-cluster-critical system-node-critical]'" ]]
+  [[ "${message3}" == "DaemonSet fire-daemonset: object has a priority class name defined with 'fire' but the only accepted priority class names are '[system-cluster-critical system-node-critical]'" ]]
+  [[ "${message4}" == "ReplicaSet fire-replicaset: object has a priority class name defined with 'fire' but the only accepted priority class names are '[system-cluster-critical system-node-critical]'" ]]
+  [[ "${message5}" == "ReplicationController fire-replicationcontroller: object has a priority class name defined with 'fire' but the only accepted priority class names are '[system-cluster-critical system-node-critical]'" ]]
+  [[ "${message6}" == "Job fire-job: object has a priority class name defined with 'fire' but the only accepted priority class names are '[system-cluster-critical system-node-critical]'" ]]
+  [[ "${message7}" == "CronJob fire-cronjob: object has a priority class name defined with 'fire' but the only accepted priority class names are '[system-cluster-critical system-node-critical]'" ]]
+  [[ "${count}" == "7" ]]
+}
+
 @test "privilege-escalation-container" {
   tmp="tests/checks/privilege-escalation-container.yml"
   cmd="${KUBE_LINTER_BIN} lint --include privilege-escalation-container --do-not-auto-add-defaults --format json ${tmp}"
