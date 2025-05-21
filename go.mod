@@ -8,7 +8,7 @@ require (
 	github.com/cert-manager/cert-manager v1.17.2
 	github.com/fatih/color v1.18.0
 	github.com/go-viper/mapstructure/v2 v2.2.1
-	github.com/kedacore/keda/v2 v2.17.0
+	github.com/kedacore/keda/v2 v2.17.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/openshift/api v0.0.0-20230406152840-ce21e3fe5da2
