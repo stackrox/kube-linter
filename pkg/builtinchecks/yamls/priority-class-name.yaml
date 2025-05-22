@@ -1,0 +1,10 @@
+name: "priority-class-name"
+description: "Indicates when a deployment-like object does not use a valid priority class name"
+remediation: >-
+  Set up the priority class name for your object to any accepted values.
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "priority-class-name"
+params:
+  acceptedPriorityClassNames: ["system-cluster-critical", "system-node-critical"]
