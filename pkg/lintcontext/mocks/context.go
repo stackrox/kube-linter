@@ -28,3 +28,8 @@ func (l *MockLintContext) InvalidObjects() []lintcontext.InvalidObject {
 func NewMockContext() *MockLintContext {
 	return &MockLintContext{objects: make(map[string]k8sutil.Object)}
 }
+
+// AddObject adds an object to the MockLintContext
+func (l *MockLintContext) AddObject(key string, obj k8sutil.Object) {
+	l.objects[key] = obj
+}
