@@ -204,28 +204,22 @@ The following are tutorials on KubeLinter written by users. If you have one that
 * [How to add a new check in KubeLinter?](https://www.psaggu.com/upstream-contribution/2021/08/17/notes.html) by Priyanka Saggu.
 * [Extending kube-linter To Build A Custom Template](https://github.com/garethahealy/kubelinter-extending-blog) by [Gareth Healy](https://github.com/garethahealy).
 
-## Community
-
-If you would like to engage with the KubeLinter community, including maintainers and other users, you can join the Slack workspace [here](https://join.slack.com/t/kube-linter/shared_invite/zt-kla9qvyo-Tk~wynTSbr9EE3AjHcv4BQ).
-
-To contribute, check out our [contributing guide](./CONTRIBUTING.md).
-
-As a reminder, all participation in the KubeLinter community is governed by our [code of conduct](./CODE_OF_CONDUCT.md).
-
-## WARNING: Alpha release
-
-KubeLinter is at an early stage of development. There may be breaking changes in
-the future to the command usage, flags, and configuration file formats. However,
-we encourage you to use KubeLinter to test your environment YAML files, see what
-breaks, and [contribute](./CONTRIBUTING.md).
-
 ## LICENSE
 
 KubeLinter is licensed under the [Apache License 2.0](./LICENSE).
 
-## StackRox
+## Community
 
-KubeLinter is made with ❤️ by [StackRox](https://stackrox.com/).
+If you would like to engage with the KubeLinter community, including maintainers and other users, you can join the Slack workspace [here](https://join.slack.com/t/kube-linter/shared_invite/zt-kla9qvyo-Tk~wynTSbr9EE3AjHcv4BQ).
 
-If you're interested in KubeLinter, or in any of the other cool things we do, please know that we're hiring!
-Check out our [open positions](https://www.stackrox.com/job-board/). We'd love to hear from you!
+There may be breaking changes in the future to the command usage, flags, and configuration
+file formats. However, we encourage you to use KubeLinter to test your environment YAML
+files, see what breaks, and [contribute](./CONTRIBUTING.md).
+
+As a reminder, all participation in the KubeLinter community is governed by our
+[code of conduct](./CODE_OF_CONDUCT.md).
+
+---
+
+KubeLinter is created with ❤️ by [StackRox](https://www.stackrox.io/) and is now powered
+by [Red Hat](https://stackrox.com/).
