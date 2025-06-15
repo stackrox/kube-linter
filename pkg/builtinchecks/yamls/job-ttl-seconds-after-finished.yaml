@@ -1,0 +1,7 @@
+name: "job-ttl-seconds-after-finished"
+description: "Indicates when standalone jobs do not set ttlSecondsAfterFinished and when jobs managed by cronjob do set ttlSecondsAfterFinished."
+remediation: "Set Job.spec.ttlSecondsAfterFinished. Unset CronJob.Spec.JobTemplate.Spec.ttlSecondsAfterFinished."
+scope:
+  objectKinds:
+    - JobLike
+template: "job-ttl-seconds-after-finished"

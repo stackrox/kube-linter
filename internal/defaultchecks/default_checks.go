@@ -17,6 +17,7 @@ var (
 		"host-network",
 		"host-pid",
 		"invalid-target-ports",
+		"job-ttl-seconds-after-finished",
 		"latest-tag",
 		"liveness-port",
 		"mismatching-selector",

@@ -277,6 +277,15 @@ minReplicas: 3
 **Remediation**: Ensure that port naming is in conjunction with the specification. For more information, please look at the Kubernetes Service specification on this page: https://kubernetes.io/docs/reference/_print/#ServiceSpec. And additional information about IANA Service naming can be found on the following page: https://www.rfc-editor.org/rfc/rfc6335.html#section-5.1.
 
 **Template**: [target-port](templates.md#target-port)
+## job-ttl-seconds-after-finished
+
+**Enabled by default**: Yes
+
+**Description**: Indicates when standalone jobs do not set ttlSecondsAfterFinished and when jobs managed by cronjob do set ttlSecondsAfterFinished.
+
+**Remediation**: Set Job.spec.ttlSecondsAfterFinished. Unset CronJob.Spec.JobTemplate.Spec.ttlSecondsAfterFinished.
+
+**Template**: [job-ttl-seconds-after-finished](templates.md#ttlsecondsafterfinished-impact-for-standalone-and-managed-job-objects)
 ## latest-tag
 
 **Enabled by default**: Yes
