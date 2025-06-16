@@ -12,14 +12,13 @@ import (
 )
 
 const (
-	JobKind        = "Job"
-	CronJobKind    = "CronJob"
-	job_no_ttl     = "job_no_ttl"
-	job_ttl        = "job_ttl"
-	cronjob_no_ttl = "cronjob_no_ttl"
-	cronjob_ttl    = "cronjob_ttl"
+	JobKind      = "Job"
+	CronJobKind  = "CronJob"
+	jobNoTTL     = "job_no_ttl"
+	jobTTL       = "job_ttl"
+	cronjobNoTTL = "cronjob_no_ttl"
+	cronjobTTL   = "cronjob_ttl"
 )
-
 
 type JobTTLSecondsAfterFinishedTestSuite struct {
 	templates.TemplateTestSuite
@@ -32,7 +31,7 @@ func (s *JobTTLSecondsAfterFinishedTestSuite) SetupTest() {
 	s.ctx = mocks.NewMockContext()
 }
 
-func (s *JobTTLSecondsAfterFinishedTestSuite) AddJobLike(kind string, name string, ttl *int32) {
+func (s *JobTTLSecondsAfterFinishedTestSuite) AddJobLike(kind, name string, ttl *int32) {
 	switch kind {
 	case JobKind:
 		s.ctx.AddMockJob(s.T(), name)
@@ -57,12 +56,12 @@ func TestJobTTLSecondsAfterFinished(t *testing.T) {
 
 func (s *JobTTLSecondsAfterFinishedTestSuite) TestJobTTL() {
 	ttl := int32(100)
-	s.AddJobLike(JobKind, job_ttl, &ttl)
+	s.AddJobLike(JobKind, jobTTL, &ttl)
 	s.Validate(s.ctx, []templates.TestCase{
 		{
 			Param: params.Params{},
 			Diagnostics: map[string][]diagnostic.Diagnostic{
-				job_ttl: nil,
+				jobTTL: nil,
 			},
 			ExpectInstantiationError: false,
 		},
@@ -70,12 +69,12 @@ func (s *JobTTLSecondsAfterFinishedTestSuite) TestJobTTL() {
 }
 
 func (s *JobTTLSecondsAfterFinishedTestSuite) TestJobNoTTL() {
-	s.AddJobLike(JobKind, job_no_ttl, nil)
+	s.AddJobLike(JobKind, jobNoTTL, nil)
 	s.Validate(s.ctx, []templates.TestCase{
 		{
 			Param: params.Params{},
 			Diagnostics: map[string][]diagnostic.Diagnostic{
-				job_no_ttl: {{Message: "Standalone Job does not specify ttlSecondsAfterFinished"}},
+				jobNoTTL: {{Message: "Standalone Job does not specify ttlSecondsAfterFinished"}},
 			},
 			ExpectInstantiationError: false,
 		},
@@ -84,12 +83,12 @@ func (s *JobTTLSecondsAfterFinishedTestSuite) TestJobNoTTL() {
 
 func (s *JobTTLSecondsAfterFinishedTestSuite) TestCronJobTTL() {
 	ttl := int32(100)
-	s.AddJobLike(CronJobKind, cronjob_ttl, &ttl)
+	s.AddJobLike(CronJobKind, cronjobTTL, &ttl)
 	s.Validate(s.ctx, []templates.TestCase{
 		{
 			Param: params.Params{},
 			Diagnostics: map[string][]diagnostic.Diagnostic{
-				cronjob_ttl: {{Message: "Managed Job specifies ttlSecondsAfterFinished which might conflict with successfulJobsHistoryLimit and failedJobsHistoryLimit from CronJob. Final behaviour is determined by the stricktier"}}, // must be nil
+				cronjobTTL: {{Message: "Managed Job specifies ttlSecondsAfterFinished which might conflict with successfulJobsHistoryLimit and failedJobsHistoryLimit from CronJob. Final behaviour is determined by the stricktier"}},
 			},
 			ExpectInstantiationError: false,
 		},
@@ -97,12 +96,12 @@ func (s *JobTTLSecondsAfterFinishedTestSuite) TestCronJobTTL() {
 }
 
 func (s *JobTTLSecondsAfterFinishedTestSuite) TestCronJobNoTTL() {
-	s.AddJobLike(CronJobKind, cronjob_no_ttl, nil)
+	s.AddJobLike(CronJobKind, cronjobNoTTL, nil)
 	s.Validate(s.ctx, []templates.TestCase{
 		{
 			Param: params.Params{},
 			Diagnostics: map[string][]diagnostic.Diagnostic{
-				cronjob_no_ttl: nil,
+				cronjobNoTTL: nil,
 			},
 			ExpectInstantiationError: false,
 		},
