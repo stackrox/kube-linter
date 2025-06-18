@@ -414,6 +414,15 @@ KubeLinter supports the following templates:
   type: array
 ```
 
+## ttlSecondsAfterFinished impact for standalone and managed Job objects
+
+**Key**: `job-ttl-seconds-after-finished`
+
+**Description**: Flag standalone Job objects not setting ttlSecondsAfterFinished. Flag CronJob objects setting ttlSecondsAfterFinished
+
+**Supported Objects**: JobLike
+
+
 ## Latest Tag
 
 **Key**: `latest-tag`

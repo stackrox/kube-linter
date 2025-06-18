@@ -394,6 +394,21 @@ get_value_from() {
   [[ "${actual_messages[3]}" == "Deployment: port name \"123456\" in container \"invalid-target-ports\" must contain at least one letter (a-z)" ]]
 }
 
+@test "job-ttl-seconds-after-finished" {
+  tmp="tests/checks/job-ttl-seconds-after-finished.yaml"
+  cmd="${KUBE_LINTER_BIN} lint --include job-ttl-seconds-after-finished --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + " " + .Reports[0].Object.K8sObject.Name + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + " " + .Reports[1].Object.K8sObject.Name + ": " + .Reports[1].Diagnostic.Message')
+
+  [[ "${message1}" == "Job bad-job: Standalone Job does not specify ttlSecondsAfterFinished" ]]
+  [[ "${message2}" == "CronJob bad-cronjob: Managed Job specifies ttlSecondsAfterFinished which might conflict with successfulJobsHistoryLimit and failedJobsHistoryLimit from CronJob that have default values. Final behaviour is determined by the strictest parameter, and therefore, setting ttlSecondsAfterFinished at the job level can result with unexpected behaviour with regard to finished jobs removal" ]]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "2" ]]
+}
+
 @test "latest-tag" {
   tmp="tests/checks/latest-tag.yml"
   cmd="${KUBE_LINTER_BIN} lint --include latest-tag --do-not-auto-add-defaults --format json ${tmp}"
