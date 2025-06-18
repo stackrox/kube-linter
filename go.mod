@@ -7,7 +7,7 @@ require (
 	github.com/bmatcuk/doublestar/v4 v4.8.1
 	github.com/cert-manager/cert-manager v1.18.0
 	github.com/fatih/color v1.18.0
-	github.com/go-viper/mapstructure/v2 v2.2.1
+	github.com/go-viper/mapstructure/v2 v2.3.0
 	github.com/kedacore/keda/v2 v2.17.1
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
