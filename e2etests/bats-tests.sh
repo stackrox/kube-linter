@@ -399,11 +399,11 @@ get_value_from() {
   cmd="${KUBE_LINTER_BIN} lint --include job-ttl-seconds-after-finished --do-not-auto-add-defaults --format json ${tmp}"
   run ${cmd}
 
-  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
-  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + " " + .Reports[0].Object.K8sObject.Name + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + " " + .Reports[1].Object.K8sObject.Name + ": " + .Reports[1].Diagnostic.Message')
 
-  [[ "${message1}" == "Job: Standalone Job does not specify ttlSecondsAfterFinished" ]]
-  [[ "${message2}" == "CronJob: Managed Job specifies ttlSecondsAfterFinished which might conflict with successfulJobsHistoryLimit and failedJobsHistoryLimit from CronJob. Final behaviour is determined by the stricktier" ]]
+  [[ "${message1}" == "Job bad-job: Standalone Job does not specify ttlSecondsAfterFinished" ]]
+  [[ "${message2}" == "CronJob bad-cronjob: Managed Job specifies ttlSecondsAfterFinished which might conflict with successfulJobsHistoryLimit and failedJobsHistoryLimit from CronJob that have default values. Final behaviour is determined by the strictest parameter, and therefore, setting ttlSecondsAfterFinished at the job level can result with unexpected behaviour with regard to finished jobs removal" ]]
 
   count=$(get_value_from "${lines[0]}" '.Reports | length')
   [[ "${count}" == "2" ]]

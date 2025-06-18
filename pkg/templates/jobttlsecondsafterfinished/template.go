@@ -36,7 +36,7 @@ func init() {
 					}
 				case "CronJob":
 					if jobSpec.TTLSecondsAfterFinished != nil {
-						return []diagnostic.Diagnostic{{Message: "Managed Job specifies ttlSecondsAfterFinished which might conflict with successfulJobsHistoryLimit and failedJobsHistoryLimit from CronJob. Final behaviour is determined by the stricktier"}}
+						return []diagnostic.Diagnostic{{Message: "Managed Job specifies ttlSecondsAfterFinished which might conflict with successfulJobsHistoryLimit and failedJobsHistoryLimit from CronJob that have default values. Final behaviour is determined by the strictest parameter, and therefore, setting ttlSecondsAfterFinished at the job level can result with unexpected behaviour with regard to finished jobs removal"}}
 					}
 				}
 				return nil
