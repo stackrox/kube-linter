@@ -67,11 +67,12 @@ If you're using GitHub, there's the [KubeLinter GitHub Action](README.md#kubelin
 Alternatively, you can grab the latest binary release with the following commands
 ```bash
 LOCATION=$(curl -s https://api.github.com/repos/stackrox/kube-linter/releases/latest \
-| grep "tag_name" \
-| awk '{print "https://github.com/stackrox/kube-linter/releases/download/" substr($2, 2, length($2)-3) "/kube-linter-linux.tar.gz"}')
+| jq -r '.tag_name
+    | "https://github.com/stackrox/kube-linter/releases/download/\(.)/kube-linter-linux.tar.gz"')
 curl -L -o kube-linter-linux.tar.gz $LOCATION
 mkdir kube-linter/
 tar -xf kube-linter-linux.tar.gz -C "kube-linter/"
+
 ```
 and pass `--fail-on-invalid-resource` as an option to have your pipeline fail if your YAML file can't be parsed. See the following example:
 ```bash
