@@ -76,7 +76,7 @@ tar -xf kube-linter-linux.tar.gz -C "kube-linter/"
 ```
 and pass `--fail-on-invalid-resource` as an option to have your pipeline fail if your YAML file can't be parsed. See the following example:
 ```bash
-./kube-linter/kube-linter lint --fail-on-invalid-resource pod.yaml
+./kube-linter/kube-linter lint --fail-on-invalid-resource /path/to/yaml-file.yaml
 ```
 
 ## KubeLinter commands
