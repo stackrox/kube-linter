@@ -62,7 +62,7 @@ includes the following pre-commit hooks:
 
 ## Using KubeLinter as part of your CI pipeline
 
-If you're using Github, there's the [KubeLinter Github Action](README.md##kubelinter-github-action) available.
+If you're using GitHub, there's the [KubeLinter GitHub Action](README.md##kubelinter-github-action) available.
 
 Alternatively, you can grab the latest binary release with the following commands
 ```bash
