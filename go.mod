@@ -8,7 +8,7 @@ require (
 	github.com/cert-manager/cert-manager v1.18.1
 	github.com/fatih/color v1.18.0
 	github.com/go-viper/mapstructure/v2 v2.3.0
-	github.com/kedacore/keda/v2 v2.17.1
+	github.com/kedacore/keda/v2 v2.17.2
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/openshift/api v0.0.0-20230406152840-ce21e3fe5da2
@@ -49,7 +49,7 @@ require (
 	github.com/evanphx/json-patch/v5 v5.9.11 // indirect
 	github.com/exponent-io/jsonpath v0.0.0-20210407135951-1de76d718b3f // indirect
 	github.com/expr-lang/expr v1.17.2 // indirect
-	github.com/fsnotify/fsnotify v1.8.0 // indirect
+	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/fxamacker/cbor/v2 v2.7.0 // indirect
 	github.com/go-errors/errors v1.5.1 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
