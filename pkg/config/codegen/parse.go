@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -11,10 +12,8 @@ import (
 	"strings"
 	"text/template"
 
-	"golang.stackrox.io/kube-linter/internal/utils"
-
 	"github.com/Masterminds/sprig/v3"
-	"github.com/pkg/errors"
+	"golang.stackrox.io/kube-linter/internal/utils"
 	"k8s.io/gengo/parser"
 	"k8s.io/gengo/types"
 )
@@ -99,7 +98,7 @@ type templateElem struct {
 func getJSONKey(member types.Member) (string, error) {
 	jsonTag := reflect.StructTag(member.Tags).Get("json")
 	if jsonTag == "" {
-		return "", errors.Errorf("member %v does not specify a json tag", member)
+		return "", fmt.Errorf("member %v does not specify a json tag", member)
 	}
 	return strings.Split(jsonTag, ",")[0], nil
 }
@@ -144,7 +143,7 @@ func constructFlagDescsFromStruct(typeSpec *types.Type, jsonPathSoFar []string) 
 		extractedTags := types.ExtractCommentTags("+", member.CommentLines)
 		flagNameTags := extractedTags[flagNameTagKey]
 		if len(flagNameTags) > 1 {
-			return nil, errors.Errorf("got multiple flag name tags in member: %v", member)
+			return nil, fmt.Errorf("got multiple flag name tags in member: %v", member)
 		}
 		var flagName string
 		if len(flagNameTags) == 1 {
@@ -165,7 +164,7 @@ func constructFlagDescsFromStruct(typeSpec *types.Type, jsonPathSoFar []string) 
 		if member.Type.Kind == types.Struct {
 			subDescs, err := constructFlagDescsFromStruct(member.Type, jsonPath)
 			if err != nil {
-				return nil, errors.Wrapf(err, "handling field %s", member.Name)
+				return nil, fmt.Errorf("handling field %s: %w", member.Name, err)
 			}
 			flagDescs = append(flagDescs, subDescs...)
 			continue
@@ -174,7 +173,7 @@ func constructFlagDescsFromStruct(typeSpec *types.Type, jsonPathSoFar []string) 
 		// If we got here, it must be a primitive field.
 		cobraType := getCobraTypeFromMember(member.Type)
 		if cobraType == "" {
-			return nil, errors.Errorf("couldn't find mapped cobra type for member %v", member)
+			return nil, fmt.Errorf("couldn't find mapped cobra type for member %v", member)
 		}
 		flagDescs = append(flagDescs, flagDesc{
 			Name:        flagName,
@@ -207,7 +206,7 @@ func mainCmd() error {
 
 	pkgNames := b.FindPackages()
 	if len(pkgNames) != 1 {
-		return errors.Errorf("found unexpected number of packages in %+v: %d", pkgNames, len(pkgNames))
+		return fmt.Errorf("found unexpected number of packages in %+v: %d", pkgNames, len(pkgNames))
 	}
 
 	pkg := typeUniverse.Package(pkgNames[0])
@@ -225,7 +224,7 @@ func mainCmd() error {
 		enc := json.NewEncoder(buf)
 		enc.SetIndent("", "\t")
 		if err := enc.Encode(flagDesc); err != nil {
-			return errors.Wrapf(err, "couldn't marshal param %v", flagDesc)
+			return fmt.Errorf("couldn't marshal param %v: %w", flagDesc, err)
 		}
 
 		templateObj = append(templateObj, templateElem{
@@ -234,11 +233,11 @@ func mainCmd() error {
 	}
 	outF, err := os.Create(filepath.Clean(outFileName))
 	if err != nil {
-		return errors.Wrap(err, "creating output file")
+		return fmt.Errorf("creating output file: %w", err)
 	}
 	defer utils.IgnoreError(outF.Close)
 	if err := fileTemplate.Execute(outF, templateObj); err != nil {
-		return errors.Wrap(err, "Writing template to File")
+		return fmt.Errorf("writing template to File: %w", err)
 	}
 	return nil
 }

@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/checkregistry"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"sigs.k8s.io/yaml"
@@ -29,7 +28,7 @@ func LoadInto(registry checkregistry.CheckRegistry) error {
 	}
 	for i := range checks {
 		if err := registry.Register(&checks[i]); err != nil {
-			return errors.Wrapf(err, "registering default check %s", checks[i].Name)
+			return fmt.Errorf("registering default check %s: %w", checks[i].Name, err)
 		}
 	}
 	return nil
@@ -40,31 +39,31 @@ func List() ([]config.Check, error) {
 	loadOnce.Do(func() {
 		fileEntries, err := yamlFiles.ReadDir("yamls")
 		if err != nil {
-			loadErr = errors.Wrap(err, "reading embedded yaml files")
+			loadErr = fmt.Errorf("reading embedded yaml files: %w", err)
 			return
 		}
 		for _, entry := range fileEntries {
 			if entry.IsDir() || filepath.Ext(entry.Name()) != ".yaml" {
-				loadErr = errors.Errorf("found unexpected entry %s in yamls directory", entry.Name())
+				loadErr = fmt.Errorf("found unexpected entry %s in yamls directory", entry.Name())
 				return
 			}
 			// Do NOT use filepath.Join here, because embed always uses `/` as the separator,
 			// irrespective of the OS we're running.
 			contents, err := yamlFiles.ReadFile(fmt.Sprintf("yamls/%s", entry.Name()))
 			if err != nil {
-				loadErr = errors.Wrapf(err, "loading file %s", entry.Name())
+				loadErr = fmt.Errorf("loading file %s: %w", entry.Name(), err)
 				return
 			}
 			var chk config.Check
 			if err := yaml.Unmarshal(contents, &chk); err != nil {
-				loadErr = errors.Wrapf(err, "unmarshalling default check from %s", entry.Name())
+				loadErr = fmt.Errorf("unmarshalling default check from %s: %w", entry.Name(), err)
 				return
 			}
 			list = append(list, chk)
 		}
 	})
 	if loadErr != nil {
-		return nil, errors.Wrap(loadErr, "UNEXPECTED: failed to load built-in checks")
+		return nil, fmt.Errorf("UNEXPECTED: failed to load built-in checks: %w", loadErr)
 	}
 	return list, nil
 }

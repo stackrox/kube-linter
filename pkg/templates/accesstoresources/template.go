@@ -5,7 +5,6 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/stringutils"
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
@@ -42,7 +41,7 @@ func init() {
 			for _, res := range p.Resources {
 				r, err := regexp.Compile(res)
 				if err != nil {
-					return nil, errors.Wrapf(err, "invalid regex %s", res)
+					return nil, fmt.Errorf("invalid regex %s: %w", res, err)
 				}
 				resourceRegexes = append(resourceRegexes, r)
 			}
@@ -50,7 +49,7 @@ func init() {
 			for _, verb := range p.Verbs {
 				v, err := regexp.Compile(verb)
 				if err != nil {
-					return nil, errors.Wrapf(err, "invalid regex %s", verb)
+					return nil, fmt.Errorf("invalid regex %s: %w", verb, err)
 				}
 				verbRegexes = append(verbRegexes, v)
 			}

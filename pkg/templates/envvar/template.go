@@ -3,7 +3,6 @@ package envvar
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
@@ -28,11 +27,11 @@ func init() {
 		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
 			nameMatcher, err := matcher.ForString(p.Name)
 			if err != nil {
-				return nil, errors.Wrap(err, "invalid name")
+				return nil, fmt.Errorf("invalid name: %w", err)
 			}
 			valueMatcher, err := matcher.ForString(p.Value)
 			if err != nil {
-				return nil, errors.Wrap(err, "invalid value")
+				return nil, fmt.Errorf("invalid value: %w", err)
 			}
 			return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
 				var results []diagnostic.Diagnostic

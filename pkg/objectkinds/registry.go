@@ -3,7 +3,6 @@ package objectkinds
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
@@ -47,7 +46,7 @@ func ConstructMatcher(objectKinds ...string) (Matcher, error) {
 	for _, obj := range objectKinds {
 		matcher := allObjectKinds[obj]
 		if matcher == nil {
-			return nil, errors.Errorf("unknown object kind: %v", obj)
+			return nil, fmt.Errorf("unknown object kind: %v", obj)
 		}
 		matchers = append(matchers, matcher)
 	}

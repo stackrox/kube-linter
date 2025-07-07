@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
@@ -34,7 +33,7 @@ func init() {
 			for _, dir := range p.Dirs {
 				r, err := regexp.Compile(dir)
 				if err != nil {
-					return nil, errors.Wrapf(err, "invalid regex %s", dir)
+					return nil, fmt.Errorf("invalid regex %s: %w", dir, err)
 				}
 				compiledRegexes = append(compiledRegexes, r)
 			}

@@ -3,6 +3,7 @@ package lintcontext
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -14,7 +15,6 @@ import (
 	kedaV1Alpha1 "github.com/kedacore/keda/v2/apis/keda/v1alpha1"
 	ocsAppsV1 "github.com/openshift/api/apps/v1"
 	ocpSecV1 "github.com/openshift/api/security/v1"
-	"github.com/pkg/errors"
 	k8sMonitoring "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	"golang.stackrox.io/kube-linter/pkg/k8sutil"
 	"helm.sh/helm/v3/pkg/chart"
@@ -58,18 +58,18 @@ func parseObjects(data []byte, d runtime.Decoder) ([]k8sutil.Object, error) {
 	}
 	obj, _, err := d.Decode(data, nil, nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to decode")
+		return nil, fmt.Errorf("failed to decode: %w", err)
 	}
 	if list, ok := obj.(*v1.List); ok {
 		objs := make([]k8sutil.Object, 0, len(list.Items))
 		for i, item := range list.Items {
 			obj, _, err := d.Decode(item.Raw, nil, nil)
 			if err != nil {
-				return nil, errors.Wrapf(err, "decoding item %d in the list", i)
+				return nil, fmt.Errorf("decoding item %d in the list: %w", i, err)
 			}
 			asK8sObj, _ := obj.(k8sutil.Object)
 			if asK8sObj == nil {
-				return nil, errors.Errorf("object was not a k8s object: %v", obj)
+				return nil, fmt.Errorf("object was not a k8s object: %v", obj)
 			}
 			objs = append(objs, asK8sObj)
 		}
@@ -77,7 +77,7 @@ func parseObjects(data []byte, d runtime.Decoder) ([]k8sutil.Object, error) {
 	}
 	asK8sObj, _ := obj.(k8sutil.Object)
 	if asK8sObj == nil {
-		return nil, errors.Errorf("object was not a k8s object: %v", obj)
+		return nil, fmt.Errorf("object was not a k8s object: %v", obj)
 	}
 	// TODO: validate
 	return []k8sutil.Object{asK8sObj}, nil
@@ -104,7 +104,7 @@ func (l *lintContextImpl) renderHelmChart(dir string) (map[string]string, error)
 	valOpts := &values.Options{ValueFiles: []string{filepath.Join(dir, "values.yaml")}}
 	values, err := valOpts.MergeValues(nil)
 	if err != nil {
-		return nil, errors.Wrap(err, "loading values.yaml file")
+		return nil, fmt.Errorf("loading values.yaml file: %w", err)
 	}
 	return l.renderValues(chrt, values)
 }
@@ -118,7 +118,7 @@ func (l *lintContextImpl) renderValues(chrt *chart.Chart, values map[string]inte
 	e := engine.Engine{LintMode: true}
 	rendered, err := e.Render(chrt, valuesToRender)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to render")
+		return nil, fmt.Errorf("failed to render: %w", err)
 	}
 
 	return rendered, nil
@@ -194,7 +194,7 @@ func (l *lintContextImpl) loadObjectsFromYAMLFile(filePath string, info os.FileI
 	}
 	file, err := os.Open(filepath.Clean(filePath))
 	if err != nil {
-		return errors.Wrapf(err, "opening file at %s", filePath)
+		return fmt.Errorf("opening file at %s: %w", filePath, err)
 	}
 	defer func() {
 		_ = file.Close()
@@ -207,7 +207,7 @@ func (l *lintContextImpl) loadObjectsFromReader(filePath string, reader io.Reade
 	yamlReader := yaml.NewYAMLReader(bufio.NewReader(reader))
 	for {
 		if err := l.loadObjectFromYAMLReader(filePath, yamlReader); err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				return nil
 			}
 			return err
@@ -230,12 +230,12 @@ func (l *lintContextImpl) renderChart(fileName string, chart *chart.Chart) (map[
 
 	indexName := filepath.Join(fileName, "values.yaml")
 	if valuesIndex == -1 {
-		return nil, errors.Errorf("%s not found", indexName)
+		return nil, fmt.Errorf("%s not found", indexName)
 	}
 
 	values := map[string]interface{}{}
 	if err := y.Unmarshal(chart.Raw[valuesIndex].Data, &values); err != nil {
-		return nil, errors.Wrapf(err, "failed to parse values file %s", indexName)
+		return nil, fmt.Errorf("failed to parse values file %s: %w", indexName, err)
 	}
 
 	return l.renderValues(chart, values)
@@ -271,7 +271,7 @@ nextFile:
 		for _, path := range ignorePaths {
 			ignoreMatch, err := doublestar.PathMatch(path, pathToTemplate)
 			if err != nil {
-				return errors.Wrapf(err, "could not match pattern %s", path)
+				return fmt.Errorf("could not match pattern %s: %w", path, err)
 			}
 			if ignoreMatch {
 				continue nextFile
@@ -284,7 +284,7 @@ nextFile:
 		}
 
 		if err := l.loadObjectsFromReader(pathToTemplate, strings.NewReader(contents)); err != nil {
-			loadErr := errors.Wrapf(err, "loading object %s from rendered helm chart %s", pathToTemplate, chartPath)
+			loadErr := fmt.Errorf("loading object %s from rendered helm chart %s: %w", pathToTemplate, chartPath, err)
 			l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: pathToTemplate}, LoadErr: loadErr})
 		}
 	}

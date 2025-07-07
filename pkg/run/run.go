@@ -1,9 +1,9 @@
 package run
 
 import (
+	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/version"
 	"golang.stackrox.io/kube-linter/pkg/checkregistry"
 	"golang.stackrox.io/kube-linter/pkg/config"
@@ -45,7 +45,7 @@ func Run(lintCtxs []lintcontext.LintContext, registry checkregistry.CheckRegistr
 	for _, checkName := range checks {
 		instantiatedCheck := registry.Load(checkName)
 		if instantiatedCheck == nil {
-			return Result{}, errors.Errorf("check %q not found", checkName)
+			return Result{}, fmt.Errorf("check %q not found", checkName)
 		}
 		instantiatedChecks = append(instantiatedChecks, instantiatedCheck)
 		result.Checks = append(result.Checks, instantiatedCheck.Spec)
