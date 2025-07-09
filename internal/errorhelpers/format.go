@@ -45,9 +45,9 @@ func (e *ErrorList) AddErrors(errs ...error) {
 	}
 }
 
-// AddWrap is a convenient wrapper around `AddError(fmt.Errorf(msg+": %w", msg, err))`.
+// AddWrap is a convenient wrapper around `AddError(fmt.Errorf("%s: %w", msg, err))`.
 func (e *ErrorList) AddWrap(err error, msg string) {
-	e.AddError(fmt.Errorf(msg+": %w", msg, err))
+	e.AddError(fmt.Errorf("%s: %w", msg, err))
 }
 
 // AddWrapf is a convenient wrapper around `AddError(fmt.Errorf(format+": %w", append(args, err)...))`.
