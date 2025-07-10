@@ -207,7 +207,7 @@ func (l *lintContextImpl) loadObjectsFromReader(filePath string, reader io.Reade
 	yamlReader := yaml.NewYAMLReader(bufio.NewReader(reader))
 	for {
 		if err := l.loadObjectFromYAMLReader(filePath, yamlReader); err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				return nil
 			}
 			return err
