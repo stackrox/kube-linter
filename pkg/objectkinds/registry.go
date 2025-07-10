@@ -3,7 +3,7 @@ package objectkinds
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
+	"golang.stackrox.io/kube-linter/pkg/errors"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 

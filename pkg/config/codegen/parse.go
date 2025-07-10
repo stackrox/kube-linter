@@ -11,10 +11,9 @@ import (
 	"strings"
 	"text/template"
 
-	"golang.stackrox.io/kube-linter/internal/utils"
-
 	"github.com/Masterminds/sprig/v3"
-	"github.com/pkg/errors"
+	"golang.stackrox.io/kube-linter/internal/utils"
+	"golang.stackrox.io/kube-linter/pkg/errors"
 	"k8s.io/gengo/parser"
 	"k8s.io/gengo/types"
 )

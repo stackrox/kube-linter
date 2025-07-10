@@ -6,9 +6,9 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/set"
 	"golang.stackrox.io/kube-linter/internal/utils"
+	"golang.stackrox.io/kube-linter/pkg/errors"
 )
 
 // EnumFlag allows setting a list of values.

@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/go-viper/mapstructure/v2"
-	"github.com/pkg/errors"
 	"github.com/spf13/viper"
+	"golang.stackrox.io/kube-linter/pkg/errors"
 )
 
 // ChecksConfig is the config that determines which checks to run.

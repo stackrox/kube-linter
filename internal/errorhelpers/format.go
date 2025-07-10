@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
+	"golang.stackrox.io/kube-linter/pkg/errors"
 )
 
 // ErrorList is a wrapper around many errors

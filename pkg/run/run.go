@@ -3,11 +3,11 @@ package run
 import (
 	"time"
 
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/version"
 	"golang.stackrox.io/kube-linter/pkg/checkregistry"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
+	"golang.stackrox.io/kube-linter/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/ignore"
 	"golang.stackrox.io/kube-linter/pkg/instantiatedcheck"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"

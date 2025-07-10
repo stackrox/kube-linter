@@ -4,22 +4,20 @@ import (
 	"fmt"
 	"os"
 
-	"golang.stackrox.io/kube-linter/pkg/diagnostic"
-	"golang.stackrox.io/kube-linter/pkg/pathutil"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"golang.stackrox.io/kube-linter/internal/flagutil"
 	"golang.stackrox.io/kube-linter/pkg/builtinchecks"
 	"golang.stackrox.io/kube-linter/pkg/checkregistry"
 	"golang.stackrox.io/kube-linter/pkg/command/common"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/configresolver"
+	"golang.stackrox.io/kube-linter/pkg/diagnostic"
+	"golang.stackrox.io/kube-linter/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
+	"golang.stackrox.io/kube-linter/pkg/pathutil"
 	"golang.stackrox.io/kube-linter/pkg/run"
-
-	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
 
 const (

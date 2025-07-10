@@ -1,8 +1,8 @@
 package checkregistry
 
 import (
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/config"
+	"golang.stackrox.io/kube-linter/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/instantiatedcheck"
 )
 

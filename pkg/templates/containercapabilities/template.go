@@ -3,11 +3,11 @@ package containercapabilities
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/utils"
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
+	"golang.stackrox.io/kube-linter/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/matcher"
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	"golang.stackrox.io/kube-linter/pkg/templates"

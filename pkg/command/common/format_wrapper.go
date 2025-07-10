@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"io"
 
-	"github.com/pkg/errors"
+	"golang.stackrox.io/kube-linter/pkg/errors"
 )
 
 // FormatType defines possible output formats.

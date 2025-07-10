@@ -9,12 +9,12 @@ import (
 	"text/template"
 
 	"github.com/owenrumney/go-sarif/v2/sarif"
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/consts"
 	"golang.stackrox.io/kube-linter/pkg/command/checks"
 	"golang.stackrox.io/kube-linter/pkg/command/common"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
+	"golang.stackrox.io/kube-linter/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
 	"golang.stackrox.io/kube-linter/pkg/run"
 )

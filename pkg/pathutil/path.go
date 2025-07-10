@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 
 	"github.com/mitchellh/go-homedir"
-	"github.com/pkg/errors"
+	"golang.stackrox.io/kube-linter/pkg/errors"
 )
 
 // GetAbsolutPath returns the absolute representation of given path.

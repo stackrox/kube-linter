@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/check"
+	"golang.stackrox.io/kube-linter/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/templates/util"
 )
 

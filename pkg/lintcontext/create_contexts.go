@@ -10,8 +10,8 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/pathutil"
 
 	"github.com/bmatcuk/doublestar/v4"
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/set"
+	"golang.stackrox.io/kube-linter/pkg/errors"
 	"helm.sh/helm/v3/pkg/chartutil"
 	"k8s.io/apimachinery/pkg/runtime"
 )
