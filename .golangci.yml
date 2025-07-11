@@ -35,7 +35,7 @@ linters:
     # - interfacer
     # - lll
     # - maligned
-    # - misspell
+    - misspell
     - nakedret
     # - nestif
     - nolintlint
