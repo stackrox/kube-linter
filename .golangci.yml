@@ -62,7 +62,6 @@ linters:
         - commentFormatting
         - octalLiteral
         - unnamedResult
-        - unnecessaryDefer
         - importShadow
         - emptyStringTest
         - hugeParam
