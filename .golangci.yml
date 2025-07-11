@@ -64,7 +64,6 @@ linters:
         - unnamedResult
         - unnecessaryDefer
         - importShadow
-        - emptyStringTest
         - hugeParam
         - rangeValCopy
 
