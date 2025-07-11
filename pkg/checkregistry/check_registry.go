@@ -1,7 +1,8 @@
 package checkregistry
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/instantiatedcheck"
 )
@@ -20,10 +21,10 @@ func (cr checkRegistry) Register(checks ...*config.Check) error {
 	for _, c := range checks {
 		instantiated, err := instantiatedcheck.ValidateAndInstantiate(c)
 		if err != nil {
-			return errors.Wrapf(err, "invalid check %s", c.Name)
+			return fmt.Errorf("invalid check %s: %w", c.Name, err)
 		}
 		if _, ok := cr[instantiated.Spec.Name]; ok {
-			return errors.Errorf("duplicate check name: %s", instantiated.Spec.Name)
+			return fmt.Errorf("duplicate check name: %s", instantiated.Spec.Name)
 		}
 		cr[instantiated.Spec.Name] = instantiated
 	}

@@ -3,7 +3,6 @@ package ports
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/matcher"
 
@@ -29,7 +28,7 @@ func init() {
 		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
 			protocolMatcher, err := matcher.ForString(p.Protocol)
 			if err != nil {
-				return nil, errors.Wrap(err, "invalid protocol")
+				return nil, fmt.Errorf("invalid protocol: %w", err)
 			}
 			return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
 				var results []diagnostic.Diagnostic
