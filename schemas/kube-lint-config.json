@@ -13,7 +13,7 @@
                 },
                 "addAllBuiltIn": {
                     "type": "boolean",
-                    "description": "Enable all built-in checks. Takes precedence over doNotAutoAddDefaults"
+                    "description": "Enable all built-in checks. Users can explicitly opt-out checks using exclude. Takes precedence over doNotAutoAddDefaults"
                 },
                 "ignorePaths": {
                     "type": "array",
