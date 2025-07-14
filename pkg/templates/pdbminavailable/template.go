@@ -111,7 +111,7 @@ func minAvailableCheck(lintCtx lintcontext.LintContext, object lintcontext.Objec
 			replicas = transformReplicaIntoMinReplicas(dl, hpa, replicas)
 		}
 		if isPercent {
-			// Calulate the actual value of the MinAvailable with respect to the Replica count if a percentage is set
+			// Calculate the actual value of the MinAvailable with respect to the Replica count if a percentage is set
 			pdbMinAvailable = int(math.Ceil(float64(replicas) * (float64(value) / float64(100))))
 		}
 		//nolint:gosec // Integer conversion should be safe here since the kube api uses int32.
