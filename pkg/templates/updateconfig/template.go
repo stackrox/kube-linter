@@ -107,8 +107,8 @@ func conditional(firstCond bool, firstStr string, secondCond bool, secondStr, bo
 
 func needsRollingUpdateDefinition(p params.Params) bool {
 	isRolling, _ := regexp.MatchString("Rolling", p.StrategyTypeRegex)
-	return isRolling && (len(p.MinPodsUnavailable) > 0 || len(p.MaxPodsUnavailable) > 0 ||
-		len(p.MinSurge) > 0 || len(p.MaxSurge) > 0)
+	return isRolling && (p.MinPodsUnavailable != "" || p.MaxPodsUnavailable != "" ||
+		p.MinSurge != "" || p.MaxSurge != "")
 }
 
 func init() {
@@ -128,25 +128,25 @@ func init() {
 			if err != nil {
 				errorList.AddWrapf(err, "invalid regex %s", p.StrategyTypeRegex)
 			}
-			if len(p.MaxPodsUnavailable) > 0 {
+			if p.MaxPodsUnavailable != "" {
 				maxPodsUnavailable, err = parseIntOrString(p.MaxPodsUnavailable)
 				if err != nil {
 					errorList.AddWrapf(err, "invalid MaxPodsUnavailable %s", p.MaxPodsUnavailable)
 				}
 			}
-			if len(p.MinPodsUnavailable) > 0 {
+			if p.MinPodsUnavailable != "" {
 				minPodsUnavailable, err = parseIntOrString(p.MinPodsUnavailable)
 				if err != nil {
 					errorList.AddWrapf(err, "invalid MinPodsUnavailable %s", p.MinPodsUnavailable)
 				}
 			}
-			if len(p.MaxSurge) > 0 {
+			if p.MaxSurge != "" {
 				maxSurge, err = parseIntOrString(p.MaxSurge)
 				if err != nil {
 					errorList.AddWrapf(err, "invalid MaxSurge %s", p.MaxSurge)
 				}
 			}
-			if len(p.MinSurge) > 0 {
+			if p.MinSurge != "" {
 				minSurge, err = parseIntOrString(p.MinSurge)
 				if err != nil {
 					errorList.AddWrapf(err, "invalid MinSurge %s", p.MinSurge)
@@ -168,7 +168,7 @@ func init() {
 				if !compiledRegex.MatchString(strategy.Type) {
 					newD := diagnostic.Diagnostic{
 						Message: fmt.Sprintf("object has %s strategy type but must match regex %s",
-							stringutils.Ternary(len(strategy.Type) > 0, strategy.Type, "no"), p.StrategyTypeRegex)}
+							stringutils.Ternary(strategy.Type != "", strategy.Type, "no"), p.StrategyTypeRegex)}
 					diagnostics = append(diagnostics, newD)
 				}
 				if !strategy.RollingConfigExists {
@@ -183,7 +183,7 @@ func init() {
 						minStr := fmt.Sprintf("at least %s", p.MinPodsUnavailable)
 						maxStr := fmt.Sprintf("no more than %s", p.MaxPodsUnavailable)
 						msg := fmt.Sprintf("object has a max unavailable of %s but %s is required", strategy.MaxUnavailable.String(),
-							conditional(len(p.MinPodsUnavailable) > 0, minStr, len(p.MaxPodsUnavailable) > 0, maxStr, " and "))
+							conditional(p.MinPodsUnavailable != "", minStr, p.MaxPodsUnavailable != "", maxStr, " and "))
 						newD := diagnostic.Diagnostic{Message: msg}
 						diagnostics = append(diagnostics, newD)
 					}
@@ -193,7 +193,7 @@ func init() {
 						minStr := fmt.Sprintf("at least %s", p.MinSurge)
 						maxStr := fmt.Sprintf("no more than %s", p.MaxSurge)
 						msg := fmt.Sprintf("object has a max surge of %s but %s is required", strategy.MaxSurge.String(),
-							conditional(len(p.MinSurge) > 0, minStr, len(p.MaxSurge) > 0, maxStr, " and "))
+							conditional(p.MinSurge != "", minStr, p.MaxSurge != "", maxStr, " and "))
 						newD := diagnostic.Diagnostic{Message: msg}
 						diagnostics = append(diagnostics, newD)
 					}

@@ -62,7 +62,6 @@ linters:
         - commentFormatting
         - unnamedResult
         - importShadow
-        - emptyStringTest
         - hugeParam
         - rangeValCopy
 
