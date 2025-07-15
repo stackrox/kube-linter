@@ -49,6 +49,10 @@
                         "type": "string",
                         "description": "Unique identifier for this custom check"
                     },
+                    "description": {
+                        "type": "string",
+                        "description": "Brief explanation of what the custom check does.",
+                    },
                     "template": {
                         "type": "string",
                         "description": "Template name (e.g. required-annotation, required-label)"
