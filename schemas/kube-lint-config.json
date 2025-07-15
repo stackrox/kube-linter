@@ -51,7 +51,7 @@
                     },
                     "description": {
                         "type": "string",
-                        "description": "Brief explanation of what the custom check does.",
+                        "description": "Brief explanation of what the custom check does."
                     },
                     "template": {
                         "type": "string",
