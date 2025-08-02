@@ -66,6 +66,10 @@ dockers:
       - "--label=org.opencontainers.image.version={{ .Version }}"
       - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
       - "--label=org.opencontainers.image.created={{ .CommitDate }}"
+  
+  - dockerfile: image/Dockerfile
+    ids:
+      - kube-linter
     image_templates:
       - "ghcr.io/stackrox/kube-linter:latest-arm64"
       - "ghcr.io/stackrox/kube-linter:{{ .Tag }}-arm64"
@@ -106,6 +110,10 @@ dockers:
       - "--label=org.opencontainers.image.version={{ .Version }}"
       - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
       - "--label=org.opencontainers.image.created={{ .CommitDate }}"
+  
+  - dockerfile: image/Dockerfile_alpine
+    ids:
+      - kube-linter
     image_templates:
       - "ghcr.io/stackrox/kube-linter:latest-alpine-arm64"
       - "ghcr.io/stackrox/kube-linter:{{ .Tag }}-alpine-arm64"
