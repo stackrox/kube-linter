@@ -49,13 +49,31 @@ dockers:
     ids:
       - kube-linter
     image_templates:
-      - "ghcr.io/stackrox/kube-linter:latest"
-      - "ghcr.io/stackrox/kube-linter:{{ .Tag }}"
-      - "stackrox/kube-linter:latest"
-      - "stackrox/kube-linter:{{ .Tag }}"
+      - "ghcr.io/stackrox/kube-linter:latest-amd64"
+      - "ghcr.io/stackrox/kube-linter:{{ .Tag }}-amd64"
+      - "stackrox/kube-linter:latest-amd64"
+      - "stackrox/kube-linter:{{ .Tag }}-amd64"
     build_flag_templates:
       - "--pull"
       - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.vendor=RedHat"
+      - "--label=org.opencontainers.image.description=Kube-Linter {{ .Version }}"
+      - "--label=org.opencontainers.image.url=https://kubelinter.io"
+      - "--label=org.opencontainers.image.documentation=https://docs.kubelinter.io/"
+      - "--label=org.opencontainers.image.source={{ .GitURL }}"
+      - "--label=org.opencontainers.image.licenses=Apache"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.created={{ .CommitDate }}"
+    image_templates:
+      - "ghcr.io/stackrox/kube-linter:latest-arm64"
+      - "ghcr.io/stackrox/kube-linter:{{ .Tag }}-arm64"
+      - "stackrox/kube-linter:latest-arm64"
+      - "stackrox/kube-linter:{{ .Tag }}-arm64"
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/arm64"
       - "--label=org.opencontainers.image.title={{ .ProjectName }}"
       - "--label=org.opencontainers.image.vendor=RedHat"
       - "--label=org.opencontainers.image.description=Kube-Linter {{ .Version }}"
@@ -71,13 +89,31 @@ dockers:
     ids:
       - kube-linter
     image_templates:
-      - "ghcr.io/stackrox/kube-linter:latest-alpine"
-      - "ghcr.io/stackrox/kube-linter:{{ .Tag }}-alpine"
-      - "stackrox/kube-linter:latest-alpine"
-      - "stackrox/kube-linter:{{ .Tag }}-alpine"
+      - "ghcr.io/stackrox/kube-linter:latest-alpine-amd64"
+      - "ghcr.io/stackrox/kube-linter:{{ .Tag }}-alpine-amd64"
+      - "stackrox/kube-linter:latest-alpine-amd64"
+      - "stackrox/kube-linter:{{ .Tag }}-alpine-amd64"
     build_flag_templates:
       - "--pull"
       - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
+      - "--label=org.opencontainers.image.vendor=RedHat"
+      - "--label=org.opencontainers.image.description=Kube-Linter {{ .Version }}"
+      - "--label=org.opencontainers.image.url=https://kubelinter.io"
+      - "--label=org.opencontainers.image.documentation=https://docs.kubelinter.io/"
+      - "--label=org.opencontainers.image.source={{ .GitURL }}"
+      - "--label=org.opencontainers.image.licenses=Apache"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.created={{ .CommitDate }}"
+    image_templates:
+      - "ghcr.io/stackrox/kube-linter:latest-alpine-arm64"
+      - "ghcr.io/stackrox/kube-linter:{{ .Tag }}-alpine-arm64"
+      - "stackrox/kube-linter:latest-alpine-arm64"
+      - "stackrox/kube-linter:{{ .Tag }}-alpine-arm64"
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/arm64"
       - "--label=org.opencontainers.image.title={{ .ProjectName }}"
       - "--label=org.opencontainers.image.vendor=RedHat"
       - "--label=org.opencontainers.image.description=Kube-Linter {{ .Version }}"
