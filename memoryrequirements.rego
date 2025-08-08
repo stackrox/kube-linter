@@ -1,8 +1,9 @@
 package kubelinter.template.memoryrequirements
 
-import kubelinter.objectkinds.is_deployment_like
+import data.kubelinter.objectkinds.is_deployment_like
+import future.keywords.in
 
-deny contains msg if {
+deny[msg] {
 	is_deployment_like
 	some container in input.spec.template.spec.containers
 	requirementsType := data.memoryrequirements.requirementsType
@@ -10,16 +11,16 @@ deny contains msg if {
 	upperBoundMB := data.memoryrequirements.upperBoundMB
 
 	# Check requests
-	(requirementsType == "request" || requirementsType == "any")
+	is_request_type(requirementsType)
 	memoryRequest := container.resources.requests.memory
 	memory_bytes := parse_memory_bytes(memoryRequest)
 	memory_mb := memory_bytes / (1024 * 1024)
 	memory_mb >= lowerBoundMB
-	(upperBoundMB == null || memory_mb <= upperBoundMB)
+	upper_bound_valid(upperBoundMB, memory_mb)
 	msg := sprintf("container %q has memory request %s", [container.name, memoryRequest])
 }
 
-deny contains msg if {
+deny[msg] {
 	is_deployment_like
 	some container in input.spec.template.spec.containers
 	requirementsType := data.memoryrequirements.requirementsType
@@ -27,13 +28,37 @@ deny contains msg if {
 	upperBoundMB := data.memoryrequirements.upperBoundMB
 
 	# Check limits
-	(requirementsType == "limit" || requirementsType == "any")
+	is_limit_type(requirementsType)
 	memoryLimit := container.resources.limits.memory
 	memory_bytes := parse_memory_bytes(memoryLimit)
 	memory_mb := memory_bytes / (1024 * 1024)
 	memory_mb >= lowerBoundMB
-	(upperBoundMB == null || memory_mb <= upperBoundMB)
+	upper_bound_valid(upperBoundMB, memory_mb)
 	msg := sprintf("container %q has memory limit %s", [container.name, memoryLimit])
+}
+
+is_request_type(requirementsType) {
+	requirementsType == "request"
+}
+
+is_request_type(requirementsType) {
+	requirementsType == "any"
+}
+
+is_limit_type(requirementsType) {
+	requirementsType == "limit"
+}
+
+is_limit_type(requirementsType) {
+	requirementsType == "any"
+}
+
+upper_bound_valid(upperBoundMB, memory_mb) {
+	upperBoundMB == null
+}
+
+upper_bound_valid(upperBoundMB, memory_mb) {
+	memory_mb <= upperBoundMB
 }
 
 # Helper function to parse memory value to bytes

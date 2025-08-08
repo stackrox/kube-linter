@@ -1,6 +1,6 @@
 package kubelinter.template.jobttlsecondsafterfinished
 
-import kubelinter.objectkinds.is_job_like
+import data.kubelinter.objectkinds.is_job_like
 
 deny contains msg if {
 	is_job_like

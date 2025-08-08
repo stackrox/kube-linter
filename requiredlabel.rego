@@ -1,15 +1,15 @@
 package kubelinter.template.requiredlabel
 
-import kubelinter.objectkinds.is_any
+import data.kubelinter.objectkinds.is_deployment_like
+import future.keywords.in
 
 deny contains msg if {
-	is_any
-	key := data.requiredlabel.key
-	value := data.requiredlabel.value
-	not has_label(key, value)
-	msg := sprintf("object is missing required label %q with value %q", [key, value])
+	is_deployment_like
+	some label in data.requiredlabel.labels
+	not has_label(label)
+	msg := sprintf("label %q is required", [label])
 }
 
-has_label(key, value) {
-	input.metadata.labels[key] == value
+has_label(label) if {
+	input.metadata.labels[label]
 }

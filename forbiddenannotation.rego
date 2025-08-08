@@ -1,15 +1,11 @@
 package kubelinter.template.forbiddenannotation
 
-import kubelinter.objectkinds.is_any
+import data.kubelinter.objectkinds.is_deployment_like
+import future.keywords.in
 
-deny contains msg if {
-	is_any
-	key := data.forbiddenannotation.key
-	value := data.forbiddenannotation.value
-	has_annotation(key, value)
-	msg := sprintf("object has forbidden annotation %q with value %q", [key, value])
-}
-
-has_annotation(key, value) {
-	input.metadata.annotations[key] == value
+deny[msg] {
+	is_deployment_like
+	some annotation in input.metadata.annotations
+	not is_allowed_annotation(annotation)
+	msg := sprintf("annotation %q is forbidden", [annotation])
 }

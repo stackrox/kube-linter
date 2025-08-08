@@ -1,32 +1,27 @@
 package kubelinter.template.dnsconfigoptions
 
-import kubelinter.objectkinds.is_deployment_like
+import data.kubelinter.objectkinds.is_deployment_like
+import future.keywords.in
 
-deny contains msg if {
+deny[msg] {
 	is_deployment_like
-	not input.spec.template.spec.dnsConfig
-	msg := "Object does not define any DNSConfig rules."
+	some container in input.spec.template.spec.containers
+	some option in container.dnsConfig.options
+	not is_allowed_dns_option(option)
+	msg := sprintf("container %q has disallowed DNS option %q", [container.name, option.name])
 }
 
-deny contains msg if {
+deny[msg] {
 	is_deployment_like
-	input.spec.template.spec.dnsConfig
-	not input.spec.template.spec.dnsConfig.options
-	msg := "Object does not define any DNSConfig Options."
+	some container in input.spec.template.spec.containers
+	some option in container.dnsConfig.options
+	not has_required_dns_option(option)
+	msg := sprintf("container %q is missing required DNS option %q", [container.name, option.name])
 }
 
-deny contains msg if {
+deny[msg] {
 	is_deployment_like
-	input.spec.template.spec.dnsConfig
-	input.spec.template.spec.dnsConfig.options
-	key := data.dnsconfigoptions.key
-	value := data.dnsconfigoptions.value
-	not has_dnsconfig_option(key, value)
-	msg := sprintf("DNSConfig Options \"%s:%s\" not found.", [key, value])
-}
-
-has_dnsconfig_option(key, value) {
-	some option in input.spec.template.spec.dnsConfig.options
-	option.name == key
-	option.value == value
+	some container in input.spec.template.spec.containers
+	not has_dns_config(container)
+	msg := sprintf("container %q has no DNS config specified", [container.name])
 }

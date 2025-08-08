@@ -1,8 +1,9 @@
 package kubelinter.template.danglinghpa
 
-import kubelinter.objectkinds.is_horizontalpodautoscaler
+import data.kubelinter.objectkinds.is_horizontalpodautoscaler
+import future.keywords.in
 
-deny contains msg if {
+deny[msg] {
 	is_horizontalpodautoscaler
 	target := input.spec.scaleTargetRef
 	not target_exists(target)

@@ -1,7 +1,7 @@
 package kubelinter.template.privilegeescalation
 
-import kubelinter.objectkinds.is_deployment_like
-
+import data.kubelinter.objectkinds.is_deployment_like
+import future.keywords.in
 deny contains msg if {
 	is_deployment_like
 	some container in input.spec.template.spec.containers

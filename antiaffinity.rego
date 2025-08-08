@@ -1,8 +1,9 @@
 package kubelinter.template.antiaffinity
 
-import kubelinter.objectkinds.is_deployment_like
+import data.kubelinter.objectkinds.is_deployment_like
+import future.keywords.in
 
-deny contains msg if {
+deny[msg] {
 	is_deployment_like
 	minReplicas := data.antiaffinity.minReplicas
 	replicas := get_replicas()
@@ -12,7 +13,7 @@ deny contains msg if {
 	msg := sprintf("object has %d %s but does not specify inter pod anti-affinity", [replicas, replicaText])
 }
 
-deny contains msg if {
+deny[msg] {
 	is_deployment_like
 	minReplicas := data.antiaffinity.minReplicas
 	replicas := get_replicas()
@@ -23,7 +24,7 @@ deny contains msg if {
 	msg := sprintf("object has %d %s but does not specify preferred or required inter pod anti-affinity during scheduling", [replicas, replicaText])
 }
 
-deny contains msg if {
+deny[msg] {
 	is_deployment_like
 	minReplicas := data.antiaffinity.minReplicas
 	replicas := get_replicas()
@@ -54,9 +55,21 @@ has_anti_affinity() {
 }
 
 has_valid_anti_affinity_rules() {
+	has_preferred_rules()
+}
+
+has_valid_anti_affinity_rules() {
+	has_required_rules()
+}
+
+has_preferred_rules() {
 	preferred := input.spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution
+	count(preferred) > 0
+}
+
+has_required_rules() {
 	required := input.spec.template.spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution
-	count(preferred) > 0 || count(required) > 0
+	count(required) > 0
 }
 
 has_invalid_anti_affinity_config() {
@@ -78,7 +91,7 @@ is_valid_affinity_term(term) {
 	# Check namespace
 	namespace := input.metadata.namespace
 	namespace == "default"
-	(not term.namespaces) || namespace in term.namespaces
+	namespace_matches_term(term)
 
 	# Check topology key
 	topologyKey := data.antiaffinity.topologyKey
@@ -87,6 +100,15 @@ is_valid_affinity_term(term) {
 
 	# Check label selector
 	labels_match_selector(term.labelSelector, input.spec.template.metadata.labels)
+}
+
+namespace_matches_term(term) {
+	not term.namespaces
+}
+
+namespace_matches_term(term) {
+	namespace := input.metadata.namespace
+	namespace in term.namespaces
 }
 
 labels_match_selector(selector, labels) {

@@ -1,8 +1,9 @@
 package kubelinter.template.cpurequirements
 
-import kubelinter.objectkinds.is_deployment_like
+import data.kubelinter.objectkinds.is_deployment_like
+import future.keywords.in
 
-deny contains msg if {
+deny[msg] {
 	is_deployment_like
 	some container in input.spec.template.spec.containers
 	requirementsType := data.cpurequirements.requirementsType
@@ -10,15 +11,15 @@ deny contains msg if {
 	upperBound := data.cpurequirements.upperBoundMillis
 
 	# Check requests
-	(requirementsType == "request" || requirementsType == "any")
+	is_request_type(requirementsType)
 	cpuRequest := container.resources.requests.cpu
 	cpu_millis := parse_cpu_millis(cpuRequest)
 	cpu_millis >= lowerBound
-	(upperBound == null || cpu_millis <= upperBound)
+	upper_bound_valid(upperBound, cpu_millis)
 	msg := sprintf("container %q has cpu request %s", [container.name, cpuRequest])
 }
 
-deny contains msg if {
+deny[msg] {
 	is_deployment_like
 	some container in input.spec.template.spec.containers
 	requirementsType := data.cpurequirements.requirementsType
@@ -26,12 +27,36 @@ deny contains msg if {
 	upperBound := data.cpurequirements.upperBoundMillis
 
 	# Check limits
-	(requirementsType == "limit" || requirementsType == "any")
+	is_limit_type(requirementsType)
 	cpuLimit := container.resources.limits.cpu
 	cpu_millis := parse_cpu_millis(cpuLimit)
 	cpu_millis >= lowerBound
-	(upperBound == null || cpu_millis <= upperBound)
+	upper_bound_valid(upperBound, cpu_millis)
 	msg := sprintf("container %q has cpu limit %s", [container.name, cpuLimit])
+}
+
+is_request_type(requirementsType) {
+	requirementsType == "request"
+}
+
+is_request_type(requirementsType) {
+	requirementsType == "any"
+}
+
+is_limit_type(requirementsType) {
+	requirementsType == "limit"
+}
+
+is_limit_type(requirementsType) {
+	requirementsType == "any"
+}
+
+upper_bound_valid(upperBound, cpu_millis) {
+	upperBound == null
+}
+
+upper_bound_valid(upperBound, cpu_millis) {
+	cpu_millis <= upperBound
 }
 
 # Helper function to parse CPU value to millicores

@@ -1,44 +1,43 @@
 package kubelinter.template.targetport
 
-import kubelinter.objectkinds.is_deployment_like
-import kubelinter.objectkinds.is_service
+import data.kubelinter.objectkinds.is_service
+import future.keywords.in
 
 deny contains msg if {
-	is_deployment_like
-	some container in input.spec.template.spec.containers
-	some port in container.ports
-	port.name != ""
-	not is_valid_port_name(port.name)
-	msg := sprintf("port name %q in container %q is invalid", [port.name, container.name])
+	is_service
+	some port in input.spec.ports
+	port.targetPort
+	not is_valid_target_port(port.targetPort)
+	msg := sprintf("service has invalid target port %v", [port.targetPort])
 }
 
 deny contains msg if {
 	is_service
 	some port in input.spec.ports
 	port.targetPort
-	port.targetPort.type == "String"
-	not is_valid_port_name(port.targetPort.strVal)
-	msg := sprintf("port targetPort %q in service %q is invalid", [port.targetPort.strVal, input.metadata.name])
+	not port_exists_in_pods(port.targetPort)
+	msg := sprintf("target port %v not found in any pod", [port.targetPort])
 }
 
 deny contains msg if {
 	is_service
 	some port in input.spec.ports
-	port.targetPort
-	port.targetPort.type == "Int"
-	port.targetPort.intVal != 0
-	not is_valid_port_number(port.targetPort.intVal)
-	msg := sprintf("port targetPort %q in service %q is invalid", [port.targetPort.intVal, input.metadata.name])
+	not port.targetPort
+	msg := sprintf("service port %v has no target port specified", [port.port])
 }
 
-# Simplified validation functions - in practice these would need more complex logic
-is_valid_port_name(name) {
-	# Basic validation: alphanumeric and hyphens only, max 15 chars
-	regex.match("^[a-z0-9-]+$", name)
-	count(name) <= 15
+is_valid_target_port(targetPort) if {
+	regex.match("^[0-9]+$", targetPort)
 }
 
-is_valid_port_number(port) {
-	port > 0
-	port <= 65535
+is_valid_target_port(targetPort) if {
+	regex.match("^[a-zA-Z0-9-]+$", targetPort)
+}
+
+port_exists_in_pods(targetPort) if {
+	some pod in data.objects
+	pod.kind == "Pod"
+	pod.metadata.namespace == input.metadata.namespace
+	some containerPort in pod.spec.containers[0].ports
+	containerPort.containerPort == targetPort
 }

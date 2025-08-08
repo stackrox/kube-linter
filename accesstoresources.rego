@@ -1,11 +1,13 @@
 package kubelinter.template.accesstoresources
 
-import kubelinter.objectkinds.is_role
-import kubelinter.objectkinds.is_clusterrole
-import kubelinter.objectkinds.is_rolebinding
-import kubelinter.objectkinds.is_clusterrolebinding
+import data.kubelinter.objectkinds.is_role
+import data.kubelinter.objectkinds.is_clusterrole
+import data.kubelinter.objectkinds.is_rolebinding
+import data.kubelinter.objectkinds.is_clusterrolebinding
+import future.keywords.in
+import future.keywords.every
 
-deny contains msg if {
+deny[msg] {
 	is_rolebinding
 	roleName := input.roleRef.name
 	namespace := input.metadata.namespace
@@ -16,7 +18,7 @@ deny contains msg if {
 	msg := sprintf("role %q in namespace %q not found", [roleName, namespace])
 }
 
-deny contains msg if {
+deny[msg] {
 	is_rolebinding
 	roleName := input.roleRef.name
 	namespace := input.metadata.namespace
@@ -27,7 +29,7 @@ deny contains msg if {
 	msg := sprintf("binding to %q role that has %s", [roleName, array.join(accesses, ", ")])
 }
 
-deny contains msg if {
+deny[msg] {
 	is_clusterrolebinding
 	clusterRoleName := input.roleRef.name
 	flagRolesNotFound := data.accesstoresources.flagRolesNotFound
@@ -36,7 +38,7 @@ deny contains msg if {
 	msg := sprintf("clusterrole %q not found", [clusterRoleName])
 }
 
-deny contains msg if {
+deny[msg] {
 	is_clusterrolebinding
 	clusterRoleName := input.roleRef.name
 	clusterRole := find_clusterrole(clusterRoleName)
@@ -45,7 +47,7 @@ deny contains msg if {
 	msg := sprintf("binding to %q clusterrole that has %s", [clusterRoleName, array.join(accesses, ", ")])
 }
 
-deny contains msg if {
+deny[msg] {
 	is_clusterrolebinding
 	clusterRoleName := input.roleRef.name
 	clusterRole := find_clusterrole(clusterRoleName)
@@ -116,10 +118,28 @@ check_clusterrole_access(clusterRole) := accesses {
 
 resource_matches(resource) {
 	some pattern in data.accesstoresources.resources
-	resource == "*" || regex.match(pattern, resource)
+	resource_is_wildcard(resource)
+}
+
+resource_matches(resource) {
+	some pattern in data.accesstoresources.resources
+	regex.match(pattern, resource)
 }
 
 verb_matches(verb) {
 	some pattern in data.accesstoresources.verbs
-	verb == "*" || regex.match(pattern, verb)
+	verb_is_wildcard(verb)
+}
+
+verb_matches(verb) {
+	some pattern in data.accesstoresources.verbs
+	regex.match(pattern, verb)
+}
+
+resource_is_wildcard(resource) {
+	resource == "*"
+}
+
+verb_is_wildcard(verb) {
+	verb == "*"
 }

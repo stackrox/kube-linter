@@ -1,6 +1,6 @@
 package kubelinter.template.sccdenypriv
 
-import kubelinter.objectkinds.is_securitycontextconstraints
+import data.kubelinter.objectkinds.is_securitycontextconstraints
 
 deny contains msg if {
 	is_securitycontextconstraints

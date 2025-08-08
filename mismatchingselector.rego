@@ -1,19 +1,23 @@
 package kubelinter.template.mismatchingselector
 
-import kubelinter.objectkinds.is_deployment_like
+import data.kubelinter.objectkinds.is_deployment_like
+import future.keywords.in
+import future.keywords.every
 
-deny contains msg if {
+deny[msg] {
 	is_deployment_like
-	not is_job_or_cronjob()
-	not has_selector()
-	msg := "object has no selector specified"
+	selector := input.spec.selector
+	templateLabels := input.spec.template.metadata.labels
+	not labels_match_selector(selector, templateLabels)
+	msg := sprintf("selector %v does not match template labels %v", [selector, templateLabels])
 }
 
-deny contains msg if {
+deny[msg] {
 	is_deployment_like
-	has_selector()
-	not selector_matches_pod_labels()
-	msg := sprintf("labels in pod spec (%v) do not match labels in selector (%v)", [input.spec.template.metadata.labels, input.spec.selector])
+	selector := input.spec.selector
+	templateLabels := input.spec.template.metadata.labels
+	not selector_matches_labels(selector, templateLabels)
+	msg := sprintf("template labels %v do not match selector %v", [templateLabels, selector])
 }
 
 is_job_or_cronjob() {

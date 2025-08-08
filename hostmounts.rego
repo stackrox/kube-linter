@@ -1,6 +1,7 @@
 package kubelinter.template.hostmounts
 
-import kubelinter.objectkinds.is_deployment_like
+import data.kubelinter.objectkinds.is_deployment_like
+import future.keywords.in
 
 deny contains msg if {
 	is_deployment_like

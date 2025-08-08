@@ -1,6 +1,7 @@
 package kubelinter.teamplate.latesttag
 
-import kubelinter.builtins.objectkinds.is_deployment_like
+import data.kubelinter.builtins.objectkinds.is_deployment_like
+import future.keywords.in
 
 deny contains msg if {
 	is_deployment_like

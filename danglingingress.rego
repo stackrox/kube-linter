@@ -1,12 +1,13 @@
 package kubelinter.template.danglingingress
 
-import kubelinter.objectkinds.is_ingress
+import data.kubelinter.objectkinds.is_ingress
+import future.keywords.in
 
-deny contains msg if {
+deny[msg] {
 	is_ingress
 	some serviceRef in get_ingress_service_references()
 	not service_exists(serviceRef)
-	msg := sprintf("no service found matching ingress label (%v), port %s", [serviceRef.name, serviceRef.port])
+	msg := sprintf("no services found matching the ingress's backend service name (%s)", [serviceRef])
 }
 
 get_ingress_service_references() := refs {

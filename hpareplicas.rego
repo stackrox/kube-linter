@@ -1,6 +1,7 @@
 package kubelinter.template.hpareplicas
 
-import kubelinter.objectkinds.is_horizontalpodautoscaler
+import data.kubelinter.objectkinds.is_horizontalpodautoscaler
+import future.keywords.in
 
 deny contains msg if {
 	is_horizontalpodautoscaler
@@ -11,18 +12,18 @@ deny contains msg if {
 	msg := sprintf("object has %d %s but minimum required replicas is %d", [replicas, replicaText, minReplicas])
 }
 
-get_hpa_min_replicas() := replicas {
+get_hpa_min_replicas() := replicas if {
 	replicas := input.spec.minReplicas
 }
 
-get_hpa_min_replicas() := 1 {
+get_hpa_min_replicas() := 1 if {
 	not input.spec.minReplicas
 }
 
-get_replica_text(replicas) := "replicas" {
+get_replica_text(replicas) := "replicas" if {
 	replicas > 1
 }
 
-get_replica_text(replicas) := "replica" {
+get_replica_text(replicas) := "replica" if {
 	replicas == 1
 }

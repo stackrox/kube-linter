@@ -1,6 +1,6 @@
 package kubelinter.template.livenessprobe
 
-import kubelinter.objectkinds.is_deployment_like
+import data.kubelinter.objectkinds.is_deployment_like
 
 deny contains msg if {
 	is_deployment_like

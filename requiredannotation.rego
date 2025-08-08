@@ -1,15 +1,15 @@
 package kubelinter.template.requiredannotation
 
-import kubelinter.objectkinds.is_any
+import data.kubelinter.objectkinds.is_deployment_like
+import future.keywords.in
 
 deny contains msg if {
-	is_any
-	key := data.requiredannotation.key
-	value := data.requiredannotation.value
-	not has_annotation(key, value)
-	msg := sprintf("object is missing required annotation %q with value %q", [key, value])
+	is_deployment_like
+	some annotation in data.requiredannotation.annotations
+	not has_annotation(annotation)
+	msg := sprintf("annotation %q is required", [annotation])
 }
 
-has_annotation(key, value) {
-	input.metadata.annotations[key] == value
+has_annotation(annotation) if {
+	input.metadata.annotations[annotation]
 }

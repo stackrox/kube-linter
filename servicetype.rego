@@ -1,6 +1,6 @@
 package kubelinter.template.servicetype
 
-import kubelinter.objectkinds.is_service
+import data.kubelinter.objectkinds.is_service
 
 deny contains msg if {
 	is_service

@@ -1,6 +1,6 @@
 package kubelinter.template.disallowedgvk
 
-import kubelinter.objectkinds.is_any
+import data.kubelinter.objectkinds.is_any
 
 deny contains msg if {
 	is_any

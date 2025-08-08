@@ -1,6 +1,8 @@
 package kubelinter.template.danglingservicemonitor
 
-import kubelinter.objectkinds.is_servicemonitor
+import data.kubelinter.objectkinds.is_servicemonitor
+import future.keywords.in
+import future.keywords.every
 
 deny contains msg if {
 	is_servicemonitor
@@ -15,35 +17,52 @@ deny contains msg if {
 	msg := sprintf("no services found matching the service monitor's label selector (%s) and namespace selector (%s)", [input.spec.selector, input.spec.namespaceSelector])
 }
 
-has_selector() {
-	nsSelector := input.spec.namespaceSelector
-	labelSelectors := input.spec.selector.matchLabels
-	(count(nsSelector.matchNames) > 0 || nsSelector.any) || count(labelSelectors) > 0
+has_selector() if {
+	has_namespace_selector()
 }
 
-has_matching_service() {
+has_selector() if {
+	has_label_selector()
+}
+
+has_namespace_selector() if {
+	nsSelector := input.spec.namespaceSelector
+	count(nsSelector.matchNames) > 0
+}
+
+has_namespace_selector() if {
+	nsSelector := input.spec.namespaceSelector
+	nsSelector.any
+}
+
+has_label_selector() if {
+	labelSelectors := input.spec.selector.matchLabels
+	count(labelSelectors) > 0
+}
+
+has_matching_service() if {
 	some service in data.objects
 	service.kind == "Service"
 	namespace_matches(service)
 	labels_match(service)
 }
 
-namespace_matches(service) {
+namespace_matches(service) if {
 	nsSelector := input.spec.namespaceSelector
 	nsSelector.any
 }
 
-namespace_matches(service) {
+namespace_matches(service) if {
 	nsSelector := input.spec.namespaceSelector
 	service.metadata.namespace in nsSelector.matchNames
 }
 
-labels_match(service) {
+labels_match(service) if {
 	labelSelectors := input.spec.selector.matchLabels
 	count(labelSelectors) == 0
 }
 
-labels_match(service) {
+labels_match(service) if {
 	labelSelectors := input.spec.selector.matchLabels
 	count(labelSelectors) > 0
 	every key, value in labelSelectors {

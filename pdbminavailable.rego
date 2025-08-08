@@ -1,47 +1,40 @@
 package kubelinter.template.pdbminavailable
 
-import kubelinter.objectkinds.is_poddisruptionbudget
+import data.kubelinter.objectkinds.is_poddisruptionbudget
+import future.keywords.in
+import future.keywords.every
 
 deny contains msg if {
 	is_poddisruptionbudget
-	input.spec.minAvailable
-	value := input.spec.minAvailable
-	is_percentage_100(value)
-	msg := "PDB has minimum available replicas set to 100 percent of replicas"
+	minAvailable := input.spec.minAvailable
+	not is_valid_min_available(minAvailable)
+	msg := sprintf("minAvailable %v is not valid", [minAvailable])
 }
 
 deny contains msg if {
 	is_poddisruptionbudget
-	input.spec.minAvailable
-	value := input.spec.minAvailable
-	replicas := get_matching_deployment_replicas()
-	replicas <= value
-	msg := sprintf("The current number of replicas for deployment is equal to or lower than the minimum number of replicas specified by its PDB.", [])
+	minAvailable := input.spec.minAvailable
+	not has_matching_deployments(minAvailable)
+	msg := sprintf("no deployments found matching PDB minAvailable %v", [minAvailable])
 }
 
-is_percentage_100(value) {
-	value == "100%"
+is_valid_min_available(minAvailable) if {
+	minAvailable > 0
 }
 
-get_matching_deployment_replicas() := replicas {
+is_valid_min_available(minAvailable) if {
+	minAvailable == "100%"
+}
+
+has_matching_deployments(minAvailable) if {
 	some deployment in data.objects
 	deployment.kind == "Deployment"
 	deployment.metadata.namespace == input.metadata.namespace
-	labels_match_selector(input.spec.selector, deployment.spec.selector)
-	replicas := deployment.spec.replicas
+	labels_match_selector(input.spec.selector, deployment.spec.template.metadata.labels)
 }
 
-get_matching_deployment_replicas() := 1 {
-	some deployment in data.objects
-	deployment.kind == "Deployment"
-	deployment.metadata.namespace == input.metadata.namespace
-	labels_match_selector(input.spec.selector, deployment.spec.selector)
-	not deployment.spec.replicas
-}
-
-labels_match_selector(selector, deploymentSelector) {
-	# Simplified label matching - in practice this would need more complex logic
+labels_match_selector(selector, labels) if {
 	every key, value in selector.matchLabels {
-		deploymentSelector.matchLabels[key] == value
+		labels[key] == value
 	}
 }
