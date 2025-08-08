@@ -50,17 +50,17 @@ func TestName(t *testing.T) {
 	//assert.NoError(t, err)
 
 	modules := []func(*rego.Rego){
-		rego.Query("data.abc.deny[_]"),
+		rego.Query(`
+{
+  "xyz": [x | x := data.abc.xyz.deny[_]],
+  "abc": [a | a := data.abc.abc.deny[_]]
+}
+`),
 		rego.SetRegoVersion(ast.RegoV1),
 		rego.Load([]string{"policies"}, nil),
 
 		rego.Input(input),
 	}
-	//for _, v := range loaded.Modules {
-	//	spew.Dump(v.Name)
-	//	modules = append(modules, rego.ParsedModule(v.Parsed))
-	//}
-
 	eval := rego.New(
 		modules...,
 	)
@@ -68,5 +68,24 @@ func TestName(t *testing.T) {
 	rs, err := eval.Eval(ctx)
 	assert.NoError(t, err)
 	spew.Dump(rs)
+
+	messages := []string{}
+	for _, result := range rs {
+		for _, r := range result.Expressions {
+			msgs, ok := r.Value.(map[string]interface{})
+			assert.True(t, ok)
+			for k, v := range msgs {
+				println(k)
+				strs, ok := v.([]interface{})
+				assert.True(t, ok)
+				for _, str := range strs {
+					messages = append(messages, str.(string))
+				}
+			}
+		}
+	}
+
+	assert.Len(t, messages, 4)
+	spew.Dump(messages)
 
 }

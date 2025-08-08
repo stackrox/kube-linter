@@ -1,4 +1,6 @@
-package abc
+package abc.abc
+
+import data.abc.b.is_ingress
 
 deny contains msg if {
 	value := input.request.object.metadata.labels.costcenter
@@ -23,5 +25,5 @@ deny contains msg if {
 
 deny contains msg if {
 	not is_ingress
-	msg := "not ingres"
+	msg := "4 not ingres"
 }

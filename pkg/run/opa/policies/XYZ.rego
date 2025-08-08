@@ -1,4 +1,4 @@
-package abc
+package abc.xyz
 
 deny contains msg if {
 	value := input.request.object.metadata.name
@@ -8,11 +8,4 @@ deny contains msg if {
 
 	# Construct an error message to return to the user.
 	msg := sprintf("3; found %v", [value])
-}
-
-
-is_ingress if {
-	input.request.kind.kind == "Ingress"
-	input.request.kind.group == "extensions"
-	input.request.kind.version == "v1beta1"
 }
