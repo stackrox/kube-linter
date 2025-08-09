@@ -1,8 +1,8 @@
 package kubelinter.template.nonisolatedpod
 
 import data.kubelinter.objectkinds.is_deployment_like
-import future.keywords.in
 import future.keywords.every
+import future.keywords.in
 
 deny contains msg if {
 	is_deployment_like
@@ -10,7 +10,7 @@ deny contains msg if {
 	msg := "object has no network policy specified"
 }
 
-has_network_policy() if {
+has_network_policy if {
 	some np in data.objects
 	np.kind == "NetworkPolicy"
 	np.metadata.namespace == input.metadata.namespace

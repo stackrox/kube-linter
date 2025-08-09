@@ -3,7 +3,7 @@ package kubelinter.template.cpurequirements
 import data.kubelinter.objectkinds.is_deployment_like
 import future.keywords.in
 
-deny[msg] {
+deny contains msg if {
 	is_deployment_like
 	some container in input.spec.template.spec.containers
 	requirementsType := data.cpurequirements.requirementsType
@@ -19,7 +19,7 @@ deny[msg] {
 	msg := sprintf("container %q has cpu request %s", [container.name, cpuRequest])
 }
 
-deny[msg] {
+deny contains msg if {
 	is_deployment_like
 	some container in input.spec.template.spec.containers
 	requirementsType := data.cpurequirements.requirementsType
@@ -35,39 +35,39 @@ deny[msg] {
 	msg := sprintf("container %q has cpu limit %s", [container.name, cpuLimit])
 }
 
-is_request_type(requirementsType) {
+is_request_type(requirementsType) if {
 	requirementsType == "request"
 }
 
-is_request_type(requirementsType) {
+is_request_type(requirementsType) if {
 	requirementsType == "any"
 }
 
-is_limit_type(requirementsType) {
+is_limit_type(requirementsType) if {
 	requirementsType == "limit"
 }
 
-is_limit_type(requirementsType) {
+is_limit_type(requirementsType) if {
 	requirementsType == "any"
 }
 
-upper_bound_valid(upperBound, cpu_millis) {
+upper_bound_valid(upperBound, cpu_millis) if {
 	upperBound == null
 }
 
-upper_bound_valid(upperBound, cpu_millis) {
+upper_bound_valid(upperBound, cpu_millis) if {
 	cpu_millis <= upperBound
 }
 
 # Helper function to parse CPU value to millicores
-parse_cpu_millis(cpu) := millis {
+parse_cpu_millis(cpu) := millis if {
 	# Handle "100m" format (millicores)
 	regex.match("^([0-9]+)m$", cpu)
 	parts := regex.split("^([0-9]+)m$", cpu, -1)
 	millis := to_number(parts[1])
 }
 
-parse_cpu_millis(cpu) := millis {
+parse_cpu_millis(cpu) := millis if {
 	# Handle "1" format (cores) - convert to millicores
 	not regex.match("^([0-9]+)m$", cpu)
 	not regex.match("^([0-9]+\\.[0-9]+)$", cpu)
@@ -76,7 +76,7 @@ parse_cpu_millis(cpu) := millis {
 	millis := to_number(parts[1]) * 1000
 }
 
-parse_cpu_millis(cpu) := millis {
+parse_cpu_millis(cpu) := millis if {
 	# Handle "1.5" format (fractional cores) - convert to millicores
 	not regex.match("^([0-9]+)m$", cpu)
 	regex.match("^([0-9]+\\.[0-9]+)$", cpu)

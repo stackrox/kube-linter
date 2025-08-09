@@ -22,7 +22,6 @@ deny contains msg if {
 	msg := sprintf("2 name must start with cccode-; found %v", [data.name])
 }
 
-
 deny contains msg if {
 	not is_ingress
 	msg := "4 not ingres"

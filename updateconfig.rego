@@ -35,49 +35,48 @@ deny contains msg if {
 	msg := sprintf("object has a max surge of %s but requirements not met", [maxSurge])
 }
 
-needs_rolling_update_definition() if {
+needs_rolling_update_definition if {
 	strategyType := input.spec.strategy.type
 	regex.match("Rolling", strategyType)
 	has_rolling_update_config()
 }
 
-has_rolling_update_config() if {
+has_rolling_update_config if {
 	has_min_pods_unavailable()
 }
 
-has_rolling_update_config() if {
+has_rolling_update_config if {
 	has_max_pods_unavailable()
 }
 
-has_rolling_update_config() if {
+has_rolling_update_config if {
 	has_min_surge()
 }
 
-has_rolling_update_config() if {
+has_rolling_update_config if {
 	has_max_surge()
 }
 
-has_min_pods_unavailable() if {
+has_min_pods_unavailable if {
 	data.updateconfig.minPodsUnavailable != ""
 }
 
-has_max_pods_unavailable() if {
+has_max_pods_unavailable if {
 	data.updateconfig.maxPodsUnavailable != ""
 }
 
-has_min_surge() if {
+has_min_surge if {
 	data.updateconfig.minSurge != ""
 }
 
-has_max_surge() if {
+has_max_surge if {
 	data.updateconfig.maxSurge != ""
 }
 
-has_rolling_update_parameters() if {
+has_rolling_update_parameters if {
 	input.spec.strategy.rollingUpdate
 }
 
-value_in_range(value, min, max) if {
-	# Simplified range checking - in practice this would need more complex parsing
-	true
-}
+value_in_range(value, min, max) := true
+
+# Simplified range checking - in practice this would need more complex parsing

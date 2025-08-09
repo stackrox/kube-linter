@@ -12,11 +12,11 @@ deny contains msg if {
 	msg := sprintf("object has %d %s but minimum required replicas is %d", [replicas, replicaText, minReplicas])
 }
 
-get_hpa_min_replicas() := replicas if {
+get_hpa_min_replicas := replicas if {
 	replicas := input.spec.minReplicas
 }
 
-get_hpa_min_replicas() := 1 if {
+get_hpa_min_replicas := 1 if {
 	not input.spec.minReplicas
 }
 

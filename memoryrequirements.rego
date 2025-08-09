@@ -3,7 +3,7 @@ package kubelinter.template.memoryrequirements
 import data.kubelinter.objectkinds.is_deployment_like
 import future.keywords.in
 
-deny[msg] {
+deny contains msg if {
 	is_deployment_like
 	some container in input.spec.template.spec.containers
 	requirementsType := data.memoryrequirements.requirementsType
@@ -20,7 +20,7 @@ deny[msg] {
 	msg := sprintf("container %q has memory request %s", [container.name, memoryRequest])
 }
 
-deny[msg] {
+deny contains msg if {
 	is_deployment_like
 	some container in input.spec.template.spec.containers
 	requirementsType := data.memoryrequirements.requirementsType
@@ -37,53 +37,53 @@ deny[msg] {
 	msg := sprintf("container %q has memory limit %s", [container.name, memoryLimit])
 }
 
-is_request_type(requirementsType) {
+is_request_type(requirementsType) if {
 	requirementsType == "request"
 }
 
-is_request_type(requirementsType) {
+is_request_type(requirementsType) if {
 	requirementsType == "any"
 }
 
-is_limit_type(requirementsType) {
+is_limit_type(requirementsType) if {
 	requirementsType == "limit"
 }
 
-is_limit_type(requirementsType) {
+is_limit_type(requirementsType) if {
 	requirementsType == "any"
 }
 
-upper_bound_valid(upperBoundMB, memory_mb) {
+upper_bound_valid(upperBoundMB, memory_mb) if {
 	upperBoundMB == null
 }
 
-upper_bound_valid(upperBoundMB, memory_mb) {
+upper_bound_valid(upperBoundMB, memory_mb) if {
 	memory_mb <= upperBoundMB
 }
 
 # Helper function to parse memory value to bytes
-parse_memory_bytes(memory) := bytes {
+parse_memory_bytes(memory) := bytes if {
 	# Handle "100Mi" format
 	regex.match("^([0-9]+)Mi$", memory)
 	parts := regex.split("^([0-9]+)Mi$", memory, -1)
-	bytes := to_number(parts[1]) * 1024 * 1024
+	bytes := (to_number(parts[1]) * 1024) * 1024
 }
 
-parse_memory_bytes(memory) := bytes {
+parse_memory_bytes(memory) := bytes if {
 	# Handle "100Gi" format
 	regex.match("^([0-9]+)Gi$", memory)
 	parts := regex.split("^([0-9]+)Gi$", memory, -1)
-	bytes := to_number(parts[1]) * 1024 * 1024 * 1024
+	bytes := ((to_number(parts[1]) * 1024) * 1024) * 1024
 }
 
-parse_memory_bytes(memory) := bytes {
+parse_memory_bytes(memory) := bytes if {
 	# Handle "100Ki" format
 	regex.match("^([0-9]+)Ki$", memory)
 	parts := regex.split("^([0-9]+)Ki$", memory, -1)
 	bytes := to_number(parts[1]) * 1024
 }
 
-parse_memory_bytes(memory) := bytes {
+parse_memory_bytes(memory) := bytes if {
 	# Handle "100" format (bytes)
 	not regex.match("^([0-9]+)[KMG]i$", memory)
 	regex.match("^([0-9]+)$", memory)

@@ -1,8 +1,8 @@
 package kubelinter.template.danglingnetworkpolicy
 
 import data.kubelinter.objectkinds.is_networkpolicy
-import future.keywords.in
 import future.keywords.every
+import future.keywords.in
 
 deny contains msg if {
 	is_networkpolicy

@@ -1,8 +1,8 @@
 package kubelinter.template.danglingservice
 
 import data.kubelinter.objectkinds.is_service
-import future.keywords.in
 import future.keywords.every
+import future.keywords.in
 
 deny contains msg if {
 	is_service

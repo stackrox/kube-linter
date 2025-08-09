@@ -3,7 +3,7 @@ package kubelinter.template.dnsconfigoptions
 import data.kubelinter.objectkinds.is_deployment_like
 import future.keywords.in
 
-deny[msg] {
+deny contains msg if {
 	is_deployment_like
 	some container in input.spec.template.spec.containers
 	some option in container.dnsConfig.options
@@ -11,7 +11,7 @@ deny[msg] {
 	msg := sprintf("container %q has disallowed DNS option %q", [container.name, option.name])
 }
 
-deny[msg] {
+deny contains msg if {
 	is_deployment_like
 	some container in input.spec.template.spec.containers
 	some option in container.dnsConfig.options
@@ -19,7 +19,7 @@ deny[msg] {
 	msg := sprintf("container %q is missing required DNS option %q", [container.name, option.name])
 }
 
-deny[msg] {
+deny contains msg if {
 	is_deployment_like
 	some container in input.spec.template.spec.containers
 	not has_dns_config(container)

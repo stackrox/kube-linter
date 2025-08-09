@@ -11,7 +11,7 @@ deny contains msg if {
 	msg := sprintf("found matching serviceAccount (%q)", [podSA])
 }
 
-get_service_account_name() := sa if {
+get_service_account_name := sa if {
 	# Check if automountServiceAccountToken is explicitly set to false
 	not input.spec.template.spec.automountServiceAccountToken == false
 
@@ -19,7 +19,7 @@ get_service_account_name() := sa if {
 	sa := input.spec.template.spec.serviceAccountName
 }
 
-get_service_account_name() := sa if {
+get_service_account_name := sa if {
 	# Check if automountServiceAccountToken is explicitly set to false
 	not input.spec.template.spec.automountServiceAccountToken == false
 
@@ -27,7 +27,7 @@ get_service_account_name() := sa if {
 	sa := input.spec.template.spec.deprecatedServiceAccount
 }
 
-get_service_account_name() := "default" if {
+get_service_account_name := "default" if {
 	# Default to "default" if not specified
 	not input.spec.template.spec.serviceAccountName
 	not input.spec.template.spec.deprecatedServiceAccount

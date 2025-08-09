@@ -2,6 +2,7 @@ package kubelinter.template.ports
 
 import data.kubelinter.objectkinds.is_deployment_like
 import future.keywords.in
+
 deny contains msg if {
 	is_deployment_like
 	some container in input.spec.template.spec.containers
@@ -14,5 +15,6 @@ deny contains msg if {
 	msg := sprintf("port %d and protocol %s in container %q found", [port.containerPort, portProtocol, container.name])
 }
 
-get_port_protocol(port) :=	port.protocol
-default get_port_protocol(_) = "TCP"
+get_port_protocol(port) := port.protocol
+
+default get_port_protocol(_) := "TCP"

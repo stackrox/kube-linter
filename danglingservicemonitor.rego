@@ -1,8 +1,8 @@
 package kubelinter.template.danglingservicemonitor
 
 import data.kubelinter.objectkinds.is_servicemonitor
-import future.keywords.in
 import future.keywords.every
+import future.keywords.in
 
 deny contains msg if {
 	is_servicemonitor
@@ -17,30 +17,30 @@ deny contains msg if {
 	msg := sprintf("no services found matching the service monitor's label selector (%s) and namespace selector (%s)", [input.spec.selector, input.spec.namespaceSelector])
 }
 
-has_selector() if {
+has_selector if {
 	has_namespace_selector()
 }
 
-has_selector() if {
+has_selector if {
 	has_label_selector()
 }
 
-has_namespace_selector() if {
+has_namespace_selector if {
 	nsSelector := input.spec.namespaceSelector
 	count(nsSelector.matchNames) > 0
 }
 
-has_namespace_selector() if {
+has_namespace_selector if {
 	nsSelector := input.spec.namespaceSelector
 	nsSelector.any
 }
 
-has_label_selector() if {
+has_label_selector if {
 	labelSelectors := input.spec.selector.matchLabels
 	count(labelSelectors) > 0
 }
 
-has_matching_service() if {
+has_matching_service if {
 	some service in data.objects
 	service.kind == "Service"
 	namespace_matches(service)
