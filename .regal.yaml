@@ -1,6 +1,10 @@
 project:
   rego-version: 1
 rules:
+  style:
+    prefer-snake-case:
+      # one of "error", "warning", "ignore"
+      level: ignore
   imports:
     unresolved-import:
       # one of "error", "warning", "ignore"
@@ -9,8 +13,8 @@ rules:
       # these may be paths to data, or rules that may
       # not be present at the time of linting
       except-imports:
-        - data.kubelinter.builtins.objectkinds.*
-        - data.kubelinter.builtins.objectkinds
+        - data.kubelinter.objectkinds.*
+        - data.kubelinter.objectkinds
     unresolved-reference:
       # one of "error", "warning", "ignore"
       level: error
@@ -22,3 +26,5 @@ rules:
         - data.kubelinter.objectkinds.*
         - data.objects
         - data.**.*
+    prefer-package-imports:
+      level: ignore
