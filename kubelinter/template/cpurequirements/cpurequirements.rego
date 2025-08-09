@@ -46,25 +46,20 @@ upper_bound_valid(upper_bound, cpu_millis) if {
 }
 
 # Helper function to parse CPU value to millicores
-parse_cpu_millis(cpu) := to_number(parts[1]) if {
+parse_cpu_millis(cpu) := to_number(regex.find_n(`[0-9]+`, cpu, 1)[0]) if {
 	# Handle "100m" format (millicores)
 	regex.match(`^([0-9]+)m$`, cpu)
-	parts := regex.split(`^([0-9]+)m$`, cpu, -1)
 }
 
-parse_cpu_millis(cpu) := to_number(parts[1]) * 1000 if {
+parse_cpu_millis(cpu) := to_number(regex.find_n(`[0-9]+`, cpu, 1)[0]) * 1000 if {
 	# Handle "1" format (cores) - convert to millicores
 	not regex.match(`^([0-9]+)m$`, cpu)
 	not regex.match(`^([0-9]+\.[0-9]+)$`, cpu)
 	regex.match(`^([0-9]+)$`, cpu)
-	parts := regex.split(`^([0-9]+)$`, cpu, -1)
 }
 
-parse_cpu_millis(cpu) := (whole * 1000) + (fraction * 1000) if {
+parse_cpu_millis(cpu) := to_number(cpu) * 1000 if {
 	# Handle "1.5" format (fractional cores) - convert to millicores
 	not regex.match(`^([0-9]+)m$`, cpu)
 	regex.match(`^([0-9]+\.[0-9]+)$`, cpu)
-	parts := regex.split(`^([0-9]+)\.([0-9]+)$`, cpu, -1)
-	whole := to_number(parts[1])
-	fraction := to_number(parts[2])
 }

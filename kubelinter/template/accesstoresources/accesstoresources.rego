@@ -116,9 +116,7 @@ check_clusterrole_access(cluster_role) := accesses if {
 }
 
 resource_matches(resource) if {
-	some pattern in data.accesstoresources.resources
-	pattern == "*"
-	resource == "*"
+	"*" in data.accesstoresources.resources
 }
 
 resource_matches(resource) if {
@@ -127,9 +125,7 @@ resource_matches(resource) if {
 }
 
 verb_matches(verb) if {
-	some pattern in data.accesstoresources.verbs
-	pattern == "*"
-	verb == "*"
+	"*" in data.accesstoresources.verbs
 }
 
 verb_matches(verb) if {

@@ -43,10 +43,8 @@ check_forbidden_capabilities(container, forbidden_caps, exceptions) if {
 }
 
 check_missing_drop_capabilities(container, forbidden_caps) if {
-	some forbidden_cap in forbidden_caps
-	forbidden_cap == "all"
-	container.securityContext.capabilities.drop
-	not "all" in container.securityContext.capabilities.drop
+	"all" in forbidden_caps
+	count([cap | some cap in container.securityContext.capabilities.drop; cap == "all"]) == 0
 }
 
 check_missing_drop_capabilities(container, forbidden_caps) if {

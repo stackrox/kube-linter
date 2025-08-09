@@ -48,27 +48,23 @@ upper_bound_valid(upper_bound_mb, memory_mb) if {
 }
 
 # Helper function to parse memory value to bytes
-parse_memory_bytes(memory) := (to_number(parts[1]) * 1024) * 1024 if {
+parse_memory_bytes(memory) := (to_number(regex.find_n(`[0-9]+`, memory, 1)[0]) * 1024) * 1024 if {
 	# Handle "100Mi" format
 	regex.match(`^([0-9]+)Mi$`, memory)
-	parts := regex.split(`^([0-9]+)Mi$`, memory, -1)
 }
 
-parse_memory_bytes(memory) := ((to_number(parts[1]) * 1024) * 1024) * 1024 if {
+parse_memory_bytes(memory) := ((to_number(regex.find_n(`[0-9]+`, memory, 1)[0]) * 1024) * 1024) * 1024 if {
 	# Handle "100Gi" format
 	regex.match(`^([0-9]+)Gi$`, memory)
-	parts := regex.split(`^([0-9]+)Gi$`, memory, -1)
 }
 
-parse_memory_bytes(memory) := to_number(parts[1]) * 1024 if {
+parse_memory_bytes(memory) := to_number(regex.find_n(`[0-9]+`, memory, 1)[0]) * 1024 if {
 	# Handle "100Ki" format
 	regex.match(`^([0-9]+)Ki$`, memory)
-	parts := regex.split(`^([0-9]+)Ki$`, memory, -1)
 }
 
-parse_memory_bytes(memory) := to_number(parts[1]) if {
+parse_memory_bytes(memory) := to_number(memory) if {
 	# Handle "100" format (bytes)
 	not regex.match(`^([0-9]+)[KMG]i$`, memory)
 	regex.match(`^([0-9]+)$`, memory)
-	parts := regex.split(`^([0-9]+)$`, memory, -1)
 }

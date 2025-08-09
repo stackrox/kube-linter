@@ -71,7 +71,12 @@ has_required_rules if {
 
 has_invalid_anti_affinity_config if {
 	some term in all_anti_affinity_terms()
-	not is_valid_affinity_term(term)
+	not is_valid_affinity_term(
+		term,
+		input.metadata.namespace,
+		data.antiaffinity.topologyKey,
+		input.spec.template.metadata.labels,
+	)
 }
 
 all_anti_affinity_terms := terms if {
@@ -84,19 +89,17 @@ all_anti_affinity_terms := terms if {
 	)
 }
 
-is_valid_affinity_term(term) if {
+is_valid_affinity_term(term, namespace, topologyKey, labels) if {
 	# Check namespace
-	namespace := input.metadata.namespace
 	namespace == "default"
 	namespace_matches_term(term)
 
 	# Check topology key
-	topologyKey := data.antiaffinity.topologyKey
 	topologyKey == "kubernetes.io/hostname"
 	term.topologyKey == topologyKey
 
 	# Check label selector
-	labels_match_selector(term.labelSelector, input.spec.template.metadata.labels)
+	labels_match_selector(term.labelSelector, labels)
 }
 
 namespace_matches_term(term) if {
@@ -114,6 +117,11 @@ labels_match_selector(selector, labels) := true
 
 anti_affinity_error_message := msg if {
 	some term in all_anti_affinity_terms()
-	not is_valid_affinity_term(term)
+	not is_valid_affinity_term(
+		term,
+		input.metadata.namespace,
+		data.antiaffinity.topologyKey,
+		input.spec.template.metadata.labels,
+	)
 	msg := sprintf("anti-affinity configuration is invalid for term with topology key %q", [term.topologyKey])
 }
