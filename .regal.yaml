@@ -1,0 +1,24 @@
+project:
+  rego-version: 1
+rules:
+  imports:
+    unresolved-import:
+      # one of "error", "warning", "ignore"
+      level: error
+      # list of paths that should be ignored
+      # these may be paths to data, or rules that may
+      # not be present at the time of linting
+      except-imports:
+        - data.kubelinter.builtins.objectkinds.*
+        - data.kubelinter.builtins.objectkinds
+    unresolved-reference:
+      # one of "error", "warning", "ignore"
+      level: error
+      # list of paths that should be ignored
+      # these may be paths to data, or rules that may
+      # not be present at the time of linting
+      # using glob syntax
+      except-paths:
+        - data.kubelinter.objectkinds.*
+        - data.objects
+        - data.**.*
