@@ -25,13 +25,13 @@ deny contains msg if {
 }
 
 not_matches := [{"image": c.image, "pattern": a} |
-	some a in input.param.latesttag.allowList
+	some a in input.params.latesttag.AllowList
 	some c in input.object.spec.template.spec.containers
 	not regex.match(a, c.image)
 ]
 
 matches := [{"image": c.image, "pattern": a} |
-	some a in input.param.latesttag.blockList
+	some a in input.params.latesttag.BlockList
 	some c in input.object.spec.template.spec.containers
 	regex.match(a, c.image)
 ]

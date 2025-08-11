@@ -1,9 +1,15 @@
 package run
 
 import (
+	"context"
 	"fmt"
+	"strings"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
+	"github.com/open-policy-agent/opa/v1/ast"
+	"github.com/open-policy-agent/opa/v1/rego"
+	"github.com/open-policy-agent/opa/v1/util"
 	"golang.stackrox.io/kube-linter/internal/version"
 	"golang.stackrox.io/kube-linter/pkg/checkregistry"
 	"golang.stackrox.io/kube-linter/pkg/config"
@@ -37,8 +43,13 @@ type Summary struct {
 	KubeLinterVersion string
 }
 
+type input struct {
+	Object interface{}            `json:"object"`
+	Params map[string]interface{} `json:"params"`
+}
+
 // Run runs the linter on the given context, with the given config.
-func Run(lintCtxs []lintcontext.LintContext, registry checkregistry.CheckRegistry, checks []string) (Result, error) {
+func Run(lintCtxs []lintcontext.LintContext, registry checkregistry.CheckRegistry, checks []string, repo string) (Result, error) {
 	var result Result
 
 	instantiatedChecks := make([]*instantiatedcheck.InstantiatedCheck, 0, len(checks))
@@ -51,6 +62,13 @@ func Run(lintCtxs []lintcontext.LintContext, registry checkregistry.CheckRegistr
 		result.Checks = append(result.Checks, instantiatedCheck.Spec)
 	}
 
+	modules := []func(*rego.Rego){
+		rego.SetRegoVersion(ast.RegoV1),
+		rego.Load([]string{repo}, nil),
+	}
+
+	params := map[string]interface{}{}
+
 	for _, lintCtx := range lintCtxs {
 		for _, obj := range lintCtx.Objects() {
 			for _, check := range instantiatedChecks {
@@ -60,10 +78,61 @@ func Run(lintCtxs []lintcontext.LintContext, registry checkregistry.CheckRegistr
 				if ignore.ObjectForCheck(obj.K8sObject.GetAnnotations(), check.Spec.Name) {
 					continue
 				}
-				diagnostics := check.Func(lintCtx, obj)
-				for _, d := range diagnostics {
+
+				template := strings.ReplaceAll(check.Spec.Template, "-", "")
+				if template != "latesttag" {
+					continue
+				}
+
+				params[template] = check.Spec.Params
+
+				in := input{
+					Object: obj.K8sObject,
+					Params: params,
+				}
+
+				inMap := util.MustUnmarshalJSON(util.MustMarshalJSON(in))
+
+				println(template)
+
+				eval := rego.New(
+					append([]func(*rego.Rego){
+						rego.Query(fmt.Sprintf("data.kubelinter.template.%s.deny", template)),
+						rego.Input(inMap),
+					},
+						modules...)...,
+				)
+
+				rs, err := eval.Eval(context.Background())
+
+				spew.Dump(rs)
+				spew.Dump(inMap)
+
+				if err != nil {
 					result.Reports = append(result.Reports, diagnostic.WithContext{
-						Diagnostic:  d,
+						Diagnostic: diagnostic.Diagnostic{
+							Message: err.Error(),
+						},
+						Check:       check.Spec.Name,
+						Remediation: check.Spec.Remediation,
+						Object:      obj,
+					})
+				}
+
+				fromResult, err := messagesFromResult(rs)
+				if err != nil {
+					result.Reports = append(result.Reports, diagnostic.WithContext{
+						Diagnostic: diagnostic.Diagnostic{
+							Message: err.Error(),
+						},
+						Check:       check.Spec.Name,
+						Remediation: check.Spec.Remediation,
+						Object:      obj,
+					})
+				}
+				for _, d := range fromResult {
+					result.Reports = append(result.Reports, diagnostic.WithContext{
+						Diagnostic:  diagnostic.Diagnostic{Message: d},
 						Check:       check.Spec.Name,
 						Remediation: check.Spec.Remediation,
 						Object:      obj,
@@ -82,4 +151,24 @@ func Run(lintCtxs []lintcontext.LintContext, registry checkregistry.CheckRegistr
 	result.Summary.KubeLinterVersion = version.Get()
 
 	return result, nil
+}
+
+func messagesFromResult(rs rego.ResultSet) ([]string, error) {
+	var messages []string
+	for _, result := range rs {
+		for _, r := range result.Expressions {
+			msgs, ok := r.Value.([]interface{})
+			if !ok {
+				return nil, fmt.Errorf("unexpected value %v", r.Value)
+			}
+			for _, v := range msgs {
+				str, ok := v.(string)
+				if !ok {
+					return nil, fmt.Errorf("unexpected value %v", v)
+				}
+				messages = append(messages, str)
+			}
+		}
+	}
+	return messages, nil
 }

@@ -2,6 +2,7 @@ package opa
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/davecgh/go-spew/spew"
@@ -52,7 +53,7 @@ func TestName(t *testing.T) {
 	//assert.NoError(t, err)
 
 	modules := []func(*rego.Rego){
-		rego.Query(`data.kubelinter.template.latesttag`),
+		rego.Query(`data.kubelinter.template.latesttag.deny`),
 		rego.SetRegoVersion(ast.RegoV1),
 		rego.Load([]string{"/home/janisz/go/src/github.com/stackrox/kube-linter/kubelinter"}, nil),
 		rego.Input(input),
@@ -65,23 +66,10 @@ func TestName(t *testing.T) {
 	assert.NoError(t, err)
 	spew.Dump(rs)
 
-	messages := []string{}
-	for _, result := range rs {
-		for _, r := range result.Expressions {
-			msgs, ok := r.Value.(map[string]interface{})
-			assert.True(t, ok)
-			for k, v := range msgs {
-				println(k)
-				strs, ok := v.([]interface{})
-				assert.True(t, ok)
-				for _, str := range strs {
-					messages = append(messages, str.(string))
-				}
-			}
-		}
-	}
+	messages, err := result(rs)
+	assert.NoError(t, err)
 
-	assert.Len(t, messages, 4)
+	assert.Len(t, messages, 1)
 	spew.Dump(messages)
 
 }

@@ -46,6 +46,7 @@ var (
 
 // Command is the command for the lint command.
 func Command() *cobra.Command {
+	var repo string
 	var configPath string
 	var failIfNoObjects bool
 	var verbose bool
@@ -126,7 +127,7 @@ func Command() *cobra.Command {
 				fmt.Fprintf(os.Stderr, "Warning: %s.\n", msg)
 				return nil
 			}
-			result, err := run.Run(lintCtxs, checkRegistry, enabledChecks)
+			result, err := run.Run(lintCtxs, checkRegistry, enabledChecks, repo)
 			if err != nil {
 				return err
 			}
@@ -151,6 +152,7 @@ func Command() *cobra.Command {
 		},
 	}
 
+	c.Flags().StringVar(&repo, "repo", "", "Path to repo dir")
 	c.Flags().StringVar(&configPath, "config", "", "Path to config file")
 	c.Flags().BoolVarP(&failIfNoObjects, "fail-if-no-objects-found", "", false, "Return non-zero exit code if no valid objects are found or failed to parse")
 	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
