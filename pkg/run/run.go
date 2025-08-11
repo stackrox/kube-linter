@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/open-policy-agent/opa/v1/ast"
 	"github.com/open-policy-agent/opa/v1/rego"
 	"github.com/open-policy-agent/opa/v1/util"
@@ -93,8 +92,6 @@ func Run(lintCtxs []lintcontext.LintContext, registry checkregistry.CheckRegistr
 
 				inMap := util.MustUnmarshalJSON(util.MustMarshalJSON(in))
 
-				println(template)
-
 				eval := rego.New(
 					append([]func(*rego.Rego){
 						rego.Query(fmt.Sprintf("data.kubelinter.template.%s.deny", template)),
@@ -104,9 +101,6 @@ func Run(lintCtxs []lintcontext.LintContext, registry checkregistry.CheckRegistr
 				)
 
 				rs, err := eval.Eval(context.Background())
-
-				spew.Dump(rs)
-				spew.Dump(inMap)
 
 				if err != nil {
 					result.Reports = append(result.Reports, diagnostic.WithContext{
