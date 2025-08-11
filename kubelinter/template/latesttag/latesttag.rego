@@ -6,9 +6,9 @@ deny contains msg if {
 	msg := sprintf(
 		concat("", [
 			"The container %q is using an invalid container image, %q. ",
-			"Please use images that are not blocked by the `BlockList` criteria : %q",
+			"Please use images that are not blocked by the `BlockList` criteria : %s",
 		]),
-		[m.image, m.image, m.pattern],
+		[m.name, m.image, (input.params.latesttag.BlockList)],
 	)
 }
 
@@ -18,19 +18,19 @@ deny contains msg if {
 	msg := sprintf(
 		concat("", [
 			"The container %q is using an invalid container image, %q. ",
-			"Please use images that are allowed by the `AllowList` criteria : %q",
+			"Please use images that are allowed by the `AllowList` criteria : %s",
 		]),
-		[m.image, m.image, m.pattern],
+		[m.name, m.image, concat(", ", input.params.latesttag.AllowList)],
 	)
 }
 
-not_matches := [{"image": c.image, "pattern": a} |
+not_matches := [{"name": c.name, "image": c.image, "pattern": a} |
 	some a in input.params.latesttag.AllowList
 	some c in input.object.spec.template.spec.containers
 	not regex.match(a, c.image)
 ]
 
-matches := [{"image": c.image, "pattern": a} |
+matches := [{"name": c.name, "image": c.image, "pattern": a} |
 	some a in input.params.latesttag.BlockList
 	some c in input.object.spec.template.spec.containers
 	regex.match(a, c.image)
