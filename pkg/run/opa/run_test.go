@@ -12,34 +12,36 @@ import (
 )
 
 var jsonFile = `{
-	   "kind": "AdmissionReview",
-	   "request": {
-	       "kind": {
-	           "kind": "Pod",
-	           "version": "v1"
-	       },
-	       "object": {
-	           "metadata": {
-	               "name": "myapp",
-	               "labels": {
-	                   "costcenter": "fakecode"
-	               }
-	           },
-	           "spec": {
-	               "containers": [
-	                   {
-	                       "image": "nginx",
-	                       "name": "nginx-frontend"
-	                   },
-	                   {
-	                       "image": "mysql",
-	                       "name": "mysql-backend"
-	                   }
-	               ]
-	           }
-	       }
-	   }
-	}`
+  "object": {
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": {
+      "name": "app"
+    },
+    "spec": {
+      "template": {
+        "spec": {
+          "containers": [
+            {
+              "name": "app",
+              "image": "app:latest"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "objects": [],
+  "param": {
+    "latesttag": {
+      "blockList": [
+        ".*:(latest)$",
+        "^[^:]*$",
+        "(.*/[^:]+)$"
+      ]
+    }
+  }
+}`
 
 func TestName(t *testing.T) {
 	ctx := context.TODO()
@@ -50,15 +52,9 @@ func TestName(t *testing.T) {
 	//assert.NoError(t, err)
 
 	modules := []func(*rego.Rego){
-		rego.Query(`
-{
-  "xyz": [x | x := data.abc.xyz.deny[_]],
-  "abc": [a | a := data.abc.abc.deny[_]]
-}
-`),
+		rego.Query(`data.kubelinter.template.latesttag`),
 		rego.SetRegoVersion(ast.RegoV1),
-		rego.Load([]string{"policies"}, nil),
-
+		rego.Load([]string{"/home/janisz/go/src/github.com/stackrox/kube-linter/kubelinter"}, nil),
 		rego.Input(input),
 	}
 	eval := rego.New(
