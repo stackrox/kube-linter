@@ -1,8 +1,5 @@
 package kubelinter.template.latesttag
 
-import data.kubelinter.objectkinds.is_deployment_like
-import future.keywords.in
-
 deny contains msg if {
 	is_deployment_like
 	some m in matches
@@ -28,13 +25,61 @@ deny contains msg if {
 }
 
 not_matches := [{"image": c.image, "pattern": a} |
-	some a in data.latesttag.allowList
-	some c in input.spec.template.spec.containers
+	some a in input.param.latesttag.allowList
+	some c in input.object.spec.template.spec.containers
 	not regex.match(a, c.image)
 ]
 
 matches := [{"image": c.image, "pattern": a} |
-	some c in input.spec.template.spec.containers
-	some a in data.latesttag.blockList
+	some a in input.param.latesttag.blockList
+	some c in input.object.spec.template.spec.containers
 	regex.match(a, c.image)
 ]
+
+
+# DeploymentLike matches various deployment-like objects
+is_deployment_like if {
+	input.object.kind == "Deployment"
+	input.object.apiVersion == "apps/v1"
+}
+
+is_deployment_like if {
+	input.object.kind == "DaemonSet"
+	input.object.apiVersion == "apps/v1"
+}
+
+is_deployment_like if {
+	input.object.kind == "StatefulSet"
+	input.object.apiVersion == "apps/v1"
+}
+
+is_deployment_like if {
+	input.object.kind == "ReplicaSet"
+	input.object.apiVersion == "apps/v1"
+}
+
+is_deployment_like if {
+	input.object.kind == "Pod"
+	input.object.apiVersion == "v1"
+}
+
+is_deployment_like if {
+	input.object.kind == "ReplicationController"
+	input.object.apiVersion == "v1"
+}
+
+is_deployment_like if {
+	input.object.kind == "Job"
+	input.object.apiVersion == "batch/v1"
+}
+
+is_deployment_like if {
+	input.object.kind == "CronJob"
+	input.object.apiVersion == "batch/v1"
+}
+
+# OpenShift specific deployment-like objects
+is_deployment_like if {
+	input.object.kind == "DeploymentConfig"
+	input.object.apiVersion == "apps.openshift.io/v1"
+}
