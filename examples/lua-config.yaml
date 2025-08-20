@@ -1,0 +1,45 @@
+# Example configuration showing how to use Lua-based checks
+customChecks:
+  # Example 1: Inline Lua script
+  - name: "inline-latest-tag-check"
+    template: "lua-script"
+    params:
+      inline: |
+        function check()
+            local diagnostics = {}
+            local podSpec = extract.podSpec()
+            if not podSpec or not podSpec.containers then
+                return diagnostics
+            end
+            
+            for i, container in ipairs(podSpec.containers) do
+                if container.image and string.match(container.image, ":latest$") then
+                    table.insert(diagnostics, diagnostic(
+                        string.format("Container '%s' uses :latest tag", container.name or "unknown")
+                    ))
+                end
+            end
+            
+            return diagnostics
+        end
+      timeout: 5
+
+  # Example 2: External Lua script file
+  - name: "privileged-and-hostnetwork"
+    template: "lua-script"
+    params:
+      script: "examples/lua-checks/privileged-and-hostnetwork.lua"
+      timeout: 10
+
+  # Example 3: Resource ratio validation
+  - name: "resource-ratio-check"
+    template: "lua-script"
+    params:
+      script: "examples/lua-checks/resource-ratio-check.lua"
+      timeout: 5
+
+checks:
+  include:
+    - "inline-latest-tag-check"
+    - "privileged-and-hostnetwork"
+    - "resource-ratio-check"
