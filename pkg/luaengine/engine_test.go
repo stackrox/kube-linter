@@ -207,7 +207,7 @@ func TestEngine_Timeout(t *testing.T) {
 
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "timeout")
-	assert.True(t, elapsed < 500*time.Millisecond, "Should timeout quickly")
+	assert.Less(t, elapsed, 500*time.Millisecond, "Should timeout quickly")
 }
 
 func TestEngine_DefaultTimeout(t *testing.T) {

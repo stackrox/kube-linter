@@ -66,7 +66,7 @@ func TestLuaScriptTemplate_InlineScript(t *testing.T) {
 	// Test with non-matching labels
 	pod.Labels["env"] = "production"
 	diagnostics = instantiated.Func(lintCtx, obj)
-	assert.Len(t, diagnostics, 0)
+	assert.Empty(t, diagnostics)
 }
 
 func TestLuaScriptTemplate_FileScript(t *testing.T) {
@@ -89,7 +89,7 @@ func TestLuaScriptTemplate_FileScript(t *testing.T) {
 		end
 	`
 
-	err := os.WriteFile(scriptPath, []byte(scriptContent), 0600)
+	err := os.WriteFile(scriptPath, []byte(scriptContent), 0o600)
 	require.NoError(t, err)
 
 	check := &config.Check{
@@ -295,7 +295,7 @@ func TestLuaScriptTemplate_ComplexCheck(t *testing.T) {
 
 	obj = lintcontext.Object{K8sObject: pod2}
 	diagnostics = instantiated.Func(lintCtx, obj)
-	assert.Len(t, diagnostics, 0)
+	assert.Empty(t, diagnostics)
 
 	// Test case 3: Pod with only host networking (should pass)
 	pod3 := &v1.Pod{
@@ -315,7 +315,7 @@ func TestLuaScriptTemplate_ComplexCheck(t *testing.T) {
 
 	obj = lintcontext.Object{K8sObject: pod3}
 	diagnostics = instantiated.Func(lintCtx, obj)
-	assert.Len(t, diagnostics, 0)
+	assert.Empty(t, diagnostics)
 }
 
 // Mock implementations for testing
