@@ -50,25 +50,17 @@ func init() {
 func evaluate(check string, subject lintcontext.Object, objects []lintcontext.Object) (string, error) {
 	// Convert subject to map via JSON marshaling/unmarshaling for CEL compatibility
 	// We need to marshal the underlying K8sObject, not the lintcontext.Object
-	subjectBytes, err := json.Marshal(subject.K8sObject)
+	subjectMap, err := toMap(subject.K8sObject)
 	if err != nil {
-		return "", fmt.Errorf("failed to marshal subject: %v", err)
-	}
-	var subjectMap map[string]any
-	if err := json.Unmarshal(subjectBytes, &subjectMap); err != nil {
-		return "", fmt.Errorf("failed to unmarshal subject: %v", err)
+		return "", err
 	}
 
 	// Convert objects to maps via JSON marshaling/unmarshaling
 	objectsMaps := make([]map[string]any, len(objects))
 	for i, obj := range objects {
-		objBytes, err := json.Marshal(obj.K8sObject)
+		objMap, err := toMap(obj.K8sObject)
 		if err != nil {
-			return "", fmt.Errorf("failed to marshal object %d: %v", i, err)
-		}
-		var objMap map[string]any
-		if err := json.Unmarshal(objBytes, &objMap); err != nil {
-			return "", fmt.Errorf("failed to unmarshal object %d: %v", i, err)
+			return "", err
 		}
 		objectsMaps[i] = objMap
 	}
@@ -101,4 +93,16 @@ func evaluate(check string, subject lintcontext.Object, objects []lintcontext.Ob
 		return "", fmt.Errorf("expected string, got %v", out.Value())
 	}
 	return o, nil
+}
+
+func toMap(obj any) (map[string]any, error) {
+	bytes, err := json.Marshal(obj)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal subject: %w", err)
+	}
+	var output map[string]any
+	if err := json.Unmarshal(bytes, &output); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal subject: %w", err)
+	}
+	return output, nil
 }
