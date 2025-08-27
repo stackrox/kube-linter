@@ -4,6 +4,7 @@ import (
 	// Import all check templates.
 	_ "golang.stackrox.io/kube-linter/pkg/templates/accesstoresources"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/antiaffinity"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/cel"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/clusteradminrolebinding"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/containercapabilities"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/cpurequirements"

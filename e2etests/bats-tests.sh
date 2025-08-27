@@ -51,6 +51,23 @@ get_value_from() {
   [[ "${count}" == "1" ]]
 }
 
+@test "cel" {
+  tmp="tests/checks/cel.yml"
+  cmd="${KUBE_LINTER_BIN} lint --config e2etests/testdata/cel-config.yaml --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  failing_resource=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.Name')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment: CEL check expression returned: Object has reloader annotation" ]]
+  [[ "${failing_resource}" == "bad-irsa-role" ]]
+  [[ "${count}" == "2" ]]
+}
+
 @test "cluster-admin-role-binding" {
   tmp="tests/checks/cluster-admin-role-binding.yml"
   cmd="${KUBE_LINTER_BIN} lint --include cluster-admin-role-binding --do-not-auto-add-defaults --format json ${tmp}"

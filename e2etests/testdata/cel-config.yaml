@@ -1,0 +1,23 @@
+checks:
+  addAllBuiltIn: false
+customChecks:
+  - name: "cel-forbidden-annotation"
+    description: "cel espression cehck"
+    remediation: "Remove reloader.stakater.com/auto annotation"
+    scope:
+      objectKinds:
+        - DeploymentLike
+    template: "cel-expression"
+    params:
+      check: |
+        has(subject.metadata.annotations) && subject.metadata.annotations["reloader.stakater.com/auto"] == "true" ? "Object has reloader annotation" : ""
+  - name: invalid-irsa-role
+    description: "IRSA annotations must have a valid IAM Role ARN value"
+    remediation: "Validate the format of the annotation's value to ensure it is a valid IAM Role ARN"
+    scope:
+      objectKinds:
+        - ServiceAccount
+    template: "cel-expression"
+    params:
+      check: |
+        subject.metadata.annotations["eks.amazonaws.com/role-arn"].matches("^arn:aws:iam::\\d{12}:role/[\\w+=,.@-]{1,64}$") ? "" : "Invalid EKS IAM role ARN format"
