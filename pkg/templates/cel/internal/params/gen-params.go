@@ -19,7 +19,7 @@ var (
 	checkParamDesc = util.MustParseParameterDesc(`{
 	"Name": "check",
 	"Type": "string",
-	"Description": "Check is a CEL Expression validate the subject and objects",
+	"Description": "Check is a CEL expression used to validate the subject and objects.",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,
@@ -32,25 +32,8 @@ var (
 }
 `)
 
-	filterParamDesc = util.MustParseParameterDesc(`{
-	"Name": "filter",
-	"Type": "string",
-	"Description": "Filter is a CEL Expression that returns true if GroupVersionKind should be inspected by Check.",
-	"Examples": null,
-	"Enum": null,
-	"SubParameters": null,
-	"ArrayElemType": "",
-	"Required": false,
-	"NoRegex": false,
-	"NotNegatable": false,
-	"XXXStructFieldName": "Filter",
-	"XXXIsPointer": false
-}
-`)
-
 	ParamDescs = []check.ParameterDesc{
 		checkParamDesc,
-		filterParamDesc,
 	}
 )
 

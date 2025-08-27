@@ -63,6 +63,26 @@ KubeLinter supports the following templates:
   type: string
 ```
 
+## CEL
+
+**Key**: `cel-expression`
+
+**Description**: Flag objects with CEL expression
+
+**Supported Objects**: Any
+
+
+**Parameters**:
+
+```yaml
+- description: Check is a CEL expression used to validate the subject and objects.
+  name: check
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
+```
+
 ## cluster-admin Role Binding
 
 **Key**: `cluster-admin-role-binding`
