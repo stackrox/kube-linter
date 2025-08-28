@@ -16,6 +16,23 @@ get_value_from() {
   echo "${value}"
 }
 
+@test "template-cel" {
+  tmp="tests/checks/cel.yml"
+  cmd="${KUBE_LINTER_BIN} lint --config e2etests/testdata/cel-config.yaml --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  failing_resource=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.Name')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment: CEL check expression returned: Object has reloader annotation" ]]
+  [[ "${failing_resource}" == "bad-irsa-role" ]]
+  [[ "${count}" == "2" ]]
+}
+
 @test "template-check-installed-bash-version" {
     run "bash --version"
     [[ "${BASH_VERSION:0:1}" -ge '4' ]] || false
@@ -49,23 +66,6 @@ get_value_from() {
 
   [[ "${message1}" == "RoleBinding: binding to \"role1\" role that has [get] access to [secrets]" ]]
   [[ "${count}" == "1" ]]
-}
-
-@test "cel" {
-  tmp="tests/checks/cel.yml"
-  cmd="${KUBE_LINTER_BIN} lint --config e2etests/testdata/cel-config.yaml --do-not-auto-add-defaults --format json ${tmp}"
-  run ${cmd}
-
-  print_info "${status}" "${output}" "${cmd}" "${tmp}"
-  [ "$status" -eq 1 ]
-
-  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
-  failing_resource=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.Name')
-  count=$(get_value_from "${lines[0]}" '.Reports | length')
-
-  [[ "${message1}" == "Deployment: CEL check expression returned: Object has reloader annotation" ]]
-  [[ "${failing_resource}" == "bad-irsa-role" ]]
-  [[ "${count}" == "2" ]]
 }
 
 @test "cluster-admin-role-binding" {
