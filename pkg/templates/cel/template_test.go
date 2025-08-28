@@ -13,7 +13,7 @@ func TestEvaluate(t *testing.T) {
 	tests := []struct {
 		name        string
 		check       string
-		subject     lintcontext.Object
+		object      lintcontext.Object
 		objects     []lintcontext.Object
 		expectedMsg string
 		expectError bool
@@ -21,7 +21,7 @@ func TestEvaluate(t *testing.T) {
 		{
 			name:  "simple string return",
 			check: `"test message"`,
-			subject: lintcontext.Object{
+			object: lintcontext.Object{
 				K8sObject: &corev1.Pod{
 					ObjectMeta: metav1.ObjectMeta{Name: "test-pod"},
 				},
@@ -31,9 +31,9 @@ func TestEvaluate(t *testing.T) {
 			expectError: false,
 		},
 		{
-			name:  "conditional message based on subject",
-			check: `subject.metadata.name == "test-pod" ? "pod found" : "pod not found"`,
-			subject: lintcontext.Object{
+			name:  "conditional message based on object",
+			check: `object.metadata.name == "test-pod" ? "pod found" : "pod not found"`,
+			object: lintcontext.Object{
 				K8sObject: &corev1.Pod{
 					ObjectMeta: metav1.ObjectMeta{Name: "test-pod"},
 				},
@@ -45,7 +45,7 @@ func TestEvaluate(t *testing.T) {
 		{
 			name:  "check objects list length",
 			check: `size(objects) > 0 ? "objects found" : "no objects"`,
-			subject: lintcontext.Object{
+			object: lintcontext.Object{
 				K8sObject: &corev1.Pod{
 					ObjectMeta: metav1.ObjectMeta{Name: "test-pod"},
 				},
@@ -61,9 +61,9 @@ func TestEvaluate(t *testing.T) {
 			expectError: false,
 		},
 		{
-			name:  "complex expression with subject properties",
-			check: `subject.metadata.namespace == "default" && subject.metadata.name.startsWith("test") ? "valid test object" : "invalid object"`,
-			subject: lintcontext.Object{
+			name:  "complex expression with object properties",
+			check: `object.metadata.namespace == "default" && object.metadata.name.startsWith("test") ? "valid test object" : "invalid object"`,
+			object: lintcontext.Object{
 				K8sObject: &corev1.Pod{
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "test-pod",
@@ -78,7 +78,7 @@ func TestEvaluate(t *testing.T) {
 		{
 			name:  "empty string return",
 			check: `""`,
-			subject: lintcontext.Object{
+			object: lintcontext.Object{
 				K8sObject: &corev1.Pod{
 					ObjectMeta: metav1.ObjectMeta{Name: "test-pod"},
 				},
@@ -90,7 +90,7 @@ func TestEvaluate(t *testing.T) {
 		{
 			name:  "invalid CEL expression",
 			check: `invalid syntax here`,
-			subject: lintcontext.Object{
+			object: lintcontext.Object{
 				K8sObject: &corev1.Pod{
 					ObjectMeta: metav1.ObjectMeta{Name: "test-pod"},
 				},
@@ -102,7 +102,7 @@ func TestEvaluate(t *testing.T) {
 		{
 			name:  "non-string return type",
 			check: `123`,
-			subject: lintcontext.Object{
+			object: lintcontext.Object{
 				K8sObject: &corev1.Pod{
 					ObjectMeta: metav1.ObjectMeta{Name: "test-pod"},
 				},
@@ -114,7 +114,7 @@ func TestEvaluate(t *testing.T) {
 		{
 			name:  "boolean return type",
 			check: `true`,
-			subject: lintcontext.Object{
+			object: lintcontext.Object{
 				K8sObject: &corev1.Pod{
 					ObjectMeta: metav1.ObjectMeta{Name: "test-pod"},
 				},
@@ -125,8 +125,8 @@ func TestEvaluate(t *testing.T) {
 		},
 		{
 			name:  "accessing nested properties",
-			check: `subject.metadata.labels.app == "web" ? "web app detected" : "not a web app"`,
-			subject: lintcontext.Object{
+			check: `object.metadata.labels.app == "web" ? "web app detected" : "not a web app"`,
+			object: lintcontext.Object{
 				K8sObject: &corev1.Pod{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "test-pod",
@@ -144,7 +144,7 @@ func TestEvaluate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			msg, err := evaluate(tt.check, tt.subject, tt.objects)
+			msg, err := evaluate(tt.check, tt.object, tt.objects)
 
 			if tt.expectError {
 				assert.Error(t, err)

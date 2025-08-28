@@ -1,8 +1,8 @@
 package params
 
-// Params represents the params accepted by this template.
+// Params defines the configuration parameters for this template.
 type Params struct {
-	// Check is a CEL expression used to validate the subject and objects.
+	// Check contains a CEL expression for validation logic. Two predefined variables are available: 'object' (the current Kubernetes object being processed) and 'objects' (all objects being linted).
 	// +required
 	// +noregex
 	Check string

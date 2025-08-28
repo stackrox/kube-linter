@@ -75,7 +75,9 @@ KubeLinter supports the following templates:
 **Parameters**:
 
 ```yaml
-- description: Check is a CEL expression used to validate the subject and objects.
+- description: 'Check contains a CEL expression for validation logic. Two predefined
+    variables are available: ''object'' (the current Kubernetes object being processed)
+    and ''objects'' (all objects being linted).'
   name: check
   negationAllowed: true
   regexAllowed: false

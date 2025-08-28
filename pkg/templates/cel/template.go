@@ -47,12 +47,12 @@ func init() {
 	})
 }
 
-func evaluate(check string, subject lintcontext.Object, objects []lintcontext.Object) (string, error) {
-	// Convert subject to map via JSON marshaling/unmarshaling for CEL compatibility
+func evaluate(check string, object lintcontext.Object, objects []lintcontext.Object) (string, error) {
+	// Convert object to map via JSON marshaling/unmarshaling for CEL compatibility
 	// We need to marshal the underlying K8sObject, not the lintcontext.Object
-	subjectMap, err := toMap(subject.K8sObject)
+	objectMap, err := toMap(object.K8sObject)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to convert object to map: %w", err)
 	}
 
 	// Convert objects to maps via JSON marshaling/unmarshaling
@@ -60,32 +60,32 @@ func evaluate(check string, subject lintcontext.Object, objects []lintcontext.Ob
 	for i, obj := range objects {
 		objMap, err := toMap(obj.K8sObject)
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("failed to convert object %s to map: %w", obj.GetK8sObjectName().String(), err)
 		}
 		objectsMaps[i] = objMap
 	}
 
 	e, err := cel.NewEnv(
-		cel.Variable("subject", cel.MapType(cel.StringType, cel.AnyType)),
+		cel.Variable("object", cel.MapType(cel.StringType, cel.AnyType)),
 		cel.Variable("objects", cel.ListType(cel.MapType(cel.StringType, cel.AnyType))),
 	)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to create CEL environment: %w", err)
 	}
 	ast, iss := e.Compile(check)
 	if iss.Err() != nil {
-		return "", iss.Err()
+		return "", fmt.Errorf("failed to compile CEL expression: %w", iss.Err())
 	}
 	prg, err := e.Program(ast)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to create CEL program: %w", err)
 	}
 	out, _, err := prg.Eval(map[string]any{
-		"subject": subjectMap,
+		"object":  objectMap,
 		"objects": objectsMaps,
 	})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to evaluate CEL expression: %w", err)
 	}
 
 	o, ok := out.Value().(string)
@@ -98,11 +98,11 @@ func evaluate(check string, subject lintcontext.Object, objects []lintcontext.Ob
 func toMap(obj any) (map[string]any, error) {
 	bytes, err := json.Marshal(obj)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal subject: %w", err)
+		return nil, fmt.Errorf("failed to marshal object: %w", err)
 	}
 	var output map[string]any
 	if err := json.Unmarshal(bytes, &output); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal subject: %w", err)
+		return nil, fmt.Errorf("failed to unmarshal object: %w", err)
 	}
 	return output, nil
 }

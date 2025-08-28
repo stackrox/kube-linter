@@ -19,7 +19,7 @@ var (
 	checkParamDesc = util.MustParseParameterDesc(`{
 	"Name": "check",
 	"Type": "string",
-	"Description": "Check is a CEL expression used to validate the subject and objects.",
+	"Description": "Check contains a CEL expression for validation logic. Two predefined variables are available: 'object' (the current Kubernetes object being processed) and 'objects' (all objects being linted).",
 	"Examples": null,
 	"Enum": null,
 	"SubParameters": null,

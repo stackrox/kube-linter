@@ -2,23 +2,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app1
+  name: fire
   annotations:
-    reloader.stakater.com/auto: "true"
+    foo.bar/baz: "true"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dont-fire
   annotations:
-    reloader.stakater.com/auto: "false"
+    foo.bar/baz: "false"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dont-fire
   annotations:
-    reloader.stakater.com/auto: T
+    foo.bar/baz: T
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -33,3 +33,105 @@ metadata:
   name: good-irsa-role
   annotations:
     eks.amazonaws.com/role-arn: arn:aws:iam::121212121212:role/role-name-goes-here
+apiVersion: v1
+kind: Service
+metadata:
+  name: dont-fire
+  namespace: dontfire
+  labels:
+    app.kubernetes.io/name: dontfire
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: dont-fire
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dontfire
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: dont-fire2
+spec:
+  namespaceSelector:
+    matchNames:
+      - dontfire
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: dont-fire
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: dontfire
+  namespaceSelector:
+    matchNames:
+      - dontfire
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app1
+  labels:
+    app.kubernetes.io/name: app1
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: app1
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app2
+  labels:
+    app.kubernetes.io/name: app2
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: app2
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app1
+  namespace: test1
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: app1
+spec:
+  namespaceSelector:
+    matchNames:
+      - test2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app1
+  namespace: test1
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: app1
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app1
+  namespaceSelector:
+    matchNames:
+      - test2
