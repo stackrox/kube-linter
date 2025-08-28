@@ -24,8 +24,8 @@ var (
 	"Enum": null,
 	"SubParameters": null,
 	"ArrayElemType": "",
-	"Required": false,
-	"NoRegex": false,
+	"Required": true,
+	"NoRegex": true,
 	"NotNegatable": false,
 	"XXXStructFieldName": "Check",
 	"XXXIsPointer": false
@@ -39,6 +39,9 @@ var (
 
 func (p *Params) Validate() error {
 	var validationErrors []string
+	if p.Check == "" {
+		validationErrors = append(validationErrors, "required param check not found")
+	}
 	if len(validationErrors) > 0 {
 		return fmt.Errorf("invalid parameters: %s", strings.Join(validationErrors, ", "))
     }

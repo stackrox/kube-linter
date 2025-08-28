@@ -78,8 +78,8 @@ KubeLinter supports the following templates:
 - description: Check is a CEL expression used to validate the subject and objects.
   name: check
   negationAllowed: true
-  regexAllowed: true
-  required: false
+  regexAllowed: false
+  required: true
   type: string
 ```
 
