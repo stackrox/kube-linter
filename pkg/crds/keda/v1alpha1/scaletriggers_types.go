@@ -17,10 +17,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"fmt"
-	"slices"
-	"strings"
-
 	autoscalingv2 "k8s.io/api/autoscaling/v2"
 )
 
@@ -46,54 +42,4 @@ type AuthenticationRef struct {
 	// Kind of the resource being referred to. Defaults to TriggerAuthentication.
 	// +optional
 	Kind string `json:"kind,omitempty"`
-}
-
-// ValidateTriggers checks that general trigger metadata are valid, it checks:
-// - triggerNames in ScaledObject are unique
-// - useCachedMetrics is defined only for a supported triggers
-func ValidateTriggers(triggers []ScaleTriggers) error {
-	triggersCount := len(triggers)
-
-	if triggersCount == 0 {
-		return fmt.Errorf("no triggers defined in the ScaledObject/ScaledJob")
-	}
-
-	if triggers != nil && triggersCount > 0 {
-		triggerNames := make(map[string]bool, triggersCount)
-		for i := 0; i < triggersCount; i++ {
-			trigger := triggers[i]
-
-			if trigger.UseCachedMetrics {
-				if trigger.Type == "cpu" || trigger.Type == "memory" || trigger.Type == "cron" {
-					return fmt.Errorf("property \"useCachedMetrics\" is not supported for %q scaler", trigger.Type)
-				}
-			}
-
-			name := trigger.Name
-			if name != "" {
-				if _, found := triggerNames[name]; found {
-					// found duplicate name
-					return fmt.Errorf("triggerName %q is defined multiple times in the ScaledObject/ScaledJob, but it must be unique", name)
-				}
-				triggerNames[name] = true
-			}
-		}
-	}
-
-	return nil
-}
-
-// CombinedTriggersAndAuthenticationsTypes returns a comma separated string of all trigger types and authentication types
-func CombinedTriggersAndAuthenticationsTypes(triggers []ScaleTriggers) (string, string) {
-	var triggersTypes []string
-	var authTypes []string
-	for _, trigger := range triggers {
-		if !slices.Contains(triggersTypes, trigger.Type) {
-			triggersTypes = append(triggersTypes, trigger.Type)
-		}
-		if trigger.AuthenticationRef != nil && !slices.Contains(authTypes, trigger.AuthenticationRef.Name) {
-			authTypes = append(authTypes, trigger.AuthenticationRef.Name)
-		}
-	}
-	return strings.Join(triggersTypes, ","), strings.Join(authTypes, ",")
 }
