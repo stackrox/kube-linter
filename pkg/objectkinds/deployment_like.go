@@ -10,7 +10,7 @@ var (
 	deploymentLikeGroupKinds = func() map[schema.GroupKind]struct{} {
 		m := make(map[schema.GroupKind]struct{})
 		for _, gk := range []schema.GroupKind{
-			jobGVK.GroupKind(),
+			deploymentGVK.GroupKind(),
 			daemonSetGVK.GroupKind(),
 			deploymentConfigGVK.GroupKind(),
 			statefulSetGVK.GroupKind(),
