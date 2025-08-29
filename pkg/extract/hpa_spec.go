@@ -21,7 +21,7 @@ func HPAMinReplicas(obj k8sutil.Object) (int32, bool) {
 	case *autoscalingV1.HorizontalPodAutoscaler:
 		return checkReplicas(hpa.Spec.MinReplicas)
 	case *kedaV1Alpha1.ScaledObject:
-		return checkReplicas(hpa.Spec.MinReplicaCount)
+		return checkReplicas(hpa.GetHPAMinReplicas())
 	default:
 		return 0, false
 	}
