@@ -12,10 +12,10 @@ import (
 	"strings"
 
 	"github.com/bmatcuk/doublestar/v4"
-	kedaV1Alpha1 "github.com/kedacore/keda/v2/apis/keda/v1alpha1"
 	ocsAppsV1 "github.com/openshift/api/apps/v1"
 	ocpSecV1 "github.com/openshift/api/security/v1"
 	k8sMonitoring "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
+	kedaV1Alpha1 "golang.stackrox.io/kube-linter/pkg/crds/keda/v1alpha1"
 	"golang.stackrox.io/kube-linter/pkg/k8sutil"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"

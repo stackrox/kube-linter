@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	kedaV1Alpha1 "github.com/kedacore/keda/v2/apis/keda/v1alpha1"
 	"github.com/stretchr/testify/require"
+	kedaV1Alpha1 "golang.stackrox.io/kube-linter/pkg/crds/keda/v1alpha1"
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"

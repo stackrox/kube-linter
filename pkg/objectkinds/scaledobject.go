@@ -3,7 +3,7 @@ package objectkinds
 import (
 	"fmt"
 
-	kedaV1Alpha1 "github.com/kedacore/keda/v2/apis/keda/v1alpha1"
+	kedaV1Alpha1 "golang.stackrox.io/kube-linter/pkg/crds/keda/v1alpha1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
