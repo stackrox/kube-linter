@@ -1,0 +1,59 @@
+checks:
+  addAllBuiltIn: false
+customChecks:
+  - name: "cel-forbidden-annotation"
+    description: "cel espression cehck"
+    remediation: "Remove foo.bar/baz annotation"
+    scope:
+      objectKinds:
+        - DeploymentLike
+    template: "cel-expression"
+    params:
+      check: |
+        has(object.metadata.annotations) && object.metadata.annotations["foo.bar/baz"] == "true" ? "Object has reloader annotation" : ""
+
+  - name: invalid-irsa-role
+    description: "IRSA annotations must have a valid IAM Role ARN value"
+    remediation: "Validate the format of the annotation's value to ensure it is a valid IAM Role ARN"
+    scope:
+      objectKinds:
+        - ServiceAccount
+    template: "cel-expression"
+    params:
+      check: |
+        object.metadata.annotations["eks.amazonaws.com/role-arn"].matches("^arn:aws:iam::\\d{12}:role/[\\w+=,.@-]{1,64}$") ? "" : "Invalid EKS IAM role ARN format"
+
+  - name: "cel-dangling-servicemonitor"
+    description: "Flag service monitors which do not match any service"
+    remediation: "Ensure the ServiceMonitor's selector matches at least one Service"
+    scope:
+      objectKinds:
+        - ServiceMonitor
+    template: "cel-expression"
+    params:
+      check: |
+        // Check if ServiceMonitor has selectors
+        (!has(object.spec.selector.matchLabels) || size(object.spec.selector.matchLabels) == 0) &&
+        (!has(object.spec.namespaceSelector.matchNames) || size(object.spec.namespaceSelector.matchNames) == 0) &&
+        (!has(object.spec.namespaceSelector.any) || !object.spec.namespaceSelector.any) ?
+        "service monitor has no selector specified" :
+
+        // Check if any services match the ServiceMonitor's selectors
+        !objects.exists(obj,
+          obj.kind == "Service" &&
+          (
+            // Check namespace selector
+            (has(object.spec.namespaceSelector.any) && object.spec.namespaceSelector.any) ||
+            (has(object.spec.namespaceSelector.matchNames) &&
+             object.spec.namespaceSelector.matchNames.exists(ns, ns == (has(obj.metadata.namespace) ? obj.metadata.namespace : ""))) ||
+            (!has(object.spec.namespaceSelector.matchNames) && !has(object.spec.namespaceSelector.any))
+          ) &&
+          (
+            // Check label selector
+            (!has(object.spec.selector.matchLabels) || size(object.spec.selector.matchLabels) == 0) ||
+            (has(obj.metadata.labels) &&
+             object.spec.selector.matchLabels.all(key, key in obj.metadata.labels &&
+                                                 obj.metadata.labels[key] == object.spec.selector.matchLabels[key]))
+          )
+        ) ?
+        "no services found matching the service monitor's label selector and namespace selector" : ""

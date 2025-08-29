@@ -16,6 +16,35 @@ get_value_from() {
   echo "${value}"
 }
 
+@test "template-cel" {
+  tmp="tests/checks/cel.yml"
+  cmd="${KUBE_LINTER_BIN} lint --config e2etests/testdata/cel-config.yaml --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
+  message4=$(get_value_from "${lines[0]}" '.Reports[3].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[3].Diagnostic.Message')
+  message5=$(get_value_from "${lines[0]}" '.Reports[4].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[4].Diagnostic.Message')
+  message6=$(get_value_from "${lines[0]}" '.Reports[5].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[5].Diagnostic.Message')
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  echo $message2
+
+  [[ "${message1}" == "Deployment: CEL check expression returned: Object has reloader annotation" ]]
+  [[ "${message2}" == "ServiceAccount: CEL check expression returned: Invalid EKS IAM role ARN format" ]]
+  [[ "${message3}" == "ServiceMonitor: CEL check expression returned: no services found matching the service monitor's label selector and namespace selector" ]]
+  [[ "${message4}" == "ServiceMonitor: CEL check expression returned: no services found matching the service monitor's label selector and namespace selector" ]]
+  [[ "${message5}" == "ServiceMonitor: CEL check expression returned: no services found matching the service monitor's label selector and namespace selector" ]]
+  [[ "${message6}" == "ServiceMonitor: CEL check expression returned: no services found matching the service monitor's label selector and namespace selector" ]]
+
+  [[ "${count}" == "6" ]]
+}
+
 @test "template-check-installed-bash-version" {
     run "bash --version"
     [[ "${BASH_VERSION:0:1}" -ge '4' ]] || false

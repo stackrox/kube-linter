@@ -63,6 +63,28 @@ KubeLinter supports the following templates:
   type: string
 ```
 
+## CEL
+
+**Key**: `cel-expression`
+
+**Description**: Flag objects with CEL expression
+
+**Supported Objects**: Any
+
+
+**Parameters**:
+
+```yaml
+- description: 'Check contains a CEL expression for validation logic. Two predefined
+    variables are available: ''object'' (the current Kubernetes object being processed)
+    and ''objects'' (all objects being linted).'
+  name: check
+  negationAllowed: true
+  regexAllowed: false
+  required: true
+  type: string
+```
+
 ## cluster-admin Role Binding
 
 **Key**: `cluster-admin-role-binding`
