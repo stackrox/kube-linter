@@ -19,7 +19,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # Checkout all repo history to make tags available for figuring out kube-linter version during build.
           fetch-depth: 0
@@ -100,7 +100,7 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Download executable
         uses: actions/download-artifact@v4
@@ -147,7 +147,7 @@ jobs:
     needs: build-and-test
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # Checkout all repo history to make tags available for figuring out kube-linter version during build.
           fetch-depth: 0
