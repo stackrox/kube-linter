@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: good-sts
+spec:
+  selector:
+    matchLabels:
+      app: good
+  serviceName: good
+  template:
+    metadata:
+      labels:
+        app: good
+    spec:
+      containers:
+      - name: app
+        image: busybox
+        command: ["sleep", "3600"]
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      annotations:
+        required-annotation: "true"
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: bad-sts
+spec:
+  selector:
+    matchLabels:
+      app: bad
+  serviceName: bad
+  template:
+    metadata:
+      labels:
+        app: bad
+    spec:
+      containers:
+      - name: app
+        image: busybox
+        command: ["sleep", "3600"]
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      # required annotation missing
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi
