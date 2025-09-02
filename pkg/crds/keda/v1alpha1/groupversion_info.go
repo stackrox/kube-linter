@@ -49,6 +49,9 @@ func init() {
 // Adds the list of known types to api.Scheme.
 func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
+		&ScaledJobList{},
+		&ScaledJob{},
+		&ScaledObjectList{},
 		&ScaledObject{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
