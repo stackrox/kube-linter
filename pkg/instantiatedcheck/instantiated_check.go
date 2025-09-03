@@ -1,9 +1,9 @@
 package instantiatedcheck
 
 import (
+	"fmt"
 	"regexp"
 
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/errorhelpers"
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
@@ -42,7 +42,7 @@ func ValidateAndInstantiate(c *config.Check) (*InstantiatedCheck, error) {
 
 	params, err := template.ParseAndValidateParams(c.Params)
 	if err != nil {
-		return nil, errors.Wrap(err, "validating and instantiating params")
+		return nil, fmt.Errorf("validating and instantiating params: %w", err)
 	}
 
 	if err := validationErrs.ToError(); err != nil {
@@ -63,7 +63,7 @@ func ValidateAndInstantiate(c *config.Check) (*InstantiatedCheck, error) {
 	i.Matcher = matcher
 	checkFunc, err := template.Instantiate(params)
 	if err != nil {
-		return nil, errors.Wrap(err, "instantiating check")
+		return nil, fmt.Errorf("instantiating check: %w", err)
 	}
 	i.Func = checkFunc
 	return i, nil

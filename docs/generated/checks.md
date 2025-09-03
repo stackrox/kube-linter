@@ -277,6 +277,15 @@ minReplicas: 3
 **Remediation**: Ensure that port naming is in conjunction with the specification. For more information, please look at the Kubernetes Service specification on this page: https://kubernetes.io/docs/reference/_print/#ServiceSpec. And additional information about IANA Service naming can be found on the following page: https://www.rfc-editor.org/rfc/rfc6335.html#section-5.1.
 
 **Template**: [target-port](templates.md#target-port)
+## job-ttl-seconds-after-finished
+
+**Enabled by default**: Yes
+
+**Description**: Indicates when standalone jobs do not set ttlSecondsAfterFinished and when jobs managed by cronjob do set ttlSecondsAfterFinished.
+
+**Remediation**: Set Job.spec.ttlSecondsAfterFinished. Unset CronJob.Spec.JobTemplate.Spec.ttlSecondsAfterFinished.
+
+**Template**: [job-ttl-seconds-after-finished](templates.md#ttlsecondsafterfinished-impact-for-standalone-and-managed-job-objects)
 ## latest-tag
 
 **Enabled by default**: Yes
@@ -446,6 +455,32 @@ strategyTypeRegex: ^(RollingUpdate|Rolling)$
 **Remediation**: Change the PodDisruptionBudget to have minAvailable set to a number lower than the number of replicas in the related deployment-like objects. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more information.
 
 **Template**: [pdb-min-available](templates.md#no-pod-disruptions-allowed---minavailable)
+## pdb-unhealthy-pod-eviction-policy
+
+**Enabled by default**: Yes
+
+**Description**: Indicates when a PodDisruptionBudget does not explicitly set the unhealthyPodEvictionPolicy field.
+
+**Remediation**: Set unhealthyPodEvictionPolicy to AlwaysAllow. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/#unhealthy-pod-eviction-policy for more information.
+
+**Template**: [pdb-unhealthy-pod-eviction-policy](templates.md#.spec.unhealthypodevictionpolicy-in-pdb-is-set-to-default)
+## priority-class-name
+
+**Enabled by default**: No
+
+**Description**: Indicates when a deployment-like object does not use a valid priority class name
+
+**Remediation**: Set up the priority class name for your object to any accepted values.
+
+**Template**: [priority-class-name](templates.md#priority-class-name)
+
+**Parameters**:
+
+```yaml
+acceptedPriorityClassNames:
+- system-cluster-critical
+- system-node-critical
+```
 ## privilege-escalation-container
 
 **Enabled by default**: Yes
@@ -522,6 +557,15 @@ value: '[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+'
 ```yaml
 key: owner
 ```
+## restart-policy
+
+**Enabled by default**: No
+
+**Description**: Indicates when a deployment-like object does not use a restart policy
+
+**Remediation**: Set up the restart policy for your object to 'Always' or 'OnFailure' to increase the fault tolerance.
+
+**Template**: [restart-policy](templates.md#restart-policy)
 ## run-as-non-root
 
 **Enabled by default**: Yes
@@ -589,9 +633,9 @@ protocol: TCP
 
 **Enabled by default**: Yes
 
-**Description**: Indicates when containers have a liveness probe to a not exposed port.
+**Description**: Indicates when containers have a startup probe to a not exposed port.
 
-**Remediation**: Check which ports you've exposed and ensure they match what you have specified in the liveness probe.
+**Remediation**: Check which ports you've exposed and ensure they match what you have specified in the startup probe.
 
 **Template**: [startup-port](templates.md#startup-port-exposed)
 ## unsafe-proc-mount

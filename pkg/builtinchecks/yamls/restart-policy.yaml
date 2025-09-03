@@ -1,0 +1,8 @@
+name: "restart-policy"
+description: "Indicates when a deployment-like object does not use a restart policy"
+remediation: >-
+  Set up the restart policy for your object to 'Always' or 'OnFailure' to increase the fault tolerance.
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "restart-policy"

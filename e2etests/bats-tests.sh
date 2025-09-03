@@ -16,6 +16,35 @@ get_value_from() {
   echo "${value}"
 }
 
+@test "template-cel" {
+  tmp="tests/checks/cel.yml"
+  cmd="${KUBE_LINTER_BIN} lint --config e2etests/testdata/cel-config.yaml --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
+  message4=$(get_value_from "${lines[0]}" '.Reports[3].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[3].Diagnostic.Message')
+  message5=$(get_value_from "${lines[0]}" '.Reports[4].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[4].Diagnostic.Message')
+  message6=$(get_value_from "${lines[0]}" '.Reports[5].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[5].Diagnostic.Message')
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  echo $message2
+
+  [[ "${message1}" == "Deployment: CEL check expression returned: Object has reloader annotation" ]]
+  [[ "${message2}" == "ServiceAccount: CEL check expression returned: Invalid EKS IAM role ARN format" ]]
+  [[ "${message3}" == "ServiceMonitor: CEL check expression returned: no services found matching the service monitor's label selector and namespace selector" ]]
+  [[ "${message4}" == "ServiceMonitor: CEL check expression returned: no services found matching the service monitor's label selector and namespace selector" ]]
+  [[ "${message5}" == "ServiceMonitor: CEL check expression returned: no services found matching the service monitor's label selector and namespace selector" ]]
+  [[ "${message6}" == "ServiceMonitor: CEL check expression returned: no services found matching the service monitor's label selector and namespace selector" ]]
+
+  [[ "${count}" == "6" ]]
+}
+
 @test "template-check-installed-bash-version" {
     run "bash --version"
     [[ "${BASH_VERSION:0:1}" -ge '4' ]] || false
@@ -394,6 +423,21 @@ get_value_from() {
   [[ "${actual_messages[3]}" == "Deployment: port name \"123456\" in container \"invalid-target-ports\" must contain at least one letter (a-z)" ]]
 }
 
+@test "job-ttl-seconds-after-finished" {
+  tmp="tests/checks/job-ttl-seconds-after-finished.yaml"
+  cmd="${KUBE_LINTER_BIN} lint --include job-ttl-seconds-after-finished --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + " " + .Reports[0].Object.K8sObject.Name + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + " " + .Reports[1].Object.K8sObject.Name + ": " + .Reports[1].Diagnostic.Message')
+
+  [[ "${message1}" == "Job bad-job: Standalone Job does not specify ttlSecondsAfterFinished" ]]
+  [[ "${message2}" == "CronJob bad-cronjob: Managed Job specifies ttlSecondsAfterFinished which might conflict with successfulJobsHistoryLimit and failedJobsHistoryLimit from CronJob that have default values. Final behaviour is determined by the strictest parameter, and therefore, setting ttlSecondsAfterFinished at the job level can result with unexpected behaviour with regard to finished jobs removal" ]]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "2" ]]
+}
+
 @test "latest-tag" {
   tmp="tests/checks/latest-tag.yml"
   cmd="${KUBE_LINTER_BIN} lint --include latest-tag --do-not-auto-add-defaults --format json ${tmp}"
@@ -648,6 +692,44 @@ get_value_from() {
   [[ "${count}" == "3" ]]
 }
 
+@test "pdb-unhealthy-pod-eviction-policy" {
+
+  tmp="tests/checks/pdb-unhealthy-pod-eviction-policy.yaml"
+  cmd="${KUBE_LINTER_BIN} lint --include pdb-unhealthy-pod-eviction-policy --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+
+  [[ "${message1}" == "PodDisruptionBudget: unhealthyPodEvictionPolicy is not explicitly set" ]]
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "1" ]]
+
+}
+
+@test "priority-class-name" {
+  tmp="tests/checks/priority-class-name.yaml"
+  cmd="${KUBE_LINTER_BIN} lint --include priority-class-name --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[2] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message4=$(get_value_from "${lines[0]}" '.Reports[3] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message5=$(get_value_from "${lines[0]}" '.Reports[4] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message6=$(get_value_from "${lines[0]}" '.Reports[5] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message7=$(get_value_from "${lines[0]}" '.Reports[6] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment fire-deployment: object has a priority class name defined with 'fire' but the only accepted priority class names are '[system-cluster-critical system-node-critical]'" ]]
+  [[ "${message2}" == "Pod fire-pod: object has a priority class name defined with 'fire' but the only accepted priority class names are '[system-cluster-critical system-node-critical]'" ]]
+  [[ "${message3}" == "DaemonSet fire-daemonset: object has a priority class name defined with 'fire' but the only accepted priority class names are '[system-cluster-critical system-node-critical]'" ]]
+  [[ "${message4}" == "ReplicaSet fire-replicaset: object has a priority class name defined with 'fire' but the only accepted priority class names are '[system-cluster-critical system-node-critical]'" ]]
+  [[ "${message5}" == "ReplicationController fire-replicationcontroller: object has a priority class name defined with 'fire' but the only accepted priority class names are '[system-cluster-critical system-node-critical]'" ]]
+  [[ "${message6}" == "Job fire-job: object has a priority class name defined with 'fire' but the only accepted priority class names are '[system-cluster-critical system-node-critical]'" ]]
+  [[ "${message7}" == "CronJob fire-cronjob: object has a priority class name defined with 'fire' but the only accepted priority class names are '[system-cluster-critical system-node-critical]'" ]]
+  [[ "${count}" == "7" ]]
+}
+
 @test "privilege-escalation-container" {
   tmp="tests/checks/privilege-escalation-container.yml"
   cmd="${KUBE_LINTER_BIN} lint --include privilege-escalation-container --do-not-auto-add-defaults --format json ${tmp}"
@@ -769,6 +851,30 @@ get_value_from() {
   [[ "${message1}" == "Deployment: no label matching \"owner=<any>\" found" ]]
   [[ "${message2}" == "DeploymentConfig: no label matching \"owner=<any>\" found" ]]
   [[ "${count}" == "2" ]]
+}
+
+@test "restart-policy" {
+  tmp="tests/checks/restart-policy.yaml"
+  cmd="${KUBE_LINTER_BIN} lint --include restart-policy --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[2] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message4=$(get_value_from "${lines[0]}" '.Reports[3] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message5=$(get_value_from "${lines[0]}" '.Reports[4] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message6=$(get_value_from "${lines[0]}" '.Reports[5] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  message7=$(get_value_from "${lines[0]}" '.Reports[6] | .Object.K8sObject.GroupVersionKind.Kind + " " + .Object.K8sObject.Name + ": " + .Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment fire-deployment-never: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
+  [[ "${message2}" == "Pod fire-pod-never: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
+  [[ "${message3}" == "DaemonSet fire-daemonset-never: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
+  [[ "${message4}" == "ReplicaSet fire-replicaset-never: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
+  [[ "${message5}" == "ReplicationController fire-replicationcontroller-never: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
+  [[ "${message6}" == "Job fire-job-never: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
+  [[ "${message7}" == "CronJob fire-cronjob-never: object has a restart policy defined with 'Never' but the only accepted restart policies are '[Always OnFailure]'" ]]
+  [[ "${count}" == "7" ]]
 }
 
 @test "run-as-non-root" {

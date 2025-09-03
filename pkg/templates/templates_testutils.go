@@ -26,6 +26,7 @@ type TestCase struct {
 
 // Init initializes the test suite with a template
 func (s *TemplateTestSuite) Init(templateKey string) {
+	s.T().Helper()
 	t, ok := Get(templateKey)
 	s.True(ok, "template with key %q not found", templateKey)
 	s.Template = t
@@ -53,6 +54,7 @@ func (s *TemplateTestSuite) Validate(
 }
 
 func (s *TemplateTestSuite) compareDiagnostics(expected, actual []diagnostic.Diagnostic) {
+	s.T().Helper()
 	expectedMessages, actualMessages := make([]string, 0, len(expected)), make([]string, 0, len(actual))
 	for _, diag := range expected {
 		expectedMessages = append(expectedMessages, diag.Message)

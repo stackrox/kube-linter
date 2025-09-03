@@ -1,0 +1,93 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "KubeLinter Configuration",
+    "type": "object",
+    "properties": {
+        "checks": {
+            "type": "object",
+            "description": "Configure which built-in checks to run or skip",
+            "properties": {
+                "doNotAutoAddDefaults": {
+                    "type": "boolean",
+                    "description": "Disable all built-in checks"
+                },
+                "addAllBuiltIn": {
+                    "type": "boolean",
+                    "description": "Enable all built-in checks. Users can explicitly opt-out checks using exclude. Takes precedence over doNotAutoAddDefaults"
+                },
+                "ignorePaths": {
+                    "type": "array",
+                    "description": "File or directory globs to skip. Uses https://pkg.go.dev/github.com/bmatcuk/doublestar#Match syntax",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "include": {
+                    "type": "array",
+                    "description": "List of specific checks to run. Exclude always takes precedence over include",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "exclude": {
+                    "type": "array",
+                    "description": "List of specific checks to skip (takes precedence over include)",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "additionalProperties": false
+        },
+        "customChecks": {
+            "type": "array",
+            "description": "User-defined checks based on templates",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "Unique identifier for this custom check"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Brief explanation of what the custom check does."
+                    },
+                    "template": {
+                        "type": "string",
+                        "description": "Template name (e.g. required-annotation, required-label)"
+                    },
+                    "params": {
+                        "type": "object",
+                        "description": "Template-specific parameters",
+                        "additionalProperties": true
+                    },
+                    "scope": {
+                        "type": "object",
+                        "description": "Limit this check to certain Kubernetes object kinds",
+                        "properties": {
+                            "objectKinds": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "description": "E.g. DeploymentLike, Service. Supported values are listed in: https://github.com/stackrox/kube-linter/tree/main/pkg/objectkinds"
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "remediation": {
+                        "type": "string",
+                        "description": "Custom message shown when this check fails"
+                    }
+                },
+                "required": [
+                    "name",
+                    "template"
+                ],
+                "additionalProperties": false
+            }
+        }
+    },
+    "additionalProperties": false
+}

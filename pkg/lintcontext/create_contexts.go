@@ -1,6 +1,7 @@
 package lintcontext
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -10,7 +11,6 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/pathutil"
 
 	"github.com/bmatcuk/doublestar/v4"
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/set"
 	"helm.sh/helm/v3/pkg/chartutil"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -61,7 +61,7 @@ fileOrDirsLoop:
 			// See https://github.com/golang/go/issues/11862
 			globMatch, err := doublestar.PathMatch(path, fileOrDir)
 			if err != nil {
-				return nil, errors.Wrapf(err, "could not match pattern %s", path)
+				return nil, fmt.Errorf("could not match pattern %s: %w", path, err)
 			}
 			if globMatch {
 				continue fileOrDirsLoop
@@ -80,11 +80,11 @@ fileOrDirsLoop:
 			for _, path := range ignorePaths {
 				absPath, err := pathutil.GetAbsolutPath(currentPath)
 				if err != nil {
-					return errors.Wrapf(err, "could not get absolute path for %s", currentPath)
+					return fmt.Errorf("could not get absolute path for %s: %w", currentPath, err)
 				}
 				globMatch, err := doublestar.PathMatch(path, absPath)
 				if err != nil {
-					return errors.Wrapf(err, "could not match pattern %s", path)
+					return fmt.Errorf("could not match pattern %s: %w", path, err)
 				}
 				if globMatch {
 					return nil
@@ -95,7 +95,7 @@ fileOrDirsLoop:
 				if strings.HasSuffix(strings.ToLower(currentPath), ".tgz") {
 					ctx := newCtx(options)
 					if err := ctx.loadObjectsFromTgzHelmChart(currentPath, ignorePaths); err != nil {
-						return errors.Wrapf(err, "loading helm chart %s", currentPath)
+						return fmt.Errorf("loading helm chart %s: %w", currentPath, err)
 					}
 
 					contextsByDir[currentPath] = ctx
@@ -124,14 +124,14 @@ fileOrDirsLoop:
 				ctx := newCtx(options)
 				contextsByDir[currentPath] = ctx
 				if err := ctx.loadObjectsFromHelmChart(currentPath, ignorePaths); err != nil {
-					return errors.Wrap(err, "loading helm chart")
+					return fmt.Errorf("loading helm chart: %w", err)
 				}
 				return filepath.SkipDir
 			}
 			return nil
 		})
 		if err != nil {
-			return nil, errors.Wrapf(err, "loading from path %q", fileOrDir)
+			return nil, fmt.Errorf("loading from path %q: %w", fileOrDir, err)
 		}
 	}
 	dirs := make([]string, 0, len(contextsByDir))

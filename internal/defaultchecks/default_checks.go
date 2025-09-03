@@ -17,6 +17,7 @@ var (
 		"host-network",
 		"host-pid",
 		"invalid-target-ports",
+		"job-ttl-seconds-after-finished",
 		"latest-tag",
 		"liveness-port",
 		"mismatching-selector",
@@ -36,5 +37,6 @@ var (
 		"unsafe-sysctls",
 		"unset-cpu-requirements",
 		"unset-memory-requirements",
+		"pdb-unhealthy-pod-eviction-policy",
 	)
 )

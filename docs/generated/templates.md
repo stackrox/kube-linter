@@ -63,6 +63,28 @@ KubeLinter supports the following templates:
   type: string
 ```
 
+## CEL
+
+**Key**: `cel-expression`
+
+**Description**: Flag objects with CEL expression
+
+**Supported Objects**: Any
+
+
+**Parameters**:
+
+```yaml
+- description: 'Check contains a CEL expression for validation logic. Two predefined
+    variables are available: ''object'' (the current Kubernetes object being processed)
+    and ''objects'' (all objects being linted).'
+  name: check
+  negationAllowed: true
+  regexAllowed: false
+  required: true
+  type: string
+```
+
 ## cluster-admin Role Binding
 
 **Key**: `cluster-admin-role-binding`
@@ -414,6 +436,15 @@ KubeLinter supports the following templates:
   type: array
 ```
 
+## ttlSecondsAfterFinished impact for standalone and managed Job objects
+
+**Key**: `job-ttl-seconds-after-finished`
+
+**Description**: Flag standalone Job objects not setting ttlSecondsAfterFinished. Flag CronJob objects setting ttlSecondsAfterFinished
+
+**Supported Objects**: JobLike
+
+
 ## Latest Tag
 
 **Key**: `latest-tag`
@@ -564,6 +595,15 @@ KubeLinter supports the following templates:
 **Supported Objects**: PodDisruptionBudget
 
 
+## .spec.unhealthyPodEvictionPolicy in PDB is set to default
+
+**Key**: `pdb-unhealthy-pod-eviction-policy`
+
+**Description**: Flag PodDisruptionBudget objects that do not explicitly set unhealthyPodEvictionPolicy.
+
+**Supported Objects**: PodDisruptionBudget
+
+
 ## Ports
 
 **Key**: `ports`
@@ -586,6 +626,27 @@ KubeLinter supports the following templates:
   regexAllowed: true
   required: false
   type: string
+```
+
+## Priority class name
+
+**Key**: `priority-class-name`
+
+**Description**: Flag applications running with invalid priority class name.
+
+**Supported Objects**: DeploymentLike
+
+
+**Parameters**:
+
+```yaml
+- arrayElemType: string
+  description: Array of all priority class names that are accepted.
+  name: acceptedPriorityClassNames
+  negationAllowed: false
+  regexAllowed: false
+  required: false
+  type: array
 ```
 
 ## Privilege Escalation on Containers
@@ -702,6 +763,15 @@ KubeLinter supports the following templates:
   required: false
   type: string
 ```
+
+## Restart policy
+
+**Key**: `restart-policy`
+
+**Description**: Flag applications running without the restart policy.
+
+**Supported Objects**: DeploymentLike
+
 
 ## Run as non-root user
 

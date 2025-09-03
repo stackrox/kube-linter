@@ -3,7 +3,6 @@ package disallowedgvk
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
@@ -28,15 +27,15 @@ func init() {
 		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
 			groupMatcher, err := matcher.ForString(p.Group)
 			if err != nil {
-				return nil, errors.Wrap(err, "invalid group")
+				return nil, fmt.Errorf("invalid group: %w", err)
 			}
 			versionMatcher, err := matcher.ForString(p.Version)
 			if err != nil {
-				return nil, errors.Wrap(err, "invalid version")
+				return nil, fmt.Errorf("invalid version: %w", err)
 			}
 			kindMatcher, err := matcher.ForString(p.Kind)
 			if err != nil {
-				return nil, errors.Wrap(err, "invalid kind")
+				return nil, fmt.Errorf("invalid kind: %w", err)
 			}
 			return func(_ lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				gvk := extract.GVK(object.K8sObject)

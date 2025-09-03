@@ -1,9 +1,7 @@
+deps: go.mod go.sum tool-imports/go.sum tool-imports/go.mod
+	@touch deps
 
-.PHONY: none
-none:
-
-
-deps: go.mod go.sum
+%.sum: %.mod
 	@echo "+ $@"
 	@go mod tidy
 ifdef CI
@@ -22,12 +20,6 @@ GOBIN := $(CURDIR)/.gobin
 DIST := $(CURDIR)/dist
 PATH := $(DIST):$(GOBIN):$(PATH)
 
-# Makefile on Mac doesn't pass the updated PATH and GOBIN to the shell
-# and so, without the following line, the shell does not end up
-# trying commands in $(GOBIN) first.
-# See https://stackoverflow.com/a/36226784/3690207
-SHELL := env GOBIN=$(GOBIN) PATH=$(PATH) /bin/bash
-
 KUBE_LINTER_BIN := $(GOBIN)/kube-linter
 
 COVFILES := $(shell mktemp -d)
@@ -39,12 +31,14 @@ COVFILES := $(shell mktemp -d)
 GOLANGCILINT_BIN := $(GOBIN)/golangci-lint
 $(GOLANGCILINT_BIN): deps
 	@echo "+ $@"
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint
+	cd tool-imports; \
+	GOBIN=$(GOBIN) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint
 
 GORELEASER_BIN := $(GOBIN)/goreleaser
 $(GORELEASER_BIN): deps
 	@echo "+ $@"
-	go install github.com/goreleaser/goreleaser
+	cd tool-imports; \
+	GOBIN=$(GOBIN) go install github.com/goreleaser/goreleaser
 
 ###########
 ## Lint ##
@@ -56,9 +50,9 @@ ifdef CI
 	@echo '+ $@'
 	@echo 'The environment indicates we are in CI; running linters in check mode.'
 	@echo 'If this fails, run `make lint`.'
-	golangci-lint run
+	$(GOLANGCILINT_BIN) run
 else
-	golangci-lint run --fix
+	$(GOLANGCILINT_BIN) run --fix
 endif
 
 .PHONY: lint
@@ -89,7 +83,8 @@ generated-srcs: go-generated-srcs generated-docs
 build: $(KUBE_LINTER_BIN)
 
 $(KUBE_LINTER_BIN): $(GORELEASER_BIN) $(shell find . -type f -name '*.go')
-	goreleaser build --snapshot --clean
+	$(GORELEASER_BIN) build --snapshot --clean
+	mkdir -p $(GOBIN)
 	@cp "$(DIST)/kube-linter_$(HOST_OS)_amd64_v1/kube-linter" "$(GOBIN)/kube-linter"
 	@chmod u+w "$(GOBIN)/kube-linter"
 

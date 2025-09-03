@@ -1,9 +1,12 @@
 package lint
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/pathutil"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -16,10 +19,6 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/configresolver"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
 	"golang.stackrox.io/kube-linter/pkg/run"
-
-	"github.com/pkg/errors"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 const (
@@ -68,7 +67,7 @@ func Command() *cobra.Command {
 			// Load Configuration
 			cfg, err := config.Load(v, configPath)
 			if err != nil {
-				return errors.Wrap(err, "failed to load config")
+				return fmt.Errorf("failed to load config: %w", err)
 			}
 
 			if err := configresolver.LoadCustomChecksInto(&cfg, checkRegistry); err != nil {
@@ -142,11 +141,11 @@ func Command() *cobra.Command {
 			}
 			err = formatter(os.Stdout, result)
 			if err != nil {
-				return errors.Wrap(err, "output formatting failed")
+				return fmt.Errorf("output formatting failed: %w", err)
 			}
 
 			if len(result.Reports) > 0 {
-				err = errors.Errorf("found %d lint errors", len(result.Reports))
+				err = fmt.Errorf("found %d lint errors", len(result.Reports))
 			}
 			return err
 		},

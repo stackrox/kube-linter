@@ -1,7 +1,7 @@
 package extract
 
 import (
-	kedaV1Alpha1 "github.com/kedacore/keda/v2/apis/keda/v1alpha1"
+	kedaV1Alpha1 "golang.stackrox.io/kube-linter/pkg/crds/keda/v1alpha1"
 	"golang.stackrox.io/kube-linter/pkg/k8sutil"
 	autoscalingV1 "k8s.io/api/autoscaling/v1"
 	autoscalingV2 "k8s.io/api/autoscaling/v2"
@@ -21,7 +21,7 @@ func HPAMinReplicas(obj k8sutil.Object) (int32, bool) {
 	case *autoscalingV1.HorizontalPodAutoscaler:
 		return checkReplicas(hpa.Spec.MinReplicas)
 	case *kedaV1Alpha1.ScaledObject:
-		return checkReplicas(hpa.Spec.MinReplicaCount)
+		return checkReplicas(hpa.GetHPAMinReplicas())
 	default:
 		return 0, false
 	}

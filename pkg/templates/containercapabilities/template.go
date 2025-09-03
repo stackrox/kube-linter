@@ -3,7 +3,6 @@ package containercapabilities
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/utils"
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
@@ -158,7 +157,7 @@ func checkForbidAll(paramCaps []string) (bool, error) {
 			return true, nil
 		}
 		// When the list contains "all", it should not contain any other element
-		return false, errors.Errorf(
+		return false, fmt.Errorf(
 			"forbidden capabilities specified contains %q,"+
 				" but it also contains other capabilities: %q. please make sure that it only contains %q",
 			reservedCapabilitiesAll,
@@ -173,13 +172,13 @@ func checkForbidAll(paramCaps []string) (bool, error) {
 func validateExceptionsList(forbidAll bool, exceptions []string) error {
 	// Check if forbidAll is set
 	if !forbidAll && len(exceptions) != 0 {
-		return errors.Errorf("for verifying container capabilities, \"Exceptions\" list should only"+
+		return fmt.Errorf("for verifying container capabilities, \"Exceptions\" list should only"+
 			" be filled when %q capabilities specified in the forbidden list", reservedCapabilitiesAll)
 	}
 	// Check no "all" in exceptions list
 	for _, cap := range exceptions {
 		if literalReservedCapabilitiesAllMatcher(cap) {
-			return errors.Errorf("capabilities exceptions list should not contain %q", reservedCapabilitiesAll)
+			return fmt.Errorf("capabilities exceptions list should not contain %q", reservedCapabilitiesAll)
 		}
 	}
 	return nil
@@ -212,7 +211,7 @@ func init() {
 				for _, cap := range p.ForbiddenCapabilities {
 					capMatcher, err := matcher.ForString(cap)
 					if err != nil {
-						return nil, errors.Wrapf(err, "checking container capabilities. invalid capability: %s", cap)
+						return nil, fmt.Errorf("checking container capabilities. invalid capability: %s: %w", cap, err)
 					}
 					paramCapMatchers[cap] = capMatcher
 				}
@@ -220,7 +219,7 @@ func init() {
 				for _, cap := range p.Exceptions {
 					capMatcher, err := matcher.ForString(cap)
 					if err != nil {
-						return nil, errors.Wrapf(err, "checking container capabilities. invalid capability: %s", cap)
+						return nil, fmt.Errorf("checking container capabilities. invalid capability: %s: %w", cap, err)
 					}
 					exceptionCapMatchers[cap] = capMatcher
 				}

@@ -2,9 +2,8 @@ package common
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
-
-	"github.com/pkg/errors"
 )
 
 // FormatType defines possible output formats.
@@ -43,7 +42,7 @@ func (f Formatters) GetEnabledFormatters() []string {
 func (f Formatters) FormatterByType(t string) (FormatFunc, error) {
 	formatter := f.Formatters[FormatType(t)]
 	if formatter == nil {
-		return nil, errors.Errorf("unknown format: %q", t)
+		return nil, fmt.Errorf("unknown format: %q", t)
 	}
 	return formatter, nil
 }

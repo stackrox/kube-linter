@@ -1,12 +1,12 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/mitchellh/mapstructure"
-	"github.com/pkg/errors"
+	"github.com/go-viper/mapstructure/v2"
 	"github.com/spf13/viper"
 )
 
@@ -69,16 +69,16 @@ func Load(v *viper.Viper, configPath string) (Config, error) {
 		v.SetConfigName(strings.TrimSuffix(filename, ext))
 		v.AddConfigPath(path)
 		if err := v.ReadInConfig(); err != nil {
-			return Config{}, errors.Wrap(err, "reading file")
+			return Config{}, fmt.Errorf("reading file: %w", err)
 		}
 	}
 
 	var conf Config
-	err := v.Unmarshal(&conf, viper.DecoderConfigOption(func(config *mapstructure.DecoderConfig) {
+	err := v.Unmarshal(&conf, func(config *mapstructure.DecoderConfig) {
 		config.TagName = "json"
-	}))
+	})
 	if err != nil {
-		return Config{}, errors.Wrap(err, "unmarshalling config File")
+		return Config{}, fmt.Errorf("unmarshalling config File: %w", err)
 	}
 	return conf, nil
 }

@@ -60,6 +60,25 @@ includes the following pre-commit hooks:
    - You must [install Docker](https://docs.docker.com/engine/install/) before
      running this pre-commit hook.
 
+## Using KubeLinter as part of your CI pipeline
+
+If you're using GitHub, there's the [KubeLinter GitHub Action](README.md#kubelinter-github-action) available.
+
+Alternatively, you can grab the latest binary release with the following commands
+```bash
+LOCATION=$(curl -s https://api.github.com/repos/stackrox/kube-linter/releases/latest \
+| jq -r '.tag_name
+    | "https://github.com/stackrox/kube-linter/releases/download/\(.)/kube-linter-linux.tar.gz"')
+curl -L -o kube-linter-linux.tar.gz $LOCATION
+mkdir kube-linter/
+tar -xf kube-linter-linux.tar.gz -C "kube-linter/"
+
+```
+and pass `--fail-on-invalid-resource` as an option to have your pipeline fail if your YAML file can't be parsed. See the following example:
+```bash
+./kube-linter/kube-linter lint --fail-on-invalid-resource /path/to/yaml-file.yaml
+```
+
 ## KubeLinter commands
 
 This section covers kube-linter command syntax, describes the command

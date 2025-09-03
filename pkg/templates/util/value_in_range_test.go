@@ -77,7 +77,7 @@ func TestValueInRange(t *testing.T) {
 	} {
 		c := testCase
 		t.Run(fmt.Sprintf("%+v", c), func(t *testing.T) {
-			assert.Equal(t, ValueInRange(c.value, c.lowerBound, c.upperBound), c.expectedMatch)
+			assert.Equal(t, c.expectedMatch, ValueInRange(c.value, c.lowerBound, c.upperBound))
 		})
 	}
 }

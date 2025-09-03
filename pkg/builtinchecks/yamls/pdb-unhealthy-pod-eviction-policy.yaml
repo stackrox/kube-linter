@@ -1,0 +1,7 @@
+name: "pdb-unhealthy-pod-eviction-policy"
+description: "Indicates when a PodDisruptionBudget does not explicitly set the unhealthyPodEvictionPolicy field."
+remediation: "Set unhealthyPodEvictionPolicy to AlwaysAllow. Refer to https://kubernetes.io/docs/tasks/run-application/configure-pdb/#unhealthy-pod-eviction-policy for more information."
+scope:
+  objectKinds:
+    - PodDisruptionBudget
+template: "pdb-unhealthy-pod-eviction-policy"

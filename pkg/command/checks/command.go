@@ -1,12 +1,12 @@
 package checks
 
 import (
+	"fmt"
 	"os"
 	"sort"
 	"strings"
 	"text/template"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"golang.stackrox.io/kube-linter/internal/defaultchecks"
 	"golang.stackrox.io/kube-linter/internal/flagutil"
@@ -114,7 +114,7 @@ func Command() *cobra.Command {
 func GetTemplateLink(check *config.Check) (string, error) {
 	t, found := templates.Get(check.Template)
 	if !found {
-		return "", errors.Errorf("unexpected: check %v references non-existent template?", check)
+		return "", fmt.Errorf("unexpected: check %v references non-existent template?", check)
 	}
 	return strings.Join(strings.Fields(strings.ToLower(t.HumanName)), "-"), nil
 }

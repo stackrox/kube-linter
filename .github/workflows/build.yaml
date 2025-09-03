@@ -19,7 +19,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # Checkout all repo history to make tags available for figuring out kube-linter version during build.
           fetch-depth: 0
@@ -60,7 +60,7 @@ jobs:
         run: make test
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4.4.1
+        uses: codecov/codecov-action@v5.5.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: stackrox/kube-linter
@@ -78,7 +78,7 @@ jobs:
         run: make e2e-bats
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4.4.1
+        uses: codecov/codecov-action@v5.5.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: stackrox/kube-linter
@@ -100,10 +100,10 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Download executable
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: kube-linter
 
@@ -134,7 +134,7 @@ jobs:
         run: |
           set -ex
           schema=$(jq -r '.["$schema"]' results.sarif)
-          [ "$schema" = https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json ]
+          [ "$schema" = https://raw.githubusercontent.com/oasis-tcs/sarif-spec/main/sarif-2.1/schema/sarif-schema-2.1.0.json ]
           ./yajsv -s ./scripts/sarif/sarif-schema-2.1.0.json results.sarif
 
       - name: Upload SARIF output file to GitHub
@@ -147,12 +147,12 @@ jobs:
     needs: build-and-test
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # Checkout all repo history to make tags available for figuring out kube-linter version during build.
           fetch-depth: 0
       - name: Download windows executable
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: kube-linter.exe
           path: tmp/

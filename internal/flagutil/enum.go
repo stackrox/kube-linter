@@ -6,7 +6,6 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/set"
 	"golang.stackrox.io/kube-linter/internal/utils"
 )
@@ -28,7 +27,7 @@ func (e *EnumFlag) String() string {
 // Set implements pflag.Value.
 func (e *EnumFlag) Set(input string) error {
 	if !e.allowedValues.Contains(input) {
-		return errors.Errorf("%q is not a valid option (valid options are: %v)", input, e.getAllowedValuesString())
+		return fmt.Errorf("%q is not a valid option (valid options are: %v)", input, e.getAllowedValuesString())
 	}
 	e.currentValue = input
 	return nil

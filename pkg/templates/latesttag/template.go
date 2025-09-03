@@ -1,10 +1,10 @@
 package latesttag
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
@@ -35,7 +35,7 @@ func init() {
 			for _, res := range p.BlockList {
 				rg, err := regexp.Compile(res)
 				if err != nil {
-					return nil, errors.Wrapf(err, "invalid regex %s", res)
+					return nil, fmt.Errorf("invalid regex %s: %w", res, err)
 				}
 				blockedRegexes = append(blockedRegexes, rg)
 			}
@@ -44,14 +44,14 @@ func init() {
 			for _, res := range p.AllowList {
 				rg, err := regexp.Compile(res)
 				if err != nil {
-					return nil, errors.Wrapf(err, "invalid regex %s", res)
+					return nil, fmt.Errorf("invalid regex %s: %w", res, err)
 				}
 				allowedRegexes = append(allowedRegexes, rg)
 			}
 
 			if len(blockedRegexes) > 0 && len(allowedRegexes) > 0 {
-				err := fmt.Errorf("check has both \"allowList\" & \"blockList\" parameter's values set")
-				return nil, errors.Wrapf(err, "only one of the paramater lists can be used at a time")
+				err := errors.New("check has both \"allowList\" & \"blockList\" parameter's values set")
+				return nil, fmt.Errorf("only one of the paramater lists can be used at a time: %w", err)
 			}
 
 			return util.PerContainerCheck(func(container *v1.Container) (results []diagnostic.Diagnostic) {

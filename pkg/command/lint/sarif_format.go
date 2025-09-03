@@ -2,6 +2,7 @@ package lint
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -9,7 +10,6 @@ import (
 	"text/template"
 
 	"github.com/owenrumney/go-sarif/v2/sarif"
-	"github.com/pkg/errors"
 	"golang.stackrox.io/kube-linter/internal/consts"
 	"golang.stackrox.io/kube-linter/pkg/command/checks"
 	"golang.stackrox.io/kube-linter/pkg/command/common"
@@ -42,7 +42,7 @@ func formatLintSarif(out io.Writer, data interface{}) error {
 	if res, ok := data.(run.Result); ok {
 		return formatSarif(out, res)
 	}
-	return errors.New("Provided data must be of run.Result type")
+	return errors.New("provided data must be of run.Result type")
 }
 
 func formatSarif(out io.Writer, result run.Result) error {
