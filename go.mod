@@ -15,7 +15,7 @@ require (
 	github.com/owenrumney/go-sarif/v2 v2.3.3
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.85.0
 	github.com/spf13/cobra v1.9.1
-	github.com/spf13/pflag v1.0.7
+	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.20.0
 	github.com/stretchr/testify v1.11.1
 	helm.sh/helm/v3 v3.18.6
