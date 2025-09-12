@@ -61,6 +61,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/targetport"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/unsafeprocmount"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/updateconfig"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/volumeclaimtemplates"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/wildcardinrules"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/writablehostmount"
 )

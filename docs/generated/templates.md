@@ -829,6 +829,26 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 
+## StatefulSet VolumeClaimTemplate Annotation
+
+**Key**: `statefulset-volumeclaimtemplate-annotation`
+
+**Description**: Check if StatefulSet's VolumeClaimTemplate contains a specific annotation
+
+**Supported Objects**: DeploymentLike
+
+
+**Parameters**:
+
+```yaml
+- description: Annotation specifies the required annotation to match.
+  name: annotation
+  negationAllowed: true
+  regexAllowed: true
+  required: true
+  type: string
+```
+
 ## Target Port
 
 **Key**: `target-port`

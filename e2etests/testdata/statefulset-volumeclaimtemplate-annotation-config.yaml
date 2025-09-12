@@ -1,0 +1,7 @@
+checks:
+  addAllBuiltIn: false
+customChecks:
+  - name: "statefulset-volumeclaimtemplate-annotation"
+    template: "statefulset-volumeclaimtemplate-annotation"
+    params:
+      annotation: required-annotation
