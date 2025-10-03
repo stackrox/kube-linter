@@ -20,7 +20,7 @@ const (
 )
 
 func process(results *[]diagnostic.Diagnostic, containerName, requirementsType string, quantity *resource.Quantity, lowerBoundBytes int, upperBoundBytes *int) {
-	if util.ValueInRange(int(quantity.Value()), lowerBoundBytes, upperBoundBytes) {
+	if !util.ValueInRange(int(quantity.Value()), lowerBoundBytes, upperBoundBytes) {
 		*results = append(*results, diagnostic.Diagnostic{
 			Message: fmt.Sprintf("container %q has memory %s %s", containerName, requirementsType, quantity),
 		})
