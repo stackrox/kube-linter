@@ -275,6 +275,36 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 
+## Env references
+
+**Key**: `env-value-from`
+
+**Description**: Flag resources which use env variables from secrets/configmaps not included in the release
+
+**Supported Objects**: DeploymentLike
+
+
+**Parameters**:
+
+```yaml
+- arrayElemType: string
+  description: list of regular expressions specifying pattern(s) for secrets that
+    will be ignored.
+  name: ignoredSecrets
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: array
+- arrayElemType: string
+  description: list of regular expressions specifying pattern(s) for secrets that
+    will be ignored.
+  name: ignoredConfigMaps
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: array
+```
+
 ## Environment Variables
 
 **Key**: `env-var`
