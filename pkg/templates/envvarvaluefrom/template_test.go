@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-
 	"golang.stackrox.io/kube-linter/internal/pointers"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext/mocks"
@@ -25,7 +23,6 @@ func TestEnvVarValueFrom(t *testing.T) {
 
 type EnVarValueFromTestSuite struct {
 	templates.TemplateTestSuite
-
 	ctx *mocks.MockLintContext
 }
 
@@ -70,7 +67,7 @@ func makeConfigMapSource(descriptor sourceReference) *coreV1.EnvVarSource {
 	}
 }
 
-func (s *EnVarValueFromTestSuite) addContainerWithEnvFromSecret(name string, envRef envReference) {
+func (s *EnVarValueFromTestSuite) addContainerWithEnvFromSecret(envRef envReference) { // Fix: Remove name parameter
 	var valueFrom *coreV1.EnvVarSource
 	switch envRef.Kind {
 	case "secret":
@@ -78,10 +75,9 @@ func (s *EnVarValueFromTestSuite) addContainerWithEnvFromSecret(name string, env
 	case "configmap":
 		valueFrom = makeConfigMapSource(envRef.Source)
 	default:
-		require.FailNow(s.T(), fmt.Sprintf("Unknown source kind %s", envRef.Kind))
+		s.Require().FailNow(fmt.Sprintf("Unknown source kind %s", envRef.Kind)) // Fix: Use s.Require().FailNow
 	}
-
-	s.ctx.AddContainerToDeployment(s.T(), name, coreV1.Container{
+	s.ctx.AddContainerToDeployment(s.T(), targetDeploymentName, coreV1.Container{ // Fix: Hardcode targetDeploymentName
 		Name: "container",
 		Env: []coreV1.EnvVar{
 			{
@@ -94,12 +90,10 @@ func (s *EnVarValueFromTestSuite) addContainerWithEnvFromSecret(name string, env
 
 func (s *EnVarValueFromTestSuite) TestDeploymentWithoutEnvPasses() {
 	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
-
 	s.ctx.AddContainerToDeployment(s.T(), targetDeploymentName, coreV1.Container{
 		Name: "container",
 		Env:  []coreV1.EnvVar{},
 	})
-
 	s.Validate(s.ctx, []templates.TestCase{
 		{
 			Param: params.Params{},
@@ -113,7 +107,6 @@ func (s *EnVarValueFromTestSuite) TestDeploymentWithoutEnvPasses() {
 
 func (s *EnVarValueFromTestSuite) TestDeploymentWithDirectEnvPasses() {
 	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
-
 	s.ctx.AddContainerToDeployment(s.T(), targetDeploymentName, coreV1.Container{
 		Name: "container",
 		Env: []coreV1.EnvVar{
@@ -123,7 +116,6 @@ func (s *EnVarValueFromTestSuite) TestDeploymentWithDirectEnvPasses() {
 			},
 		},
 	})
-
 	s.Validate(s.ctx, []templates.TestCase{
 		{
 			Param: params.Params{},
@@ -137,8 +129,7 @@ func (s *EnVarValueFromTestSuite) TestDeploymentWithDirectEnvPasses() {
 
 func (s *EnVarValueFromTestSuite) TestDeploymentWithUnknownSecret() {
 	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
-
-	s.addContainerWithEnvFromSecret(targetDeploymentName, envReference{
+	s.addContainerWithEnvFromSecret(envReference{
 		Name: "my-secret",
 		Kind: "secret",
 		Source: sourceReference{
@@ -147,7 +138,6 @@ func (s *EnVarValueFromTestSuite) TestDeploymentWithUnknownSecret() {
 			Optional: pointers.Bool(false),
 		},
 	})
-
 	s.Validate(s.ctx, []templates.TestCase{
 		{
 			Param: params.Params{},
@@ -163,8 +153,7 @@ func (s *EnVarValueFromTestSuite) TestDeploymentWithUnknownSecret() {
 
 func (s *EnVarValueFromTestSuite) TestDeploymentWithNoOptionalSecret() {
 	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
-
-	s.addContainerWithEnvFromSecret(targetDeploymentName, envReference{
+	s.addContainerWithEnvFromSecret(envReference{
 		Name: "my-secret",
 		Kind: "secret",
 		Source: sourceReference{
@@ -173,7 +162,6 @@ func (s *EnVarValueFromTestSuite) TestDeploymentWithNoOptionalSecret() {
 			Optional: nil,
 		},
 	})
-
 	s.Validate(s.ctx, []templates.TestCase{
 		{
 			Param: params.Params{},
@@ -189,8 +177,7 @@ func (s *EnVarValueFromTestSuite) TestDeploymentWithNoOptionalSecret() {
 
 func (s *EnVarValueFromTestSuite) TestDeploymentWithUnknownOptionalSecretPasses() {
 	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
-
-	s.addContainerWithEnvFromSecret(targetDeploymentName, envReference{
+	s.addContainerWithEnvFromSecret(envReference{
 		Name: "my-secret",
 		Kind: "secret",
 		Source: sourceReference{
@@ -199,7 +186,6 @@ func (s *EnVarValueFromTestSuite) TestDeploymentWithUnknownOptionalSecretPasses(
 			Optional: pointers.Bool(true),
 		},
 	})
-
 	s.Validate(s.ctx, []templates.TestCase{
 		{
 			Param: params.Params{},
@@ -213,8 +199,7 @@ func (s *EnVarValueFromTestSuite) TestDeploymentWithUnknownOptionalSecretPasses(
 
 func (s *EnVarValueFromTestSuite) TestDeploymentWithUnknownConfigMap() {
 	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
-
-	s.addContainerWithEnvFromSecret(targetDeploymentName, envReference{
+	s.addContainerWithEnvFromSecret(envReference{
 		Name: "my_config_var",
 		Kind: "configmap",
 		Source: sourceReference{
@@ -223,7 +208,6 @@ func (s *EnVarValueFromTestSuite) TestDeploymentWithUnknownConfigMap() {
 			Optional: pointers.Bool(false),
 		},
 	})
-
 	s.Validate(s.ctx, []templates.TestCase{
 		{
 			Param: params.Params{},
@@ -239,8 +223,7 @@ func (s *EnVarValueFromTestSuite) TestDeploymentWithUnknownConfigMap() {
 
 func (s *EnVarValueFromTestSuite) TestDeploymentWithUnknownOptionalConfigMapPasses() {
 	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
-
-	s.addContainerWithEnvFromSecret(targetDeploymentName, envReference{
+	s.addContainerWithEnvFromSecret(envReference{
 		Name: "my_config_var",
 		Kind: "configmap",
 		Source: sourceReference{
@@ -249,7 +232,6 @@ func (s *EnVarValueFromTestSuite) TestDeploymentWithUnknownOptionalConfigMapPass
 			Optional: pointers.Bool(true),
 		},
 	})
-
 	s.Validate(s.ctx, []templates.TestCase{
 		{
 			Param: params.Params{},
@@ -263,8 +245,7 @@ func (s *EnVarValueFromTestSuite) TestDeploymentWithUnknownOptionalConfigMapPass
 
 func (s *EnVarValueFromTestSuite) TestDeploymentWithNoOptionalConfigMap() {
 	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
-
-	s.addContainerWithEnvFromSecret(targetDeploymentName, envReference{
+	s.addContainerWithEnvFromSecret(envReference{
 		Name: "my-config",
 		Kind: "configmap",
 		Source: sourceReference{
@@ -273,7 +254,6 @@ func (s *EnVarValueFromTestSuite) TestDeploymentWithNoOptionalConfigMap() {
 			Optional: nil,
 		},
 	})
-
 	s.Validate(s.ctx, []templates.TestCase{
 		{
 			Param: params.Params{},
