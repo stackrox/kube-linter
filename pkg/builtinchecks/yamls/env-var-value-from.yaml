@@ -1,0 +1,12 @@
+# customChecks defines custom checks.
+name: "env-value-from"
+template: "env-value-from"
+description: "Indicates when objects use a secret or configmap not included in the deployment."
+remediation: >-
+  Change the name or key to match a secret / configmap in the deployment.
+scope:
+  objectKinds:
+    - DeploymentLike
+params:
+  IgnoredSecrets: []
+  IgnoredConfigMaps: []
