@@ -19,6 +19,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/dnsconfigoptions"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/duplicatenvvar"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/envvar"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/envvarvaluefrom"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/forbiddenannotation"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/hostipc"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/hostmounts"
