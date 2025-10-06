@@ -35,35 +35,28 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-
 			ignoredConfigMaps, err := extractRegexList(p.IgnoredConfigMaps)
 			if err != nil {
 				return nil, err
 			}
-
 			return func(lintCtx lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				secrets := make(map[string]*v1.Secret)
 				configmaps := make(map[string]*v1.ConfigMap)
-
 				for _, obj := range lintCtx.Objects() {
-					secret, found := obj.K8sObject.(*v1.Secret)
-					if found {
-						secrets[secret.ObjectMeta.Name] = secret
+					if secret, found := obj.K8sObject.(*v1.Secret); found {
+						secrets[secret.Name] = secret // Fix: Remove ObjectMeta
 					}
-
-					configmap, found := obj.K8sObject.(*v1.ConfigMap)
-					if found {
-						configmaps[configmap.ObjectMeta.Name] = configmap
+					if configmap, found := obj.K8sObject.(*v1.ConfigMap); found {
+						configmaps[configmap.Name] = configmap // Fix: Remove ObjectMeta
 					}
 				}
-
 				return lintForEachContainer(lintCtx, object, ignoredSecrets, ignoredConfigMaps, secrets, configmaps)
 			}, nil
 		}),
 	})
 }
 
-func lintForEachContainer(lintCtx lintcontext.LintContext, object lintcontext.Object, ignoredSecrets []*regexp.Regexp, ignoredConfigMaps []*regexp.Regexp, secrets map[string]*v1.Secret, configmaps map[string]*v1.ConfigMap) []diagnostic.Diagnostic {
+func lintForEachContainer(lintCtx lintcontext.LintContext, object lintcontext.Object, ignoredSecrets, ignoredConfigMaps []*regexp.Regexp, secrets map[string]*v1.Secret, configmaps map[string]*v1.ConfigMap) []diagnostic.Diagnostic {
 	return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
 		var results []diagnostic.Diagnostic
 		for _, envVar := range container.Env {
@@ -71,16 +64,13 @@ func lintForEachContainer(lintCtx lintcontext.LintContext, object lintcontext.Ob
 			if valueFrom == nil {
 				continue
 			}
-
 			if secretKeySelector := valueFrom.SecretKeyRef; secretKeySelector != nil {
 				if secretKeySelector.Optional != nil && *secretKeySelector.Optional {
 					continue
 				}
-
-				if len(ignoredSecrets) > 0 && isInRegexList(ignoredSecrets, secretKeySelector.Name) {
+				if isInRegexList(ignoredSecrets, secretKeySelector.Name) {
 					continue
 				}
-
 				secret, ok := secrets[secretKeySelector.Name]
 				if !ok {
 					results = append(results, diagnostic.Diagnostic{
@@ -95,15 +85,13 @@ func lintForEachContainer(lintCtx lintcontext.LintContext, object lintcontext.Ob
 					Message: fmt.Sprintf("The container %q is referring to an unknown key %q in secret %q", container.Name, secretKeySelector.Key, secretKeySelector.Name),
 				})
 			}
-
 			if configMapSelector := valueFrom.ConfigMapKeyRef; configMapSelector != nil {
 				if configMapSelector.Optional != nil && *configMapSelector.Optional {
 					continue
 				}
-				if len(ignoredConfigMaps) > 0 && isInRegexList(ignoredConfigMaps, configMapSelector.Name) {
+				if isInRegexList(ignoredConfigMaps, configMapSelector.Name) {
 					continue
 				}
-
 				configmap, ok := configmaps[configMapSelector.Name]
 				if !ok {
 					results = append(results, diagnostic.Diagnostic{
@@ -111,11 +99,9 @@ func lintForEachContainer(lintCtx lintcontext.LintContext, object lintcontext.Ob
 					})
 					continue
 				}
-
 				if isInList(Keys(configmap.Data), configMapSelector.Key) || isInList(Keys(configmap.BinaryData), configMapSelector.Key) {
 					continue
 				}
-
 				results = append(results, diagnostic.Diagnostic{
 					Message: fmt.Sprintf("The container %q is referring to an unknown key %q in config map %q", container.Name, configMapSelector.Key, configMapSelector.Name),
 				})
