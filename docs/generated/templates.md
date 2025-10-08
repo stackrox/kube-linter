@@ -445,6 +445,64 @@ KubeLinter supports the following templates:
 **Supported Objects**: JobLike
 
 
+## kubeconform
+
+**Key**: `kubeconform`
+
+**Description**: Flag objects that does not match schema using https://github.com/yannh/kubeconform
+
+**Supported Objects**: Any
+
+
+**Parameters**:
+
+```yaml
+- arrayElemType: string
+  description: 'SchemaLocations contains locations of schemas to use. See: https://github.com/yannh/kubeconform/tree/master?tab=readme-ov-file#overriding-schemas-location'
+  name: schemaLocations
+  negationAllowed: true
+  regexAllowed: false
+  required: false
+  type: array
+- description: Cache specifies the folder to cache schemas downloaded via HTTP.
+  name: cache
+  negationAllowed: true
+  regexAllowed: false
+  required: false
+  type: string
+- arrayElemType: string
+  description: SkipKinds lists resource kinds to ignore during validation.
+  name: skipKinds
+  negationAllowed: true
+  regexAllowed: false
+  required: false
+  type: array
+- arrayElemType: string
+  description: RejectKinds lists resource kinds to reject during validation.
+  name: rejectKinds
+  negationAllowed: true
+  regexAllowed: false
+  required: false
+  type: array
+- description: KubernetesVersion specifies the Kubernetes version - must match one
+    in https://github.com/instrumenta/kubernetes-json-schema
+  name: kubernetesVersion
+  negationAllowed: true
+  regexAllowed: false
+  required: false
+  type: string
+- description: Strict enables strict validation that will error if resources contain
+    undocumented fields.
+  name: strict
+  required: false
+  type: boolean
+- description: IgnoreMissingSchemas will skip validation for resources if no schema
+    can be found.
+  name: ignoreMissingSchemas
+  required: false
+  type: boolean
+```
+
 ## Latest Tag
 
 **Key**: `latest-tag`
