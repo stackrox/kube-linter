@@ -24,8 +24,10 @@ import (
 	"helm.sh/helm/v3/pkg/engine"
 	autoscalingV2Beta1 "k8s.io/api/autoscaling/v2beta1"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
+	runtimeYaml "k8s.io/apimachinery/pkg/runtime/serializer/yaml"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/kubernetes/scheme"
 	y "sigs.k8s.io/yaml"
@@ -58,7 +60,17 @@ func parseObjects(data []byte, d runtime.Decoder) ([]k8sutil.Object, error) {
 	}
 	obj, _, err := d.Decode(data, nil, nil)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode: %w", err)
+		// this is for backward compatibility, should be replaced with kubeconform
+		if strings.Contains(err.Error(), "json: cannot unmarshal") {
+			return nil, fmt.Errorf("failed to decode: %w", err)
+		}
+		// fallback to unstructured as schema validation will be performed by kubeconform check
+		dec := runtimeYaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
+		var unstructuredErr error
+		obj, _, unstructuredErr = dec.Decode(data, nil, obj)
+		if unstructuredErr != nil {
+			return nil, fmt.Errorf("failed to decode: %w: %w", err, unstructuredErr)
+		}
 	}
 	if list, ok := obj.(*v1.List); ok {
 		objs := make([]k8sutil.Object, 0, len(list.Items))
