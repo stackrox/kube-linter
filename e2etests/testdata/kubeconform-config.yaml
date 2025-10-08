@@ -1,0 +1,13 @@
+checks:
+  addAllBuiltIn: false
+customChecks:
+  - name: "kubeconform-validation"
+    description: "Validate Kubernetes resources against their schemas using kubeconform"
+    remediation: "Fix the resource to conform to the Kubernetes API schema"
+    scope:
+      objectKinds:
+        - Any
+    template: "kubeconform"
+    params:
+      strict: true
+      ignoreMissingSchemas: true
