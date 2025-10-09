@@ -2,6 +2,7 @@ package kubeconform
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/yannh/kubeconform/pkg/resource"
 	"github.com/yannh/kubeconform/pkg/validator"
@@ -33,6 +34,13 @@ func init() {
 }
 
 func validate(p params.Params) (check.Func, error) {
+	// Create cache directory if it doesn't exist
+	if p.Cache != "" {
+		if err := os.MkdirAll(p.Cache, 0750); err != nil {
+			return nil, fmt.Errorf("creating cache directory %s: %w", p.Cache, err)
+		}
+	}
+
 	v, err := validator.New(p.SchemaLocations, validator.Opts{
 		Cache:                p.Cache,
 		SkipKinds:            sliceToMap(p.SkipKinds),
