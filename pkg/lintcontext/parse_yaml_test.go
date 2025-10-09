@@ -132,7 +132,7 @@ spec:
     image: nginx:latest
     ports:
     - containerPort: "invalid-port-type"`, // string instead of int
-			expectError: true,             // Should fail due to type mismatch
+			expectError: true, // Should fail due to type mismatch
 			expectCount: 0,
 			expectKind:  "",
 			expectName:  "",
@@ -253,7 +253,7 @@ spec:
 
 	// Test GroupVersionKind
 	gvk := pod.GetObjectKind().GroupVersionKind()
-	assert.Equal(t, "", gvk.Group)
+	assert.Empty(t, gvk.Group)
 	assert.Equal(t, "v1", gvk.Version)
 	assert.Equal(t, "Pod", gvk.Kind)
 }
