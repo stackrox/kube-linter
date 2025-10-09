@@ -185,7 +185,7 @@ spec:
 }
 
 func TestParseObjectsWithCustomDecoder(t *testing.T) {
-	// Test that parseObjects respects the custom decoder parameter
+	// Test that parseObjects can handle CRDs by falling back to unstructured parsing
 	tektonTaskYAML := `apiVersion: tekton.dev/v1
 kind: Task
 metadata:
@@ -200,15 +200,19 @@ spec:
     args:
     - "Hello World!"`
 
-	// Test with default decoder (should fail)
+	// Test with default decoder (should succeed by falling back to unstructured)
 	objects, err := parseObjects([]byte(tektonTaskYAML), nil)
-	assert.Error(t, err, "Expected Tekton Task to fail with default decoder")
-	assert.Empty(t, objects)
+	assert.NoError(t, err, "Expected Tekton Task to parse as unstructured with default decoder")
+	assert.Len(t, objects, 1)
+	assert.Equal(t, "Task", objects[0].GetObjectKind().GroupVersionKind().Kind)
+	assert.Equal(t, "hello-world-task", objects[0].GetName())
 
-	// Test with explicit decoder (should also fail since we're using the same decoder)
+	// Test with explicit decoder (should also succeed)
 	objects, err = parseObjects([]byte(tektonTaskYAML), decoder)
-	assert.Error(t, err, "Expected Tekton Task to fail with current scheme")
-	assert.Empty(t, objects)
+	assert.NoError(t, err, "Expected Tekton Task to parse as unstructured with explicit decoder")
+	assert.Len(t, objects, 1)
+	assert.Equal(t, "Task", objects[0].GetObjectKind().GroupVersionKind().Kind)
+	assert.Equal(t, "hello-world-task", objects[0].GetName())
 }
 
 func TestParseObjectsEmptyInput(t *testing.T) {
