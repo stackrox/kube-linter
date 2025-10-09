@@ -63,6 +63,24 @@ get_value_from() {
   [[ "${message2}" =~ "Pod: resource is not valid:" ]]
 }
 
+@test "builtin-schema-validation" {
+  tmp="tests/checks/kubeconform.yml"
+  cmd="${KUBE_LINTER_BIN} lint --config e2etests/testdata/schema-validation-config.yaml --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  # Should find 2 validation errors using builtin schema-validation check
+  [[ "${count}" == "2" ]]
+  [[ "${message1}" =~ "DaemonSet: resource is not valid:" ]]
+  [[ "${message2}" =~ "Pod: resource is not valid:" ]]
+}
+
 @test "template-check-installed-bash-version" {
     run "bash --version"
     [[ "${BASH_VERSION:0:1}" -ge '4' ]] || false
