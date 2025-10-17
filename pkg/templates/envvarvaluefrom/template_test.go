@@ -11,6 +11,7 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	"golang.stackrox.io/kube-linter/pkg/templates/envvarvaluefrom/internal/params"
 	coreV1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
@@ -265,4 +266,79 @@ func (s *EnVarValueFromTestSuite) TestDeploymentWithNoOptionalConfigMap() {
 			ExpectInstantiationError: false,
 		},
 	})
+}
+
+func (s *EnVarValueFromTestSuite) TestExtractRegexListInvalidPattern() {
+	p := params.Params{IgnoredSecrets: []string{"[invalid("}} // Invalid regex
+	_, err := extractRegexList(p.IgnoredSecrets)
+	s.Error(err)
+	s.Contains(err.Error(), "invalid regex [invalid(")
+}
+
+func (s *EnVarValueFromTestSuite) TestExtractRegexListEmpty() {
+	regexList, err := extractRegexList([]string{})
+	s.NoError(err)
+	s.Empty(regexList)
+}
+
+func (s *EnVarValueFromTestSuite) TestUnknownKeyInSecret() {
+	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
+	secret := &coreV1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-secret"},
+		Data:       map[string][]byte{"key": []byte("value")},
+	}
+	s.ctx.AddObject("test-secret", secret) // Fixed: Use object name as key, not s.T()
+	s.addContainerWithEnvFromSecret(envReference{
+		Name: "my-secret",
+		Kind: "secret",
+		Source: sourceReference{
+			Name:     "test-secret",
+			Key:      "unknown-key",
+			Optional: pointers.Bool(false),
+		},
+	})
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				targetDeploymentName: {{
+					Message: "The container \"container\" is referring to an unknown key \"unknown-key\" in secret \"test-secret\"",
+				}},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+func (s *EnVarValueFromTestSuite) TestIgnoredSecretWithRegex() {
+	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
+	secret := &coreV1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "ignored-secret"},
+		Data:       map[string][]byte{"key": []byte("value")},
+	}
+	s.ctx.AddObject("ignored-secret", secret) // Fixed: Use object name as key, not s.T()
+	s.addContainerWithEnvFromSecret(envReference{
+		Name: "my-secret",
+		Kind: "secret",
+		Source: sourceReference{
+			Name:     "ignored-secret",
+			Key:      "key",
+			Optional: pointers.Bool(false),
+		},
+	})
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{IgnoredSecrets: []string{"^ignored-secret$"}},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				targetDeploymentName: {},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+func (s *EnVarValueFromTestSuite) TestKeysEmptyMap() {
+	emptyMap := map[string]string{}
+	keys := Keys(emptyMap)
+	s.Empty(keys)
 }
