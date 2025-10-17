@@ -1,0 +1,84 @@
+---
+# This should fail due to key mismatch (chimpmunk vs chimpmun)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: should-fire
+spec:
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.14.2
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+          env:
+            - name: BLAH
+              valueFrom:
+                secretKeyRef:
+                  name: secretsquirrels
+                  key: chimpmunk
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secretsquirrels
+stringData:
+  chimpmun: "aaaaaaa"
+---
+# This should pass (exact match)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: should-pass
+spec:
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.14.2
+          securityContext:
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+          env:
+            - name: BLAH
+              valueFrom:
+                secretKeyRef:
+                  name: validsecret
+                  key: validkey
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: validsecret
+stringData:
+  validkey: "bbbbbbb"
