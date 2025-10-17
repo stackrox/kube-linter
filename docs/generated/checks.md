@@ -613,6 +613,21 @@ dirs:
 - ^/sys$
 - ^/usr$
 ```
+## sorted-keys
+
+**Enabled by default**: No
+
+**Description**: Check that YAML keys are sorted in alphabetical order wherever possible.
+
+**Remediation**: Ensure that keys in your YAML manifest are sorted in alphabetical order to improve consistency and readability.
+
+**Template**: [sorted-keys](templates.md#sorted-keys)
+
+**Parameters**:
+
+```yaml
+recursive: true
+```
 ## ssh-port
 
 **Enabled by default**: Yes

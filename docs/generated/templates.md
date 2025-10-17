@@ -820,6 +820,25 @@ KubeLinter supports the following templates:
   type: string
 ```
 
+## Sorted Keys
+
+**Key**: `sorted-keys`
+
+**Description**: Flag YAML keys that are not sorted in alphabetical order
+
+**Supported Objects**: Any
+
+
+**Parameters**:
+
+```yaml
+- description: Recursive determines whether to check keys recursively at all nesting
+    levels. Default is true.
+  name: recursive
+  required: false
+  type: boolean
+```
+
 ## Startup Port Exposed
 
 **Key**: `startup-port`
