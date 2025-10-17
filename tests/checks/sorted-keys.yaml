@@ -1,0 +1,71 @@
+# Test case 1: Keys are properly sorted - should NOT fire
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sorted-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.14.2
+          ports:
+            - containerPort: 80
+---
+# Test case 2: Top-level keys not sorted - SHOULD fire
+apiVersion: apps/v1
+metadata:
+  name: unsorted-top-level
+spec:
+  replicas: 1
+kind: Deployment  # "kind" should come before "metadata"
+---
+# Test case 3: Nested keys not sorted - SHOULD fire
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unsorted-nested
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          image: myapp:latest
+    metadata:  # "metadata" should come before "spec"
+      labels:
+        app: myapp
+---
+# Test case 4: Spec-level keys not sorted - SHOULD fire
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unsorted-spec-keys
+spec:
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+        - name: test
+          image: test:latest
+  selector:
+    matchLabels:
+      app: test
+  replicas: 2  # Keys in spec not sorted: should be replicas, selector, template
+---
+# Test case 5: Multiple levels with unsorted keys - SHOULD fire
+apiVersion: v1
+kind: ConfigMap
+data:
+  zebra: "z"
+  apple: "a"  # "apple" should come before "zebra"
+metadata:
+  name: unsorted-configmap

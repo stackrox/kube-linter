@@ -15,11 +15,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const templateKey = "sorted-keys"
 
 func init() {
 	templates.Register(check.Template{
 		HumanName:   "Sorted Keys",
-		Key:         "sorted-keys",
+		Key:         templateKey,
 		Description: "Flag YAML keys that are not sorted in alphabetical order",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.Any},
