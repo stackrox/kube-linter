@@ -39,8 +39,9 @@ type testCase struct {
 
 // Helper function to load YAML from testdata
 func (s *SortedKeysTestSuite) loadTestYAML(filename string) []byte {
+	s.T().Helper()
 	path := filepath.Join("testdata", filename)
-	content, err := os.ReadFile(path)
+	content, err := os.ReadFile(path) //nolint:gosec // Test file paths are controlled and safe
 	s.Require().NoError(err, "Failed to read test file %s", filename)
 	return content
 }

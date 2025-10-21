@@ -5,6 +5,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/goccy/go-yaml/ast"
+	"github.com/goccy/go-yaml/parser"
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
@@ -12,7 +14,6 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	"golang.stackrox.io/kube-linter/pkg/templates/sortedkeys/internal/params"
-	"gopkg.in/yaml.v3"
 )
 
 const templateKey = "sorted-keys"
@@ -30,19 +31,19 @@ func init() {
 		Instantiate: params.WrapInstantiateFunc(func(p params.Params) (check.Func, error) {
 			return func(_ lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				// Parse the raw YAML to preserve key order
-				var node yaml.Node
-				if err := yaml.Unmarshal(object.Metadata.Raw, &node); err != nil {
+				file, err := parser.ParseBytes(object.Metadata.Raw, parser.ParseComments)
+				if err != nil {
 					// Skip objects that can't be parsed
 					return nil
 				}
 
 				var diagnostics []diagnostic.Diagnostic
 
-				// The root node is a document node, we need to check its content
-				if node.Kind == yaml.DocumentNode && len(node.Content) > 0 {
-					diagnostics = checkNode(node.Content[0], "", p.Recursive)
-				} else if node.Kind == yaml.MappingNode {
-					diagnostics = checkNode(&node, "", p.Recursive)
+				// Check all documents in the file
+				for _, doc := range file.Docs {
+					if doc != nil && doc.Body != nil {
+						diagnostics = append(diagnostics, checkNode(doc.Body, "", p.Recursive)...)
+					}
 				}
 
 				return diagnostics
@@ -52,25 +53,26 @@ func init() {
 }
 
 // checkNode recursively checks if keys in a YAML node are sorted
-func checkNode(node *yaml.Node, path string, recursive bool) []diagnostic.Diagnostic {
+func checkNode(node ast.Node, path string, recursive bool) []diagnostic.Diagnostic {
 	if node == nil {
 		return nil
 	}
 
 	var diagnostics []diagnostic.Diagnostic
 
-	switch node.Kind {
-	case yaml.MappingNode:
-		// Extract keys from the mapping node
-		// In yaml.v3, mapping nodes store key-value pairs as alternating elements in Content
+	switch n := node.(type) {
+	case *ast.MappingNode:
+		// MappingNode contains Values which are MappingValueNodes
 		var keys []string
-		keyPositions := make(map[string]int) // Track original positions
+		keyPositions := make(map[string]int)
 
-		for i := 0; i < len(node.Content); i += 2 {
-			if node.Content[i].Kind == yaml.ScalarNode {
-				key := node.Content[i].Value
+		for i, value := range n.Values {
+			// Values in a MappingNode are already MappingValueNode pointers
+			// Extract the key
+			key := getKeyString(value.Key)
+			if key != "" {
 				keys = append(keys, key)
-				keyPositions[key] = i / 2
+				keyPositions[key] = i
 			}
 		}
 
@@ -104,32 +106,66 @@ func checkNode(node *yaml.Node, path string, recursive bool) []diagnostic.Diagno
 
 		// Recursively check child nodes if recursive is enabled
 		if recursive {
-			for i := 0; i < len(node.Content); i += 2 {
-				keyNode := node.Content[i]
-				valueNode := node.Content[i+1]
-
+			for _, value := range n.Values {
+				key := getKeyString(value.Key)
 				childPath := path
 				if childPath == "" {
-					childPath = keyNode.Value
+					childPath = key
 				} else {
-					childPath = path + "." + keyNode.Value
+					childPath = path + "." + key
 				}
 
-				childDiagnostics := checkNode(valueNode, childPath, recursive)
+				childDiagnostics := checkNode(value.Value, childPath, recursive)
 				diagnostics = append(diagnostics, childDiagnostics...)
 			}
 		}
 
-	case yaml.SequenceNode:
+	case *ast.SequenceNode:
 		// For sequences, check each element if it's a mapping
 		if recursive {
-			for idx, item := range node.Content {
+			for idx, item := range n.Values {
 				childPath := fmt.Sprintf("%s[%d]", path, idx)
 				childDiagnostics := checkNode(item, childPath, recursive)
 				diagnostics = append(diagnostics, childDiagnostics...)
 			}
 		}
+
+	case *ast.AnchorNode:
+		// Handle anchor nodes by checking their value
+		diagnostics = append(diagnostics, checkNode(n.Value, path, recursive)...)
+
+	case *ast.AliasNode:
+		// Skip alias nodes - they reference already checked content
+		// No need to check as the original anchor was already checked
+
+	case *ast.MergeKeyNode:
+		// Handle merge keys (<<: *alias)
+		// The merge key itself is represented as a special key
+		// No special handling needed as it will be treated as a key
 	}
 
 	return diagnostics
+}
+
+// getKeyString extracts the string representation of a key node
+func getKeyString(node ast.Node) string {
+	switch n := node.(type) {
+	case *ast.StringNode:
+		return n.Value
+	case *ast.IntegerNode:
+		return n.String()
+	case *ast.FloatNode:
+		return n.String()
+	case *ast.BoolNode:
+		if n.Value {
+			return "true"
+		}
+		return "false"
+	case *ast.MergeKeyNode:
+		return "<<"
+	case *ast.NullNode:
+		return "null"
+	default:
+		return ""
+	}
 }
