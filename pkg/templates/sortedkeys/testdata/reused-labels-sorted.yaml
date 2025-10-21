@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels: &labels
+    app: myapp
+    environment: production
+    version: v1.0
+  name: anchor-deployment
+spec:
+  selector:
+    matchLabels: *labels
+  template:
+    metadata:
+      labels: *labels
+    spec:
+      containers:
+        - image: myapp:latest
+          name: app

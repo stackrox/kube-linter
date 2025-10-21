@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multi-container
+spec:
+  template:
+    metadata:
+      labels:
+        app: multi
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:latest
+          ports:
+            - protocol: TCP
+              containerPort: 80
+              name: http
+        - name: sidecar
+          image: sidecar:latest
+          volumeMounts:
+            - name: data
+              mountPath: /data
+        - image: logger:latest
+          name: logger
+      volumes:
+        - name: data
+          emptyDir: {}

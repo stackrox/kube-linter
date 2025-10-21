@@ -1,0 +1,19 @@
+apiVersion: v1
+data:
+  base-config: &base
+    timeout: "30s"
+    retries: "3"
+
+  # When merged, these keys will be unsorted
+  service-a-config:
+    <<: *base
+    endpoint: "http://service-a"
+    auth: "bearer-token"
+
+  service-b-config:
+    <<: *base
+    zz-custom: "value"
+    aa-priority: "high"
+kind: ConfigMap
+metadata:
+  name: config-with-anchors

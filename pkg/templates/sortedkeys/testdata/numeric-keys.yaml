@@ -1,0 +1,10 @@
+apiVersion: v1
+data:
+  "10-config": value10
+  "2-config": value2
+  "1-config": value1
+  config-z: valuez
+  config-a: valuea
+kind: ConfigMap
+metadata:
+  name: numeric-keys

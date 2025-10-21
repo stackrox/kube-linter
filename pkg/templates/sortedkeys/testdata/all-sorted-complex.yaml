@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.kubernetes.io/version: "1.0"
+    kubernetes.io/description: "test app"
+  labels:
+    app: test
+    environment: prod
+  name: all-sorted-complex
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+        - env:
+            - name: ENV
+              value: prod
+          image: test:latest
+          name: main
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+      volumes:
+        - emptyDir: {}
+          name: cache

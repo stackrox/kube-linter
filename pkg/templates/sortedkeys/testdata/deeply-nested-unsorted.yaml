@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubernetes.io/change-cause: "updated image"
+    app.kubernetes.io/version: "1.0.0"
+  labels:
+    app: myapp
+  name: deeply-nested
+spec:
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+        - env:
+            - name: LOG_LEVEL
+              value: debug
+            - name: APP_MODE
+              value: production
+          image: myapp:latest
+          name: main
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"

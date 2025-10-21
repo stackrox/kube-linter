@@ -1,0 +1,7 @@
+apiVersion: v1
+data:
+  zebra: "z"
+  apple: "a"
+kind: ConfigMap
+metadata:
+  name: unsorted-configmap

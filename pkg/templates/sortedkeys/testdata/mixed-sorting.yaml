@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: test
+    version: v1
+  name: mixed-sorting
+spec:
+  selector:
+    matchLabels:
+      version: v1
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+        - image: test:latest
+          name: test
