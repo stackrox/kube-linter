@@ -193,6 +193,22 @@ forbiddenCapabilities:
 **Remediation**: Confirm that your DeploymentLike doesn't have duplicate env vars names.
 
 **Template**: [duplicate-env-var](templates.md#duplicate-environment-variables)
+## env-value-from
+
+**Enabled by default**: No
+
+**Description**: Indicates when objects use a secret or configmap not included in the deployment.
+
+**Remediation**: Change the name or key to match a secret / configmap in the deployment.
+
+**Template**: [env-value-from](templates.md#env-references)
+
+**Parameters**:
+
+```yaml
+IgnoredConfigMaps: []
+IgnoredSecrets: []
+```
 ## env-var-secret
 
 **Enabled by default**: Yes
