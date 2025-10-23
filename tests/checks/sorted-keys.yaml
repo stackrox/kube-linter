@@ -1,0 +1,508 @@
+# Test case 1: Keys are properly sorted - should NOT fire
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sorted-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.14.2
+          ports:
+            - containerPort: 80
+---
+# Test case 2: Top-level keys not sorted - SHOULD fire
+apiVersion: apps/v1
+metadata:
+  name: unsorted-top-level
+spec:
+  replicas: 1
+kind: Deployment  # "kind" should come before "metadata"
+---
+# Test case 3: Nested keys not sorted - SHOULD fire
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unsorted-nested
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          image: myapp:latest
+    metadata:  # "metadata" should come before "spec"
+      labels:
+        app: myapp
+---
+# Test case 4: Spec-level keys not sorted - SHOULD fire
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unsorted-spec-keys
+spec:
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+        - name: test
+          image: test:latest
+  selector:
+    matchLabels:
+      app: test
+  replicas: 2  # Keys in spec not sorted: should be replicas, selector, template
+---
+# Test case 5: Multiple levels with unsorted keys - SHOULD fire
+apiVersion: v1
+kind: ConfigMap
+data:
+  zebra: "z"
+  apple: "a"  # "apple" should come before "zebra"
+metadata:
+  name: unsorted-configmap
+---
+# Test case 6: Complex StatefulSet with volumeClaimTemplates - sorted correctly
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: postgres
+  name: postgres-statefulset
+  namespace: database
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: postgres
+  serviceName: postgres-service
+  template:
+    metadata:
+      labels:
+        app: postgres
+        version: "13"
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DB
+              value: mydb
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: postgres-secret
+            - name: POSTGRES_USER
+              value: admin
+          image: postgres:13
+          name: postgres
+          ports:
+            - containerPort: 5432
+              name: postgres
+          resources:
+            limits:
+              cpu: "2"
+              memory: 4Gi
+            requests:
+              cpu: "1"
+              memory: 2Gi
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-storage
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - chown -R 999:999 /var/lib/postgresql/data
+          image: busybox
+          name: init-permissions
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-storage
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 10Gi
+        storageClassName: fast-ssd
+---
+# Test case 7: Service with unsorted keys - SHOULD fire
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: nlb
+  name: frontend-service
+spec:
+  type: LoadBalancer  # type should come after selector
+  selector:
+    app: frontend
+  sessionAffinity: ClientIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+      protocol: TCP
+    - port: 443
+      targetPort: 8443
+      protocol: TCP
+      name: https  # name should come before port
+---
+# Test case 8: Ingress with multiple rules - sorted correctly
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: app-ingress
+  namespace: production
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: api.example.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: api-service
+                port:
+                  number: 80
+            path: /api
+            pathType: Prefix
+    - host: web.example.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: web-service
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - api.example.com
+        - web.example.com
+      secretName: tls-secret
+---
+# Test case 9: CronJob with unsorted keys - SHOULD fire
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup-job
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: backup
+              image: backup-tool:latest
+              volumeMounts:
+                - name: backup-storage
+                  mountPath: /backups
+              env:
+                - value: "production"
+                  name: ENVIRONMENT  # name should come before value
+          volumes:
+            - name: backup-storage
+              persistentVolumeClaim:
+                claimName: backup-pvc
+  concurrencyPolicy: Forbid  # concurrencyPolicy should come before jobTemplate
+---
+# Test case 10: NetworkPolicy with complex rules - sorted correctly
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: api-network-policy
+  namespace: production
+spec:
+  egress:
+    - ports:
+        - port: 5432
+          protocol: TCP
+      to:
+        - namespaceSelector:
+            matchLabels:
+              name: database
+    - ports:
+        - port: 6379
+          protocol: TCP
+      to:
+        - podSelector:
+            matchLabels:
+              app: redis
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: frontend
+        - podSelector:
+            matchLabels:
+              app: web
+      ports:
+        - port: 8080
+          protocol: TCP
+  podSelector:
+    matchLabels:
+      app: api
+  policyTypes:
+    - Egress
+    - Ingress
+---
+# Test case 11: DaemonSet with unsorted tolerations - SHOULD fire
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: log-collector
+spec:
+  selector:
+    matchLabels:
+      app: log-collector
+  template:
+    metadata:
+      labels:
+        app: log-collector
+    spec:
+      containers:
+        - name: fluentd
+          image: fluentd:latest
+          volumeMounts:
+            - name: varlog
+              mountPath: /var/log
+            - mountPath: /var/lib/docker/containers
+              name: varlibdockercontainers  # mountPath should come before name
+          resources:
+            requests:
+              memory: 200Mi
+              cpu: 100m
+            limits:
+              memory: 500Mi
+              cpu: 200m
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+        - key: node.kubernetes.io/disk-pressure
+          operator: Exists
+          effect: NoSchedule  # effect should come before operator
+      volumes:
+        - hostPath:
+            path: /var/log
+          name: varlog
+        - hostPath:
+            path: /var/lib/docker/containers
+          name: varlibdockercontainers
+---
+# Test case 12: HorizontalPodAutoscaler with custom metrics - sorted correctly
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api-hpa
+  namespace: production
+spec:
+  behavior:
+    scaleDown:
+      policies:
+        - periodSeconds: 60
+          type: Pods
+          value: 2
+      stabilizationWindowSeconds: 300
+    scaleUp:
+      policies:
+        - periodSeconds: 30
+          type: Percent
+          value: 50
+      stabilizationWindowSeconds: 0
+  maxReplicas: 10
+  metrics:
+    - resource:
+        name: cpu
+        target:
+          averageUtilization: 70
+          type: Utilization
+      type: Resource
+    - resource:
+        name: memory
+        target:
+          averageUtilization: 80
+          type: Utilization
+      type: Resource
+  minReplicas: 2
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api-deployment
+---
+# Test case 13: Job with complex pod spec - unsorted volumes - SHOULD fire
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: data-migration
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      containers:
+        - command:
+            - /bin/sh
+            - -c
+            - python migrate.py
+          env:
+            - name: DB_HOST
+              value: postgres.database.svc
+            - valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: password
+              name: DB_PASSWORD  # name should come before valueFrom
+          image: migration-tool:v2.0
+          name: migrate
+          volumeMounts:
+            - mountPath: /config
+              name: config
+            - mountPath: /data
+              name: data
+      restartPolicy: Never
+      volumes:
+        - name: config
+          configMap:
+            name: migration-config
+        - name: data
+          emptyDir: {}
+        - persistentVolumeClaim:
+            claimName: data-pvc
+          name: persistent-data  # name should come before persistentVolumeClaim
+---
+# Test case 14: Complex Deployment with all features - sorted correctly
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "3"
+  labels:
+    app: web-app
+    environment: production
+    team: platform
+  name: web-app-deployment
+  namespace: production
+spec:
+  minReadySeconds: 30
+  progressDeadlineSeconds: 600
+  replicas: 5
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: web-app
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        prometheus.io/port: "9090"
+        prometheus.io/scrape: "true"
+      labels:
+        app: web-app
+        version: v1.2.3
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: web-app
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+      containers:
+        - env:
+            - name: APP_ENV
+              value: production
+            - name: LOG_LEVEL
+              value: info
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  key: secret-key
+                  name: app-secrets
+          image: myapp:v1.2.3
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          name: web-app
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 9090
+              name: metrics
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 1000
+          volumeMounts:
+            - mountPath: /config
+              name: config
+              readOnly: true
+            - mountPath: /tmp
+              name: tmp
+      imagePullSecrets:
+        - name: registry-credentials
+      nodeSelector:
+        disktype: ssd
+        node.kubernetes.io/instance-type: m5.large
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 1000
+        runAsUser: 1000
+      serviceAccountName: web-app-sa
+      terminationGracePeriodSeconds: 60
+      tolerations:
+        - effect: NoSchedule
+          key: dedicated
+          operator: Equal
+          value: frontend
+      volumes:
+        - configMap:
+            name: app-config
+          name: config
+        - emptyDir: {}
+          name: tmp

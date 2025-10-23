@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: unsorted-nested
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          image: myapp:latest
+    metadata:
+      labels:
+        app: myapp

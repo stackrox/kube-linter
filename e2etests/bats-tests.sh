@@ -926,6 +926,25 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "sorted-keys" {
+  tmp="tests/checks/sorted-keys.yaml"
+  cmd="${KUBE_LINTER_BIN} lint --include sorted-keys --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment: Keys are not sorted at spec.template.spec.containers[0]. Expected order: [image, name, ports], got: [name, image, ports]" ]]
+  [[ "${message2}" == "Deployment: Keys are not sorted at root. Expected order: [apiVersion, kind, metadata, spec], got: [apiVersion, metadata, spec, kind]" ]]
+  [[ "${message3}" == "Deployment: Keys are not sorted at spec.template. Expected order: [metadata, spec], got: [spec, metadata]" ]]
+  [[ "${count}" == "27" ]]
+}
+
 @test "ssh-port" {
   tmp="tests/checks/ssh-port.yml"
   cmd="${KUBE_LINTER_BIN} lint --include ssh-port --do-not-auto-add-defaults --format json ${tmp}"
@@ -1100,7 +1119,7 @@ get_value_from() {
 
 @test "flag-ignore-paths" {
   tmp="."
-  cmd="${KUBE_LINTER_BIN} lint --ignore-paths \"tests/**\" --ignore-paths \"e2etests/**\" ${tmp}"
+  cmd="${KUBE_LINTER_BIN} lint --ignore-paths \"tests/**\" --ignore-paths \"e2etests/**\" --ignore-paths \"pkg/**/testdata/**\" ${tmp}"
   run ${cmd}
   print_info "${status}" "${output}" "${cmd}" "${tmp}"
   [ "$status" -eq 0 ]

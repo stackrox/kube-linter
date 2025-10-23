@@ -7,14 +7,19 @@ import (
 
 // MockLintContext is mock implementation of the LintContext used in unit tests
 type MockLintContext struct {
-	objects map[string]k8sutil.Object
+	objects    map[string]k8sutil.Object
+	rawObjects map[string][]byte
 }
 
 // Objects returns all the objects under this MockLintContext
 func (l *MockLintContext) Objects() []lintcontext.Object {
 	result := make([]lintcontext.Object, 0, len(l.objects))
-	for _, p := range l.objects {
-		result = append(result, lintcontext.Object{Metadata: lintcontext.ObjectMetadata{}, K8sObject: p})
+	for key, p := range l.objects {
+		metadata := lintcontext.ObjectMetadata{}
+		if raw, ok := l.rawObjects[key]; ok {
+			metadata.Raw = raw
+		}
+		result = append(result, lintcontext.Object{Metadata: metadata, K8sObject: p})
 	}
 	return result
 }
@@ -26,10 +31,19 @@ func (l *MockLintContext) InvalidObjects() []lintcontext.InvalidObject {
 
 // NewMockContext returns an empty mockLintContext
 func NewMockContext() *MockLintContext {
-	return &MockLintContext{objects: make(map[string]k8sutil.Object)}
+	return &MockLintContext{
+		objects:    make(map[string]k8sutil.Object),
+		rawObjects: make(map[string][]byte),
+	}
 }
 
 // AddObject adds an object to the MockLintContext
 func (l *MockLintContext) AddObject(key string, obj k8sutil.Object) {
 	l.objects[key] = obj
+}
+
+// AddObjectWithRaw adds an object to the MockLintContext with raw YAML data
+func (l *MockLintContext) AddObjectWithRaw(key string, obj k8sutil.Object, raw []byte) {
+	l.objects[key] = obj
+	l.rawObjects[key] = raw
 }

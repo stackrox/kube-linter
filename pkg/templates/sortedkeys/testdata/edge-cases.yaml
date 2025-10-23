@@ -1,0 +1,9 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations: {}
+  labels:
+    single: value
+  name: edge-cases
+spec:
+  replicas: 1

@@ -1,0 +1,9 @@
+name: "sorted-keys"
+description: "Check that YAML keys are sorted in alphabetical order wherever possible."
+remediation: "Ensure that keys in your YAML manifest are sorted in alphabetical order to improve consistency and readability."
+scope:
+  objectKinds:
+    - Any
+template: "sorted-keys"
+params:
+  recursive: true

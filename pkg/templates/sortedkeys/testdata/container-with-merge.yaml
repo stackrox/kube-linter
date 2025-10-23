@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: complex-anchors
+spec:
+  template:
+    spec:
+      containers:
+        - &app-container
+          image: myapp:latest
+          name: app
+          resources: &resources
+            limits:
+              cpu: "1"
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          env: &common-env
+            - name: LOG_LEVEL
+              value: info
+            - name: APP_MODE
+              value: production
+        - <<: *app-container
+          name: sidecar
+          image: sidecar:latest
+          resources: *resources
+          env:
+            - name: SIDECAR_MODE
+              value: enabled
+            - <<: *common-env
+        - <<: *app-container
+          name: worker
+          env: *common-env
+          image: worker:latest

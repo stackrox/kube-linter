@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: complex-pod-spec
+spec:
+  template:
+    metadata:
+      labels:
+        app: complex
+    spec:
+      containers:
+        - image: app:latest
+          name: app
+          volumeMounts:
+            - mountPath: /data
+              name: data-volume
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - echo init
+          image: busybox:latest
+          name: init
+      serviceAccountName: app-sa
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsGroup: 1000
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: data-pvc
