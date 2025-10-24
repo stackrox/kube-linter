@@ -76,6 +76,15 @@ func minAvailableCheck(lintCtx lintcontext.LintContext, object lintcontext.Objec
 		}
 	}
 
+	// Check if selector is present - it's a required field for PDB
+	if pdb.Spec.Selector == nil {
+		return []diagnostic.Diagnostic{
+			{
+				Message: "PDB is missing required selector field: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget",
+			},
+		}
+	}
+
 	// Build the label selector for the PDB to use for comparison
 	labelSelector, err := metaV1.LabelSelectorAsSelector(&metaV1.LabelSelector{
 		MatchLabels:      pdb.Spec.Selector.MatchLabels,

@@ -296,3 +296,25 @@ func (p *PDBTestSuite) TestPDBWithMinAvailableAndKedaScaledObjectHasMinReplicas(
 		},
 	})
 }
+
+// test that the check handles PDB with minAvailable but no selector (should not panic)
+func (p *PDBTestSuite) TestPDBWithMinAvailableButNoSelector() {
+	p.ctx.AddMockPodDisruptionBudget(p.T(), "test-pdb")
+	p.ctx.ModifyPodDisruptionBudget(p.T(), "test-pdb", func(pdb *v1.PodDisruptionBudget) {
+		pdb.Namespace = "test"
+		pdb.Spec.Selector = nil // Missing required selector field
+		pdb.Spec.MinAvailable = &intstr.IntOrString{StrVal: "40%", Type: intstr.String}
+	})
+
+	p.Validate(p.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				"test-pdb": {
+					{Message: "PDB is missing required selector field: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget"},
+				},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
