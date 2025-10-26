@@ -68,7 +68,7 @@ func makeConfigMapSource(descriptor sourceReference) *coreV1.EnvVarSource {
 	}
 }
 
-func (s *EnVarValueFromTestSuite) addContainerWithEnvFromSecret(envRef envReference) { // Fix: Remove name parameter
+func (s *EnVarValueFromTestSuite) addContainerWithEnvFromSecret(envRef envReference) {
 	var valueFrom *coreV1.EnvVarSource
 	switch envRef.Kind {
 	case "secret":
@@ -76,9 +76,9 @@ func (s *EnVarValueFromTestSuite) addContainerWithEnvFromSecret(envRef envRefere
 	case "configmap":
 		valueFrom = makeConfigMapSource(envRef.Source)
 	default:
-		s.Require().FailNow(fmt.Sprintf("Unknown source kind %s", envRef.Kind)) // Fix: Use s.Require().FailNow
+		s.Require().FailNow(fmt.Sprintf("Unknown source kind %s", envRef.Kind))
 	}
-	s.ctx.AddContainerToDeployment(s.T(), targetDeploymentName, coreV1.Container{ // Fix: Hardcode targetDeploymentName
+	s.ctx.AddContainerToDeployment(s.T(), targetDeploymentName, coreV1.Container{
 		Name: "container",
 		Env: []coreV1.EnvVar{
 			{
@@ -341,4 +341,87 @@ func (s *EnVarValueFromTestSuite) TestKeysEmptyMap() {
 	emptyMap := map[string]string{}
 	keys := Keys(emptyMap)
 	s.Empty(keys)
+}
+
+func (s *EnVarValueFromTestSuite) TestExtractRegexListInvalidConfigMaps() {
+	p := params.Params{IgnoredConfigMaps: []string{"[invalid("}}
+	_, err := extractRegexList(p.IgnoredConfigMaps)
+	s.Error(err)
+	s.Contains(err.Error(), "invalid regex [invalid(")
+}
+
+func (s *EnVarValueFromTestSuite) TestUnknownKeyInSecretWithStringData() {
+	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
+	secret := &coreV1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "test-secret"},
+		StringData: map[string]string{"key1": "value"},
+	}
+	s.ctx.AddObject("test-secret", secret)
+	s.addContainerWithEnvFromSecret(envReference{
+		Name: "my-secret",
+		Kind: "secret",
+		Source: sourceReference{
+			Name:     "test-secret",
+			Key:      "unknown-key",
+			Optional: pointers.Bool(false),
+		},
+	})
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				targetDeploymentName: {{
+					Message: "The container \"container\" is referring to an unknown key \"unknown-key\" in secret \"test-secret\"",
+				}},
+			},
+		},
+	})
+}
+
+func (s *EnVarValueFromTestSuite) TestMultipleIgnoredSecrets() {
+	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
+	secret1 := &coreV1.Secret{ObjectMeta: metav1.ObjectMeta{Name: "secret1"}, Data: map[string][]byte{"key": []byte("value")}}
+	secret2 := &coreV1.Secret{ObjectMeta: metav1.ObjectMeta{Name: "secret2"}, Data: map[string][]byte{"key": []byte("value")}}
+	s.ctx.AddObject("secret1", secret1)
+	s.ctx.AddObject("secret2", secret2)
+	s.addContainerWithEnvFromSecret(envReference{
+		Name: "my-secret",
+		Kind: "secret",
+		Source: sourceReference{
+			Name:     "secret1",
+			Key:      "key",
+			Optional: pointers.Bool(false),
+		},
+	})
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{IgnoredSecrets: []string{"^secret2$"}},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				targetDeploymentName: {},
+			},
+		},
+	})
+}
+
+func (s *EnVarValueFromTestSuite) TestEmptyObjectList() {
+	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
+	s.addContainerWithEnvFromSecret(envReference{
+		Name: "my-secret",
+		Kind: "secret",
+		Source: sourceReference{
+			Name:     "test-secret",
+			Key:      "key",
+			Optional: pointers.Bool(false),
+		},
+	})
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				targetDeploymentName: {{
+					Message: "The container \"container\" is referring to an unknown secret \"test-secret\"",
+				}},
+			},
+		},
+	})
 }
