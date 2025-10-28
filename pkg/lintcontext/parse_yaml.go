@@ -3,6 +3,7 @@ package lintcontext
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
 	"io"
@@ -12,6 +13,8 @@ import (
 	"strings"
 
 	"github.com/bmatcuk/doublestar/v4"
+	"github.com/lburgazzoli/k8s-manifests-lib/pkg/engine"
+	"github.com/lburgazzoli/k8s-manifests-lib/pkg/renderer/kustomize"
 	ocsAppsV1 "github.com/openshift/api/apps/v1"
 	ocpSecV1 "github.com/openshift/api/security/v1"
 	k8sMonitoring "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
@@ -21,7 +24,7 @@ import (
 	"helm.sh/helm/v3/pkg/chart/loader"
 	"helm.sh/helm/v3/pkg/chartutil"
 	"helm.sh/helm/v3/pkg/cli/values"
-	"helm.sh/helm/v3/pkg/engine"
+	helmEngine "helm.sh/helm/v3/pkg/engine"
 	autoscalingV2Beta1 "k8s.io/api/autoscaling/v2beta1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -127,7 +130,7 @@ func (l *lintContextImpl) renderValues(chrt *chart.Chart, values map[string]inte
 		return nil, err
 	}
 
-	e := engine.Engine{LintMode: true}
+	e := helmEngine.Engine{LintMode: true}
 	rendered, err := e.Render(chrt, valuesToRender)
 	if err != nil {
 		return nil, fmt.Errorf("failed to render: %w", err)
@@ -321,4 +324,45 @@ func normalizeDirectoryPaths(renderedFiles map[string]string) map[string]string 
 		}
 	}
 	return normalizedFiles
+}
+
+func (l *lintContextImpl) loadObjectsFromKustomize(dir string, ignorePaths []string) error {
+	// Create a kustomize engine
+	e, err := engine.Kustomize(kustomize.Source{
+		Path: dir,
+	})
+	if err != nil {
+		l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: dir}, LoadErr: err})
+		return nil
+	}
+
+	// Render the kustomize manifests
+	ctx := context.Background()
+	objects, err := e.Render(ctx)
+	if err != nil {
+		l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: dir}, LoadErr: err})
+		return nil
+	}
+
+	// Convert each object to YAML and load it
+	for _, obj := range objects {
+		// Marshal the underlying object content to YAML
+		yamlData, err := y.Marshal(obj.UnstructuredContent())
+		if err != nil {
+			loadErr := fmt.Errorf("marshaling kustomize object %s/%s from %s: %w", obj.GetKind(), obj.GetName(), dir, err)
+			l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: dir}, LoadErr: loadErr})
+			continue
+		}
+
+		// Create a file path for the object for reporting purposes
+		filePath := filepath.Join(dir, fmt.Sprintf("%s-%s.yaml", strings.ToLower(obj.GetKind()), obj.GetName()))
+
+		// Load the object using the existing YAML reader
+		if err := l.loadObjectsFromReader(filePath, bytes.NewReader(yamlData)); err != nil {
+			loadErr := fmt.Errorf("loading object %s from rendered kustomization %s: %w", filePath, dir, err)
+			l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: filePath}, LoadErr: loadErr})
+		}
+	}
+
+	return nil
 }

@@ -1197,3 +1197,24 @@ get_value_from() {
   [[ "${failing_resource}" == "bad-sts" ]]
   [[ "${count}" == "1" ]]
 }
+
+@test "kustomize-support" {
+  tmp="tests/testdata/mykustomize"
+  cmd="${KUBE_LINTER_BIN} lint --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  # Verify that kustomize manifests were rendered and linted
+  deployment_name=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.Name')
+  deployment_kind=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  # The deployment name should have the kustomize namePrefix applied
+  [[ "${deployment_name}" == "kustomize-test-deployment" ]]
+  [[ "${deployment_kind}" == "Deployment" ]]
+  # There should be lint errors for the deployment
+  [[ "${count}" -ge 1 ]]
+}
+
