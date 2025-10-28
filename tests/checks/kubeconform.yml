@@ -1,0 +1,69 @@
+---
+# Valid Pod - should pass
+apiVersion: v1
+kind: Pod
+metadata:
+  name: valid-pod
+  namespace: default
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+    ports:
+    - containerPort: 80
+---
+# Invalid DaemonSet with replicas field - should fail
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: invalid-daemonset
+  namespace: default
+spec:
+  replicas: 3  # This field is not allowed in DaemonSet
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+---
+# Valid Service - should pass
+apiVersion: v1
+kind: Service
+metadata:
+  name: valid-service
+  namespace: default
+spec:
+  selector:
+    app: nginx
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+---
+# CRD without schema - should be ignored due to ignoreMissingSchemas: true
+apiVersion: example.com/v1
+kind: CustomResource
+metadata:
+  name: custom-resource
+  namespace: default
+spec:
+  customField: "value"
+  anotherField: 123
+---
+# Invalid Pod with unknown field - should fail in strict mode
+apiVersion: v1
+kind: Pod
+metadata:
+  name: invalid-pod
+  namespace: default
+spec:
+  containers:
+  - name: nginx
+    image: nginx:latest
+  invalidField: "this should not be here"  # This field is not allowed

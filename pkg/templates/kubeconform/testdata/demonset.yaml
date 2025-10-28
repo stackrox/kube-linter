@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nginx-ds
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      k8s-app: true
+  template:
+    spec:
+      containers:
+        - image: nginx
+          name: nginx
