@@ -14,13 +14,14 @@ import (
 )
 
 const (
-	chartTarball       = "../../tests/testdata/mychart-0.1.0.tgz"
-	chartDirectory     = "../../tests/testdata/mychart"
-	renamedTarball     = "../../tests/testdata/my-renamed-chart-0.1.0.tgz"
-	renamedChartDir    = "../../tests/testdata/my-renamed-chart"
-	mockIgnorePath     = "../../tests/testdata/**"
-	mockGlobIgnorePath = "../../tests/**"
-	mockPath           = "mock path"
+	chartTarball         = "../../tests/testdata/mychart-0.1.0.tgz"
+	chartDirectory       = "../../tests/testdata/mychart"
+	renamedTarball       = "../../tests/testdata/my-renamed-chart-0.1.0.tgz"
+	renamedChartDir      = "../../tests/testdata/my-renamed-chart"
+	kustomizeDirectory   = "../../tests/testdata/mykustomize"
+	mockIgnorePath       = "../../tests/testdata/**"
+	mockGlobIgnorePath   = "../../tests/**"
+	mockPath             = "mock path"
 )
 
 func TestCreateContextsWithIgnorePaths(t *testing.T) {
@@ -203,4 +204,50 @@ func checkObjectPaths(t *testing.T, objects []Object, expectedPrefix string) {
 		path.Join(expectedPrefix, "charts/subchart/templates/deployment.yaml"),
 	}
 	assert.ElementsMatchf(t, expectedPaths, actualPaths, "expected and actual template paths don't match")
+}
+
+func TestKustomizeContextCreation(t *testing.T) {
+	// Test that kustomize directory is loaded correctly
+	lintCtxs, err := CreateContexts(nil, kustomizeDirectory)
+	require.NoError(t, err)
+	require.Len(t, lintCtxs, 1, "expecting single lint context to be present")
+
+	lintCtx := lintCtxs[0]
+	objects := lintCtx.Objects()
+
+	assert.NotEmpty(t, objects, "expecting kustomize objects to be loaded")
+	assert.Empty(t, lintCtx.InvalidObjects(), "no invalid objects expected")
+
+	// Verify that we have the expected objects (Deployment and Service)
+	assert.Len(t, objects, 2, "expecting 2 objects from kustomization")
+
+	// Check that objects have the kustomize transformations applied
+	foundDeployment := false
+	foundService := false
+	for _, obj := range objects {
+		k8sObj := obj.K8sObject
+		if k8sObj.GetObjectKind().GroupVersionKind().Kind == "Deployment" {
+			foundDeployment = true
+			// Check that kustomize namePrefix was applied
+			assert.Contains(t, k8sObj.GetName(), "kustomize-", "deployment should have kustomize namePrefix")
+		}
+		if k8sObj.GetObjectKind().GroupVersionKind().Kind == "Service" {
+			foundService = true
+			// Check that kustomize namePrefix was applied
+			assert.Contains(t, k8sObj.GetName(), "kustomize-", "service should have kustomize namePrefix")
+		}
+	}
+
+	assert.True(t, foundDeployment, "deployment should be present")
+	assert.True(t, foundService, "service should be present")
+}
+
+func TestKustomizeWithIgnorePaths(t *testing.T) {
+	// Test that ignore paths work with kustomize
+	ignorePaths := []string{kustomizeDirectory + "/**"}
+	lintCtxs, err := CreateContexts(ignorePaths, kustomizeDirectory)
+	require.NoError(t, err)
+
+	// Should be empty because we ignored the kustomize directory
+	checkEmptyLintContext(t, lintCtxs)
 }
