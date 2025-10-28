@@ -29,6 +29,13 @@ func TestSliceToMap(t *testing.T) {
 			},
 		},
 		{
+			name:  "duplicate element",
+			input: []string{"pod", "pod"},
+			expected: map[string]struct{}{
+				"pod": {},
+			},
+		},
+		{
 			name:  "multiple elements",
 			input: []string{"pod", "service", "deployment"},
 			expected: map[string]struct{}{
