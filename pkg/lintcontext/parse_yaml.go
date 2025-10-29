@@ -15,6 +15,7 @@ import (
 	"github.com/bmatcuk/doublestar/v4"
 	"github.com/lburgazzoli/k8s-manifests-lib/pkg/engine"
 	"github.com/lburgazzoli/k8s-manifests-lib/pkg/renderer/kustomize"
+	"github.com/lburgazzoli/k8s-manifests-lib/pkg/types"
 	ocsAppsV1 "github.com/openshift/api/apps/v1"
 	ocpSecV1 "github.com/openshift/api/security/v1"
 	k8sMonitoring "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
@@ -327,10 +328,10 @@ func normalizeDirectoryPaths(renderedFiles map[string]string) map[string]string 
 }
 
 func (l *lintContextImpl) loadObjectsFromKustomize(dir string, ignorePaths []string) error {
-	// Create a kustomize engine
+	// Create a kustomize engine with source annotations enabled
 	e, err := engine.Kustomize(kustomize.Source{
 		Path: dir,
-	})
+	}, kustomize.WithSourceAnnotations(true))
 	if err != nil {
 		l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: dir}, LoadErr: err})
 		return nil
@@ -354,8 +355,18 @@ func (l *lintContextImpl) loadObjectsFromKustomize(dir string, ignorePaths []str
 			continue
 		}
 
-		// Create a file path for the object for reporting purposes
-		filePath := filepath.Join(dir, fmt.Sprintf("%s-%s.yaml", strings.ToLower(obj.GetKind()), obj.GetName()))
+		// Extract the source file from annotations if available
+		filePath := ""
+		if annotations := obj.GetAnnotations(); annotations != nil {
+			if sourceFile, ok := annotations[types.AnnotationSourceFile]; ok && sourceFile != "" {
+				// Prefix with the kustomization directory to show full path
+				filePath = filepath.Join(dir, sourceFile)
+			}
+		}
+		// Fallback: Create a file path for the object for reporting purposes
+		if filePath == "" {
+			filePath = filepath.Join(dir, fmt.Sprintf("%s-%s.yaml", strings.ToLower(obj.GetKind()), obj.GetName()))
+		}
 
 		// Load the object using the existing YAML reader
 		if err := l.loadObjectsFromReader(filePath, bytes.NewReader(yamlData)); err != nil {
