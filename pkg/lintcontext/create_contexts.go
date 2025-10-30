@@ -136,7 +136,7 @@ fileOrDirsLoop:
 				}
 				ctx := newCtx(options)
 				contextsByDir[currentPath] = ctx
-				if err := ctx.loadObjectsFromKustomize(currentPath, ignorePaths); err != nil {
+				if err := ctx.loadObjectsFromKustomize(currentPath); err != nil {
 					return fmt.Errorf("loading kustomization: %w", err)
 				}
 				return filepath.SkipDir

@@ -327,7 +327,7 @@ func normalizeDirectoryPaths(renderedFiles map[string]string) map[string]string 
 	return normalizedFiles
 }
 
-func (l *lintContextImpl) loadObjectsFromKustomize(dir string, ignorePaths []string) error {
+func (l *lintContextImpl) loadObjectsFromKustomize(dir string) error {
 	// Create a kustomize engine with source annotations enabled
 	e, err := engine.Kustomize(kustomize.Source{
 		Path: dir,
