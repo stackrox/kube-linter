@@ -14,14 +14,14 @@ import (
 )
 
 const (
-	chartTarball         = "../../tests/testdata/mychart-0.1.0.tgz"
-	chartDirectory       = "../../tests/testdata/mychart"
-	renamedTarball       = "../../tests/testdata/my-renamed-chart-0.1.0.tgz"
-	renamedChartDir      = "../../tests/testdata/my-renamed-chart"
-	kustomizeDirectory   = "../../tests/testdata/mykustomize"
-	mockIgnorePath       = "../../tests/testdata/**"
-	mockGlobIgnorePath   = "../../tests/**"
-	mockPath             = "mock path"
+	chartTarball       = "../../tests/testdata/mychart-0.1.0.tgz"
+	chartDirectory     = "../../tests/testdata/mychart"
+	renamedTarball     = "../../tests/testdata/my-renamed-chart-0.1.0.tgz"
+	renamedChartDir    = "../../tests/testdata/my-renamed-chart"
+	kustomizeDirectory = "../../tests/testdata/mykustomize"
+	mockIgnorePath     = "../../tests/testdata/**"
+	mockGlobIgnorePath = "../../tests/**"
+	mockPath           = "mock path"
 )
 
 func TestCreateContextsWithIgnorePaths(t *testing.T) {
