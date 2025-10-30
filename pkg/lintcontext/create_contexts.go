@@ -20,8 +20,8 @@ import (
 const ReadFromStdin = "-"
 
 var (
-	knownYAMLExtensions     = set.NewFrozenStringSet(".yaml", ".yml")
-	kustomizationFileNames  = []string{"kustomization.yaml", "kustomization.yml"}
+	knownYAMLExtensions    = set.NewFrozenStringSet(".yaml", ".yml")
+	kustomizationFileNames = []string{"kustomization.yaml", "kustomization.yml"}
 )
 
 // Options represent values that can be provided to modify how objects are parsed to create lint contexts
