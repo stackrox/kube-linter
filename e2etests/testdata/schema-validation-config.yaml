@@ -1,0 +1,4 @@
+checks:
+  addAllBuiltIn: false
+  include:
+    - "schema-validation"
