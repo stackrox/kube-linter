@@ -318,6 +318,18 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "env-value-from" {
+  tmp="tests/checks/env-var-value-from.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include env-value-from --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${message1}" == "Deployment: The container \"app\" is referring to an unknown key \"chimpmunk\" in secret \"secretsquirrels\"" ]]
+  [[ "${count}" == "1" ]]
+}
+
 @test "env-var-secret" {
   tmp="tests/checks/env-var-secret.yml"
   cmd="${KUBE_LINTER_BIN} lint --include env-var-secret --do-not-auto-add-defaults --format json ${tmp}"
