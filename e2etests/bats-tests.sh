@@ -63,7 +63,7 @@ get_value_from() {
   [[ "${message2}" =~ "Pod: resource is not valid:" ]]
 }
 
-@test "builtin-schema-validation" {
+@test "schema-validation" {
   tmp="tests/checks/kubeconform.yml"
   cmd="${KUBE_LINTER_BIN} lint --config e2etests/testdata/schema-validation-config.yaml --do-not-auto-add-defaults --format json ${tmp}"
   run ${cmd}
