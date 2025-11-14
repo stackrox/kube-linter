@@ -1,0 +1,2 @@
+this is malformed YAML that should fail to parse: {
+invalid: unclosed bracket

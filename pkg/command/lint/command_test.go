@@ -16,8 +16,7 @@ func TestCommand_InvalidResources(t *testing.T) {
 		failure bool
 		output  string
 	}{
-		{name: "InvalidPodResource", cmd: createLintCommand("./testdata/invalid-pod-resources.yaml", "--fail-on-invalid-resource"), failure: true},
-		{name: "InvalidPVCResource", cmd: createLintCommand("./testdata/invalid-pvc-resources.yaml", "--fail-on-invalid-resource"), failure: true},
+		{name: "InvalidYAML", cmd: createLintCommand("./testdata/invalid.yaml", "--fail-on-invalid-resource"), failure: true},
 		{name: "NonexistentFile", cmd: createLintCommand("./testdata/foo-bar.yaml", "--fail-on-invalid-resource"), failure: true},
 		{name: "ValidPod", cmd: createLintCommand("./testdata/valid-pod.yaml", "--fail-on-invalid-resource"), failure: false},
 	}

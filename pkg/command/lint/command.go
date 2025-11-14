@@ -156,6 +156,7 @@ func Command() *cobra.Command {
 	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
 	c.Flags().Var(format, "format", format.Usage())
 	c.Flags().BoolVarP(&errorOnInvalidResource, "fail-on-invalid-resource", "", false, "Error out when we have an invalid resource")
+	_ = c.Flags().MarkDeprecated("fail-on-invalid-resource", "Use 'schema-validation' builtin check or kubeconform template for better schema validation.")
 
 	config.AddFlags(c, v)
 	return c
