@@ -596,7 +596,7 @@ AllowPrivilegedContainer: true
 
 **Description**: Validate Kubernetes resources against their schemas using kubeconform
 
-**Remediation**: Fix the resource to conform to the Kubernetes API schema
+**Remediation**: Fix the resource to conform to the Kubernetes API schema.
 
 **Template**: [kubeconform](templates.md#kubeconform)
 

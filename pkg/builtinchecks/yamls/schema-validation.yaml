@@ -1,6 +1,6 @@
 name: "schema-validation"
 description: "Validate Kubernetes resources against their schemas using kubeconform"
-remediation: "Fix the resource to conform to the Kubernetes API schema"
+remediation: "Fix the resource to conform to the Kubernetes API schema."
 scope:
   objectKinds:
     - Any
