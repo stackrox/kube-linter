@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: InvalidKind
-metadata:
-  name: foo-pod
-  namespace: foo
-spec:
-  invalidField: [this is invalid YAML that should fail to parse
