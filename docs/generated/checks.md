@@ -590,6 +590,22 @@ key: owner
 ```yaml
 AllowPrivilegedContainer: true
 ```
+## schema-validation
+
+**Enabled by default**: No
+
+**Description**: Validate Kubernetes resources against their schemas using kubeconform
+
+**Remediation**: Fix the resource to conform to the Kubernetes API schema
+
+**Template**: [kubeconform](templates.md#kubeconform)
+
+**Parameters**:
+
+```yaml
+ignoreMissingSchemas: true
+strict: true
+```
 ## sensitive-host-mounts
 
 **Enabled by default**: Yes
