@@ -327,14 +327,14 @@ func normalizeDirectoryPaths(renderedFiles map[string]string) map[string]string 
 	return normalizedFiles
 }
 
-func (l *lintContextImpl) loadObjectsFromKustomize(dir string) error {
+func (l *lintContextImpl) loadObjectsFromKustomize(dir string) {
 	// Create a kustomize engine with source annotations enabled
 	e, err := engine.Kustomize(kustomize.Source{
 		Path: dir,
 	}, kustomize.WithSourceAnnotations(true))
 	if err != nil {
 		l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: dir}, LoadErr: err})
-		return nil
+		return
 	}
 
 	// Render the kustomize manifests
@@ -342,7 +342,7 @@ func (l *lintContextImpl) loadObjectsFromKustomize(dir string) error {
 	objects, err := e.Render(ctx)
 	if err != nil {
 		l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: dir}, LoadErr: err})
-		return nil
+		return
 	}
 
 	// Convert each object to YAML and load it
@@ -374,6 +374,4 @@ func (l *lintContextImpl) loadObjectsFromKustomize(dir string) error {
 			l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: filePath}, LoadErr: loadErr})
 		}
 	}
-
-	return nil
 }
