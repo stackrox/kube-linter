@@ -1198,7 +1198,7 @@ get_value_from() {
   [[ "${count}" == "1" ]]
 }
 
-@test "kustomize-support" {
+@test "flag-kustomize-support" {
   tmp="tests/testdata/mykustomize"
   cmd="${KUBE_LINTER_BIN} lint --format json ${tmp}"
   run ${cmd}
