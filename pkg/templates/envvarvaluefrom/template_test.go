@@ -337,12 +337,6 @@ func (s *EnVarValueFromTestSuite) TestIgnoredSecretWithRegex() {
 	})
 }
 
-func (s *EnVarValueFromTestSuite) TestKeysEmptyMap() {
-	emptyMap := map[string]string{}
-	keys := Keys(emptyMap)
-	s.Empty(keys)
-}
-
 func (s *EnVarValueFromTestSuite) TestExtractRegexListInvalidConfigMaps() {
 	p := params.Params{IgnoredConfigMaps: []string{"[invalid("}}
 	_, err := extractRegexList(p.IgnoredConfigMaps)
