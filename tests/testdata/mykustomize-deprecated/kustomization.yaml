@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# Use deprecated 'bases' field instead of 'resources'
+# This triggers a deprecation warning from kustomize
+bases:
+- base/deployment.yaml
+- base/service.yaml
+namePrefix: deprecated-kustomize-
+labels:
+- pairs:
+    environment: test
