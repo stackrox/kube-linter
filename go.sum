@@ -226,8 +226,8 @@ github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 h1:P6pPBnrTSX3DEVR4fDembhR
 github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0/go.mod h1:vmVJ0l/dxyfGW6FmdpVm2joNMFikkuWg0EoCKLGUMNw=
 github.com/lburgazzoli/gomega-matchers v0.1.1 h1:it5XiuJGJB2Noq1KayamTgEe7Ls2/Cycezt3g6xyuo4=
 github.com/lburgazzoli/gomega-matchers v0.1.1/go.mod h1:sTPi8iTNViVEDJujnMzYicDshmo6G4rl9+gF/O02/V8=
-github.com/lburgazzoli/k8s-manifests-lib v0.1.3 h1:EfzE7nvISc+vIVYOTapGuvu+PkHP3OtIcOiQGIWokGY=
-github.com/lburgazzoli/k8s-manifests-lib v0.1.3/go.mod h1:KbU9qYnaBuQ9pzy5eouAouaA/VdvKB1I00y20NEqxj8=
+github.com/lburgazzoli/k8s-manifests-lib v0.1.4-0.20251117120254-104132b6a2be h1:NUk3nkp6vkvRgARJpG+gvGaTQ6VrEZCBaKZXQ7xohKc=
+github.com/lburgazzoli/k8s-manifests-lib v0.1.4-0.20251117120254-104132b6a2be/go.mod h1:KbU9qYnaBuQ9pzy5eouAouaA/VdvKB1I00y20NEqxj8=
 github.com/lib/pq v1.10.9 h1:YXG7RB+JIjhP29X+OtkiDnYaXQwpS4JEWq7dtCCRUEw=
 github.com/lib/pq v1.10.9/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
 github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de h1:9TO3cAIGXtEhnIaL+V+BEER86oLrvS+kWobKpbJuye0=
