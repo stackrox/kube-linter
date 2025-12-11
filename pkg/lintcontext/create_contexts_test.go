@@ -14,14 +14,15 @@ import (
 )
 
 const (
-	chartTarball       = "../../tests/testdata/mychart-0.1.0.tgz"
-	chartDirectory     = "../../tests/testdata/mychart"
-	renamedTarball     = "../../tests/testdata/my-renamed-chart-0.1.0.tgz"
-	renamedChartDir    = "../../tests/testdata/my-renamed-chart"
-	kustomizeDirectory = "../../tests/testdata/mykustomize"
-	mockIgnorePath     = "../../tests/testdata/**"
-	mockGlobIgnorePath = "../../tests/**"
-	mockPath           = "mock path"
+	chartTarball           = "../../tests/testdata/mychart-0.1.0.tgz"
+	chartDirectory         = "../../tests/testdata/mychart"
+	renamedTarball         = "../../tests/testdata/my-renamed-chart-0.1.0.tgz"
+	renamedChartDir        = "../../tests/testdata/my-renamed-chart"
+	kustomizeDirectory     = "../../tests/testdata/mykustomize"
+	kustomizeDeprecatedDir = "../../tests/testdata/mykustomize-deprecated"
+	mockIgnorePath         = "../../tests/testdata/**"
+	mockGlobIgnorePath     = "../../tests/**"
+	mockPath               = "mock path"
 )
 
 func TestCreateContextsWithIgnorePaths(t *testing.T) {
@@ -250,4 +251,37 @@ func TestKustomizeWithIgnorePaths(t *testing.T) {
 
 	// Should be empty because we ignored the kustomize directory
 	checkEmptyLintContext(t, lintCtxs)
+}
+
+func TestKustomizeWithDeprecatedSyntax(t *testing.T) {
+	// Test that kustomize deprecation warnings are converted to errors
+	// and added to InvalidObjects
+	lintCtxs, err := CreateContexts(nil, kustomizeDeprecatedDir)
+	require.NoError(t, err, "CreateContexts should not return an error")
+	require.Len(t, lintCtxs, 1, "expecting single lint context to be present")
+
+	lintCtx := lintCtxs[0]
+
+	// The kustomization should fail to load due to deprecation warnings
+	invalidObjects := lintCtx.InvalidObjects()
+	assert.NotEmpty(t, invalidObjects, "expecting invalid objects due to deprecation warnings")
+	assert.Len(t, invalidObjects, 1, "expecting exactly one invalid object")
+
+	// Verify the error contains warning information
+	invalidObj := invalidObjects[0]
+	assert.Equal(t, kustomizeDeprecatedDir, invalidObj.Metadata.FilePath,
+		"FilePath should be the kustomize directory")
+	assert.NotNil(t, invalidObj.LoadErr, "LoadErr should not be nil")
+
+	// The error message should contain information about the deprecated 'bases' field
+	// Kustomize warns: "Warning: 'bases' is deprecated. Please use 'resources' instead."
+	errorMsg := invalidObj.LoadErr.Error()
+	assert.Contains(t, errorMsg, "bases",
+		"error should mention the deprecated 'bases' field")
+	assert.Contains(t, errorMsg, "deprecated",
+		"error should indicate deprecation")
+
+	// No valid objects should be loaded since the kustomization failed
+	objects := lintCtx.Objects()
+	assert.Empty(t, objects, "no objects should be loaded when kustomization fails")
 }

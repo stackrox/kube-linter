@@ -331,7 +331,15 @@ func (l *lintContextImpl) loadObjectsFromKustomize(dir string) {
 	// Create a kustomize engine with source annotations enabled
 	e, err := engine.Kustomize(kustomize.Source{
 		Path: dir,
-	}, kustomize.WithSourceAnnotations(true))
+	},
+		kustomize.WithSourceAnnotations(true),
+		kustomize.WithWarningHandler(func(warnings []string) error {
+			if len(warnings) > 0 {
+				return fmt.Errorf("%s", strings.Join(warnings, "\n"))
+			}
+			return nil
+		}),
+	)
 	if err != nil {
 		l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: dir}, LoadErr: err})
 		return
