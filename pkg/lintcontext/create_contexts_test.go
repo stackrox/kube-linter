@@ -271,7 +271,7 @@ func TestKustomizeWithDeprecatedSyntax(t *testing.T) {
 	invalidObj := invalidObjects[0]
 	assert.Equal(t, kustomizeDeprecatedDir, invalidObj.Metadata.FilePath,
 		"FilePath should be the kustomize directory")
-	assert.NotNil(t, invalidObj.LoadErr, "LoadErr should not be nil")
+	assert.Error(t, invalidObj.LoadErr, "LoadErr should not be nil")
 
 	// The error message should contain information about the deprecated 'bases' field
 	// Kustomize warns: "Warning: 'bases' is deprecated. Please use 'resources' instead."
