@@ -197,14 +197,6 @@ func isInList(regexlist []string, name string) bool {
 	return false
 }
 
-// func Keys[K comparable, V any](m map[K]V) []K {
-// 	r := make([]K, 0, len(m))
-// 	for k := range m {
-// 		r = append(r, k)
-// 	}
-// 	return r
-// }
-
 func getSecretKeys(obj interface{}) []string {
 	secret := obj.(*v1.Secret)
 	var keys []string
