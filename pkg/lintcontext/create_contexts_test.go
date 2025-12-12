@@ -254,34 +254,51 @@ func TestKustomizeWithIgnorePaths(t *testing.T) {
 }
 
 func TestKustomizeWithDeprecatedSyntax(t *testing.T) {
-	// Test that kustomize deprecation warnings are converted to errors
-	// and added to InvalidObjects
+	// Test that kustomize deprecation warnings are ignored (not converted to errors)
+	// Similar to how helm warnings are suppressed
 	lintCtxs, err := CreateContexts(nil, kustomizeDeprecatedDir)
 	require.NoError(t, err, "CreateContexts should not return an error")
 	require.Len(t, lintCtxs, 1, "expecting single lint context to be present")
 
 	lintCtx := lintCtxs[0]
 
-	// The kustomization should fail to load due to deprecation warnings
+	// Warnings should be ignored, so no invalid objects
 	invalidObjects := lintCtx.InvalidObjects()
-	assert.NotEmpty(t, invalidObjects, "expecting invalid objects due to deprecation warnings")
-	assert.Len(t, invalidObjects, 1, "expecting exactly one invalid object")
+	assert.Empty(t, invalidObjects, "deprecated syntax should not create invalid objects")
 
-	// Verify the error contains warning information
-	invalidObj := invalidObjects[0]
-	assert.Equal(t, kustomizeDeprecatedDir, invalidObj.Metadata.FilePath,
-		"FilePath should be the kustomize directory")
-	assert.Error(t, invalidObj.LoadErr, "LoadErr should not be nil")
-
-	// The error message should contain information about the deprecated 'bases' field
-	// Kustomize warns: "Warning: 'bases' is deprecated. Please use 'resources' instead."
-	errorMsg := invalidObj.LoadErr.Error()
-	assert.Contains(t, errorMsg, "bases",
-		"error should mention the deprecated 'bases' field")
-	assert.Contains(t, errorMsg, "deprecated",
-		"error should indicate deprecation")
-
-	// No valid objects should be loaded since the kustomization failed
+	// The kustomization should still load successfully despite using deprecated syntax
 	objects := lintCtx.Objects()
-	assert.Empty(t, objects, "no objects should be loaded when kustomization fails")
+	assert.NotEmpty(t, objects, "objects should be loaded even with deprecated 'bases' field")
+
+	// Verify we have the expected objects from the kustomization
+	assert.Len(t, objects, 2, "expecting 2 objects (Deployment and Service) from deprecated kustomization")
+}
+
+func TestWarningSuppressionParity(t *testing.T) {
+	// This test documents that both Helm and Kustomize suppress warnings
+	// Helm: Uses nopWriter{} to discard log output (parse_yaml.go:102-106)
+	// Kustomize: Uses WithWarningHandler that returns nil (parse_yaml.go:336-339)
+
+	t.Run("Helm suppresses warnings via nopWriter", func(t *testing.T) {
+		// Test that helm charts load without error even if they generate warnings
+		// The existing helm tests verify this behavior by successfully loading charts
+		lintCtxs, err := CreateContexts(nil, chartDirectory)
+		require.NoError(t, err)
+		require.Len(t, lintCtxs, 1)
+
+		lintCtx := lintCtxs[0]
+		assert.Empty(t, lintCtx.InvalidObjects(), "helm charts should load despite any warnings")
+		assert.NotEmpty(t, lintCtx.Objects(), "helm charts should produce objects")
+	})
+
+	t.Run("Kustomize suppresses warnings via handler", func(t *testing.T) {
+		// Test that kustomizations with deprecation warnings still load
+		lintCtxs, err := CreateContexts(nil, kustomizeDeprecatedDir)
+		require.NoError(t, err)
+		require.Len(t, lintCtxs, 1)
+
+		lintCtx := lintCtxs[0]
+		assert.Empty(t, lintCtx.InvalidObjects(), "warnings should be suppressed, not converted to errors")
+		assert.NotEmpty(t, lintCtx.Objects(), "objects should load despite warnings")
+	})
 }

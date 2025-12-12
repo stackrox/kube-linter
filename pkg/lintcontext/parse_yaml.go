@@ -334,9 +334,7 @@ func (l *lintContextImpl) loadObjectsFromKustomize(dir string) {
 	},
 		kustomize.WithSourceAnnotations(true),
 		kustomize.WithWarningHandler(func(warnings []string) error {
-			if len(warnings) > 0 {
-				return fmt.Errorf("%s", strings.Join(warnings, "\n"))
-			}
+			// Ignore warnings, similar to how we suppress Helm logs with nopWriter
 			return nil
 		}),
 	)
