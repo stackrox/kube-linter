@@ -1,0 +1,176 @@
+---
+# Secret test cases
+---
+# This should fail due to key mismatch (chimpmunk vs chimpmun)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: should-fire-secret
+spec:
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.14.2
+          env:
+            - name: BLAH
+              valueFrom:
+                secretKeyRef:
+                  name: secretsquirrels
+                  key: chimpmunk
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: secretsquirrels
+stringData:
+  chimpmun: "aaaaaaa"
+---
+# This should pass (exact match for secret)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: should-pass-secret
+spec:
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.14.2
+          env:
+            - name: BLAH
+              valueFrom:
+                secretKeyRef:
+                  name: validsecret
+                  key: validkey
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: validsecret
+stringData:
+  validkey: "bbbbbbb"
+---
+# ConfigMap test cases
+---
+# This should fail due to key mismatch for ConfigMap (configkey-wrong vs configkey)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: should-fire-configmap
+spec:
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.14.2
+          env:
+            - name: CONFIG_VAR
+              valueFrom:
+                configMapKeyRef:
+                  name: testconfig
+                  key: configkey-wrong
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: testconfig
+data:
+  configkey: "correct-value"
+---
+# This should pass (exact match for ConfigMap)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: should-pass-configmap
+spec:
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.14.2
+          env:
+            - name: CONFIG_VAR
+              valueFrom:
+                configMapKeyRef:
+                  name: validconfig
+                  key: validconfigkey
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: validconfig
+data:
+  validconfigkey: "correct-config-value"
+---
+# This should fail - referring to non-existent ConfigMap
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: should-fire-missing-configmap
+spec:
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.14.2
+          env:
+            - name: MISSING_VAR
+              valueFrom:
+                configMapKeyRef:
+                  name: missingconfig
+                  key: somekey
+---
+# This should fail - referring to non-existent Secret
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: should-fire-missing-secret
+spec:
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.14.2
+          env:
+            - name: MISSING_SECRET_VAR
+              valueFrom:
+                secretKeyRef:
+                  name: missingsecret
+                  key: secretkey
