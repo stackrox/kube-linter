@@ -9,7 +9,7 @@ load test_helper/redhatcop-bats-library/src/error-handling
 get_value_from() {
   value=$(echo "${1}" | jq -r "${2}")
 
-  if [[ -z "${value}" ]] ; then
+  if [[ -z "${value}" ]]; then
     fail "# FATAL-ERROR: get_value_from: value is empty or invalid" || return $?
   fi
 
@@ -64,8 +64,8 @@ get_value_from() {
 }
 
 @test "template-check-installed-bash-version" {
-    run "bash --version"
-    [[ "${BASH_VERSION:0:1}" -ge '4' ]] || false
+  run "bash --version"
+  [[ "${BASH_VERSION:0:1}" -ge '4' ]] || false
 }
 
 @test "access-to-create-pods" {
@@ -318,6 +318,25 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "env-value-from" {
+  tmp="tests/checks/env-var-value-from.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include env-value-from --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
+  message4=$(get_value_from "${lines[0]}" '.Reports[3].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[3].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment: The container \"app\" is referring to an unknown key \"chimpmunk\" in secret \"secretsquirrels\"" ]]
+  [[ "${message2}" == "Deployment: The container \"app\" is referring to an unknown key \"configkey-wrong\" in config map \"testconfig\"" ]]
+  [[ "${message3}" == "Deployment: The container \"app\" is referring to an unknown config map \"missingconfig\"" ]]
+  [[ "${message4}" == "Deployment: The container \"app\" is referring to an unknown secret \"missingsecret\"" ]]
+  [[ "${count}" == "4" ]]
+}
+
 @test "env-var-secret" {
   tmp="tests/checks/env-var-secret.yml"
   cmd="${KUBE_LINTER_BIN} lint --include env-var-secret --do-not-auto-add-defaults --format json ${tmp}"
@@ -429,8 +448,7 @@ get_value_from() {
 
   # TODO: export to helper function so that it can be used for other tests
   actual_messages=()
-  for (( i=0; i<$((count)); i++ ))
-  do
+  for ((i = 0; i < $((count)); i++)); do
     actual_message=$(get_value_from "${lines[0]}" ".Reports[${i}] | .Object.K8sObject.GroupVersionKind.Kind + \": \" + .Diagnostic.Message")
     actual_messages+=("${actual_message}")
   done
@@ -493,7 +511,6 @@ get_value_from() {
   [[ "${message4}" == "StatefulSet: container \"fire-stateful-name\" does not expose port healthcheck for the HTTPGet" ]]
   [[ "${count}" == "4" ]]
 }
-
 
 @test "minimum-three-replicas" {
   tmp="tests/checks/minimum-three-replicas.yml"
@@ -697,7 +714,6 @@ get_value_from() {
   tmp="tests/checks/pdb-min-available.yaml"
   cmd="${KUBE_LINTER_BIN} lint --include pdb-min-available --do-not-auto-add-defaults --format json ${tmp}"
   run ${cmd}
-
 
   message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
   message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
@@ -1181,4 +1197,3 @@ get_value_from() {
   [[ "${failing_resource}" == "bad-sts" ]]
   [[ "${count}" == "1" ]]
 }
-
