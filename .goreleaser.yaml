@@ -3,7 +3,7 @@
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # vim: set ts=2 sw=2 tw=0 fo=cnqoj
 
-version: 1
+version: 2
 
 before:
   hooks:
@@ -30,7 +30,7 @@ builds:
 
 
 archives:
-  - format: binary
+  - formats: [binary]
     name_template: >-
       {{ .ProjectName }}
       {{- if eq .Os "windows" }}
@@ -38,100 +38,62 @@ archives:
       {{- if eq .Arch "amd64" }}
       {{- else }}_{{ .Arch }}{{ end }}
   - id: archive
-    format: tar.gz
+    formats: [tar.gz]
     name_template: >-
       {{ .ProjectName }}-{{ .Os }}
       {{- if eq .Arch "amd64" }}
       {{- else }}_{{ .Arch }}{{ end }}
 
-dockers:
-  - dockerfile: image/Dockerfile
+dockers_v2:
+  - id: kube-linter
+    dockerfile: image/Dockerfile
     ids:
       - kube-linter
-    image_templates:
-      - "ghcr.io/stackrox/kube-linter:latest-amd64"
-      - "ghcr.io/stackrox/kube-linter:{{ .Tag }}-amd64"
-      - "stackrox/kube-linter:latest-amd64"
-      - "stackrox/kube-linter:{{ .Tag }}-amd64"
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/amd64"
-      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-      - "--label=org.opencontainers.image.vendor=RedHat"
-      - "--label=org.opencontainers.image.description=Kube-Linter {{ .Version }}"
-      - "--label=org.opencontainers.image.url=https://kubelinter.io"
-      - "--label=org.opencontainers.image.documentation=https://docs.kubelinter.io/"
-      - "--label=org.opencontainers.image.source={{ .GitURL }}"
-      - "--label=org.opencontainers.image.licenses=Apache"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.created={{ .CommitDate }}"
-  
-  - dockerfile: image/Dockerfile
-    ids:
-      - kube-linter
-    image_templates:
-      - "ghcr.io/stackrox/kube-linter:latest-arm64"
-      - "ghcr.io/stackrox/kube-linter:{{ .Tag }}-arm64"
-      - "stackrox/kube-linter:latest-arm64"
-      - "stackrox/kube-linter:{{ .Tag }}-arm64"
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/arm64"
-      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-      - "--label=org.opencontainers.image.vendor=RedHat"
-      - "--label=org.opencontainers.image.description=Kube-Linter {{ .Version }}"
-      - "--label=org.opencontainers.image.url=https://kubelinter.io"
-      - "--label=org.opencontainers.image.documentation=https://docs.kubelinter.io/"
-      - "--label=org.opencontainers.image.source={{ .GitURL }}"
-      - "--label=org.opencontainers.image.licenses=Apache"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.created={{ .CommitDate }}"
+    images:
+      - "ghcr.io/stackrox/kube-linter"
+      - "stackrox/kube-linter"
+    tags:
+      - "latest"
+      - "{{ .Tag }}"
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    labels:
+      "org.opencontainers.image.title": "{{ .ProjectName }}"
+      "org.opencontainers.image.vendor": "RedHat"
+      "org.opencontainers.image.description": "Kube-Linter {{ .Version }}"
+      "org.opencontainers.image.url": "https://kubelinter.io"
+      "org.opencontainers.image.documentation": "https://docs.kubelinter.io/"
+      "org.opencontainers.image.source": "{{ .GitURL }}"
+      "org.opencontainers.image.licenses": "Apache"
+      "org.opencontainers.image.version": "{{ .Version }}"
+      "org.opencontainers.image.revision": "{{ .FullCommit }}"
+      "org.opencontainers.image.created": "{{ .CommitDate }}"
 
-  - dockerfile: image/Dockerfile_alpine
+  - id: kube-linter-alpine
+    dockerfile: image/Dockerfile_alpine
     ids:
       - kube-linter
-    image_templates:
-      - "ghcr.io/stackrox/kube-linter:latest-alpine-amd64"
-      - "ghcr.io/stackrox/kube-linter:{{ .Tag }}-alpine-amd64"
-      - "stackrox/kube-linter:latest-alpine-amd64"
-      - "stackrox/kube-linter:{{ .Tag }}-alpine-amd64"
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/amd64"
-      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-      - "--label=org.opencontainers.image.vendor=RedHat"
-      - "--label=org.opencontainers.image.description=Kube-Linter {{ .Version }}"
-      - "--label=org.opencontainers.image.url=https://kubelinter.io"
-      - "--label=org.opencontainers.image.documentation=https://docs.kubelinter.io/"
-      - "--label=org.opencontainers.image.source={{ .GitURL }}"
-      - "--label=org.opencontainers.image.licenses=Apache"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.created={{ .CommitDate }}"
-  
-  - dockerfile: image/Dockerfile_alpine
-    ids:
-      - kube-linter
-    image_templates:
-      - "ghcr.io/stackrox/kube-linter:latest-alpine-arm64"
-      - "ghcr.io/stackrox/kube-linter:{{ .Tag }}-alpine-arm64"
-      - "stackrox/kube-linter:latest-alpine-arm64"
-      - "stackrox/kube-linter:{{ .Tag }}-alpine-arm64"
-    build_flag_templates:
-      - "--pull"
-      - "--platform=linux/arm64"
-      - "--label=org.opencontainers.image.title={{ .ProjectName }}"
-      - "--label=org.opencontainers.image.vendor=RedHat"
-      - "--label=org.opencontainers.image.description=Kube-Linter {{ .Version }}"
-      - "--label=org.opencontainers.image.url=https://kubelinter.io"
-      - "--label=org.opencontainers.image.documentation=https://docs.kubelinter.io/"
-      - "--label=org.opencontainers.image.source={{ .GitURL }}"
-      - "--label=org.opencontainers.image.licenses=Apache"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.created={{ .CommitDate }}"
+    images:
+      - "ghcr.io/stackrox/kube-linter"
+      - "stackrox/kube-linter"
+    tags:
+      - "latest-alpine"
+      - "{{ .Tag }}-alpine"
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    labels:
+      "org.opencontainers.image.title": "{{ .ProjectName }}"
+      "org.opencontainers.image.vendor": "RedHat"
+      "org.opencontainers.image.description": "Kube-Linter {{ .Version }}"
+      "org.opencontainers.image.url": "https://kubelinter.io"
+      "org.opencontainers.image.documentation": "https://docs.kubelinter.io/"
+      "org.opencontainers.image.source": "{{ .GitURL }}"
+      "org.opencontainers.image.licenses": "Apache"
+      "org.opencontainers.image.version": "{{ .Version }}"
+      "org.opencontainers.image.revision": "{{ .FullCommit }}"
+      "org.opencontainers.image.created": "{{ .CommitDate }}"
 
 
 checksum:
