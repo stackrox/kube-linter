@@ -103,7 +103,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Download executable
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: kube-linter
 
@@ -152,7 +152,7 @@ jobs:
           # Checkout all repo history to make tags available for figuring out kube-linter version during build.
           fetch-depth: 0
       - name: Download windows executable
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: kube-linter.exe
           path: tmp/
