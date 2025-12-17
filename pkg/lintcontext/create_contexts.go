@@ -20,7 +20,8 @@ import (
 const ReadFromStdin = "-"
 
 var (
-	knownYAMLExtensions = set.NewFrozenStringSet(".yaml", ".yml")
+	knownYAMLExtensions    = set.NewFrozenStringSet(".yaml", ".yml")
+	kustomizationFileNames = []string{"kustomization.yaml", "kustomization.yml"}
 )
 
 // Options represent values that can be provided to modify how objects are parsed to create lint contexts
@@ -128,6 +129,16 @@ fileOrDirsLoop:
 				}
 				return filepath.SkipDir
 			}
+			if isKustomizeDir(currentPath) {
+				// Path has already been loaded, possibly through another argument. Skip.
+				if _, alreadyExists := contextsByDir[currentPath]; alreadyExists {
+					return nil
+				}
+				ctx := newCtx(options)
+				contextsByDir[currentPath] = ctx
+				ctx.loadObjectsFromKustomize(currentPath)
+				return filepath.SkipDir
+			}
 			return nil
 		})
 		if err != nil {
@@ -156,4 +167,15 @@ func CreateContextsFromHelmArchive(ignorePaths []string, fileName string, tgzRea
 	}
 
 	return []LintContext{ctx}, nil
+}
+
+// isKustomizeDir checks if the given directory contains a kustomization.yaml or kustomization.yml file.
+func isKustomizeDir(dirName string) bool {
+	for _, fileName := range kustomizationFileNames {
+		kustomizationPath := filepath.Join(dirName, fileName)
+		if info, err := os.Stat(kustomizationPath); err == nil && !info.IsDir() {
+			return true
+		}
+	}
+	return false
 }

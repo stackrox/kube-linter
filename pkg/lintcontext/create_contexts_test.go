@@ -14,13 +14,15 @@ import (
 )
 
 const (
-	chartTarball       = "../../tests/testdata/mychart-0.1.0.tgz"
-	chartDirectory     = "../../tests/testdata/mychart"
-	renamedTarball     = "../../tests/testdata/my-renamed-chart-0.1.0.tgz"
-	renamedChartDir    = "../../tests/testdata/my-renamed-chart"
-	mockIgnorePath     = "../../tests/testdata/**"
-	mockGlobIgnorePath = "../../tests/**"
-	mockPath           = "mock path"
+	chartTarball           = "../../tests/testdata/mychart-0.1.0.tgz"
+	chartDirectory         = "../../tests/testdata/mychart"
+	renamedTarball         = "../../tests/testdata/my-renamed-chart-0.1.0.tgz"
+	renamedChartDir        = "../../tests/testdata/my-renamed-chart"
+	kustomizeDirectory     = "../../tests/testdata/mykustomize"
+	kustomizeDeprecatedDir = "../../tests/testdata/mykustomize-deprecated"
+	mockIgnorePath         = "../../tests/testdata/**"
+	mockGlobIgnorePath     = "../../tests/**"
+	mockPath               = "mock path"
 )
 
 func TestCreateContextsWithIgnorePaths(t *testing.T) {
@@ -203,4 +205,100 @@ func checkObjectPaths(t *testing.T, objects []Object, expectedPrefix string) {
 		path.Join(expectedPrefix, "charts/subchart/templates/deployment.yaml"),
 	}
 	assert.ElementsMatchf(t, expectedPaths, actualPaths, "expected and actual template paths don't match")
+}
+
+func TestKustomizeContextCreation(t *testing.T) {
+	// Test that kustomize directory is loaded correctly
+	lintCtxs, err := CreateContexts(nil, kustomizeDirectory)
+	require.NoError(t, err)
+	require.Len(t, lintCtxs, 1, "expecting single lint context to be present")
+
+	lintCtx := lintCtxs[0]
+	objects := lintCtx.Objects()
+
+	assert.NotEmpty(t, objects, "expecting kustomize objects to be loaded")
+	assert.Empty(t, lintCtx.InvalidObjects(), "no invalid objects expected")
+
+	// Verify that we have the expected objects (Deployment and Service)
+	assert.Len(t, objects, 2, "expecting 2 objects from kustomization")
+
+	// Check that objects have the kustomize transformations applied
+	foundDeployment := false
+	foundService := false
+	for _, obj := range objects {
+		k8sObj := obj.K8sObject
+		if k8sObj.GetObjectKind().GroupVersionKind().Kind == "Deployment" {
+			foundDeployment = true
+			// Check that kustomize namePrefix was applied
+			assert.Contains(t, k8sObj.GetName(), "kustomize-", "deployment should have kustomize namePrefix")
+		}
+		if k8sObj.GetObjectKind().GroupVersionKind().Kind == "Service" {
+			foundService = true
+			// Check that kustomize namePrefix was applied
+			assert.Contains(t, k8sObj.GetName(), "kustomize-", "service should have kustomize namePrefix")
+		}
+	}
+
+	assert.True(t, foundDeployment, "deployment should be present")
+	assert.True(t, foundService, "service should be present")
+}
+
+func TestKustomizeWithIgnorePaths(t *testing.T) {
+	// Test that ignore paths work with kustomize
+	ignorePaths := []string{kustomizeDirectory + "/**"}
+	lintCtxs, err := CreateContexts(ignorePaths, kustomizeDirectory)
+	require.NoError(t, err)
+
+	// Should be empty because we ignored the kustomize directory
+	checkEmptyLintContext(t, lintCtxs)
+}
+
+func TestKustomizeWithDeprecatedSyntax(t *testing.T) {
+	// Test that kustomize deprecation warnings are ignored (not converted to errors)
+	// Similar to how helm warnings are suppressed
+	lintCtxs, err := CreateContexts(nil, kustomizeDeprecatedDir)
+	require.NoError(t, err, "CreateContexts should not return an error")
+	require.Len(t, lintCtxs, 1, "expecting single lint context to be present")
+
+	lintCtx := lintCtxs[0]
+
+	// Warnings should be ignored, so no invalid objects
+	invalidObjects := lintCtx.InvalidObjects()
+	assert.Empty(t, invalidObjects, "deprecated syntax should not create invalid objects")
+
+	// The kustomization should still load successfully despite using deprecated syntax
+	objects := lintCtx.Objects()
+	assert.NotEmpty(t, objects, "objects should be loaded even with deprecated 'bases' field")
+
+	// Verify we have the expected objects from the kustomization
+	assert.Len(t, objects, 2, "expecting 2 objects (Deployment and Service) from deprecated kustomization")
+}
+
+func TestWarningSuppressionParity(t *testing.T) {
+	// This test documents that both Helm and Kustomize suppress warnings
+	// Helm: Uses nopWriter{} to discard log output (parse_yaml.go:102-106)
+	// Kustomize: Uses WithWarningHandler that returns nil (parse_yaml.go:336-339)
+
+	t.Run("Helm suppresses warnings via nopWriter", func(t *testing.T) {
+		// Test that helm charts load without error even if they generate warnings
+		// The existing helm tests verify this behavior by successfully loading charts
+		lintCtxs, err := CreateContexts(nil, chartDirectory)
+		require.NoError(t, err)
+		require.Len(t, lintCtxs, 1)
+
+		lintCtx := lintCtxs[0]
+		assert.Empty(t, lintCtx.InvalidObjects(), "helm charts should load despite any warnings")
+		assert.NotEmpty(t, lintCtx.Objects(), "helm charts should produce objects")
+	})
+
+	t.Run("Kustomize suppresses warnings via handler", func(t *testing.T) {
+		// Test that kustomizations with deprecation warnings still load
+		lintCtxs, err := CreateContexts(nil, kustomizeDeprecatedDir)
+		require.NoError(t, err)
+		require.Len(t, lintCtxs, 1)
+
+		lintCtx := lintCtxs[0]
+		assert.Empty(t, lintCtx.InvalidObjects(), "warnings should be suppressed, not converted to errors")
+		assert.NotEmpty(t, lintCtx.Objects(), "objects should load despite warnings")
+	})
 }
