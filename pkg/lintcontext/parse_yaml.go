@@ -329,14 +329,15 @@ func normalizeDirectoryPaths(renderedFiles map[string]string) map[string]string 
 
 func (l *lintContextImpl) loadObjectsFromKustomize(dir string) {
 	// Create a kustomize engine with source annotations enabled
-	e, err := engine.Kustomize(kustomize.Source{
-		Path: dir,
-	},
+	kustomizeSource := kustomize.Source{Path: dir}
+	ignoreWarnings := func(warnings []string) error {
+		// Ignore warnings, similar to how we suppress Helm logs with nopWriter
+		return nil
+	}
+	e, err := engine.Kustomize(
+		kustomizeSource,
 		kustomize.WithSourceAnnotations(true),
-		kustomize.WithWarningHandler(func(warnings []string) error {
-			// Ignore warnings, similar to how we suppress Helm logs with nopWriter
-			return nil
-		}),
+		kustomize.WithWarningHandler(ignoreWarnings),
 	)
 	if err != nil {
 		l.addInvalidObjects(InvalidObject{Metadata: ObjectMetadata{FilePath: dir}, LoadErr: err})
