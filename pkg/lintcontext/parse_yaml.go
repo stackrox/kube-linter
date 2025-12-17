@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	"github.com/bmatcuk/doublestar/v4"
-	"github.com/lburgazzoli/k8s-manifests-lib/pkg/engine"
+	manifestengine "github.com/lburgazzoli/k8s-manifests-lib/pkg/engine"
 	"github.com/lburgazzoli/k8s-manifests-lib/pkg/renderer/kustomize"
 	"github.com/lburgazzoli/k8s-manifests-lib/pkg/types"
 	ocsAppsV1 "github.com/openshift/api/apps/v1"
@@ -334,7 +334,7 @@ func (l *lintContextImpl) loadObjectsFromKustomize(dir string) {
 		// Ignore warnings, similar to how we suppress Helm logs with nopWriter
 		return nil
 	}
-	e, err := engine.Kustomize(
+	e, err := manifestengine.Kustomize(
 		kustomizeSource,
 		kustomize.WithSourceAnnotations(true),
 		kustomize.WithWarningHandler(ignoreWarnings),
