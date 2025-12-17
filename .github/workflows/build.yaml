@@ -45,7 +45,7 @@ jobs:
         run: make build
 
       - name: Upload binary
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: bin
           path: bin
@@ -85,13 +85,13 @@ jobs:
           flags: bats
 
       - name: Upload Linux binary
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: kube-linter
           path: dist/kube-linter_linux_amd64_v1/kube-linter
 
       - name: Upload Windows binary
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: kube-linter.exe
           path: dist/kube-linter_windows_amd64_v1/kube-linter.exe
@@ -122,7 +122,7 @@ jobs:
         run: jq -es 'if . == [] then null else .[] | . end' results.sarif
 
       - name: Upload output file as GitHub artifact for manual investigation
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: results.sarif
           path: results.sarif
