@@ -38,7 +38,7 @@ GORELEASER_BIN := $(GOBIN)/goreleaser
 $(GORELEASER_BIN): deps
 	@echo "+ $@"
 	cd tool-imports; \
-	GOBIN=$(GOBIN) go install github.com/goreleaser/goreleaser
+	GOBIN=$(GOBIN) go install github.com/goreleaser/goreleaser/v2
 
 ###########
 ## Lint ##
