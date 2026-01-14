@@ -1,0 +1,9 @@
+name: "stackrox-securedcluster-deprecated-fields"
+description: "Indicates when deprecated fields are set in SecuredCluster custom resources."
+remediation: >-
+  Remove the deprecated field from your SecuredCluster custom resource.
+  Consult the StackRox documentation for the recommended alternative configuration.
+scope:
+  objectKinds:
+    - SecuredCluster
+template: "deprecated-field"
