@@ -1016,6 +1016,25 @@ get_value_from() {
   [[ "${count}" == "3" ]]
 }
 
+@test "stackrox-securedcluster-deprecated-fields" {
+  tmp="tests/checks/stackrox-securedcluster-deprecated-fields.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include stackrox-securedcluster-deprecated-fields --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "SecuredCluster: field \"spec.admissionControl.listenOnCreates\" is deprecated and should not be set" ]]
+  [[ "${message2}" == "SecuredCluster: field \"spec.admissionControl.listenOnCreates\" is deprecated and should not be set" ]]
+  [[ "${message3}" == "SecuredCluster: field \"spec.misc\" is deprecated and should not be set" ]]
+  [[ "${count}" == "3" ]]
+}
+
 @test "startup-port" {
   tmp="tests/checks/startup-port.yml"
   cmd="${KUBE_LINTER_BIN} lint --include startup-port --do-not-auto-add-defaults --format json ${tmp}"
