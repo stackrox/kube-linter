@@ -147,11 +147,11 @@ type SensorComponentSpec struct {
 type AdmissionControlComponentSpec struct {
 	// Deprecated field. This field will be removed in a future release.
 	//+operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:hidden"}
-	ListenOnCreates *bool `json:"listenOnCreates,omitempty"`
+	ListenOnCreates *bool `json:"listenOnCreates,omitempty" deprecated:"true"`
 
 	// Deprecated field. This field will be removed in a future release.
 	//+operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:hidden"}
-	ListenOnUpdates *bool `json:"listenOnUpdates,omitempty"`
+	ListenOnUpdates *bool `json:"listenOnUpdates,omitempty" deprecated:"true"`
 
 	// Deprecated field. This field will be removed in a future release.
 	//+operator-sdk:csv:customresourcedefinitions:type=spec,xDescriptors={"urn:alm:descriptor:com.tectonic.ui:hidden"}
