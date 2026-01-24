@@ -20,6 +20,7 @@ import (
 	ocpSecV1 "github.com/openshift/api/security/v1"
 	k8sMonitoring "github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring/v1"
 	kedaV1Alpha1 "golang.stackrox.io/kube-linter/pkg/crds/keda/v1alpha1"
+	stackroxV1Alpha1 "golang.stackrox.io/kube-linter/pkg/crds/stackrox/v1alpha1"
 	"golang.stackrox.io/kube-linter/pkg/k8sutil"
 	"helm.sh/helm/v3/pkg/chart"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -50,8 +51,15 @@ var (
 func init() {
 	clientScheme := scheme.Scheme
 
-	// Add OpenShift and Autoscaling schema
-	schemeBuilder := runtime.NewSchemeBuilder(ocsAppsV1.AddToScheme, autoscalingV2Beta1.AddToScheme, k8sMonitoring.AddToScheme, ocpSecV1.AddToScheme, kedaV1Alpha1.AddToScheme)
+	// Add OpenShift, Autoscaling, and CRDs.
+	schemeBuilder := runtime.NewSchemeBuilder(
+		ocsAppsV1.AddToScheme,
+		autoscalingV2Beta1.AddToScheme,
+		k8sMonitoring.AddToScheme,
+		ocpSecV1.AddToScheme,
+		kedaV1Alpha1.AddToScheme,
+		stackroxV1Alpha1.AddDirectlyToScheme,
+	)
 	if err := schemeBuilder.AddToScheme(clientScheme); err != nil {
 		panic(fmt.Sprintf("Can not add OpenShift schema %v", err))
 	}
