@@ -1,0 +1,44 @@
+---
+# no deprecated fields set
+apiVersion: platform.stackrox.io/v1alpha1
+kind: SecuredCluster
+metadata:
+  name: valid-secured-cluster
+  namespace: stackrox
+spec:
+  clusterName: "some-cluster"
+  admissionControl:
+    enforcement: Enabled
+---
+# listenOnCreates deprecated field set to true
+apiVersion: platform.stackrox.io/v1alpha1
+kind: SecuredCluster
+metadata:
+  name: deprecated-listen-on-creates-true
+  namespace: stackrox
+spec:
+  clusterName: "some-cluster"
+  admissionControl:
+    listenOnCreates: true
+---
+# listenOnCreates deprecated field set to false
+apiVersion: platform.stackrox.io/v1alpha1
+kind: SecuredCluster
+metadata:
+  name: deprecated-listen-on-creates-false
+  namespace: stackrox
+spec:
+  clusterName: "some-cluster"
+  admissionControl:
+    listenOnCreates: false
+---
+# deprecated sub map is set
+apiVersion: platform.stackrox.io/v1alpha1
+kind: SecuredCluster
+metadata:
+  name: deprecrated-sub-map-set
+  namespace: stackrox
+spec:
+  clusterName: "some-cluster"
+  misc:
+    createSCCs: true
