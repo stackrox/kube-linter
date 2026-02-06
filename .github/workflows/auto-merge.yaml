@@ -1,16 +1,17 @@
-name: auto-merge
+name: Dependabot auto-merge
+on: pull_request
 
-on:
-  pull_request_target:
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
-  auto-merge:
+  dependabot:
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
     steps:
-      - uses: ahmadnassri/action-dependabot-auto-merge@v2.6
-        with:
-          github-token: '${{ secrets.RHACS_BOT_GITHUB_TOKEN }}'
-          command: "squash and merge"
-          approve: true
-          target: minor
+      - name: Enable auto-merge for Dependabot PRs
+        run: gh pr merge --auto --squash "$PR_URL" && gh pr review --approve "$PR_URL"
+        env:
+          PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
