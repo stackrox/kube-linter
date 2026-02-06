@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -11,7 +12,6 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/pathutil"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
-	"golang.stackrox.io/kube-linter/internal/flagutil"
 	"golang.stackrox.io/kube-linter/pkg/builtinchecks"
 	"golang.stackrox.io/kube-linter/pkg/checkregistry"
 	"golang.stackrox.io/kube-linter/pkg/command/common"
@@ -50,7 +50,8 @@ func Command() *cobra.Command {
 	var failIfNoObjects bool
 	var verbose bool
 	var errorOnInvalidResource bool
-	format := flagutil.NewEnumFlag("Output format", formatters.GetEnabledFormatters(), common.PlainFormat)
+	var formats []string
+	var outputs []string
 
 	v := viper.New()
 
@@ -135,13 +136,65 @@ func Command() *cobra.Command {
 				result.Reports = append(result.Reports, invalidObjectsResult...)
 			}
 
-			formatter, err := formatters.FormatterByType(format.String())
+			// Validate and pair formats with outputs
+			pairs, err := ValidateAndPairFormatsOutputs(formats, outputs, formatters.GetEnabledFormatters())
 			if err != nil {
 				return err
 			}
-			err = formatter(os.Stdout, result)
-			if err != nil {
-				return fmt.Errorf("output formatting failed: %w", err)
+
+			// Write output for each format
+			var writeErrors []error
+			var successCount int
+			for _, pair := range pairs {
+				formatter, err := formatters.FormatterByType(string(pair.Format))
+				if err != nil {
+					return err
+				}
+
+				dest, err := NewOutputDestination(pair.Output)
+				if err != nil {
+					writeErrors = append(writeErrors,
+						fmt.Errorf("failed to create output destination for %s: %w", pair.Format, err))
+					continue
+				}
+
+				// Write output
+				writeErr := formatter(dest.Writer, result)
+
+				// Always close the destination, even on write error
+				closeErr := dest.Close()
+
+				if writeErr != nil {
+					writeErrors = append(writeErrors,
+						fmt.Errorf("formatting failed for %s: %w", pair.Format, writeErr))
+					continue
+				}
+
+				if closeErr != nil {
+					writeErrors = append(writeErrors,
+						fmt.Errorf("failed to close output for %s: %w", pair.Format, closeErr))
+					continue
+				}
+
+				successCount++
+				// Log success for file outputs
+				if pair.Output != "" {
+					fmt.Fprintf(os.Stderr, "Wrote %s output to %s\n", pair.Format, pair.Output)
+				}
+			}
+
+			if len(writeErrors) > 0 {
+				// Report both successes and failures
+				var errMsg strings.Builder
+				fmt.Fprintf(&errMsg, "failed to write %d of %d output format(s)", len(writeErrors), len(pairs))
+				if successCount > 0 {
+					fmt.Fprintf(&errMsg, " (%d succeeded)", successCount)
+				}
+				fmt.Fprintf(&errMsg, ":\n")
+				for i, err := range writeErrors {
+					fmt.Fprintf(&errMsg, "  %d. %v\n", i+1, err)
+				}
+				return errors.New(errMsg.String())
 			}
 
 			if len(result.Reports) > 0 {
@@ -154,7 +207,12 @@ func Command() *cobra.Command {
 	c.Flags().StringVar(&configPath, "config", "", "Path to config file")
 	c.Flags().BoolVarP(&failIfNoObjects, "fail-if-no-objects-found", "", false, "Return non-zero exit code if no valid objects are found or failed to parse")
 	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
-	c.Flags().Var(format, "format", format.Usage())
+	c.Flags().StringSliceVar(&formats, "format", []string{common.PlainFormat},
+		fmt.Sprintf("Output format (can be repeated). Allowed values: %s",
+			strings.Join(formatters.GetEnabledFormatters(), ", ")))
+	c.Flags().StringSliceVar(&outputs, "output", []string{},
+		"Output file path (can be repeated). Must match the number of --format flags. "+
+			"If omitted, all outputs go to stdout")
 	c.Flags().BoolVarP(&errorOnInvalidResource, "fail-on-invalid-resource", "", false, "Error out when we have an invalid resource")
 	_ = c.Flags().MarkDeprecated("fail-on-invalid-resource", "Use 'schema-validation' builtin check or kubeconform template for better schema validation.")
 
