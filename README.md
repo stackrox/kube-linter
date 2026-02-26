@@ -5,9 +5,9 @@
 
 # What is KubeLinter?
 
-KubeLinter analyzes Kubernetes YAML files and Helm charts, and checks them against a variety of best practices, with a focus on production readiness and security.
+KubeLinter analyzes Kubernetes YAML files, Helm charts, and Kustomize manifests, and checks them against a variety of best practices, with a focus on production readiness and security.
 
-KubeLinter runs sensible default checks, designed to give you useful information about your Kubernetes YAML files and Helm charts. This is to help teams check early and often for security misconfigurations and DevOps best practices. Some common examples of these include running containers as a non-root user, enforcing least privilege, and storing sensitive information only in secrets.
+KubeLinter runs sensible default checks, designed to give you useful information about your Kubernetes YAML files, Helm charts, and Kustomize manifests. This is to help teams check early and often for security misconfigurations and DevOps best practices. Some common examples of these include running containers as a non-root user, enforcing least privilege, and storing sensitive information only in secrets.
 
 KubeLinter is configurable, so you can enable and disable checks, as well as create your own custom checks, depending on the policies you want to follow within your organization.
 
@@ -193,6 +193,28 @@ Consider the following sample pod specification file `pod.yaml`. This file has t
 
    Error: found 3 lint errors
    ```
+
+### Multiple Output Formats
+
+KubeLinter supports generating multiple output formats in a single run. This is useful for generating both human-readable and machine-readable reports simultaneously:
+
+```bash
+kube-linter lint \
+  --format sarif --output kube-linter.sarif \
+  --format json --output kube-linter.json \
+  --config .kube-linter.yaml \
+  pod.yaml
+```
+
+This command will:
+- Generate a SARIF format report in `kube-linter.sarif`
+- Generate a JSON format report in `kube-linter.json`
+- Process the files only once, improving efficiency
+
+**Note:** Multiple formats require explicit `--output` flags. For single format output to stdout, use just one `--format` flag without `--output`.
+
+For more details on using multiple output formats, see the [documentation](./docs/using-kubelinter.md).
+
 To learn more about using and configuring KubeLinter, visit the [documentation](./docs) page.
 
 ## Mentions/Tutorials
