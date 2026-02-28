@@ -126,6 +126,11 @@ func (l *lintContextImpl) renderHelmChart(dir string) (map[string]string, error)
 }
 
 func (l *lintContextImpl) renderValues(chrt *chart.Chart, values map[string]interface{}) (map[string]string, error) {
+	// Process chart dependencies to handle import-values
+	if err := chartutil.ProcessDependencies(chrt, values); err != nil {
+		return nil, fmt.Errorf("processing dependencies: %w", err)
+	}
+
 	valuesToRender, err := chartutil.ToRenderValues(chrt, values, chartutil.ReleaseOptions{Name: "test-release", Namespace: "default"}, nil)
 	if err != nil {
 		return nil, err
