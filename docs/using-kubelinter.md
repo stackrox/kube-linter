@@ -25,6 +25,15 @@ The path to a directory containing the `Chart.yaml` file:
 kube-linter lint /path/to/directory/containing/Chart.yaml-file/
 ```
 
+#### ** Kustomize **
+The path to a directory containing a `kustomization.yaml` file:
+```bash
+kube-linter lint /path/to/directory/containing/kustomization.yaml
+```
+
+> [!NOTE] KubeLinter automatically detects Kustomize directories and renders the manifests before linting.
+> Source file paths are preserved in lint reports, pointing to the actual base/overlay files rather than generated output.
+
 <!-- tabs:end -->
 
 
@@ -32,6 +41,80 @@ kube-linter lint /path/to/directory/containing/Chart.yaml-file/
 > For example,
 > - Use `--format=json` to get the output in JSON format.
 > - Use `--format=sarif` to get the output in the [SARIF spec](https://github.com/microsoft/sarif-tutorials).
+
+## Multiple Output Formats
+
+KubeLinter supports writing results in multiple formats in a single run. This eliminates the need to run the linter multiple times for different output formats, improving efficiency and ensuring consistency across reports.
+
+### Single format to stdout (backward compatible)
+
+The default behavior outputs a single format to stdout:
+
+```bash
+kube-linter lint --format json myapp.yaml
+```
+
+### Single format to file
+
+To write output to a file, use the `--output` flag:
+
+```bash
+kube-linter lint --format sarif --output results.sarif myapp.yaml
+```
+
+### Multiple formats to multiple files
+
+You can generate multiple output formats in a single run by repeating the `--format` and `--output` flags. The flags are paired by position (first `--format` with first `--output`, etc.):
+
+```bash
+kube-linter lint \
+  --format sarif --output kube-linter.sarif \
+  --format json --output kube-linter.json \
+  --format plain --output kube-linter.txt \
+  myapp.yaml
+```
+
+This command will:
+- Generate a SARIF format report in `kube-linter.sarif`
+- Generate a JSON format report in `kube-linter.json`
+- Generate a plain text report in `kube-linter.txt`
+- Process the files only once, improving efficiency
+
+### Important Notes
+
+- **Positional pairing**: Format and output flags are paired by position. The first `--format` corresponds to the first `--output`, the second `--format` to the second `--output`, and so on.
+- **All stdout or all files**: Either all formats write to stdout (when no `--output` flags are provided), or each format must have a corresponding output file. You cannot mix stdout and file outputs.
+- **Error handling**: If one format fails to write, the other successful formats are still written, and errors are reported at the end.
+- **File overwrites**: Output files are created or overwritten if they already exist.
+- **Duplicate formats allowed**: You can specify the same format multiple times with different output files if needed.
+
+### Examples
+
+**Example 1: Generate JSON and SARIF for CI integration**
+```bash
+kube-linter lint \
+  --format json --output build/kube-linter.json \
+  --format sarif --output build/kube-linter.sarif \
+  --config .kube-linter.yaml \
+  deployments/
+```
+
+**Example 2: Error case - mismatched counts**
+```bash
+# This will fail with an error
+kube-linter lint \
+  --format json --format sarif \
+  --output out.json \
+  pod.yaml
+```
+Output: `Error: format/output mismatch: 2 format(s) specified but 1 output(s) provided`
+
+**Example 3: Error case - multiple formats to stdout**
+```bash
+# This will fail with an error (prevents unparseable mixed output)
+kube-linter lint --format json --format plain pod.yaml
+```
+Output: `Error: multiple formats require explicit --output flags. Use --output to specify files, or use a single --format for stdout`
 
 ## Using KubeLinter with the pre-commit framework
 
