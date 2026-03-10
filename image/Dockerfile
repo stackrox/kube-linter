@@ -1,5 +1,7 @@
 FROM scratch
 
-COPY kube-linter /
+ARG TARGETPLATFORM
+
+COPY $TARGETPLATFORM/kube-linter /
 
 ENTRYPOINT ["/kube-linter"]
