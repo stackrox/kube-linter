@@ -1,0 +1,2 @@
+# child should be a map, but we set it to a scalar to trigger error
+child: "not-a-map"
