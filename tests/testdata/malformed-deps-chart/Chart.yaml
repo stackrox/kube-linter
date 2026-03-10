@@ -1,0 +1,7 @@
+apiVersion: v2
+name: malformed-deps-chart
+version: 0.1.0
+dependencies:
+  - name: child
+    version: 0.1.0
+    repository: file://charts/child

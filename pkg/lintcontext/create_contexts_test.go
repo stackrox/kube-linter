@@ -20,6 +20,7 @@ const (
 	renamedChartDir        = "../../tests/testdata/my-renamed-chart"
 	kustomizeDirectory     = "../../tests/testdata/mykustomize"
 	kustomizeDeprecatedDir = "../../tests/testdata/mykustomize-deprecated"
+	malformedDepsChartDir  = "../../tests/testdata/malformed-deps-chart"
 	mockIgnorePath         = "../../tests/testdata/**"
 	mockGlobIgnorePath     = "../../tests/**"
 	mockPath               = "mock path"
@@ -301,4 +302,14 @@ func TestWarningSuppressionParity(t *testing.T) {
 		assert.Empty(t, lintCtx.InvalidObjects(), "warnings should be suppressed, not converted to errors")
 		assert.NotEmpty(t, lintCtx.Objects(), "objects should load despite warnings")
 	})
+}
+
+func TestHelmChartWithMalformedDependencies(t *testing.T) {
+	lintCtxs, err := CreateContexts(nil, malformedDepsChartDir)
+	require.NoError(t, err)
+	require.Len(t, lintCtxs, 1)
+
+	lintCtx := lintCtxs[0]
+	require.Len(t, lintCtx.InvalidObjects(), 1)
+	assert.Contains(t, lintCtx.InvalidObjects()[0].LoadErr.Error(), "processing dependencies")
 }
