@@ -1218,3 +1218,29 @@ get_value_from() {
   [[ "${count}" -ge 1 ]]
 }
 
+@test "flag-multi-format-output" {
+  tmp="tests/checks/run-as-non-root.yml"
+  json_out=$(mktemp)
+  sarif_out=$(mktemp)
+
+  cmd="${KUBE_LINTER_BIN} lint --format json --output ${json_out} --format sarif --output ${sarif_out} ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+
+  # Verify both files were created
+  [ -f "${json_out}" ]
+  [ -f "${sarif_out}" ]
+
+  # Verify JSON format is valid
+  json_format=$(jq -r 'has("Reports")' ${json_out})
+  [[ "${json_format}" == "true" ]]
+
+  # Verify SARIF format is valid
+  sarif_version=$(jq -r '.version' ${sarif_out})
+  [[ "${sarif_version}" == "2.1.0" ]]
+
+  # Cleanup
+  rm -f ${json_out} ${sarif_out}
+}
+
