@@ -522,4 +522,4 @@ require (
 
 exclude google.golang.org/grpc/stats/opentelemetry v0.0.0-20241028142157-ada6787961b3
 
-replace github.com/charmbracelet/lipgloss => github.com/charmbracelet/lipgloss/v2 v2.0.0
+replace github.com/charmbracelet/lipgloss => github.com/charmbracelet/lipgloss/v2 v2.0.0-beta.3.0.20250917201909-41ff0bf215ea
