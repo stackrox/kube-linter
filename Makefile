@@ -1,4 +1,4 @@
-deps: go.mod go.sum tool-imports/go.sum tool-imports/go.mod
+deps: go.mod go.sum tool-imports/golangci-lint/go.sum tool-imports/golangci-lint/go.mod tool-imports/goreleaser/go.sum tool-imports/goreleaser/go.mod
 	@touch deps
 
 %.sum: %.mod
@@ -31,13 +31,13 @@ COVFILES := $(shell mktemp -d)
 GOLANGCILINT_BIN := $(GOBIN)/golangci-lint
 $(GOLANGCILINT_BIN): deps
 	@echo "+ $@"
-	cd tool-imports; \
+	cd tool-imports/golangci-lint; \
 	GOBIN=$(GOBIN) go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint
 
 GORELEASER_BIN := $(GOBIN)/goreleaser
 $(GORELEASER_BIN): deps
 	@echo "+ $@"
-	cd tool-imports; \
+	cd tool-imports/goreleaser; \
 	GOBIN=$(GOBIN) go install github.com/goreleaser/goreleaser/v2
 
 ###########
