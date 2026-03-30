@@ -8,6 +8,5 @@ package toolimports
 // for an explanation of the approach.
 
 import (
-	_ "github.com/golangci/golangci-lint/v2/cmd/golangci-lint"
 	_ "github.com/goreleaser/goreleaser/v2"
 )

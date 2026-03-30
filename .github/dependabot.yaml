@@ -21,7 +21,15 @@ updates:
         patterns:
           - "k8s.io/*"
   - package-ecosystem: 'gomod'
-    directory: 'tool-imports'
+    directory: 'tool-imports/golangci-lint'
+    schedule:
+      interval: 'weekly'
+      day: 'wednesday'
+    open-pull-requests-limit: 3
+    reviewers:
+      - "janisz"
+  - package-ecosystem: 'gomod'
+    directory: 'tool-imports/goreleaser'
     schedule:
       interval: 'weekly'
       day: 'wednesday'
