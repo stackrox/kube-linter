@@ -5,7 +5,7 @@ go 1.26.1
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/bmatcuk/doublestar/v4 v4.10.0
-	github.com/cert-manager/cert-manager v1.20.1
+	github.com/cert-manager/cert-manager v1.20.2
 	github.com/fatih/color v1.19.0
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/goccy/go-yaml v1.19.2
@@ -132,7 +132,6 @@ require (
 	github.com/xlab/treeprint v1.2.0 // indirect
 	go.opentelemetry.io/contrib/bridges/prometheus v0.63.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.62.0 // indirect
-	go.opentelemetry.io/otel v1.43.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploggrpc v0.14.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlplog/otlploghttp v0.19.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc v1.37.0 // indirect
@@ -141,10 +140,8 @@ require (
 	go.opentelemetry.io/otel/exporters/prometheus v0.60.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdoutlog v0.14.0 // indirect
 	go.opentelemetry.io/otel/exporters/stdout/stdoutmetric v1.37.0 // indirect
-	go.opentelemetry.io/otel/metric v1.43.0 // indirect
-	go.opentelemetry.io/otel/sdk v1.43.0 // indirect
 	go.opentelemetry.io/otel/sdk/log v0.19.0 // indirect
-	go.opentelemetry.io/otel/trace v1.43.0 // indirect
+	go.opentelemetry.io/otel/sdk/metric v1.43.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.4 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.49.0 // indirect
