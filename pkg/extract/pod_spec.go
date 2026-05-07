@@ -34,7 +34,7 @@ func PodTemplateSpec(obj k8sutil.Object) (coreV1.PodTemplateSpec, bool) {
 		if !template.IsValid() {
 			return coreV1.PodTemplateSpec{}, false
 		}
-		if template.Kind() == reflect.Ptr && !template.IsNil() {
+		if template.Kind() == reflect.Pointer && !template.IsNil() {
 			template = template.Elem()
 		}
 		podTemplate, ok := template.Interface().(coreV1.PodTemplateSpec)

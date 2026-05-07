@@ -72,7 +72,7 @@ func rollingUpdateFromUpdateStrategy(strategy reflect.Value) (reflect.Value, boo
 			return rollingUpdate, false
 		}
 	}
-	if rollingUpdate.Kind() == reflect.Ptr && !rollingUpdate.IsNil() {
+	if rollingUpdate.Kind() == reflect.Pointer && !rollingUpdate.IsNil() {
 		rollingUpdate = rollingUpdate.Elem()
 	}
 	return rollingUpdate, true
