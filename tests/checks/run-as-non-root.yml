@@ -56,3 +56,34 @@ spec:
       containers:
       - name: app2
         runAsUser: 0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: group-zero
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app3
+  template:
+    spec:
+      containers:
+        - name: app3
+          securityContext:
+            runAsUser: 1001
+            runAsGroup: 0
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: group-zero
+spec:
+  selector:
+    app.kubernetes.io/name: app4
+  template:
+    spec:
+      containers:
+      - name: app4
+        securityContext:
+          runAsUser: 1001
+          runAsGroup: 0

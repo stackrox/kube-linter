@@ -921,11 +921,15 @@ get_value_from() {
 
   message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
   message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
+  message4=$(get_value_from "${lines[0]}" '.Reports[3].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[3].Diagnostic.Message')
   count=$(get_value_from "${lines[0]}" '.Reports | length')
 
   [[ "${message1}" == "Deployment: container \"app\" is not set to runAsNonRoot" ]]
   [[ "${message2}" == "DeploymentConfig: container \"app2\" is not set to runAsNonRoot" ]]
-  [[ "${count}" == "2" ]]
+  [[ "${message3}" == "Deployment: container \"app3\" is set to runAsGroup 0" ]]
+  [[ "${message4}" == "DeploymentConfig: container \"app4\" is set to runAsGroup 0" ]]
+  [[ "${count}" == "4" ]]
 }
 
 @test "scc-deny-privileged-container" {
