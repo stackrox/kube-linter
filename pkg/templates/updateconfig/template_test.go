@@ -109,6 +109,63 @@ func (s *UpgradeConfigTestSuite) TestInvalidStrategyType() {
 	})
 }
 
+func (s *UpgradeConfigTestSuite) TestDefaultStrategyType() {
+	tests := map[string]struct {
+		addObject     func(name string)
+		expectedType  string
+		expectedFound bool
+	}{
+		"deployment": {
+			addObject: func(name string) {
+				s.ctx.AddMockDeployment(s.T(), name)
+			},
+			expectedType:  string(appsv1.RollingUpdateDeploymentStrategyType),
+			expectedFound: true,
+		},
+		"daemon set": {
+			addObject: func(name string) {
+				s.ctx.AddMockDaemonSet(s.T(), name)
+			},
+			expectedType:  string(appsv1.RollingUpdateDaemonSetStrategyType),
+			expectedFound: true,
+		},
+		"stateful set": {
+			addObject: func(name string) {
+				s.ctx.AddObject(name, &appsv1.StatefulSet{})
+			},
+			expectedType:  string(appsv1.RollingUpdateStatefulSetStrategyType),
+			expectedFound: true,
+		},
+		"deployment config": {
+			addObject: func(name string) {
+				s.ctx.AddMockDeploymentConfig(s.T(), name)
+			},
+			expectedType:  string(ocsAppsv1.DeploymentStrategyTypeRolling),
+			expectedFound: true,
+		},
+		"replication controller": {
+			addObject: func(name string) {
+				s.addReplicationControllerWithReplicas(name, 2)
+			},
+			expectedFound: false,
+		},
+	}
+
+	for name, test := range tests {
+		s.Run(name, func() {
+			s.SetupTest()
+			test.addObject(name)
+
+			objects := s.ctx.Objects()
+			s.Require().Len(objects, 1)
+			defaultType, found := defaultStrategyType(objects[0])
+
+			s.Equal(test.expectedFound, found)
+			s.Equal(test.expectedType, defaultType)
+		})
+	}
+}
+
 func (s *UpgradeConfigTestSuite) TestValidStrategyType() {
 	const (
 		deploymentWithStrategy       = "deployment-strategy-recreate"
