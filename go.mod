@@ -10,7 +10,7 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/goccy/go-yaml v1.19.2
 	github.com/google/cel-go v0.28.1
-	github.com/lburgazzoli/k8s-manifests-lib v0.1.4-0.20251117120254-104132b6a2be
+	github.com/lburgazzoli/k8s-manifests-lib v0.1.4-0.20260603051037-da973e140f6f
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/mapstructure v1.5.1-0.20231216201459-8508981c8b6c
 	github.com/openshift/api v0.0.0-20230406152840-ce21e3fe5da2
