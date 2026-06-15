@@ -223,8 +223,8 @@ github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0 h1:P6pPBnrTSX3DEVR4fDembhR
 github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0/go.mod h1:vmVJ0l/dxyfGW6FmdpVm2joNMFikkuWg0EoCKLGUMNw=
 github.com/lburgazzoli/gomega-matchers v0.1.1 h1:it5XiuJGJB2Noq1KayamTgEe7Ls2/Cycezt3g6xyuo4=
 github.com/lburgazzoli/gomega-matchers v0.1.1/go.mod h1:sTPi8iTNViVEDJujnMzYicDshmo6G4rl9+gF/O02/V8=
-github.com/lburgazzoli/k8s-manifests-lib v0.1.4-0.20260603051037-da973e140f6f h1:v/8+RJlvWRbnUf9xBWfOQcJ3DUslArZ/HvTtqUm5qbU=
-github.com/lburgazzoli/k8s-manifests-lib v0.1.4-0.20260603051037-da973e140f6f/go.mod h1:KbU9qYnaBuQ9pzy5eouAouaA/VdvKB1I00y20NEqxj8=
+github.com/lburgazzoli/k8s-manifests-lib v0.1.4-0.20260604152250-c709b6bbaabb h1:4nioLkiz7/rBE6eBcZoFZ4pvNk8AZ3k+lK9TgUrl4n8=
+github.com/lburgazzoli/k8s-manifests-lib v0.1.4-0.20260604152250-c709b6bbaabb/go.mod h1:KbU9qYnaBuQ9pzy5eouAouaA/VdvKB1I00y20NEqxj8=
 github.com/lib/pq v1.10.9/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
 github.com/lib/pq v1.11.2 h1:x6gxUeu39V0BHZiugWe8LXZYZ+Utk7hSJGThs8sdzfs=
 github.com/lib/pq v1.11.2/go.mod h1:/p+8NSbOcwzAEI7wiMXFlgydTwcgTr3OSKMsD2BitpA=
