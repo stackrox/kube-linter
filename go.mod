@@ -24,7 +24,7 @@ require (
 	github.com/yannh/kubeconform v0.8.0
 	helm.sh/helm/v3 v3.21.0
 	k8s.io/api v0.35.4
-	k8s.io/apimachinery v0.36.1
+	k8s.io/apimachinery v0.36.2
 	k8s.io/client-go v0.35.4
 	k8s.io/gengo v0.0.0-20240404160639-a0386bf69313
 	sigs.k8s.io/yaml v1.6.0
