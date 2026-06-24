@@ -53,7 +53,7 @@ jobs:
         uses: sigstore/cosign-installer@v4.1.2
 
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
