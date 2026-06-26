@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dont-fire
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fire-externalname
+spec:
+  type: ExternalName
+  externalName: attacker.example.com
