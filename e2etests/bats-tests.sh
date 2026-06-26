@@ -1244,3 +1244,15 @@ get_value_from() {
   rm -f ${json_out} ${sarif_out}
 }
 
+@test "insecure-route-termination" {
+  tmp="tests/checks/insecure-route-termination.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include insecure-route-termination --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${count}" == "1" ]]
+}
