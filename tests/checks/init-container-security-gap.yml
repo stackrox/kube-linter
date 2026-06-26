@@ -1,0 +1,47 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire-no-init
+spec:
+  template:
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      containers:
+        - name: app
+          image: app:v1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire-init-hardened
+spec:
+  template:
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      initContainers:
+        - name: init
+          image: init:v1
+          securityContext:
+            runAsNonRoot: true
+      containers:
+        - name: app
+          image: app:v1
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fire-init-no-security-context
+spec:
+  template:
+    spec:
+      securityContext:
+        runAsNonRoot: true
+      initContainers:
+        - name: init
+          image: init:v1
+      containers:
+        - name: app
+          image: app:v1
