@@ -12,6 +12,8 @@ scope:
 template: cel-expression
 params:
   check: >
+    object.kind == 'Service' &&
+    has(object.spec) &&
     object.spec.type == 'ExternalName' &&
     has(object.spec.externalName)
     ? 'ExternalName service redirects cluster traffic to external DNS — potential SSRF vector' : ''

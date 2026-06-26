@@ -3,7 +3,6 @@ package imagedigest
 import (
 	"fmt"
 	"regexp"
-	"strings"
 
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
@@ -14,6 +13,8 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/templates/util"
 	v1 "k8s.io/api/core/v1"
 )
+
+var digestRefRE = regexp.MustCompile(`@sha256:[a-f0-9]{64}`)
 
 const (
 	templateKey = "image-not-pinned-by-digest"
@@ -43,7 +44,7 @@ func init() {
 				if isAllowed(allowedRegexes, container.Image) {
 					return nil
 				}
-				if !strings.Contains(container.Image, "@sha256:") {
+				if !digestRefRE.MatchString(container.Image) {
 					results = append(results, diagnostic.Diagnostic{
 						Message: fmt.Sprintf("container %q image %q is not pinned by digest", container.Name, container.Image),
 					})
