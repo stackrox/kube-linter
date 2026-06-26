@@ -1,0 +1,20 @@
+name: webhook-failure-policy-ignore
+description: >-
+  Admission webhook with failurePolicy: Ignore silently allows all requests
+  when the webhook is unavailable — attackers can bypass validation by DoSing
+  the webhook endpoint.
+remediation: >-
+  Set failurePolicy to Fail. Ensure webhook availability with proper
+  health checks, replicas, and PodDisruptionBudgets.
+scope:
+  objectKinds:
+    - Any
+template: cel-expression
+params:
+  check: >
+    (object.kind == 'ValidatingWebhookConfiguration' ||
+     object.kind == 'MutatingWebhookConfiguration') &&
+    has(object.webhooks) &&
+    object.webhooks.exists(w,
+      has(w.failurePolicy) && w.failurePolicy == 'Ignore'
+    ) ? 'admission webhook with failurePolicy: Ignore fails open — bypass via webhook DoS' : ''
