@@ -1,11 +1,11 @@
 name: init-container-security-gap
 description: >-
-  Init container does not set runAsNonRoot or readOnlyRootFilesystem while
-  the pod-level securityContext does. Init containers can run as root even
-  when main containers are hardened.
+  Init container does not set runAsNonRoot: true while the pod-level
+  securityContext does. Init containers can run as root even when main
+  containers are hardened via the pod-level security context.
 remediation: >-
-  Apply the same securityContext restrictions to init containers as to
-  regular containers.
+  Set runAsNonRoot: true in each init container's securityContext to match
+  the pod-level restriction.
 scope:
   objectKinds:
     - DeploymentLike

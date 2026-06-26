@@ -1,8 +1,8 @@
 name: projected-token-long-expiration
 description: >-
-  Projected service account token volume with expirationSeconds > 24h or
-  without explicit expiration. Long-lived tokens extracted from compromised
-  pods remain valid indefinitely.
+  Projected service account token volume with expirationSeconds greater
+  than 24 hours. Long-lived tokens extracted from compromised pods remain
+  valid for extended periods.
 remediation: >-
   Set expirationSeconds to 3600 (1 hour) or less unless the workload
   specifically requires longer token lifetimes.
