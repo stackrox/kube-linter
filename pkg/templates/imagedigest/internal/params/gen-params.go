@@ -41,7 +41,7 @@ func (p *Params) Validate() error {
 	var validationErrors []string
 	if len(validationErrors) > 0 {
 		return fmt.Errorf("invalid parameters: %s", strings.Join(validationErrors, ", "))
-	}
+    }
 	return nil
 }
 
