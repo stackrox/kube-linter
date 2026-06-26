@@ -14,6 +14,7 @@ template: cel-expression
 params:
   check: >
     object.rules.exists(r,
+      r.resources.exists(res, res == 'users' || res == 'groups' || res == 'serviceaccounts' || res == '*') &&
       r.verbs.exists(v, v == 'impersonate' || v == '*') &&
       (!has(r.resourceNames) || r.resourceNames.size() == 0)
     ) ? 'impersonate verb granted without resourceNames restriction — allows system:masters impersonation' : ''

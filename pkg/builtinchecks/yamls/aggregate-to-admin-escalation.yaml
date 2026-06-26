@@ -24,6 +24,7 @@ params:
        object.metadata.labels['rbac.authorization.k8s.io/aggregate-to-view'] == 'true')
     ) &&
     object.rules.exists(r,
+      r.apiGroups.exists(g, g == '' || g == 'rbac.authorization.k8s.io' || g == '*') &&
       r.verbs.exists(v, v == '*' || v == 'create' || v == 'delete' || v == 'patch') &&
       r.resources.exists(res, res == '*' || res == 'secrets' || res == 'roles' ||
         res == 'clusterroles' || res == 'clusterrolebindings')

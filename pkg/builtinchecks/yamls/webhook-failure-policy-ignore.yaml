@@ -14,6 +14,7 @@ params:
   check: >
     (object.kind == 'ValidatingWebhookConfiguration' ||
      object.kind == 'MutatingWebhookConfiguration') &&
+    has(object.webhooks) &&
     object.webhooks.exists(w,
       has(w.failurePolicy) && w.failurePolicy == 'Ignore'
     ) ? 'admission webhook with failurePolicy: Ignore fails open — bypass via webhook DoS' : ''

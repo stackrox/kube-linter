@@ -15,6 +15,7 @@ template: cel-expression
 params:
   check: >
     object.rules.exists(r,
+      r.apiGroups.exists(g, g == 'rbac.authorization.k8s.io' || g == '*') &&
       r.resources.exists(res, res == 'roles' || res == 'clusterroles' || res == '*') &&
       r.verbs.exists(v, v == 'escalate' || v == '*')
     ) ? 'escalate verb on roles/clusterroles allows privilege escalation' : ''

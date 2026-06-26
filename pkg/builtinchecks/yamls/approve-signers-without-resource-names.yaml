@@ -13,6 +13,7 @@ template: cel-expression
 params:
   check: >
     object.rules.exists(r,
+      r.apiGroups.exists(g, g == 'certificates.k8s.io' || g == '*') &&
       r.resources.exists(res, res == 'signers' || res == '*') &&
       r.verbs.exists(v, v == 'approve' || v == '*') &&
       (!has(r.resourceNames) || r.resourceNames.size() == 0)

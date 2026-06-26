@@ -14,7 +14,7 @@ template: cel-expression
 params:
   check: >
     object.rules.exists(r,
-      r.verbs.exists(v, v == 'deletecollection') &&
+      r.verbs.exists(v, v == 'deletecollection' || v == '*') &&
       r.resources.exists(res, res == '*' || res == 'secrets' || res == 'pods' ||
         res == 'deployments' || res == 'configmaps' || res == 'namespaces')
     ) ? 'deletecollection verb allows bulk resource destruction in a single API call' : ''

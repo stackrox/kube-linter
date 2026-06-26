@@ -13,7 +13,7 @@ template: cel-expression
 params:
   check: >
     object.rules.exists(r,
-      r.apiGroups.exists(g, g == '*' || g == '') &&
+      r.apiGroups.exists(g, g == '*') &&
       r.resources.exists(res, res == '*') &&
       r.verbs.exists(v, v == '*')
     ) ? 'rule grants wildcard verbs on wildcard resources — functionally cluster-admin' : ''

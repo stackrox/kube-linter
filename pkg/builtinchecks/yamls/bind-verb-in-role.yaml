@@ -15,7 +15,7 @@ template: cel-expression
 params:
   check: >
     object.rules.exists(r,
-      r.resources.exists(res, res == 'roles' || res == 'clusterroles' ||
-        res == 'rolebindings' || res == 'clusterrolebindings' || res == '*') &&
+      r.apiGroups.exists(g, g == 'rbac.authorization.k8s.io' || g == '*') &&
+      r.resources.exists(res, res == 'roles' || res == 'clusterroles' || res == '*') &&
       r.verbs.exists(v, v == 'bind' || v == '*')
     ) ? 'bind verb on RBAC resources allows privilege escalation via arbitrary bindings' : ''
