@@ -1,0 +1,20 @@
+name: escalate-verb-in-role
+description: >-
+  Roles granting the 'escalate' verb on roles or clusterroles allow the
+  holder to create or modify roles with permissions exceeding their own,
+  bypassing Kubernetes RBAC escalation protection.
+remediation: >-
+  Remove the 'escalate' verb unless the workload is a controller that
+  legitimately manages RBAC resources. If required, scope with
+  resourceNames to limit which roles can be escalated.
+scope:
+  objectKinds:
+    - Role
+    - ClusterRole
+template: cel-expression
+params:
+  check: >
+    object.rules.exists(r,
+      r.resources.exists(res, res == 'roles' || res == 'clusterroles' || res == '*') &&
+      r.verbs.exists(v, v == 'escalate' || v == '*')
+    ) ? 'escalate verb on roles/clusterroles allows privilege escalation' : ''

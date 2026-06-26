@@ -1,0 +1,19 @@
+name: wildcard-resource-verb-combo
+description: >-
+  ClusterRole rule with wildcard verbs on wildcard resources is functionally
+  equivalent to cluster-admin. Unlike a named cluster-admin binding, this
+  pattern is not caught by the cluster-admin-role-binding check.
+remediation: >-
+  Replace wildcard grants with explicit resource and verb lists scoped to
+  what the workload actually needs.
+scope:
+  objectKinds:
+    - ClusterRole
+template: cel-expression
+params:
+  check: >
+    object.rules.exists(r,
+      r.apiGroups.exists(g, g == '*' || g == '') &&
+      r.resources.exists(res, res == '*') &&
+      r.verbs.exists(v, v == '*')
+    ) ? 'rule grants wildcard verbs on wildcard resources — functionally cluster-admin' : ''

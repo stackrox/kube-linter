@@ -1,0 +1,20 @@
+name: deletecollection-verb-in-role
+description: >-
+  Role grants deletecollection verb, which allows bulk deletion of all
+  resources of a type in a single API call. Unlike delete (per-resource),
+  deletecollection enables rapid, complete resource destruction.
+remediation: >-
+  Remove deletecollection unless the workload legitimately needs to bulk-delete
+  resources. Use delete instead for per-resource deletion.
+scope:
+  objectKinds:
+    - Role
+    - ClusterRole
+template: cel-expression
+params:
+  check: >
+    object.rules.exists(r,
+      r.verbs.exists(v, v == 'deletecollection') &&
+      r.resources.exists(res, res == '*' || res == 'secrets' || res == 'pods' ||
+        res == 'deployments' || res == 'configmaps' || res == 'namespaces')
+    ) ? 'deletecollection verb allows bulk resource destruction in a single API call' : ''
