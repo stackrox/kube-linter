@@ -14,3 +14,26 @@ metadata:
 spec:
   strategy:
     type: Other
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app3
+spec:
+  selector:
+    matchLabels:
+      app: app3
+  template:
+    metadata:
+      labels:
+        app: app3
+    spec:
+      containers:
+        - name: app
+          image: nginx
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: app4
+spec: {}
