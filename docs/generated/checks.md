@@ -586,9 +586,9 @@ key: owner
 
 **Enabled by default**: Yes
 
-**Description**: Indicates when containers are not set to runAsNonRoot.
+**Description**: Indicates when containers are not set to runAsNonRoot or explicitly use the root group.
 
-**Remediation**: Set runAsUser to a non-zero number and runAsNonRoot to true in your pod or container securityContext. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for details.
+**Remediation**: Set runAsUser and runAsGroup to non-zero numbers and runAsNonRoot to true in your pod or container securityContext. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for details.
 
 **Template**: [run-as-non-root](templates.md#run-as-non-root-user)
 ## scc-deny-privileged-container
