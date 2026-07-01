@@ -304,3 +304,28 @@ func TestFindingsForObjectWithSuppressedFinding(t *testing.T) {
 	require.Len(t, result, 1, "should only return non-suppressed finding")
 	assert.Equal(t, "KC-002", result[0].RuleID)
 }
+
+func TestAnalyzeConversionError(t *testing.T) {
+	ctx := &fakeLintContext{objects: []lintcontext.Object{
+		{Metadata: lintcontext.ObjectMetadata{FilePath: "bad.yaml"}, K8sObject: nil},
+	}}
+
+	p := params.Params{}
+	checkFn, err := analyze(p)
+	require.NoError(t, err)
+
+	// First call: error reported during analysis
+	diags1 := checkFn(ctx, ctx.Objects()[0])
+	require.Len(t, diags1, 1)
+	assert.Contains(t, diags1[0].Message, "conversion error")
+	assert.Equal(t, "warning", diags1[0].Severity)
+
+	// Second call: error re-reported once via initErrReported flag
+	diags2 := checkFn(ctx, ctx.Objects()[0])
+	require.Len(t, diags2, 1)
+	assert.Contains(t, diags2[0].Message, "conversion error")
+
+	// Third call: no more reports
+	diags3 := checkFn(ctx, ctx.Objects()[0])
+	assert.Empty(t, diags3, "conversion error should stop after second report")
+}

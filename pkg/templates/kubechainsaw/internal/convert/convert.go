@@ -19,6 +19,9 @@ func FromLintContext(ctx lintcontext.LintContext) (*models.LoadedResources, erro
 	for _, obj := range ctx.Objects() {
 		path := obj.Metadata.FilePath
 		k8sObj := obj.K8sObject
+		if k8sObj == nil {
+			return nil, fmt.Errorf("nil K8sObject at %s", path)
+		}
 
 		switch o := k8sObj.(type) {
 		case *rbacV1.ClusterRole:

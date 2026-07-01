@@ -427,3 +427,15 @@ func TestConvertWorkloadDefaultSA(t *testing.T) {
 	require.Len(t, resources.Workloads, 1)
 	assert.Equal(t, "default", resources.Workloads["Deployment/default/test-dep"].ServiceAccountName)
 }
+
+func TestConvertNilK8sObjectReturnsError(t *testing.T) {
+	ctx := &fakeLintContext{objects: []lintcontext.Object{
+		{Metadata: lintcontext.ObjectMetadata{FilePath: "bad.yaml"}, K8sObject: nil},
+	}}
+
+	resources, err := FromLintContext(ctx)
+	assert.Nil(t, resources)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "nil K8sObject")
+	assert.Contains(t, err.Error(), "bad.yaml")
+}
