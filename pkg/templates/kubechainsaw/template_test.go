@@ -96,3 +96,112 @@ func TestAnalyzeRuleExclusion(t *testing.T) {
 		}
 	}
 }
+
+func TestAnalyzeRuleInclusion(t *testing.T) {
+	cr := &rbacV1.ClusterRole{
+		ObjectMeta: metaV1.ObjectMeta{Name: "dangerous-role"},
+		Rules: []rbacV1.PolicyRule{
+			{APIGroups: []string{""}, Resources: []string{"secrets"}, Verbs: []string{"*"}},
+		},
+	}
+	cr.SetGroupVersionKind(schema.GroupVersionKind{Group: "rbac.authorization.k8s.io", Version: "v1", Kind: "ClusterRole"})
+
+	ctx := &fakeLintContext{objects: []lintcontext.Object{
+		{Metadata: lintcontext.ObjectMetadata{FilePath: "test.yaml"}, K8sObject: cr},
+	}}
+
+	p := params.Params{Rules: []string{"KC-002"}}
+	checkFn, err := analyze(p)
+	require.NoError(t, err)
+
+	diags := checkFn(ctx, ctx.Objects()[0])
+	for _, d := range diags {
+		if d.Metadata != nil {
+			assert.Equal(t, "KC-002", d.Metadata[diagnostic.MetaKeyRuleID])
+		}
+	}
+}
+
+func TestAnalyzeSeverityFiltering(t *testing.T) {
+	cr := &rbacV1.ClusterRole{
+		ObjectMeta: metaV1.ObjectMeta{Name: "dangerous-role"},
+		Rules: []rbacV1.PolicyRule{
+			{APIGroups: []string{""}, Resources: []string{"secrets"}, Verbs: []string{"*"}},
+		},
+	}
+	cr.SetGroupVersionKind(schema.GroupVersionKind{Group: "rbac.authorization.k8s.io", Version: "v1", Kind: "ClusterRole"})
+
+	ctx := &fakeLintContext{objects: []lintcontext.Object{
+		{Metadata: lintcontext.ObjectMetadata{FilePath: "test.yaml"}, K8sObject: cr},
+	}}
+
+	p := params.Params{MinSeverity: "high"}
+	checkFn, err := analyze(p)
+	require.NoError(t, err)
+
+	diags := checkFn(ctx, ctx.Objects()[0])
+	for _, d := range diags {
+		severity := d.Severity
+		assert.NotEqual(t, "info", severity, "info severity should be filtered out")
+		assert.NotEqual(t, "warning", severity, "warning severity should be filtered out")
+	}
+}
+
+func TestAnalyzeFindingsForObject_NonMatching(t *testing.T) {
+	cr := &rbacV1.ClusterRole{
+		ObjectMeta: metaV1.ObjectMeta{Name: "role-a"},
+		Rules: []rbacV1.PolicyRule{
+			{APIGroups: []string{""}, Resources: []string{"secrets"}, Verbs: []string{"*"}},
+		},
+	}
+	cr.SetGroupVersionKind(schema.GroupVersionKind{Group: "rbac.authorization.k8s.io", Version: "v1", Kind: "ClusterRole"})
+
+	cr2 := &rbacV1.ClusterRole{
+		ObjectMeta: metaV1.ObjectMeta{Name: "role-b"},
+		Rules:      []rbacV1.PolicyRule{},
+	}
+	cr2.SetGroupVersionKind(schema.GroupVersionKind{Group: "rbac.authorization.k8s.io", Version: "v1", Kind: "ClusterRole"})
+
+	ctx := &fakeLintContext{objects: []lintcontext.Object{
+		{Metadata: lintcontext.ObjectMetadata{FilePath: "test.yaml"}, K8sObject: cr},
+		{Metadata: lintcontext.ObjectMetadata{FilePath: "test2.yaml"}, K8sObject: cr2},
+	}}
+
+	p := params.Params{}
+	checkFn, err := analyze(p)
+	require.NoError(t, err)
+
+	checkFn(ctx, ctx.Objects()[0])
+
+	diags := checkFn(ctx, ctx.Objects()[1])
+	assert.Empty(t, diags, "role-b should have no findings")
+}
+
+
+func TestAnalyzeSuppressionFileError(t *testing.T) {
+	cr := &rbacV1.ClusterRole{
+		ObjectMeta: metaV1.ObjectMeta{Name: "test-role"},
+		Rules:      []rbacV1.PolicyRule{},
+	}
+	cr.SetGroupVersionKind(schema.GroupVersionKind{Group: "rbac.authorization.k8s.io", Version: "v1", Kind: "ClusterRole"})
+
+	ctx := &fakeLintContext{objects: []lintcontext.Object{
+		{Metadata: lintcontext.ObjectMetadata{FilePath: "test.yaml"}, K8sObject: cr},
+	}}
+
+	p := params.Params{SuppressionsFile: "/nonexistent/file.yaml"}
+	checkFn, err := analyze(p)
+	require.NoError(t, err)
+
+	diags1 := checkFn(ctx, ctx.Objects()[0])
+	require.Len(t, diags1, 1)
+	assert.Contains(t, diags1[0].Message, "failed to load suppressions")
+	assert.Equal(t, "warning", diags1[0].Severity)
+
+	diags2 := checkFn(ctx, ctx.Objects()[0])
+	require.Len(t, diags2, 1)
+	assert.Contains(t, diags2[0].Message, "failed to load suppressions")
+
+	diags3 := checkFn(ctx, ctx.Objects()[0])
+	assert.Empty(t, diags3, "suppression error should only be reported twice (once during analysis, once after)")
+}
