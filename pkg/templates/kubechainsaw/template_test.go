@@ -1,8 +1,10 @@
 package kubechainsaw
 
 import (
+	"os"
 	"testing"
 
+	kcModels "github.com/ugiordan/kube-chainsaw/pkg/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
@@ -203,4 +205,102 @@ func TestAnalyzeSuppressionFileError(t *testing.T) {
 
 	diags3 := checkFn(ctx, ctx.Objects()[0])
 	assert.Empty(t, diags3, "suppression error should only be reported twice (once during analysis, once after)")
+}
+
+func TestAnalyzeValidateCustomError(t *testing.T) {
+	// Test the ValidateCustom error path (template.go:35-38)
+	p := params.Params{Rules: []string{"KC-INVALID"}}
+	checkFn, err := analyze(p)
+	require.Error(t, err)
+	assert.Nil(t, checkFn)
+	assert.Contains(t, err.Error(), "unknown rule ID")
+}
+
+func TestAnalyzeSuppressionSuccess(t *testing.T) {
+	// Test the suppression success path (template.go:76)
+	cr := &rbacV1.ClusterRole{
+		ObjectMeta: metaV1.ObjectMeta{Name: "dangerous-role"},
+		Rules: []rbacV1.PolicyRule{
+			{APIGroups: []string{""}, Resources: []string{"secrets"}, Verbs: []string{"*"}},
+		},
+	}
+	cr.SetGroupVersionKind(schema.GroupVersionKind{Group: "rbac.authorization.k8s.io", Version: "v1", Kind: "ClusterRole"})
+
+	ctx := &fakeLintContext{objects: []lintcontext.Object{
+		{Metadata: lintcontext.ObjectMetadata{FilePath: "test.yaml"}, K8sObject: cr},
+	}}
+
+	// Create a temp suppressions file
+	tmpFile, err := os.CreateTemp("", "suppressions-*.yaml")
+	require.NoError(t, err)
+	defer os.Remove(tmpFile.Name())
+
+	suppressionYAML := `suppressions:
+- rule_id: KC-002
+  resource_name: dangerous-role
+  reason: "accepted risk for test"
+`
+	_, err = tmpFile.WriteString(suppressionYAML)
+	require.NoError(t, err)
+	tmpFile.Close()
+
+	p := params.Params{SuppressionsFile: tmpFile.Name()}
+	checkFn, err := analyze(p)
+	require.NoError(t, err)
+
+	diags := checkFn(ctx, ctx.Objects()[0])
+	// The finding should be suppressed
+	for _, d := range diags {
+		if d.Metadata != nil && d.Metadata[diagnostic.MetaKeyRuleID] == "KC-002" {
+			t.Errorf("KC-002 finding should have been suppressed")
+		}
+	}
+}
+
+func TestFilterBySeverityWithInvalidSeverity(t *testing.T) {
+	// Test filterBySeverity error path (template.go:175-183)
+	// Create a fake finding
+	findings := []kcModels.Finding{
+		{RuleID: "KC-001", Severity: kcModels.SeverityHigh},
+	}
+
+	// Call filterBySeverity with an invalid severity string
+	// This should return all findings unfiltered
+	result := filterBySeverity(findings, "invalid-severity")
+	assert.Equal(t, findings, result, "invalid severity should return all findings unfiltered")
+}
+
+func TestFindingsForObjectWithSuppressedFinding(t *testing.T) {
+	// Test findingsForObject skipping suppressed findings (template.go:119-120)
+	cr := &rbacV1.ClusterRole{
+		ObjectMeta: metaV1.ObjectMeta{Name: "test-role"},
+		Rules:      []rbacV1.PolicyRule{},
+	}
+	cr.SetGroupVersionKind(schema.GroupVersionKind{Group: "rbac.authorization.k8s.io", Version: "v1", Kind: "ClusterRole"})
+
+	obj := lintcontext.Object{
+		Metadata:  lintcontext.ObjectMetadata{FilePath: "test.yaml"},
+		K8sObject: cr,
+	}
+
+	findings := []kcModels.Finding{
+		{
+			RuleID:            "KC-001",
+			ResourceKind:      "ClusterRole",
+			ResourceName:      "test-role",
+			ResourceNamespace: "",
+			Suppressed:        true,
+		},
+		{
+			RuleID:            "KC-002",
+			ResourceKind:      "ClusterRole",
+			ResourceName:      "test-role",
+			ResourceNamespace: "",
+			Suppressed:        false,
+		},
+	}
+
+	result := findingsForObject(findings, obj)
+	require.Len(t, result, 1, "should only return non-suppressed finding")
+	assert.Equal(t, "KC-002", result[0].RuleID)
 }

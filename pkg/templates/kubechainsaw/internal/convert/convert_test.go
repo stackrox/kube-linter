@@ -405,3 +405,25 @@ func TestConvertMultipleObjects(t *testing.T) {
 	assert.Len(t, resources.ServiceAccounts, 1)
 	assert.Len(t, resources.Workloads, 1)
 }
+
+func TestConvertWorkloadDefaultSA(t *testing.T) {
+	// Test convertWorkload with empty ServiceAccountName (convert.go:134-135)
+	dep := &appsV1.Deployment{
+		ObjectMeta: metaV1.ObjectMeta{Name: "test-dep", Namespace: "default"},
+		Spec: appsV1.DeploymentSpec{
+			Template: v1.PodTemplateSpec{
+				Spec: v1.PodSpec{}, // Empty ServiceAccountName
+			},
+		},
+	}
+	dep.SetGroupVersionKind(schema.GroupVersionKind{Group: "apps", Version: "v1", Kind: "Deployment"})
+
+	ctx := &fakeLintContext{objects: []lintcontext.Object{
+		{Metadata: lintcontext.ObjectMetadata{FilePath: "dep.yaml"}, K8sObject: dep},
+	}}
+
+	resources, err := FromLintContext(ctx)
+	require.NoError(t, err)
+	require.Len(t, resources.Workloads, 1)
+	assert.Equal(t, "default", resources.Workloads["Deployment/default/test-dep"].ServiceAccountName)
+}
