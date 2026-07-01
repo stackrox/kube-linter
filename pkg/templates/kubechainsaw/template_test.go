@@ -4,9 +4,9 @@ import (
 	"os"
 	"testing"
 
-	kcModels "github.com/ugiordan/kube-chainsaw/pkg/models"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	kcModels "github.com/ugiordan/kube-chainsaw/pkg/models"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
 	"golang.stackrox.io/kube-linter/pkg/templates/kubechainsaw/internal/params"
@@ -242,7 +242,7 @@ func TestAnalyzeSuppressionSuccess(t *testing.T) {
 `
 	_, err = tmpFile.WriteString(suppressionYAML)
 	require.NoError(t, err)
-	tmpFile.Close()
+	require.NoError(t, tmpFile.Close())
 
 	p := params.Params{SuppressionsFile: tmpFile.Name()}
 	checkFn, err := analyze(p)
