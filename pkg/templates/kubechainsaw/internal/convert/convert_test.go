@@ -17,7 +17,7 @@ type fakeLintContext struct {
 	objects []lintcontext.Object
 }
 
-func (f *fakeLintContext) Objects() []lintcontext.Object              { return f.objects }
+func (f *fakeLintContext) Objects() []lintcontext.Object               { return f.objects }
 func (f *fakeLintContext) InvalidObjects() []lintcontext.InvalidObject { return nil }
 
 func TestConvertClusterRole(t *testing.T) {
