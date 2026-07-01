@@ -42,6 +42,7 @@ func analyze(p params.Params) (check.Func, error) {
 	var findings []kcModels.Finding
 	var analyzed bool
 	var initErr []diagnostic.Diagnostic
+	var initErrReported bool
 
 	return func(lintCtx lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 		mu.Lock()
@@ -79,7 +80,14 @@ func analyze(p params.Params) (check.Func, error) {
 		mu.Unlock()
 
 		if initErr != nil {
-			return initErr
+			mu.Lock()
+			alreadyReported := initErrReported
+			initErrReported = true
+			mu.Unlock()
+			if !alreadyReported {
+				return initErr
+			}
+			return nil
 		}
 
 		kind := object.K8sObject.GetObjectKind().GroupVersionKind().Kind
@@ -169,7 +177,11 @@ func filterBySeverity(findings []kcModels.Finding, minSeverity string) []kcModel
 		return findings
 	}
 
-	minLevel := parseSeverityLevel(minSeverity)
+	minLevel, err := params.ParseSeverityLevel(minSeverity)
+	if err != nil {
+		// Should never happen: params are validated during template instantiation
+		return findings
+	}
 	var filtered []kcModels.Finding
 	for _, f := range findings {
 		if int(f.Severity) >= minLevel {
@@ -177,19 +189,4 @@ func filterBySeverity(findings []kcModels.Finding, minSeverity string) []kcModel
 		}
 	}
 	return filtered
-}
-
-func parseSeverityLevel(s string) int {
-	switch strings.ToLower(s) {
-	case "info", "note":
-		return 0
-	case "warning":
-		return 1
-	case "high", "error":
-		return 2
-	case "critical":
-		return 3
-	default:
-		return 0
-	}
 }

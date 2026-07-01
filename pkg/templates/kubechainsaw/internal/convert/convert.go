@@ -27,9 +27,9 @@ func FromLintContext(ctx lintcontext.LintContext) (*models.LoadedResources, erro
 			key := o.Namespace + "/" + o.Name
 			resources.Roles[key] = convertRole(o, path)
 		case *rbacV1.ClusterRoleBinding:
-			resources.ClusterRoleBindings = append(resources.ClusterRoleBindings, convertBinding(o.Name, "", o.RoleRef, o.Subjects, path))
+			resources.ClusterRoleBindings = append(resources.ClusterRoleBindings, convertBinding("ClusterRoleBinding", o.Name, "", o.RoleRef, o.Subjects, path))
 		case *rbacV1.RoleBinding:
-			resources.RoleBindings = append(resources.RoleBindings, convertBinding(o.Name, o.Namespace, o.RoleRef, o.Subjects, path))
+			resources.RoleBindings = append(resources.RoleBindings, convertBinding("RoleBinding", o.Name, o.Namespace, o.RoleRef, o.Subjects, path))
 		case *v1.ServiceAccount:
 			key := o.Namespace + "/" + o.Name
 			resources.ServiceAccounts[key] = &models.SAData{
@@ -104,7 +104,7 @@ func convertPolicyRule(r rbacV1.PolicyRule) map[string]interface{} {
 	}
 }
 
-func convertBinding(name, namespace string, roleRef rbacV1.RoleRef, subjects []rbacV1.Subject, path string) *models.BindingData {
+func convertBinding(kind, name, namespace string, roleRef rbacV1.RoleRef, subjects []rbacV1.Subject, path string) *models.BindingData {
 	subs := make([]map[string]interface{}, len(subjects))
 	for i, s := range subjects {
 		subs[i] = map[string]interface{}{
@@ -123,7 +123,7 @@ func convertBinding(name, namespace string, roleRef rbacV1.RoleRef, subjects []r
 		Subjects: subs,
 		File:     path,
 		Doc: map[string]interface{}{
-			"kind":     "ClusterRoleBinding",
+			"kind":     kind,
 			"metadata": map[string]interface{}{"name": name, "namespace": namespace},
 		},
 	}

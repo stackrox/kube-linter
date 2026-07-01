@@ -46,7 +46,7 @@ func (p *Params) ValidateCustom() error {
 	}
 
 	if p.MinSeverity != "" {
-		if _, err := parseMinSeverity(p.MinSeverity); err != nil {
+		if _, err := ParseSeverityLevel(p.MinSeverity); err != nil {
 			return err
 		}
 	}
@@ -54,7 +54,9 @@ func (p *Params) ValidateCustom() error {
 	return nil
 }
 
-func parseMinSeverity(s string) (int, error) {
+// ParseSeverityLevel converts a severity string to a numeric level (0-3).
+// Exported for use by the template's filterBySeverity function.
+func ParseSeverityLevel(s string) (int, error) {
 	switch strings.ToLower(s) {
 	case "info", "note":
 		return 0, nil
