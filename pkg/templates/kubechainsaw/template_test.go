@@ -177,7 +177,6 @@ func TestAnalyzeFindingsForObject_NonMatching(t *testing.T) {
 	assert.Empty(t, diags, "role-b should have no findings")
 }
 
-
 func TestAnalyzeSuppressionFileError(t *testing.T) {
 	cr := &rbacV1.ClusterRole{
 		ObjectMeta: metaV1.ObjectMeta{Name: "test-role"},

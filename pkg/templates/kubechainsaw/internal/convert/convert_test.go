@@ -338,7 +338,7 @@ func TestConvertClusterRoleBinding(t *testing.T) {
 
 	bd := resources.ClusterRoleBindings[0]
 	assert.Equal(t, "test-crb", bd.Name)
-	assert.Equal(t, "", bd.Namespace)
+	assert.Empty(t, bd.Namespace)
 	assert.Equal(t, "ClusterRole", bd.RoleRef["kind"])
 	assert.Equal(t, "cluster-admin", bd.RoleRef["name"])
 	assert.Len(t, bd.Subjects, 1)
