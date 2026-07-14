@@ -1,0 +1,20 @@
+name: approve-signers-without-resource-names
+description: >-
+  Roles granting the 'approve' verb on certificate signers without
+  resourceNames restriction allow approval of certificates from any
+  signer, including cluster-scoped signers.
+remediation: >-
+  Add resourceNames to restrict which certificate signers can be approved.
+scope:
+  objectKinds:
+    - Role
+    - ClusterRole
+template: cel-expression
+params:
+  check: >
+    object.rules.exists(r,
+      r.apiGroups.exists(g, g == 'certificates.k8s.io' || g == '*') &&
+      r.resources.exists(res, res == 'signers' || res == '*') &&
+      r.verbs.exists(v, v == 'approve' || v == '*') &&
+      (!has(r.resourceNames) || r.resourceNames.size() == 0)
+    ) ? 'approve verb on signers without resourceNames restriction' : ''

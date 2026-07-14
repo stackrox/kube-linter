@@ -49,6 +49,75 @@ verbs:
 - ^watch$
 - ^*$
 ```
+## aggregate-to-admin-escalation
+
+**Enabled by default**: No
+
+**Description**: ClusterRole with an aggregate-to-admin, aggregate-to-edit, or aggregate-to-view label grants escalation-capable verbs on privileged resources. Kubernetes automatically merges these rules into the admin, edit, or view ClusterRole, meaning every namespace admin inherits them.
+
+**Remediation**: Review whether the aggregated permissions are necessary. Remove escalation verbs (create, delete, patch, *) on privileged resources (secrets, roles, clusterroles, clusterrolebindings) from aggregate-labeled ClusterRoles.
+
+**Template**: [cel-expression](templates.md#cel)
+
+**Parameters**:
+
+```yaml
+check: |
+  has(object.metadata.labels) && (
+    (has(object.metadata.labels['rbac.authorization.k8s.io/aggregate-to-admin']) &&
+     object.metadata.labels['rbac.authorization.k8s.io/aggregate-to-admin'] == 'true') ||
+    (has(object.metadata.labels['rbac.authorization.k8s.io/aggregate-to-edit']) &&
+     object.metadata.labels['rbac.authorization.k8s.io/aggregate-to-edit'] == 'true') ||
+    (has(object.metadata.labels['rbac.authorization.k8s.io/aggregate-to-view']) &&
+     object.metadata.labels['rbac.authorization.k8s.io/aggregate-to-view'] == 'true')
+  ) && object.rules.exists(r,
+    r.apiGroups.exists(g, g == '' || g == 'rbac.authorization.k8s.io' || g == '*') &&
+    r.verbs.exists(v, v == '*' || v == 'create' || v == 'delete' || v == 'patch') &&
+    r.resources.exists(res, res == '*' || res == 'secrets' || res == 'roles' ||
+      res == 'clusterroles' || res == 'clusterrolebindings')
+  ) ? 'aggregate-labeled ClusterRole grants escalation verbs on privileged resources — inherited by every namespace admin/editor' : ''
+```
+## approve-signers-without-resource-names
+
+**Enabled by default**: No
+
+**Description**: Roles granting the 'approve' verb on certificate signers without resourceNames restriction allow approval of certificates from any signer, including cluster-scoped signers.
+
+**Remediation**: Add resourceNames to restrict which certificate signers can be approved.
+
+**Template**: [cel-expression](templates.md#cel)
+
+**Parameters**:
+
+```yaml
+check: |
+  object.rules.exists(r,
+    r.apiGroups.exists(g, g == 'certificates.k8s.io' || g == '*') &&
+    r.resources.exists(res, res == 'signers' || res == '*') &&
+    r.verbs.exists(v, v == 'approve' || v == '*') &&
+    (!has(r.resourceNames) || r.resourceNames.size() == 0)
+  ) ? 'approve verb on signers without resourceNames restriction' : ''
+```
+## bind-verb-in-role
+
+**Enabled by default**: No
+
+**Description**: Roles granting the 'bind' verb on roles, clusterroles, rolebindings, or clusterrolebindings allow the holder to create bindings to any role, including roles with more permissions than they currently have.
+
+**Remediation**: Remove the 'bind' verb unless the workload is a controller that legitimately manages RBAC bindings. If required, scope with resourceNames to limit which roles can be bound.
+
+**Template**: [cel-expression](templates.md#cel)
+
+**Parameters**:
+
+```yaml
+check: |
+  object.rules.exists(r,
+    r.apiGroups.exists(g, g == 'rbac.authorization.k8s.io' || g == '*') &&
+    r.resources.exists(res, res == 'roles' || res == 'clusterroles' || res == '*') &&
+    r.verbs.exists(v, v == 'bind' || v == '*')
+  ) ? 'bind verb on RBAC resources allows privilege escalation via arbitrary bindings' : ''
+```
 ## cluster-admin-role-binding
 
 **Enabled by default**: No
@@ -126,6 +195,26 @@ verbs:
 
 ```yaml
 serviceAccount: ^(|default)$
+```
+## deletecollection-verb-in-role
+
+**Enabled by default**: No
+
+**Description**: Role grants deletecollection verb, which allows bulk deletion of all resources of a type in a single API call. Unlike delete (per-resource), deletecollection enables rapid, complete resource destruction.
+
+**Remediation**: Remove deletecollection unless the workload legitimately needs to bulk-delete resources. Use delete instead for per-resource deletion.
+
+**Template**: [cel-expression](templates.md#cel)
+
+**Parameters**:
+
+```yaml
+check: |
+  object.rules.exists(r,
+    r.verbs.exists(v, v == 'deletecollection' || v == '*') &&
+    r.resources.exists(res, res == '*' || res == 'secrets' || res == 'pods' ||
+      res == 'deployments' || res == 'configmaps' || res == 'namespaces')
+  ) ? 'deletecollection verb allows bulk resource destruction in a single API call' : ''
 ```
 ## deprecated-service-account-field
 
@@ -225,6 +314,26 @@ IgnoredSecrets: []
 name: (?i).*secret.*
 value: .+
 ```
+## escalate-verb-in-role
+
+**Enabled by default**: No
+
+**Description**: Roles granting the 'escalate' verb on roles or clusterroles allow the holder to create or modify roles with permissions exceeding their own, bypassing Kubernetes RBAC escalation protection.
+
+**Remediation**: Remove the 'escalate' verb unless the workload is a controller that legitimately manages RBAC resources. If required, scope with resourceNames to limit which roles can be escalated.
+
+**Template**: [cel-expression](templates.md#cel)
+
+**Parameters**:
+
+```yaml
+check: |
+  object.rules.exists(r,
+    r.apiGroups.exists(g, g == 'rbac.authorization.k8s.io' || g == '*') &&
+    r.resources.exists(res, res == 'roles' || res == 'clusterroles' || res == '*') &&
+    r.verbs.exists(v, v == 'escalate' || v == '*')
+  ) ? 'escalate verb on roles/clusterroles allows privilege escalation' : ''
+```
 ## exposed-services
 
 **Enabled by default**: No
@@ -283,6 +392,26 @@ forbiddenServiceTypes:
 
 ```yaml
 minReplicas: 3
+```
+## impersonate-without-resource-names
+
+**Enabled by default**: No
+
+**Description**: Roles granting the 'impersonate' verb on users, groups, or serviceaccounts without a resourceNames restriction allow any bearer of the bound SA token to impersonate system:masters and gain cluster-admin equivalent access.
+
+**Remediation**: Add a resourceNames list to restrict which identities can be impersonated, or remove the impersonate verb if it is not needed.
+
+**Template**: [cel-expression](templates.md#cel)
+
+**Parameters**:
+
+```yaml
+check: |
+  object.rules.exists(r,
+    r.resources.exists(res, res == 'users' || res == 'groups' || res == 'serviceaccounts' || res == '*') &&
+    r.verbs.exists(v, v == 'impersonate' || v == '*') &&
+    (!has(r.resourceNames) || r.resourceNames.size() == 0)
+  ) ? 'impersonate verb granted without resourceNames restriction — allows system:masters impersonation' : ''
 ```
 ## invalid-target-ports
 
@@ -757,6 +886,26 @@ upperBoundMB: 0
 **Remediation**: Create namespaces for objects in your deployment.
 
 **Template**: [use-namespace](templates.md#use-namespaces-for-administrative-boundaries-between-resources)
+## webhook-failure-policy-ignore
+
+**Enabled by default**: No
+
+**Description**: Admission webhook with failurePolicy: Ignore silently allows all requests when the webhook is unavailable — attackers can bypass validation by DoSing the webhook endpoint.
+
+**Remediation**: Set failurePolicy to Fail. Ensure webhook availability with proper health checks, replicas, and PodDisruptionBudgets.
+
+**Template**: [cel-expression](templates.md#cel)
+
+**Parameters**:
+
+```yaml
+check: |
+  (object.kind == 'ValidatingWebhookConfiguration' ||
+   object.kind == 'MutatingWebhookConfiguration') &&
+  has(object.webhooks) && object.webhooks.exists(w,
+    has(w.failurePolicy) && w.failurePolicy == 'Ignore'
+  ) ? 'admission webhook with failurePolicy: Ignore fails open — bypass via webhook DoS' : ''
+```
 ## wildcard-in-rules
 
 **Enabled by default**: No
@@ -766,6 +915,26 @@ upperBoundMB: 0
 **Remediation**: Where possible replace any use of wildcards in clusterroles and roles with specific objects or actions.
 
 **Template**: [wildcard-in-rules](templates.md#wildcard-use-in-role-and-clusterrole-rules)
+## wildcard-resource-verb-combo
+
+**Enabled by default**: No
+
+**Description**: ClusterRole rule with wildcard verbs on wildcard resources is functionally equivalent to cluster-admin. Unlike a named cluster-admin binding, this pattern is not caught by the cluster-admin-role-binding check.
+
+**Remediation**: Replace wildcard grants with explicit resource and verb lists scoped to what the workload actually needs.
+
+**Template**: [cel-expression](templates.md#cel)
+
+**Parameters**:
+
+```yaml
+check: |
+  object.rules.exists(r,
+    r.apiGroups.exists(g, g == '*') &&
+    r.resources.exists(res, res == '*') &&
+    r.verbs.exists(v, v == '*')
+  ) ? 'rule grants wildcard verbs on wildcard resources — functionally cluster-admin' : ''
+```
 ## writable-host-mount
 
 **Enabled by default**: No
