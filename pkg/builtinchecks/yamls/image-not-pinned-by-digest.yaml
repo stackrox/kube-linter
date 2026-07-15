@@ -1,0 +1,12 @@
+name: "image-not-pinned-by-digest"
+description: >-
+  Container images referenced by tag are mutable — a tag can be moved to
+  point to a different image at any time. Pinning by digest guarantees
+  the exact image content that will run.
+remediation: >-
+  Reference container images by digest (e.g. image@sha256:abc123...)
+  instead of by tag.
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "image-not-pinned-by-digest"
