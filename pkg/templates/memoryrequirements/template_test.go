@@ -54,7 +54,7 @@ func (s *MemoryRequirementsTestSuite) TestInitAndRegularContainersWithLimitsSet(
 	s.Validate(s.ctx, []templates.TestCase{
 		{
 			Param: params.Params{
-				RequirementsType: "limit",
+				RequirementsType: "any",
 				UpperBoundMB:     pointers.Int(0),
 			},
 			Diagnostics: map[string][]diagnostic.Diagnostic{
