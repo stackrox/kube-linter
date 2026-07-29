@@ -15,3 +15,10 @@ func (l *MockLintContext) AddContainerToDeployment(t *testing.T, deploymentName 
 	// TODO: keep supporting other fields
 	deployment.Spec.Template.Spec.Containers = append(deployment.Spec.Template.Spec.Containers, container)
 }
+
+// AddInitContainerToDeployment adds a mock init container to the specified pod under context
+func (l *MockLintContext) AddInitContainerToDeployment(t *testing.T, deploymentName string, container v1.Container) {
+	deployment, ok := l.objects[deploymentName].(*appsV1.Deployment)
+	require.True(t, ok, "deployment with name %s not found", deploymentName)
+	deployment.Spec.Template.Spec.InitContainers = append(deployment.Spec.Template.Spec.InitContainers, container)
+}
