@@ -1,6 +1,7 @@
 package lintcontext
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -89,4 +90,39 @@ spec:
 	require.NoError(t, err)
 	require.Len(t, objects, 1)
 	assert.IsType(t, &appsV1.Deployment{}, objects[0])
+}
+
+// Reporting unreadable manifests must not turn section separators into findings.
+// A document that holds nothing but comments carries no manifest at all, so it is
+// neither a valid object nor an invalid one.
+func TestLoadObjectsFromReaderSkipsCommentOnlyDocuments(t *testing.T) {
+	const doc = `---
+# Secret test cases
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+spec:
+  selector:
+    matchLabels:
+      name: my-label-value
+  template:
+    metadata:
+      labels:
+        name: my-label-value
+    spec:
+      containers:
+        - name: my-container
+          image: nginx:latest
+---
+# ConfigMap test cases
+---
+`
+
+	ctx := newCtx(Options{})
+	require.NoError(t, ctx.loadObjectsFromReader("test.yaml", strings.NewReader(doc)))
+	assert.Empty(t, ctx.InvalidObjects(), "comment-only documents must not be reported as unreadable")
+	require.Len(t, ctx.Objects(), 1)
+	assert.Equal(t, "my-deployment", ctx.Objects()[0].K8sObject.GetName())
 }

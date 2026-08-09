@@ -184,13 +184,28 @@ func (l *lintContextImpl) renderTgzHelmChart(tgzFile string) (map[string]string,
 	return l.renderChart(tgzFile, chrt)
 }
 
+// isBlankDocument reports whether a YAML document carries no content at all: every
+// line is blank, a comment, or a bare document marker. Files that separate sections
+// with "--- # some comment" produce such documents, and there is nothing in them to
+// decode - reporting them as unreadable objects would be a false positive.
+func isBlankDocument(doc []byte) bool {
+	for _, line := range bytes.Split(doc, []byte("\n")) {
+		line = bytes.TrimSpace(line)
+		if len(line) == 0 || line[0] == '#' || bytes.Equal(line, []byte("---")) || bytes.Equal(line, []byte("...")) {
+			continue
+		}
+		return false
+	}
+	return true
+}
+
 func (l *lintContextImpl) loadObjectFromYAMLReader(filePath string, r *yaml.YAMLReader) error {
 	doc, err := r.Read()
 	if err != nil {
 		return err
 	}
 	doc = bytes.TrimSpace(doc)
-	if len(doc) == 0 {
+	if len(doc) == 0 || isBlankDocument(doc) {
 		return nil
 	}
 
