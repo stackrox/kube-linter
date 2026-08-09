@@ -68,6 +68,13 @@ func parseObjects(data []byte, d runtime.Decoder) ([]k8sutil.Object, error) {
 		if strings.Contains(err.Error(), "json: cannot unmarshal") {
 			return nil, fmt.Errorf("failed to decode: %w", err)
 		}
+		// The fallback below exists for custom resources, whose Go types we do not know.
+		// If the kind is registered, the manifest is simply invalid: decoding it as
+		// unstructured would swallow the real error and, worse, hide the object from every
+		// check that relies on its typed representation (see extract.PodTemplateSpec).
+		if !runtime.IsNotRegisteredError(err) {
+			return nil, fmt.Errorf("failed to decode: %w", err)
+		}
 		// fallback to unstructured as schema validation will be performed by kubeconform check
 		dec := runtimeYaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
 		var unstructuredErr error

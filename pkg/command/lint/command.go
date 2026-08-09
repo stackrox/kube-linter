@@ -105,10 +105,11 @@ func Command() *cobra.Command {
 				return err
 			}
 			invalidObjectsResult := generateReportFromInvalidObjects(lintCtxs)
-			if verbose {
-				for _, invalidObj := range invalidObjectsResult {
-					_, _ = fmt.Fprintf(os.Stderr, "Warning: failed to load object from %s: %v\n", invalidObj.Object.Metadata.FilePath, invalidObj.Diagnostic.Message)
-				}
+			// Objects we failed to load are silently missing from every check that would
+			// have applied to them, which surfaces as an unrelated diagnostic somewhere
+			// else (see #591). Always tell the user what we could not read.
+			for _, invalidObj := range invalidObjectsResult {
+				_, _ = fmt.Fprintf(os.Stderr, "Warning: failed to load object from %s: %v\n", invalidObj.Object.Metadata.FilePath, invalidObj.Diagnostic.Message)
 			}
 
 			var atLeastOneObjectFound = errorOnInvalidResource && len(invalidObjectsResult) > 0
