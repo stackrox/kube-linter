@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"text/template"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -25,7 +26,7 @@ const (
 	plainTemplateStr = `KubeLinter {{.Summary.KubeLinterVersion}}
 
 {{range .Reports}}
-{{- .Object.Metadata.FilePath | bold}}: (object: {{.Object.GetK8sObjectName | bold}}) {{.Diagnostic.Message | red}} (check: {{.Check | yellow}}, remediation: {{.Remediation | yellow}})
+{{- .Object.Metadata.FilePath | bold}}: (object: {{.Object.GetK8sObjectName | bold}}) {{if .Diagnostic.Severity}}[{{.Diagnostic.Severity | toUpper}}] {{end}}{{.Diagnostic.Message | red}} (check: {{.Check | yellow}}, remediation: {{effectiveRemediation . | yellow}})
 
 {{else}}No lint errors found!
 {{end -}}
@@ -33,7 +34,18 @@ const (
 )
 
 var (
-	plainTemplate = common.MustInstantiatePlainTemplate(plainTemplateStr, nil)
+	plainTemplate = common.MustInstantiatePlainTemplate(plainTemplateStr, template.FuncMap{
+		"toUpper": strings.ToUpper,
+		"effectiveRemediation": func(report diagnostic.WithContext) string {
+			// If Diagnostic.Metadata contains a remediation, use it; otherwise use the check's remediation
+			if report.Diagnostic.Metadata != nil {
+				if customRem, ok := report.Diagnostic.Metadata[diagnostic.MetaKeyRemediation]; ok && customRem != "" {
+					return customRem
+				}
+			}
+			return report.Remediation
+		},
+	})
 
 	formatters = common.Formatters{
 		Formatters: map[common.FormatType]common.FormatFunc{
