@@ -1,0 +1,20 @@
+name: impersonate-without-resource-names
+description: >-
+  Roles granting the 'impersonate' verb on users, groups, or serviceaccounts
+  without a resourceNames restriction allow any bearer of the bound SA token
+  to impersonate system:masters and gain cluster-admin equivalent access.
+remediation: >-
+  Add a resourceNames list to restrict which identities can be impersonated,
+  or remove the impersonate verb if it is not needed.
+scope:
+  objectKinds:
+    - Role
+    - ClusterRole
+template: cel-expression
+params:
+  check: >
+    object.rules.exists(r,
+      r.resources.exists(res, res == 'users' || res == 'groups' || res == 'serviceaccounts' || res == '*') &&
+      r.verbs.exists(v, v == 'impersonate' || v == '*') &&
+      (!has(r.resourceNames) || r.resourceNames.size() == 0)
+    ) ? 'impersonate verb granted without resourceNames restriction — allows system:masters impersonation' : ''
