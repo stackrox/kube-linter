@@ -71,6 +71,31 @@ func (s *MissingLivenessPort) TestDeploymentWith() {
 			expected: nil,
 		},
 		{
+			name: "PortExposedViaArgs",
+			container: v1.Container{
+				Name: "manager",
+				Args: []string{
+					"--metrics-addr=0.0.0.0:8080",
+					"--health-probe-addr=:8081",
+				},
+				Ports: []v1.ContainerPort{
+					{
+						Name:          "metrics",
+						ContainerPort: 8080,
+						Protocol:      v1.ProtocolTCP,
+					},
+				},
+				LivenessProbe: &v1.Probe{
+					ProbeHandler: v1.ProbeHandler{
+						HTTPGet: &v1.HTTPGetAction{
+							Port: intstr.FromInt(8081),
+						},
+					},
+				},
+			},
+			expected: nil,
+		},
+		{
 			name: "MatchinPortStr",
 			container: v1.Container{
 				Ports: []v1.ContainerPort{
