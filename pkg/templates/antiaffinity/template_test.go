@@ -132,6 +132,24 @@ func (s *AntiAffinityTestSuite) addDeploymentWithAntiAffinity(name string, repli
 	})
 }
 
+func (s *AntiAffinityTestSuite) addDeploymentWithTopologySpreadConstraint(name string, replicas int32, topologyKey string,
+	labelName string, whenUnsatisfiable v1.UnsatisfiableConstraintAction) {
+	s.addDeploymentWithReplicas(name, replicas)
+	s.ctx.ModifyDeployment(s.T(), name, func(deployment *appsV1.Deployment) {
+		deployment.Spec.Template.Labels = map[string]string{"app": name}
+		deployment.Spec.Template.Spec.TopologySpreadConstraints = []v1.TopologySpreadConstraint{
+			{
+				MaxSkew:           1,
+				TopologyKey:       topologyKey,
+				WhenUnsatisfiable: whenUnsatisfiable,
+				LabelSelector: &metaV1.LabelSelector{
+					MatchLabels: map[string]string{"app": labelName},
+				},
+			},
+		}
+	})
+}
+
 func (s *AntiAffinityTestSuite) addDeploymentWithEmptyAntiAffinity(name string, replicas int32) {
 	s.addDeploymentWithReplicas(name, replicas)
 	s.ctx.ModifyDeployment(s.T(), name, func(deployment *appsV1.Deployment) {
@@ -217,6 +235,101 @@ func (s *AntiAffinityTestSuite) TestWithAntiAffinity() {
 				},
 				nonMatchingNamespace: {
 					{Message: "pod's namespace \"\" not found in anti-affinity's namespaces [non-matching-namespace]"},
+				},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+func (s *AntiAffinityTestSuite) TestWithTopologySpreadConstraints() {
+	const (
+		kubernetesIOHostnameDepName = "topology-spread-kubernetes-io-hostname"
+		otherValidKeyDepName        = "topology-spread-other-valid-key"
+		weirdKeyDepName             = "topology-spread-weird-key"
+		nonMatchingLabelSelectors   = "topology-spread-non-matching-label-selector"
+		scheduleAnywayDepName       = "topology-spread-schedule-anyway"
+		invalidLabelSelectorDepName = "topology-spread-invalid-label-selector"
+	)
+	s.addDeploymentWithTopologySpreadConstraint(kubernetesIOHostnameDepName, 2, "kubernetes.io/hostname",
+		kubernetesIOHostnameDepName, v1.DoNotSchedule)
+	s.addDeploymentWithTopologySpreadConstraint(otherValidKeyDepName, 3, "other.valid/key", otherValidKeyDepName,
+		v1.DoNotSchedule)
+	s.addDeploymentWithTopologySpreadConstraint(weirdKeyDepName, 4, "weird/key", weirdKeyDepName, v1.DoNotSchedule)
+	s.addDeploymentWithTopologySpreadConstraint(nonMatchingLabelSelectors, 4, "kubernetes.io/hostname",
+		"non-matching", v1.DoNotSchedule)
+	s.addDeploymentWithTopologySpreadConstraint(scheduleAnywayDepName, 4, "kubernetes.io/hostname", scheduleAnywayDepName,
+		v1.ScheduleAnyway)
+	s.addDeploymentWithTopologySpreadConstraint(invalidLabelSelectorDepName, 4, "kubernetes.io/hostname",
+		invalidLabelSelectorDepName, v1.DoNotSchedule)
+	s.ctx.ModifyDeployment(s.T(), invalidLabelSelectorDepName, func(deployment *appsV1.Deployment) {
+		deployment.Spec.Template.Spec.TopologySpreadConstraints[0].LabelSelector = &metaV1.LabelSelector{
+			MatchExpressions: []metaV1.LabelSelectorRequirement{
+				{
+					Key:      "app",
+					Operator: metaV1.LabelSelectorOperator("InvalidOperator"),
+					Values:   []string{invalidLabelSelectorDepName},
+				},
+			},
+		}
+	})
+
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{
+				MinReplicas: 2,
+			},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				otherValidKeyDepName: {
+					{Message: "object has 3 replicas but does not specify inter pod anti-affinity"},
+				},
+				weirdKeyDepName: {
+					{Message: "object has 4 replicas but does not specify inter pod anti-affinity"},
+				},
+				nonMatchingLabelSelectors: {
+					{Message: "object has 4 replicas but does not specify inter pod anti-affinity"},
+				},
+				invalidLabelSelectorDepName: {
+					{Message: "object has 4 replicas but does not specify inter pod anti-affinity"},
+				},
+			},
+			ExpectInstantiationError: false,
+		},
+		{
+			Param: params.Params{
+				MinReplicas: 2,
+				TopologyKey: "other.valid/key",
+			},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				kubernetesIOHostnameDepName: {
+					{Message: "object has 2 replicas but does not specify inter pod anti-affinity"},
+				},
+				weirdKeyDepName: {
+					{Message: "object has 4 replicas but does not specify inter pod anti-affinity"},
+				},
+				nonMatchingLabelSelectors: {
+					{Message: "object has 4 replicas but does not specify inter pod anti-affinity"},
+				},
+				scheduleAnywayDepName: {
+					{Message: "object has 4 replicas but does not specify inter pod anti-affinity"},
+				},
+				invalidLabelSelectorDepName: {
+					{Message: "object has 4 replicas but does not specify inter pod anti-affinity"},
+				},
+			},
+			ExpectInstantiationError: false,
+		},
+		{
+			Param: params.Params{
+				MinReplicas: 2,
+				TopologyKey: ".+",
+			},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				nonMatchingLabelSelectors: {
+					{Message: "object has 4 replicas but does not specify inter pod anti-affinity"},
+				},
+				invalidLabelSelectorDepName: {
+					{Message: "object has 4 replicas but does not specify inter pod anti-affinity"},
 				},
 			},
 			ExpectInstantiationError: false,
