@@ -17,6 +17,8 @@ import (
 
 const (
 	bytesInMB = 1024 * 1024
+
+	templateKey = "memory-requirements"
 )
 
 func process(results *[]diagnostic.Diagnostic, containerName, requirementsType string, quantity *resource.Quantity, lowerBoundBytes int, upperBoundBytes *int) {
@@ -30,7 +32,7 @@ func process(results *[]diagnostic.Diagnostic, containerName, requirementsType s
 func init() {
 	templates.Register(check.Template{
 		HumanName:   "Memory Requirements",
-		Key:         "memory-requirements",
+		Key:         templateKey,
 		Description: "Flag containers with memory requirements in the given range",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
