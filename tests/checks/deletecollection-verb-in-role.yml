@@ -1,0 +1,18 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: dont-fire
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fire-deletecollection
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["deletecollection"]
