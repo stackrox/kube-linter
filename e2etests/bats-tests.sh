@@ -98,6 +98,18 @@ get_value_from() {
   [[ "${count}" == "1" ]]
 }
 
+@test "automount-service-account-token" {
+  tmp="tests/checks/automount-service-account-token.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include automount-service-account-token --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "2" ]]
+}
+
 @test "cluster-admin-role-binding" {
   tmp="tests/checks/cluster-admin-role-binding.yml"
   cmd="${KUBE_LINTER_BIN} lint --include cluster-admin-role-binding --do-not-auto-add-defaults --format json ${tmp}"
@@ -432,6 +444,18 @@ get_value_from() {
   count=$(get_value_from "${lines[0]}" '.Reports | length')
 
   [[ "${message1}" == "HorizontalPodAutoscaler: object has 2 replicas but minimum required replicas is 3" ]]
+  [[ "${count}" == "1" ]]
+}
+
+@test "init-container-security-gap" {
+  tmp="tests/checks/init-container-security-gap.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include init-container-security-gap --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
   [[ "${count}" == "1" ]]
 }
 
@@ -813,6 +837,18 @@ get_value_from() {
   [[ "${message1}" == "Deployment: port 80 is mapped in container \"app\"." ]]
   [[ "${message2}" == "DeploymentConfig: port 80 is mapped in container \"app\"." ]]
   [[ "${count}" == "2" ]]
+}
+
+@test "projected-token-long-expiration" {
+  tmp="tests/checks/projected-token-long-expiration.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include projected-token-long-expiration --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "1" ]]
 }
 
 @test "read-secret-from-env-var" {
