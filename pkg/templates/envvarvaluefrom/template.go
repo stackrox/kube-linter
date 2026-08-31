@@ -36,9 +36,27 @@ const (
 
 type resourceChecker struct {
 	objType      string
-	objMap       map[string]interface{}
+	objects      map[string][]namespacedObject
 	getKeys      func(interface{}) []string
 	ignoredRegex []*regexp.Regexp
+}
+
+// namespacedObject pairs a secret or config map with its namespace: names repeat across namespaces.
+type namespacedObject struct {
+	namespace string
+	object    interface{}
+}
+
+// inNamespace returns the objects a reference from namespace resolves against.
+// An empty namespace matches any: manifests get one when they are applied.
+func (c *resourceChecker) inNamespace(namespace, name string) []interface{} {
+	var matches []interface{}
+	for _, candidate := range c.objects[name] {
+		if candidate.namespace == namespace || candidate.namespace == "" || namespace == "" {
+			matches = append(matches, candidate.object)
+		}
+	}
+	return matches
 }
 
 func init() {
@@ -61,14 +79,14 @@ func init() {
 				return nil, err
 			}
 			return func(lintCtx lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
-				secrets := make(map[string]*v1.Secret)
-				configmaps := make(map[string]*v1.ConfigMap)
+				secrets := make(map[string][]namespacedObject)
+				configmaps := make(map[string][]namespacedObject)
 				for _, obj := range lintCtx.Objects() {
 					if secret, found := obj.K8sObject.(*v1.Secret); found {
-						secrets[secret.Name] = secret // Fix: Remove ObjectMeta
+						secrets[secret.Name] = append(secrets[secret.Name], namespacedObject{namespace: secret.Namespace, object: secret})
 					}
 					if configmap, found := obj.K8sObject.(*v1.ConfigMap); found {
-						configmaps[configmap.Name] = configmap // Fix: Remove ObjectMeta
+						configmaps[configmap.Name] = append(configmaps[configmap.Name], namespacedObject{namespace: configmap.Namespace, object: configmap})
 					}
 				}
 				return lintForEachContainer(lintCtx, object, ignoredSecrets, ignoredConfigMaps, secrets, configmaps)
@@ -77,7 +95,23 @@ func init() {
 	})
 }
 
-func lintForEachContainer(lintCtx lintcontext.LintContext, object lintcontext.Object, ignoredSecrets, ignoredConfigMaps []*regexp.Regexp, secrets map[string]*v1.Secret, configmaps map[string]*v1.ConfigMap) []diagnostic.Diagnostic {
+func lintForEachContainer(lintCtx lintcontext.LintContext, object lintcontext.Object, ignoredSecrets, ignoredConfigMaps []*regexp.Regexp, secrets, configmaps map[string][]namespacedObject) []diagnostic.Diagnostic {
+	namespace := object.K8sObject.GetNamespace()
+
+	secretChecker := &resourceChecker{
+		objType:      "secret",
+		objects:      secrets,
+		getKeys:      getSecretKeys,
+		ignoredRegex: ignoredSecrets,
+	}
+
+	configMapChecker := &resourceChecker{
+		objType:      "config map",
+		objects:      configmaps,
+		getKeys:      getConfigMapKeys,
+		ignoredRegex: ignoredConfigMaps,
+	}
+
 	return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
 		var results []diagnostic.Diagnostic
 		var envRefs []struct {
@@ -120,26 +154,6 @@ func lintForEachContainer(lintCtx lintcontext.LintContext, object lintcontext.Ob
 			}
 		}
 
-		secretChecker := &resourceChecker{
-			objType:      "secret",
-			objMap:       make(map[string]interface{}),
-			getKeys:      getSecretKeys,
-			ignoredRegex: ignoredSecrets,
-		}
-		for k, v := range secrets {
-			secretChecker.objMap[k] = v
-		}
-
-		configMapChecker := &resourceChecker{
-			objType:      "config map",
-			objMap:       make(map[string]interface{}),
-			getKeys:      getConfigMapKeys,
-			ignoredRegex: ignoredConfigMaps,
-		}
-		for k, v := range configmaps {
-			configMapChecker.objMap[k] = v
-		}
-
 		for _, envRef := range envRefs {
 			var checker *resourceChecker
 			switch envRef.typ {
@@ -149,7 +163,7 @@ func lintForEachContainer(lintCtx lintcontext.LintContext, object lintcontext.Ob
 				checker = configMapChecker
 			}
 
-			if msg := checkResourceReference(container.Name, envRef.info, checker); msg != "" {
+			if msg := checkResourceReference(container.Name, namespace, envRef.info, checker); msg != "" {
 				results = append(results, diagnostic.Diagnostic{Message: msg})
 			}
 		}
@@ -157,7 +171,7 @@ func lintForEachContainer(lintCtx lintcontext.LintContext, object lintcontext.Ob
 	})(lintCtx, object)
 }
 
-func checkResourceReference(containerName string, ref resourceInfo, checker *resourceChecker) string {
+func checkResourceReference(containerName, namespace string, ref resourceInfo, checker *resourceChecker) string {
 	if ref.optional != nil && *ref.optional {
 		return ""
 	}
@@ -166,17 +180,18 @@ func checkResourceReference(containerName string, ref resourceInfo, checker *res
 		return ""
 	}
 
-	obj, ok := checker.objMap[ref.name]
-	if !ok {
+	objs := checker.inNamespace(namespace, ref.name)
+	if len(objs) == 0 {
 		return fmt.Sprintf("The container %q is referring to an unknown %s %q", containerName, checker.objType, ref.name)
 	}
 
-	keys := checker.getKeys(obj)
-	if !isInList(keys, ref.key) {
-		return fmt.Sprintf("The container %q is referring to an unknown key %q in %s %q", containerName, ref.key, checker.objType, ref.name)
+	for _, obj := range objs {
+		if isInList(checker.getKeys(obj), ref.key) {
+			return ""
+		}
 	}
 
-	return ""
+	return fmt.Sprintf("The container %q is referring to an unknown key %q in %s %q", containerName, ref.key, checker.objType, ref.name)
 }
 
 func isInRegexList(regexlist []*regexp.Regexp, name string) bool {
