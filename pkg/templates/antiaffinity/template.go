@@ -62,6 +62,10 @@ func init() {
 					return nil
 				}
 				namespace := object.K8sObject.GetNamespace()
+				if topologySpreadConstraintsMatchAgainstNodes(podTemplateSpec.Spec.TopologySpreadConstraints,
+					podTemplateSpec.Labels, topologyKeyMatcher) {
+					return nil
+				}
 				affinity := podTemplateSpec.Spec.Affinity
 				// Short-circuit if no affinity rule is specified within the pod spec.
 				if affinity == nil || affinity.PodAntiAffinity == nil {
@@ -106,6 +110,20 @@ func init() {
 			}, nil
 		}),
 	})
+}
+
+func topologySpreadConstraintsMatchAgainstNodes(topologySpreadConstraints []coreV1.TopologySpreadConstraint,
+	podLabels map[string]string, topologyKeyMatcher func(string) bool) bool {
+	for _, constraint := range topologySpreadConstraints {
+		labelSelector, err := metaV1.LabelSelectorAsSelector(constraint.LabelSelector)
+		if err != nil {
+			continue
+		}
+		if topologyKeyMatcher(constraint.TopologyKey) && labelSelector.Matches(labels.Set(podLabels)) {
+			return true
+		}
+	}
+	return false
 }
 
 func validateAffinityTermMatchesAgainstNodes(affinityTerm coreV1.PodAffinityTerm, podNamespace string,
