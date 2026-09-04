@@ -244,6 +244,29 @@ func (s *AccessToSecretsTestSuite) TestClusterRoleWithNoAccessToSecrets() {
 	})
 }
 
+func (s *AccessToSecretsTestSuite) TestRoleBindingReferencesClusterRoleWithAccessToSecrets() {
+	rulesForClusterRole := append([]rbacV1.PolicyRule{}, rules2...)
+	rulesForClusterRole = append(rulesForClusterRole, rules4...)
+	s.addClusterRole(clusterRole1, nil, rulesForClusterRole, aggRule)
+	s.addRoleBinding(roleBinding1, namespace1, clusterRoleRef1, subjects1)
+
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{
+				FlagRolesNotFound: false,
+				Resources:         []string{"^secrets$"},
+				Verbs:             []string{"^get$", "^create$", "^watch$"},
+			},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				roleBinding1: {
+					{Message: fmt.Sprintf("binding to %q clusterrole that has [get watch] access to [*]", clusterRole1)},
+				},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
 func (s *AccessToSecretsTestSuite) TestClusterRoleWithAggregationRule() {
 	s.addClusterRole(clusterRole1, nil, rules2, aggRule)
 	s.addClusterRole(clusterRole2, labels1, rules4, rbacV1.AggregationRule{})
