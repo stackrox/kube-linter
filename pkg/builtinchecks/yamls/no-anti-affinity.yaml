@@ -2,9 +2,7 @@ name: "no-anti-affinity"
 description: "Indicates when deployments with multiple replicas fail to specify inter-pod anti-affinity or topology spread constraints, to ensure that the orchestrator attempts to schedule replicas on different nodes."
 remediation: >-
   Specify anti-affinity or topology spread constraints in your pod specification to ensure that the orchestrator attempts to schedule replicas on different nodes.
-  Using podAntiAffinity, specify a labelSelector that matches pods for the deployment,
-  and set the topologyKey to kubernetes.io/hostname.
-  Using topologySpreadConstraints, specify a labelSelector that matches pods for the deployment,
+  Using podAntiAffinity or topologySpreadConstraints, specify a labelSelector that matches pods for the deployment,
   and set the topologyKey to kubernetes.io/hostname.
   Refer to https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity
   and https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/ for details.
