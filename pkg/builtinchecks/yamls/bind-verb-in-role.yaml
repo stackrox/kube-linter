@@ -1,0 +1,21 @@
+name: bind-verb-in-role
+description: >-
+  Roles granting the 'bind' verb on roles, clusterroles, rolebindings,
+  or clusterrolebindings allow the holder to create bindings to any role,
+  including roles with more permissions than they currently have.
+remediation: >-
+  Remove the 'bind' verb unless the workload is a controller that
+  legitimately manages RBAC bindings. If required, scope with
+  resourceNames to limit which roles can be bound.
+scope:
+  objectKinds:
+    - Role
+    - ClusterRole
+template: cel-expression
+params:
+  check: >
+    object.rules.exists(r,
+      r.apiGroups.exists(g, g == 'rbac.authorization.k8s.io' || g == '*') &&
+      r.resources.exists(res, res == 'roles' || res == 'clusterroles' || res == '*') &&
+      r.verbs.exists(v, v == 'bind' || v == '*')
+    ) ? 'bind verb on RBAC resources allows privilege escalation via arbitrary bindings' : ''
