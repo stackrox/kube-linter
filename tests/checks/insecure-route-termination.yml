@@ -1,0 +1,45 @@
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: dont-fire-redirect
+spec:
+  to:
+    kind: Service
+    name: my-service
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: dont-fire-none
+spec:
+  to:
+    kind: Service
+    name: my-service
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: None
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: fire-allow-insecure
+spec:
+  to:
+    kind: Service
+    name: my-service
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Allow
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dont-fire-not-a-route
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
