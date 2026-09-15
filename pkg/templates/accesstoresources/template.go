@@ -56,6 +56,9 @@ func init() {
 			return func(lintCtx lintcontext.LintContext, object lintcontext.Object) []diagnostic.Diagnostic {
 				rbinding, ok := object.K8sObject.(*rbacV1.RoleBinding)
 				if ok {
+					if rbinding.RoleRef.Kind == objectkinds.ClusterRole {
+						return findClusterRole(rbinding.RoleRef.Name, lintCtx, resourceRegexes, verbRegexes, p.FlagRolesNotFound)
+					}
 					namespace := stringutils.OrDefault(rbinding.Namespace, "default")
 					return findRole(rbinding.RoleRef.Name, namespace, lintCtx, resourceRegexes, verbRegexes, p.FlagRolesNotFound)
 				}
