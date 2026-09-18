@@ -35,6 +35,24 @@ func checkReplicas(minReplicas *int32) (int32, bool) {
 	return 1, true
 }
 
+// HPAMaxReplicas extracts maxReplicas from the given object, if available.
+func HPAMaxReplicas(obj k8sutil.Object) (int32, bool) {
+	switch hpa := obj.(type) {
+	case *autoscalingV2Beta1.HorizontalPodAutoscaler:
+		return hpa.Spec.MaxReplicas, true
+	case *autoscalingV2Beta2.HorizontalPodAutoscaler:
+		return hpa.Spec.MaxReplicas, true
+	case *autoscalingV2.HorizontalPodAutoscaler:
+		return hpa.Spec.MaxReplicas, true
+	case *autoscalingV1.HorizontalPodAutoscaler:
+		return hpa.Spec.MaxReplicas, true
+	case *kedaV1Alpha1.ScaledObject:
+		return hpa.GetHPAMaxReplicas(), true
+	default:
+		return 0, false
+	}
+}
+
 // HPAScaleTargetRefName extracts Spec.ScaleTargetRef.Name
 func HPAScaleTargetRefName(obj k8sutil.Object) (string, bool) {
 	switch hpa := obj.(type) {
