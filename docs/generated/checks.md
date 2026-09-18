@@ -222,7 +222,7 @@ IgnoredSecrets: []
 **Parameters**:
 
 ```yaml
-name: (?i).*secret.*
+name: (?i).*secret([^s].*|$)
 value: .+
 ```
 ## exposed-services
