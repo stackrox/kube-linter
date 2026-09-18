@@ -184,14 +184,28 @@ func (l *lintContextImpl) renderTgzHelmChart(tgzFile string) (map[string]string,
 	return l.renderChart(tgzFile, chrt)
 }
 
+// documentMarkers are the YAML start- and end-of-document markers. A marker may be
+// followed by a comment on the same line, which still leaves the document empty.
+var documentMarkers = [][]byte{[]byte("---"), []byte("...")}
+
 // isBlankDocument reports whether a YAML document carries no content at all: every
-// line is blank, a comment, or a bare document marker. Files that separate sections
-// with "--- # some comment" produce such documents, and there is nothing in them to
+// line is blank, a comment, or a document marker optionally followed by a comment.
+// Files that separate sections with "--- # some comment" or close them with
+// "... # end of section" produce such documents, and there is nothing in them to
 // decode - reporting them as unreadable objects would be a false positive.
 func isBlankDocument(doc []byte) bool {
 	for _, line := range bytes.Split(doc, []byte("\n")) {
 		line = bytes.TrimSpace(line)
-		if len(line) == 0 || line[0] == '#' || bytes.Equal(line, []byte("---")) || bytes.Equal(line, []byte("...")) {
+		for _, marker := range documentMarkers {
+			if bytes.HasPrefix(line, marker) {
+				line = bytes.TrimSpace(bytes.TrimPrefix(line, marker))
+				break
+			}
+		}
+		// Whatever follows the marker decides: nothing and a comment leave the
+		// document empty, anything else (a tag, say) is content and has to be
+		// decoded like any other line.
+		if len(line) == 0 || line[0] == '#' {
 			continue
 		}
 		return false

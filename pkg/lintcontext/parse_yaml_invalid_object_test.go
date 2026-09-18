@@ -126,3 +126,58 @@ spec:
 	require.Len(t, ctx.Objects(), 1)
 	assert.Equal(t, "my-deployment", ctx.Objects()[0].K8sObject.GetName())
 }
+
+// A document marker may carry a comment on the same line. The start marker is consumed
+// by the YAML reader, but the end marker is not: "... # end of section" reaches the
+// parser as the whole body of a document and used to be reported as unreadable.
+func TestLoadObjectsFromReaderSkipsDocumentMarkersWithComments(t *testing.T) {
+	const doc = `--- # deployment section
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+spec:
+  selector:
+    matchLabels:
+      name: my-label-value
+  template:
+    metadata:
+      labels:
+        name: my-label-value
+    spec:
+      containers:
+        - name: my-container
+          image: nginx:latest
+--- # nothing below this one
+... # end of section
+`
+
+	ctx := newCtx(Options{})
+	require.NoError(t, ctx.loadObjectsFromReader("test.yaml", strings.NewReader(doc)))
+	assert.Empty(t, ctx.InvalidObjects(), "a document marker with a trailing comment carries no manifest")
+	require.Len(t, ctx.Objects(), 1)
+	assert.Equal(t, "my-deployment", ctx.Objects()[0].K8sObject.GetName())
+}
+
+// The marker must not swallow real content that happens to start with one: a tagged
+// document ("--- !SomeTag") has something to decode and has to reach the parser.
+func TestIsBlankDocumentKeepsContentAfterMarker(t *testing.T) {
+	for _, tc := range []struct {
+		name  string
+		doc   string
+		blank bool
+	}{
+		{name: "bare start marker", doc: "---", blank: true},
+		{name: "bare end marker", doc: "...", blank: true},
+		{name: "start marker with comment", doc: "--- # section two", blank: true},
+		{name: "end marker with comment", doc: "... # end of section", blank: true},
+		{name: "end marker then comment line", doc: "...\n# trailing note", blank: true},
+		{name: "marker followed by a tag", doc: "--- !SomeTag", blank: false},
+		{name: "marker glued to content", doc: "---foo: bar", blank: false},
+		{name: "plain manifest", doc: "kind: Deployment", blank: false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.blank, isBlankDocument([]byte(tc.doc)))
+		})
+	}
+}
