@@ -24,6 +24,8 @@ env:
 
 jobs:
   build-and-test:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -110,6 +112,9 @@ jobs:
 
   test-sarif:
     needs: build-and-test
+    permissions:
+      contents: read
+      security-events: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -157,6 +162,8 @@ jobs:
   windows-sanity-test:
     name: Windows sanity test
     needs: build-and-test
+    permissions:
+      contents: read
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7
