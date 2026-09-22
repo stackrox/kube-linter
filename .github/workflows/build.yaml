@@ -69,7 +69,13 @@ jobs:
         run: make test
 
       - name: Upload coverage reports to Codecov
+        id: codecov-unit
         uses: codecov/codecov-action@v7.0.0
+        # A rejected upload must be visible, but it must not take the rest of
+        # the job with it: this step runs before the E2E and bats tests and
+        # before the binary artifacts, and two jobs depend on this one. The
+        # outcome is recorded here and turned into a failure at the very end.
+        continue-on-error: true
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: stackrox/kube-linter
@@ -91,7 +97,9 @@ jobs:
         run: make e2e-bats
 
       - name: Upload coverage reports to Codecov
+        id: codecov-bats
         uses: codecov/codecov-action@v7.0.0
+        continue-on-error: true
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: stackrox/kube-linter
@@ -109,6 +117,19 @@ jobs:
         with:
           name: kube-linter.exe
           path: dist/kube-linter_windows_amd64_v1/kube-linter.exe
+
+      - name: Fail if a coverage upload was rejected
+        # Runs last on purpose: every test and every artifact upload above has
+        # already happened by now, so a rejected upload is reported without
+        # costing the job its validation.
+        if: >-
+          github.event_name != 'pull_request' &&
+          (steps.codecov-unit.outcome == 'failure' ||
+           steps.codecov-bats.outcome == 'failure')
+        run: |
+          echo "A coverage upload was rejected by Codecov." >&2
+          echo "unit: ${{ steps.codecov-unit.outcome }}, bats: ${{ steps.codecov-bats.outcome }}" >&2
+          exit 1
 
   test-sarif:
     needs: build-and-test
