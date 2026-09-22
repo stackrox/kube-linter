@@ -9,7 +9,7 @@ var (
 	List = set.NewFrozenStringSet(
 		"dangling-service",
 		"deprecated-service-account-field",
-		"docker-sock",
+		"container-runtime-sock",
 		"drop-net-raw-capability",
 		"duplicate-env-var",
 		"env-var-secret",

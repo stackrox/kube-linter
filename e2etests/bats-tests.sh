@@ -113,6 +113,27 @@ get_value_from() {
   [[ "${count}" == "1" ]]
 }
 
+@test "container-runtime-sock" {
+  tmp="tests/checks/container-runtime-sock.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include container-runtime-sock --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
+  message4=$(get_value_from "${lines[0]}" '.Reports[3].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[3].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment: host system directory \"/var/run/docker.sock\" is mounted on container \"appdocker\"" ]]
+  [[ "${message2}" == "Deployment: host system directory \"/var/run/containerd.sock\" is mounted on container \"appcontainerd\"" ]]
+  [[ "${message3}" == "StatefulSet: host system directory \"/var/run/crio.sock\" is mounted on container \"appcrio\"" ]]
+  [[ "${message4}" == "DeploymentConfig: host system directory \"/var/run/docker.sock\" is mounted on container \"app\"" ]]
+  [[ "${count}" == "4" ]]
+}
+
 @test "dangling-horizontalpodautoscaler" {
   tmp="tests/checks/dangling-hpa.yml"
   cmd="${KUBE_LINTER_BIN} lint --include dangling-horizontalpodautoscaler --do-not-auto-add-defaults --format json ${tmp}"
@@ -265,23 +286,6 @@ get_value_from() {
   [[ "${message2}" == "Deployment: Object does not define any DNSConfig Options." ]]
   [[ "${message3}" == "Deployment: Object does not define any DNSConfig rules." ]]
   [[ "${count}" == "3" ]]
-}
-
-@test "docker-sock" {
-  tmp="tests/checks/docker-sock.yml"
-  cmd="${KUBE_LINTER_BIN} lint --include docker-sock --do-not-auto-add-defaults --format json ${tmp}"
-  run ${cmd}
-
-  print_info "${status}" "${output}" "${cmd}" "${tmp}"
-  [ "$status" -eq 1 ]
-
-  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
-  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
-  count=$(get_value_from "${lines[0]}" '.Reports | length')
-
-  [[ "${message1}" == "Deployment: host system directory \"/var/run/docker.sock\" is mounted on container \"app\"" ]]
-  [[ "${message2}" == "DeploymentConfig: host system directory \"/var/run/docker.sock\" is mounted on container \"app\"" ]]
-  [[ "${count}" == "2" ]]
 }
 
 @test "drop-net-raw-capability" {
