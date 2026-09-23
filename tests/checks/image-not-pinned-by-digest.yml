@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          image: registry.example.com/app@sha256:a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fire-tag-only
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          image: registry.example.com/app:v1.2.3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fire-no-tag
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          image: registry.example.com/app

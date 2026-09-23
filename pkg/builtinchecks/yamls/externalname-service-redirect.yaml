@@ -1,0 +1,19 @@
+name: externalname-service-redirect
+description: >-
+  Service with type: ExternalName redirects internal traffic to an external
+  DNS name. If the external name resolves to an attacker-controlled host,
+  this enables SSRF at the infrastructure level.
+remediation: >-
+  Use type: ClusterIP with an Endpoints object pointing to a known-safe IP,
+  or validate that the externalName resolves to a trusted destination.
+scope:
+  objectKinds:
+    - Any
+template: cel-expression
+params:
+  check: >
+    object.kind == 'Service' &&
+    has(object.spec) &&
+    object.spec.type == 'ExternalName' &&
+    has(object.spec.externalName)
+    ? 'ExternalName service redirects cluster traffic to external DNS — potential SSRF vector' : ''
