@@ -4,7 +4,7 @@ go 1.26.4
 
 require (
 	github.com/Masterminds/sprig/v3 v3.3.0
-	github.com/bmatcuk/doublestar/v4 v4.10.0
+	github.com/bmatcuk/doublestar/v4 v4.10.1
 	github.com/cert-manager/cert-manager v1.20.3
 	github.com/fatih/color v1.19.0
 	github.com/go-viper/mapstructure/v2 v2.5.0

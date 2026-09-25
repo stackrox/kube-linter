@@ -70,7 +70,7 @@ jobs:
 
       - name: Upload coverage reports to Codecov
         id: codecov-unit
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v7.1.1
         # A rejected upload must be visible, but it must not take the rest of
         # the job with it: this step runs before the E2E and bats tests and
         # before the binary artifacts, and two jobs depend on this one. The
@@ -98,7 +98,7 @@ jobs:
 
       - name: Upload coverage reports to Codecov
         id: codecov-bats
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v7.1.1
         continue-on-error: true
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
