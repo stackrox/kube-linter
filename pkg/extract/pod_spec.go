@@ -59,6 +59,8 @@ func Selector(obj k8sutil.Object) (*metaV1.LabelSelector, bool) {
 	switch obj := obj.(type) {
 	case *ocsAppsV1.DeploymentConfig:
 		return &metaV1.LabelSelector{MatchLabels: obj.Spec.Selector}, true
+	case *coreV1.ReplicationController:
+		return &metaV1.LabelSelector{MatchLabels: obj.Spec.Selector}, true
 	case *batchV1Beta1.CronJob:
 		return obj.Spec.JobTemplate.Spec.Selector, true
 	case *batchV1.CronJob:
