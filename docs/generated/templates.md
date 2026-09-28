@@ -905,7 +905,7 @@ KubeLinter supports the following templates:
 
 **Key**: `run-as-non-root`
 
-**Description**: Flag containers set to run as a root user
+**Description**: Flag containers set to run as a root user or group
 
 **Supported Objects**: DeploymentLike
 

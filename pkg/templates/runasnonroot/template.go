@@ -14,6 +14,8 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
+const templateKey = "run-as-non-root"
+
 func effectiveRunAsNonRoot(podSC *v1.PodSecurityContext, containerSC *v1.SecurityContext) bool {
 	if containerSC != nil && containerSC.RunAsNonRoot != nil {
 		return *containerSC.RunAsNonRoot
@@ -34,11 +36,21 @@ func effectiveRunAsUser(podSC *v1.PodSecurityContext, containerSC *v1.SecurityCo
 	return nil
 }
 
+func effectiveRunAsGroup(podSC *v1.PodSecurityContext, containerSC *v1.SecurityContext) *int64 {
+	if containerSC != nil && containerSC.RunAsGroup != nil {
+		return containerSC.RunAsGroup
+	}
+	if podSC != nil {
+		return podSC.RunAsGroup
+	}
+	return nil
+}
+
 func init() {
 	templates.Register(check.Template{
 		HumanName:   "Run as non-root user",
-		Key:         "run-as-non-root",
-		Description: "Flag containers set to run as a root user",
+		Key:         templateKey,
+		Description: "Flag containers set to run as a root user or group",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
@@ -52,6 +64,13 @@ func init() {
 				}
 				var results []diagnostic.Diagnostic
 				for _, container := range podSpec.AllContainers() {
+					runAsGroup := effectiveRunAsGroup(podSpec.SecurityContext, container.SecurityContext)
+					if runAsGroup != nil && *runAsGroup == 0 {
+						results = append(results, diagnostic.Diagnostic{
+							Message: fmt.Sprintf("container %q is set to runAsGroup 0", container.Name),
+						})
+					}
+
 					runAsUser := effectiveRunAsUser(podSpec.SecurityContext, container.SecurityContext)
 					// runAsUser explicitly set to non-root. All good.
 					if runAsUser != nil && *runAsUser > 0 {

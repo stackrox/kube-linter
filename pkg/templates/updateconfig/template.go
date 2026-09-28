@@ -17,6 +17,8 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	"golang.stackrox.io/kube-linter/pkg/templates/updateconfig/internal/params"
 
+	ocsAppsv1 "github.com/openshift/api/apps/v1"
+	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
@@ -111,6 +113,21 @@ func needsRollingUpdateDefinition(p params.Params) bool {
 		p.MinSurge != "" || p.MaxSurge != "")
 }
 
+func defaultStrategyType(object lintcontext.Object) (string, bool) {
+	switch object.K8sObject.(type) {
+	case *appsv1.Deployment:
+		return string(appsv1.RollingUpdateDeploymentStrategyType), true
+	case *appsv1.DaemonSet:
+		return string(appsv1.RollingUpdateDaemonSetStrategyType), true
+	case *appsv1.StatefulSet:
+		return string(appsv1.RollingUpdateStatefulSetStrategyType), true
+	case *ocsAppsv1.DeploymentConfig:
+		return string(ocsAppsv1.DeploymentStrategyTypeRolling), true
+	default:
+		return "", false
+	}
+}
+
 func init() {
 	templates.Register(check.Template{
 		HumanName:   "Update configuration",
@@ -165,10 +182,16 @@ func init() {
 				if !strategy.TypeExists {
 					return nil
 				}
-				if !compiledRegex.MatchString(strategy.Type) {
+				strategyType := strategy.Type
+				if strategyType == "" {
+					if defaultType, ok := defaultStrategyType(object); ok {
+						strategyType = defaultType
+					}
+				}
+				if !compiledRegex.MatchString(strategyType) {
 					newD := diagnostic.Diagnostic{
 						Message: fmt.Sprintf("object has %s strategy type but must match regex %s",
-							stringutils.Ternary(strategy.Type != "", strategy.Type, "no"), p.StrategyTypeRegex)}
+							stringutils.Ternary(strategyType != "", strategyType, "no"), p.StrategyTypeRegex)}
 					diagnostics = append(diagnostics, newD)
 				}
 				if !strategy.RollingConfigExists {

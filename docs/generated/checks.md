@@ -222,7 +222,7 @@ IgnoredSecrets: []
 **Parameters**:
 
 ```yaml
-name: (?i).*secret.*
+name: (?i).*secret([^s].*|$)
 value: .+
 ```
 ## exposed-services
@@ -366,9 +366,9 @@ minReplicas: 3
 
 **Enabled by default**: Yes
 
-**Description**: Indicates when deployments with multiple replicas fail to specify inter-pod anti-affinity, to ensure that the orchestrator attempts to schedule replicas on different nodes.
+**Description**: Indicates when deployments with multiple replicas fail to specify inter-pod anti-affinity or topology spread constraints, to ensure that the orchestrator attempts to schedule replicas on different nodes.
 
-**Remediation**: Specify anti-affinity in your pod specification to ensure that the orchestrator attempts to schedule replicas on different nodes. Using podAntiAffinity, specify a labelSelector that matches pods for the deployment, and set the topologyKey to kubernetes.io/hostname. Refer to https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity for details.
+**Remediation**: Specify anti-affinity or topology spread constraints in your pod specification to ensure that the orchestrator attempts to schedule replicas on different nodes. Using podAntiAffinity or topologySpreadConstraints, specify a labelSelector that matches pods for the deployment, and set the topologyKey to kubernetes.io/hostname. Refer to https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#inter-pod-affinity-and-anti-affinity and https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/ for details.
 
 **Template**: [anti-affinity](templates.md#anti-affinity-not-specified)
 
@@ -595,9 +595,9 @@ key: owner
 
 **Enabled by default**: Yes
 
-**Description**: Indicates when containers are not set to runAsNonRoot.
+**Description**: Indicates when containers are not set to runAsNonRoot or explicitly use the root group.
 
-**Remediation**: Set runAsUser to a non-zero number and runAsNonRoot to true in your pod or container securityContext. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for details.
+**Remediation**: Set runAsUser and runAsGroup to non-zero numbers and runAsNonRoot to true in your pod or container securityContext. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for details.
 
 **Template**: [run-as-non-root](templates.md#run-as-non-root-user)
 ## scc-deny-privileged-container

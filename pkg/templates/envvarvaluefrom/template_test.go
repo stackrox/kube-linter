@@ -10,6 +10,7 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/lintcontext/mocks"
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	"golang.stackrox.io/kube-linter/pkg/templates/envvarvaluefrom/internal/params"
+	appsV1 "k8s.io/api/apps/v1"
 	coreV1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -390,6 +391,100 @@ func (s *EnVarValueFromTestSuite) TestMultipleIgnoredSecrets() {
 	s.Validate(s.ctx, []templates.TestCase{
 		{
 			Param: params.Params{IgnoredSecrets: []string{"^secret2$"}},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				targetDeploymentName: {},
+			},
+		},
+	})
+}
+
+func (s *EnVarValueFromTestSuite) TestSecretOfAnotherNamespaceDoesNotShadow() {
+	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
+	s.ctx.ModifyDeployment(s.T(), targetDeploymentName, func(deployment *appsV1.Deployment) {
+		deployment.Namespace = "alpha"
+	})
+	alpha := &coreV1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "shared", Namespace: "alpha"},
+		Data:       map[string][]byte{"key-alpha": []byte("value")},
+	}
+	beta := &coreV1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "shared", Namespace: "beta"},
+		Data:       map[string][]byte{"key-beta": []byte("value")},
+	}
+	s.ctx.AddObject("alpha/shared", alpha)
+	s.ctx.AddObject("beta/shared", beta)
+	s.addContainerWithEnvFromSecret(envReference{
+		Name: "my-secret",
+		Kind: "secret",
+		Source: sourceReference{
+			Name:     "shared",
+			Key:      "key-alpha",
+			Optional: pointers.Bool(false),
+		},
+	})
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				targetDeploymentName: {},
+			},
+		},
+	})
+}
+
+func (s *EnVarValueFromTestSuite) TestSecretOfAnotherNamespaceIsUnknown() {
+	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
+	s.ctx.ModifyDeployment(s.T(), targetDeploymentName, func(deployment *appsV1.Deployment) {
+		deployment.Namespace = "alpha"
+	})
+	beta := &coreV1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "shared", Namespace: "beta"},
+		Data:       map[string][]byte{"key-beta": []byte("value")},
+	}
+	s.ctx.AddObject("beta/shared", beta)
+	s.addContainerWithEnvFromSecret(envReference{
+		Name: "my-secret",
+		Kind: "secret",
+		Source: sourceReference{
+			Name:     "shared",
+			Key:      "key-beta",
+			Optional: pointers.Bool(false),
+		},
+	})
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				targetDeploymentName: {{
+					Message: "The container \"container\" is referring to an unknown secret \"shared\"",
+				}},
+			},
+		},
+	})
+}
+
+func (s *EnVarValueFromTestSuite) TestSecretWithoutNamespaceStillResolves() {
+	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
+	s.ctx.ModifyDeployment(s.T(), targetDeploymentName, func(deployment *appsV1.Deployment) {
+		deployment.Namespace = "alpha"
+	})
+	secret := &coreV1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "shared"},
+		Data:       map[string][]byte{"key": []byte("value")},
+	}
+	s.ctx.AddObject("shared", secret)
+	s.addContainerWithEnvFromSecret(envReference{
+		Name: "my-secret",
+		Kind: "secret",
+		Source: sourceReference{
+			Name:     "shared",
+			Key:      "key",
+			Optional: pointers.Bool(false),
+		},
+	})
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
 			Diagnostics: map[string][]diagnostic.Diagnostic{
 				targetDeploymentName: {},
 			},
