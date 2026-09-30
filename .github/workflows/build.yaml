@@ -8,6 +8,13 @@ on:
     branches-ignore: "dependabot/**"
     tags:
       - "*"
+  # Dependabot auto-merges are pushed with GITHUB_TOKEN, and a push made with
+  # that token starts no workflow run. main has therefore gone months at a time
+  # with no build and no coverage upload, which leaves every pull request
+  # comparing against a stale base. A weekly run keeps the base current.
+  schedule:
+    - cron: "17 4 * * 1"
+  workflow_dispatch:
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -17,6 +24,8 @@ env:
 
 jobs:
   build-and-test:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -60,11 +69,21 @@ jobs:
         run: make test
 
       - name: Upload coverage reports to Codecov
+        id: codecov-unit
         uses: codecov/codecov-action@v7.1.1
+        # A rejected upload must be visible, but it must not take the rest of
+        # the job with it: this step runs before the E2E and bats tests and
+        # before the binary artifacts, and two jobs depend on this one. The
+        # outcome is recorded here and turned into a failure at the very end.
+        continue-on-error: true
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: stackrox/kube-linter
           flags: unit
+          # A rejected upload is otherwise silent: the step reports success and
+          # main simply stops receiving reports. Pull requests from forks have
+          # no token and upload tokenless, so they stay tolerant.
+          fail_ci_if_error: ${{ github.event_name != 'pull_request' }}
 
       - name: Run E2E tests
         run: make e2e-test
@@ -78,11 +97,14 @@ jobs:
         run: make e2e-bats
 
       - name: Upload coverage reports to Codecov
+        id: codecov-bats
         uses: codecov/codecov-action@v7.1.1
+        continue-on-error: true
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: stackrox/kube-linter
           flags: bats
+          fail_ci_if_error: ${{ github.event_name != 'pull_request' }}
 
       - name: Upload Linux binary
         uses: actions/upload-artifact@v7
@@ -96,8 +118,24 @@ jobs:
           name: kube-linter.exe
           path: dist/kube-linter_windows_amd64_v1/kube-linter.exe
 
+      - name: Fail if a coverage upload was rejected
+        # Runs last on purpose: every test and every artifact upload above has
+        # already happened by now, so a rejected upload is reported without
+        # costing the job its validation.
+        if: >-
+          github.event_name != 'pull_request' &&
+          (steps.codecov-unit.outcome == 'failure' ||
+           steps.codecov-bats.outcome == 'failure')
+        run: |
+          echo "A coverage upload was rejected by Codecov." >&2
+          echo "unit: ${{ steps.codecov-unit.outcome }}, bats: ${{ steps.codecov-bats.outcome }}" >&2
+          exit 1
+
   test-sarif:
     needs: build-and-test
+    permissions:
+      contents: read
+      security-events: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -145,6 +183,8 @@ jobs:
   windows-sanity-test:
     name: Windows sanity test
     needs: build-and-test
+    permissions:
+      contents: read
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7
