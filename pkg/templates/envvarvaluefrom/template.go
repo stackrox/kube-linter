@@ -9,6 +9,7 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/check"
 	"golang.stackrox.io/kube-linter/pkg/config"
 	"golang.stackrox.io/kube-linter/pkg/diagnostic"
+	"golang.stackrox.io/kube-linter/pkg/extract"
 	"golang.stackrox.io/kube-linter/pkg/lintcontext"
 	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	"golang.stackrox.io/kube-linter/pkg/templates"
@@ -63,7 +64,7 @@ func init() {
 	templates.Register(check.Template{
 		HumanName:   "Env references",
 		Key:         templateKey,
-		Description: "Flag resources which use env variables from secrets/configmaps not included in the release",
+		Description: "Flag resources which use env variables or volumes from secrets/configmaps not included in the release",
 		SupportedObjectKinds: config.ObjectKindsDesc{
 			ObjectKinds: []string{objectkinds.DeploymentLike},
 		},
@@ -112,7 +113,7 @@ func lintForEachContainer(lintCtx lintcontext.LintContext, object lintcontext.Ob
 		ignoredRegex: ignoredConfigMaps,
 	}
 
-	return util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
+	diagnostics := util.PerContainerCheck(func(container *v1.Container) []diagnostic.Diagnostic {
 		var results []diagnostic.Diagnostic
 		var envRefs []struct {
 			info resourceInfo
@@ -154,6 +155,35 @@ func lintForEachContainer(lintCtx lintcontext.LintContext, object lintcontext.Ob
 			}
 		}
 
+		for _, envFrom := range container.EnvFrom {
+			if secretRef := envFrom.SecretRef; secretRef != nil {
+				envRefs = append(envRefs, struct {
+					info resourceInfo
+					typ  resourceType
+				}{
+					info: resourceInfo{
+						name:     secretRef.Name,
+						optional: secretRef.Optional,
+					},
+					typ: resourceTypeSecret,
+				})
+			}
+
+			if configMapRef := envFrom.ConfigMapRef; configMapRef != nil {
+				envRefs = append(envRefs, struct {
+					info resourceInfo
+					typ  resourceType
+				}{
+					info: resourceInfo{
+						name:     configMapRef.Name,
+						optional: configMapRef.Optional,
+					},
+					typ: resourceTypeConfigMap,
+				})
+			}
+		}
+
+		subject := fmt.Sprintf("container %q", container.Name)
 		for _, envRef := range envRefs {
 			var checker *resourceChecker
 			switch envRef.typ {
@@ -163,15 +193,55 @@ func lintForEachContainer(lintCtx lintcontext.LintContext, object lintcontext.Ob
 				checker = configMapChecker
 			}
 
-			if msg := checkResourceReference(container.Name, namespace, envRef.info, checker); msg != "" {
+			if msg := checkResourceReference(subject, namespace, envRef.info, checker); msg != "" {
 				results = append(results, diagnostic.Diagnostic{Message: msg})
 			}
 		}
 		return results
 	})(lintCtx, object)
+
+	return append(diagnostics, lintVolumes(object, namespace, secretChecker, configMapChecker)...)
 }
 
-func checkResourceReference(containerName, namespace string, ref resourceInfo, checker *resourceChecker) string {
+// lintVolumes checks the secrets and config maps mounted as pod volumes.
+func lintVolumes(object lintcontext.Object, namespace string, secretChecker, configMapChecker *resourceChecker) []diagnostic.Diagnostic {
+	podSpec, found := extract.PodSpec(object.K8sObject)
+	if !found {
+		return nil
+	}
+
+	var results []diagnostic.Diagnostic
+	check := func(subject string, ref resourceInfo, items []v1.KeyToPath, checker *resourceChecker) {
+		// Check the object itself first so that a missing object is reported once, not once per item.
+		refs := []resourceInfo{ref}
+		for _, item := range items {
+			refs = append(refs, resourceInfo{name: ref.name, key: item.Key, optional: ref.optional})
+		}
+		for _, r := range refs {
+			if msg := checkResourceReference(subject, namespace, r, checker); msg != "" {
+				results = append(results, diagnostic.Diagnostic{Message: msg})
+				if r.key == "" {
+					return
+				}
+			}
+		}
+	}
+
+	for _, volume := range podSpec.Volumes {
+		subject := fmt.Sprintf("volume %q", volume.Name)
+		if secret := volume.Secret; secret != nil {
+			check(subject, resourceInfo{name: secret.SecretName, optional: secret.Optional}, secret.Items, secretChecker)
+		}
+		if configMap := volume.ConfigMap; configMap != nil {
+			check(subject, resourceInfo{name: configMap.Name, optional: configMap.Optional}, configMap.Items, configMapChecker)
+		}
+	}
+	return results
+}
+
+// checkResourceReference returns a message if ref points to a missing object or key.
+// An empty key only requires the object to exist.
+func checkResourceReference(subject, namespace string, ref resourceInfo, checker *resourceChecker) string {
 	if ref.optional != nil && *ref.optional {
 		return ""
 	}
@@ -182,7 +252,11 @@ func checkResourceReference(containerName, namespace string, ref resourceInfo, c
 
 	objs := checker.inNamespace(namespace, ref.name)
 	if len(objs) == 0 {
-		return fmt.Sprintf("The container %q is referring to an unknown %s %q", containerName, checker.objType, ref.name)
+		return fmt.Sprintf("The %s is referring to an unknown %s %q", subject, checker.objType, ref.name)
+	}
+
+	if ref.key == "" {
+		return ""
 	}
 
 	for _, obj := range objs {
@@ -191,7 +265,7 @@ func checkResourceReference(containerName, namespace string, ref resourceInfo, c
 		}
 	}
 
-	return fmt.Sprintf("The container %q is referring to an unknown key %q in %s %q", containerName, ref.key, checker.objType, ref.name)
+	return fmt.Sprintf("The %s is referring to an unknown key %q in %s %q", subject, ref.key, checker.objType, ref.name)
 }
 
 func isInRegexList(regexlist []*regexp.Regexp, name string) bool {
