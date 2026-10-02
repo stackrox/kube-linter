@@ -118,6 +118,8 @@ func TestArgContainsPort(t *testing.T) {
 		{"--addr=:808", "8081", false},
 		{"--flag", "8081", false},
 		{"--addr=:8081 --other=:8081", "8081", true},
+		// possible false positive induced by negative command line arguments
+		{"--disable-port-80", "80", true},
 	}
 	for _, c := range cases {
 		assert.Equalf(t, c.want, argContainsPort(c.arg, c.needle), "argContainsPort(%q, %q)", c.arg, c.needle)
