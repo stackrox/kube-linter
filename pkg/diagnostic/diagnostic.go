@@ -8,6 +8,14 @@ import (
 type Diagnostic struct {
 	Message string
 
+	// Severity is the severity level for this diagnostic (e.g., "critical", "high", "warning", "info").
+	// Optional. If not set, formatters may use a default severity.
+	Severity string `json:",omitempty"`
+
+	// Metadata is an optional key-value map for additional diagnostic information.
+	// Common keys are defined as MetaKey* constants in metadata_keys.go.
+	Metadata map[string]string `json:",omitempty"`
+
 	// TODO: add line number/col number
 }
 

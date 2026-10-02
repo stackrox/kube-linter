@@ -474,6 +474,21 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "kube-chainsaw-rbac" {
+  tmp="tests/checks/kube-chainsaw/cluster-admin-pod.yaml"
+  cmd="${KUBE_LINTER_BIN} lint --include kube-chainsaw-rbac --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == *"cluster-admin"* ]]
+  [[ "${count}" -ge "1" ]]
+}
+
 @test "latest-tag" {
   tmp="tests/checks/latest-tag.yml"
   cmd="${KUBE_LINTER_BIN} lint --include latest-tag --do-not-auto-add-defaults --format json ${tmp}"
