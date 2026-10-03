@@ -1,0 +1,31 @@
+name: aggregate-to-admin-escalation
+description: >-
+  ClusterRole with an aggregate-to-admin, aggregate-to-edit, or
+  aggregate-to-view label grants escalation-capable verbs on privileged
+  resources. Kubernetes automatically merges these rules into the admin,
+  edit, or view ClusterRole, meaning every namespace admin inherits them.
+remediation: >-
+  Review whether the aggregated permissions are necessary. Remove escalation
+  verbs (create, delete, patch, *) on privileged resources (secrets, roles,
+  clusterroles, clusterrolebindings) from aggregate-labeled ClusterRoles.
+scope:
+  objectKinds:
+    - ClusterRole
+template: cel-expression
+params:
+  check: >
+    has(object.metadata.labels) &&
+    (
+      (has(object.metadata.labels['rbac.authorization.k8s.io/aggregate-to-admin']) &&
+       object.metadata.labels['rbac.authorization.k8s.io/aggregate-to-admin'] == 'true') ||
+      (has(object.metadata.labels['rbac.authorization.k8s.io/aggregate-to-edit']) &&
+       object.metadata.labels['rbac.authorization.k8s.io/aggregate-to-edit'] == 'true') ||
+      (has(object.metadata.labels['rbac.authorization.k8s.io/aggregate-to-view']) &&
+       object.metadata.labels['rbac.authorization.k8s.io/aggregate-to-view'] == 'true')
+    ) &&
+    object.rules.exists(r,
+      r.apiGroups.exists(g, g == '' || g == 'rbac.authorization.k8s.io' || g == '*') &&
+      r.verbs.exists(v, v == '*' || v == 'create' || v == 'delete' || v == 'patch') &&
+      r.resources.exists(res, res == '*' || res == 'secrets' || res == 'roles' ||
+        res == 'clusterroles' || res == 'clusterrolebindings')
+    ) ? 'aggregate-labeled ClusterRole grants escalation verbs on privileged resources — inherited by every namespace admin/editor' : ''

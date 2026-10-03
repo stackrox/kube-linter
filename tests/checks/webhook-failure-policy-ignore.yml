@@ -1,0 +1,28 @@
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: dont-fire
+webhooks:
+  - name: validate.example.com
+    failurePolicy: Fail
+    clientConfig:
+      service:
+        name: webhook-service
+        namespace: default
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: fire-ignore-policy
+webhooks:
+  - name: validate.example.com
+    failurePolicy: Ignore
+    clientConfig:
+      service:
+        name: webhook-service
+        namespace: default
+    admissionReviewVersions: ["v1"]
+    sideEffects: None
