@@ -41,6 +41,22 @@ kube-linter lint /path/to/directory/containing/kustomization.yaml
 > For example,
 > - Use `--format=json` to get the output in JSON format.
 > - Use `--format=sarif` to get the output in the [SARIF spec](https://github.com/microsoft/sarif-tutorials).
+> - Use `--format=plain` for the previous one-line-per-finding text output.
+
+## Pretty Output
+
+The pretty format is the default output: a human-readable terminal report. Use `--format plain` for the previous one-line-per-finding output, for example when parsing it in scripts. Findings are grouped by object, then by category (Security, Reliability, Resources, Hygiene, Other), with an overview bar at the top. Repeated checks on the same object are collapsed into one entry.
+
+```bash
+kube-linter lint myapp.yaml
+```
+
+The output can be tuned with environment variables:
+
+- `NO_COLOR=1` disables ANSI colors. Colors are also off automatically when the output is not a terminal.
+- `FORCE_COLOR=1` enables colors even when the output is not a terminal, for example in CI logs.
+- `NO_UNICODE=1` switches to an ASCII-only layout.
+- `KLP_FIX=1` shows the remediation once per check group.
 
 ## Multiple Output Formats
 
