@@ -1,0 +1,23 @@
+name: init-container-security-gap
+description: >-
+  Init container does not set runAsNonRoot: true while the pod-level
+  securityContext does. Init containers can run as root even when main
+  containers are hardened via the pod-level security context.
+remediation: >-
+  Set runAsNonRoot: true in each init container's securityContext to match
+  the pod-level restriction.
+scope:
+  objectKinds:
+    - DeploymentLike
+template: cel-expression
+params:
+  check: >
+    has(object.spec.template.spec.securityContext) &&
+    has(object.spec.template.spec.securityContext.runAsNonRoot) &&
+    object.spec.template.spec.securityContext.runAsNonRoot == true &&
+    has(object.spec.template.spec.initContainers) &&
+    object.spec.template.spec.initContainers.exists(c,
+      !has(c.securityContext) ||
+      !has(c.securityContext.runAsNonRoot) ||
+      c.securityContext.runAsNonRoot != true
+    ) ? 'init container may run as root despite pod-level runAsNonRoot — apply securityContext to init containers' : ''
