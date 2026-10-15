@@ -21,6 +21,18 @@ spec:
             httpGet:
               path: "/"
               port: 8080
+        - name: dont-fire-deployment-port-in-args
+          args:
+            - --metrics-addr=0.0.0.0:8080
+            - --health-probe-addr=:8081
+          ports:
+          - containerPort: 8080
+            name: metrics
+            protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: "/healthz"
+              port: 8081
         - name: fire-deployment-name
           livenessProbe:
             httpGet:
