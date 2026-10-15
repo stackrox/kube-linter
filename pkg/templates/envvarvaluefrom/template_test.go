@@ -514,3 +514,73 @@ func (s *EnVarValueFromTestSuite) TestEmptyObjectList() {
 		},
 	})
 }
+
+func (s *EnVarValueFromTestSuite) TestEnvFromReferences() {
+	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
+	s.ctx.AddObject("existing-config", &coreV1.ConfigMap{ObjectMeta: metav1.ObjectMeta{Name: "existing-config"}})
+	s.ctx.AddContainerToDeployment(s.T(), targetDeploymentName, coreV1.Container{
+		Name: "container",
+		EnvFrom: []coreV1.EnvFromSource{
+			{SecretRef: &coreV1.SecretEnvSource{LocalObjectReference: coreV1.LocalObjectReference{Name: "missing-secret"}}},
+			{ConfigMapRef: &coreV1.ConfigMapEnvSource{LocalObjectReference: coreV1.LocalObjectReference{Name: "missing-config"}}},
+			{ConfigMapRef: &coreV1.ConfigMapEnvSource{LocalObjectReference: coreV1.LocalObjectReference{Name: "existing-config"}}},
+			{SecretRef: &coreV1.SecretEnvSource{LocalObjectReference: coreV1.LocalObjectReference{Name: "optional-secret"}, Optional: pointers.Bool(true)}},
+		},
+	})
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				targetDeploymentName: {
+					{Message: "The container \"container\" is referring to an unknown secret \"missing-secret\""},
+					{Message: "The container \"container\" is referring to an unknown config map \"missing-config\""},
+				},
+			},
+		},
+		{
+			Param: params.Params{IgnoredSecrets: []string{"^missing-"}, IgnoredConfigMaps: []string{"^missing-"}},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				targetDeploymentName: {},
+			},
+		},
+	})
+}
+
+func (s *EnVarValueFromTestSuite) TestVolumeReferences() {
+	s.ctx.AddMockDeployment(s.T(), targetDeploymentName)
+	s.ctx.AddObject("existing-secret", &coreV1.Secret{
+		ObjectMeta: metav1.ObjectMeta{Name: "existing-secret"},
+		Data:       map[string][]byte{"key": []byte("value")},
+	})
+	s.ctx.AddContainerToDeployment(s.T(), targetDeploymentName, coreV1.Container{Name: "container"})
+	s.ctx.ModifyDeployment(s.T(), targetDeploymentName, func(deployment *appsV1.Deployment) {
+		deployment.Spec.Template.Spec.Volumes = []coreV1.Volume{
+			{Name: "missing-secret-vol", VolumeSource: coreV1.VolumeSource{Secret: &coreV1.SecretVolumeSource{SecretName: "missing-secret"}}},
+			{Name: "missing-config-vol", VolumeSource: coreV1.VolumeSource{ConfigMap: &coreV1.ConfigMapVolumeSource{
+				LocalObjectReference: coreV1.LocalObjectReference{Name: "missing-config"},
+				Items:                []coreV1.KeyToPath{{Key: "a", Path: "a"}, {Key: "b", Path: "b"}},
+			}}},
+			{Name: "optional-config-vol", VolumeSource: coreV1.VolumeSource{ConfigMap: &coreV1.ConfigMapVolumeSource{
+				LocalObjectReference: coreV1.LocalObjectReference{Name: "optional-config"},
+				Optional:             pointers.Bool(true),
+			}}},
+			{Name: "existing-secret-vol", VolumeSource: coreV1.VolumeSource{Secret: &coreV1.SecretVolumeSource{
+				SecretName: "existing-secret",
+				Items:      []coreV1.KeyToPath{{Key: "key", Path: "key"}, {Key: "wrong-key", Path: "wrong"}},
+			}}},
+			{Name: "empty-dir", VolumeSource: coreV1.VolumeSource{EmptyDir: &coreV1.EmptyDirVolumeSource{}}},
+		}
+	})
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				targetDeploymentName: {
+					{Message: "The volume \"missing-secret-vol\" is referring to an unknown secret \"missing-secret\""},
+					{Message: "The volume \"missing-config-vol\" is referring to an unknown config map \"missing-config\""},
+					{Message: "The volume \"existing-secret-vol\" is referring to an unknown key \"wrong-key\" in secret \"existing-secret\""},
+				},
+			},
+		},
+	})
+}
