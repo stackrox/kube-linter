@@ -302,6 +302,15 @@ minReplicas: 3
 **Remediation**: Set Job.spec.ttlSecondsAfterFinished. Unset CronJob.Spec.JobTemplate.Spec.ttlSecondsAfterFinished.
 
 **Template**: [job-ttl-seconds-after-finished](templates.md#ttlsecondsafterfinished-impact-for-standalone-and-managed-job-objects)
+## kube-chainsaw-rbac
+
+**Enabled by default**: No
+
+**Description**: Detects RBAC privilege escalation paths, dangerous verbs, sensitive resource access, and scope confusion using graph analysis powered by kube-chainsaw
+
+**Remediation**: Review the RBAC configuration and apply least-privilege principles. See https://ugiordan.github.io/kube-chainsaw/ for detailed remediation guidance per rule.
+
+**Template**: [kube-chainsaw](templates.md#rbac-privilege-chain-analysis)
 ## latest-tag
 
 **Enabled by default**: Yes
