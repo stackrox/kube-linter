@@ -19,6 +19,8 @@ const (
 	// SARIFFormat is JSON-based standard for reporting lint errors.
 	// See https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=sarif
 	SARIFFormat = "sarif"
+	// PrettyFormat is a grouped, human-readable terminal report.
+	PrettyFormat = "pretty"
 )
 
 // FormatFunc sets contract formatter of each FormatType should follow.

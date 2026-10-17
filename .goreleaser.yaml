@@ -50,8 +50,7 @@ dockers_v2:
     ids:
       - kube-linter
     images:
-      - "ghcr.io/stackrox/kube-linter"
-      - "stackrox/kube-linter"
+      - "ghcr.io/shushyu/kube-linter"
     tags:
       - "latest"
       - "{{ .Tag }}"
@@ -75,8 +74,7 @@ dockers_v2:
     ids:
       - kube-linter
     images:
-      - "ghcr.io/stackrox/kube-linter"
-      - "stackrox/kube-linter"
+      - "ghcr.io/shushyu/kube-linter"
     tags:
       - "latest-alpine"
       - "{{ .Tag }}-alpine"
@@ -98,36 +96,6 @@ dockers_v2:
 
 checksum:
   disable: true
-
-signs:
-  - cmd: cosign
-    stdin: "{{ .Env.COSIGN_PASSWORD }}"
-    signature: "${artifact}.sigstore.json"
-    args:
-      - "sign-blob"
-      - "--key"
-      - "env://KEY"
-      - "--bundle=${signature}"
-      - "${artifact}"
-      - "--yes"
-    artifacts: binary
-
-docker_signs:
-  - cmd: cosign
-    artifacts: all
-    args:
-      - 'sign'
-      - '${artifact}'
-      - '--yes'
-  - id: key
-    cmd: cosign
-    artifacts: all
-    args:
-      - 'sign'
-      - "--key"
-      - "env://KEY"
-      - '${artifact}'
-      - '--yes'
 
 changelog:
   use: github-native
