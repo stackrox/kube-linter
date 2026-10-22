@@ -255,6 +255,19 @@ func (s *SortedKeysTestSuite) TestSortedKeysTableDriven() {
 			},
 		},
 		{
+			// The anchor is defined under an ignored key, so its content must
+			// still be checked where it is aliased from a non-ignored key.
+			name:           "anchor_under_ignored_key_aliased_elsewhere",
+			yamlFile:       "reused-labels-unsorted.yaml",
+			deploymentName: "anchor-unsorted",
+			recursive:      true,
+			ignoredKeys:    []string{"labels"},
+			expectedDiagnostics: []string{
+				"Keys are not sorted at spec.selector.matchLabels. Expected order: [app, environment, version], got: [version, app, environment]",
+				"Keys are not sorted at spec.template.spec.containers[0]. Expected order: [image, name], got: [name, image]",
+			},
+		},
+		{
 			name:           "ignored_key_still_sorted_among_siblings",
 			yamlFile:       "unsorted-top-level.yaml",
 			deploymentName: "unsorted-deployment",

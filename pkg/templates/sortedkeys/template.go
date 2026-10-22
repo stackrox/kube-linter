@@ -42,7 +42,11 @@ func init() {
 				}
 
 				var diagnostics []diagnostic.Diagnostic
-				c := checker{recursive: p.Recursive, ignoredKeys: ignoredKeys}
+				c := checker{
+					recursive:      p.Recursive,
+					ignoredKeys:    ignoredKeys,
+					skippedAnchors: make(map[string]ast.Node),
+				}
 
 				// Check all documents in the file
 				for _, doc := range file.Docs {
@@ -60,6 +64,34 @@ func init() {
 type checker struct {
 	recursive   bool
 	ignoredKeys map[string]struct{}
+	// skippedAnchors holds anchors defined inside the value of an ignored key,
+	// keyed by anchor name. Their content has not been checked yet, so it is
+	// checked at the first alias that refers to them from a non-ignored key.
+	skippedAnchors map[string]ast.Node
+}
+
+// collectAnchors records every anchor defined in node as skipped.
+func (c checker) collectAnchors(node ast.Node) {
+	switch n := node.(type) {
+	case *ast.MappingNode:
+		for _, value := range n.Values {
+			c.collectAnchors(value.Value)
+		}
+	case *ast.SequenceNode:
+		for _, item := range n.Values {
+			c.collectAnchors(item)
+		}
+	case *ast.AnchorNode:
+		c.skippedAnchors[nodeName(n.Name)] = n.Value
+		c.collectAnchors(n.Value)
+	}
+}
+
+func nodeName(node ast.Node) string {
+	if node == nil || node.GetToken() == nil {
+		return ""
+	}
+	return node.GetToken().Value
 }
 
 // checkNode recursively checks if keys in a YAML node are sorted
@@ -119,6 +151,7 @@ func (c checker) checkNode(node ast.Node, path string) []diagnostic.Diagnostic {
 			for _, value := range n.Values {
 				key := getKeyString(value.Key)
 				if _, ignored := c.ignoredKeys[key]; ignored {
+					c.collectAnchors(value.Value)
 					continue
 				}
 				childPath := path
@@ -144,12 +177,20 @@ func (c checker) checkNode(node ast.Node, path string) []diagnostic.Diagnostic {
 		}
 
 	case *ast.AnchorNode:
-		// Handle anchor nodes by checking their value
+		// Handle anchor nodes by checking their value. A later anchor with
+		// the same name replaces any skipped one.
+		delete(c.skippedAnchors, nodeName(n.Name))
 		diagnostics = append(diagnostics, c.checkNode(n.Value, path)...)
 
 	case *ast.AliasNode:
-		// Skip alias nodes - they reference already checked content
-		// No need to check as the original anchor was already checked
+		// Alias nodes normally reference already checked content. If the
+		// anchor was skipped because it sits under an ignored key, check its
+		// content here, once.
+		name := nodeName(n.Value)
+		if anchored, ok := c.skippedAnchors[name]; ok {
+			delete(c.skippedAnchors, name)
+			diagnostics = append(diagnostics, c.checkNode(anchored, path)...)
+		}
 
 	case *ast.MergeKeyNode:
 		// Handle merge keys (<<: *alias)
