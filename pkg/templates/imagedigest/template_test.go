@@ -39,14 +39,16 @@ func (s *ImageDigestTestSuite) addDeploymentWithContainerImage(name, containerIm
 
 func (s *ImageDigestTestSuite) TestUnpinnedImagesFlagged() {
 	const (
-		taggedImage   = "dep-with-tagged-image"
-		latestImage   = "dep-with-latest-image"
-		untaggedImage = "dep-with-untagged-image"
+		taggedImage    = "dep-with-tagged-image"
+		latestImage    = "dep-with-latest-image"
+		untaggedImage  = "dep-with-untagged-image"
+		shortDigestImg = "dep-with-short-sha256-digest"
 	)
 
 	s.addDeploymentWithContainerImage(taggedImage, "example.com/app:v1.2.3")
 	s.addDeploymentWithContainerImage(latestImage, "example.com/app:latest")
 	s.addDeploymentWithContainerImage(untaggedImage, "example.com/app")
+	s.addDeploymentWithContainerImage(shortDigestImg, "example.com/app@sha256:2cf0d5dcdb7680af443d09f850490eb79d9245b6e")
 
 	s.Validate(s.ctx, []templates.TestCase{
 		{
@@ -61,6 +63,9 @@ func (s *ImageDigestTestSuite) TestUnpinnedImagesFlagged() {
 				untaggedImage: {
 					{Message: "container \"test-container\" is using image \"example.com/app\" which is not pinned to a digest. Pin the image to an immutable digest (for example, \"image@sha256:<digest>\") so that a tag cannot be re-pointed at a different image."},
 				},
+				shortDigestImg: {
+					{Message: "container \"test-container\" is using image \"example.com/app@sha256:2cf0d5dcdb7680af443d09f850490eb79d9245b6e\" which is not pinned to a digest. Pin the image to an immutable digest (for example, \"image@sha256:<digest>\") so that a tag cannot be re-pointed at a different image."},
+				},
 			},
 			ExpectInstantiationError: false,
 		},
@@ -71,11 +76,13 @@ func (s *ImageDigestTestSuite) TestDigestPinnedImagesPass() {
 	const (
 		digestOnly    = "dep-with-digest-only"
 		tagAndDigest  = "dep-with-tag-and-digest"
+		sha512Digest  = "dep-with-sha512-digest"
 		allowedByList = "dep-with-allowed-image"
 	)
 
 	s.addDeploymentWithContainerImage(digestOnly, "example.com/app@sha256:2cf0d5dcdb7680af443d09f850490eb79d9245b6e5c9b04b9a70ea38513b6c00")
 	s.addDeploymentWithContainerImage(tagAndDigest, "example.com/app:v1.2.3@sha256:2cf0d5dcdb7680af443d09f850490eb79d9245b6e5c9b04b9a70ea38513b6c00")
+	s.addDeploymentWithContainerImage(sha512Digest, "example.com/app@sha512:401b09eab3c013d4ca54922bb802bec8fd5318192b0a75f201d8b372742401b09eab3c013d4ca54922bb802bec8fd5318192b0a75f201d8b372742")
 	s.addDeploymentWithContainerImage(allowedByList, "localhost:5000/dev-image")
 
 	s.Validate(s.ctx, []templates.TestCase{

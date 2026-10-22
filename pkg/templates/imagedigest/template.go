@@ -18,11 +18,12 @@ const (
 	templateKey = "image-digest"
 )
 
-// digestRegex matches the digest portion of an image reference, for example
+// digestRegex matches the digest portion of an image reference, capturing the
+// algorithm and the hex-encoded digest, for example
 // "@sha256:2cf0d5dcdb7680af443d09f850490eb79d9245b6e5c9b04b9a70ea38513b6c00".
-// A reference carrying a digest pins the exact image content, unlike a tag,
-// which is mutable and can be re-pointed at a different image at any time.
-var digestRegex = regexp.MustCompile(`@[a-zA-Z0-9][a-zA-Z0-9._-]*:[a-fA-F0-9]{32,}`)
+// A reference carrying a valid digest pins the exact image content, unlike a
+// tag, which is mutable and can be re-pointed at a different image at any time.
+var digestRegex = regexp.MustCompile(`@([a-zA-Z0-9][a-zA-Z0-9._-]*):([a-fA-F0-9]+)`)
 
 func init() {
 	templates.Register(check.Template{
@@ -58,8 +59,17 @@ func init() {
 }
 
 // hasDigest returns true if the image reference carries a content digest.
+// A sha256 digest is only valid at exactly 64 hex characters; other
+// algorithms must carry at least 32 hex characters to count as a digest.
 func hasDigest(image string) bool {
-	return digestRegex.MatchString(image)
+	matches := digestRegex.FindStringSubmatch(image)
+	if len(matches) != 3 {
+		return false
+	}
+	if matches[1] == "sha256" {
+		return len(matches[2]) == 64
+	}
+	return len(matches[2]) >= 32
 }
 
 // isAllowed returns true if the image matches any of the exemption regexes.
