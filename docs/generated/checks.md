@@ -384,6 +384,15 @@ minReplicas: 2
 group: extensions
 version: v1beta.+
 ```
+## no-image-digest
+
+**Enabled by default**: No
+
+**Description**: Indicates when a deployment-like object is running a container whose image is not pinned to an immutable digest
+
+**Remediation**: Pin container images to an immutable digest (for example, "nginx@sha256:<digest>") instead of relying on a mutable tag alone.
+
+**Template**: [image-digest](templates.md#image-digest)
 ## no-liveness-probe
 
 **Enabled by default**: No
