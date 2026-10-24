@@ -23,7 +23,9 @@ const (
 // "@sha256:2cf0d5dcdb7680af443d09f850490eb79d9245b6e5c9b04b9a70ea38513b6c00".
 // A reference carrying a valid digest pins the exact image content, unlike a
 // tag, which is mutable and can be re-pointed at a different image at any time.
-var digestRegex = regexp.MustCompile(`@([a-zA-Z0-9][a-zA-Z0-9._-]*):([a-fA-F0-9]+)`)
+// The match is anchored to the end of the reference so that a trailing suffix
+// (for example, "@sha256:<digest>:extra") does not count as a valid digest.
+var digestRegex = regexp.MustCompile(`@([a-zA-Z0-9][a-zA-Z0-9._-]*):([a-fA-F0-9]+)$`)
 
 func init() {
 	templates.Register(check.Template{

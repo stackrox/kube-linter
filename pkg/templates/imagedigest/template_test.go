@@ -37,18 +37,36 @@ func (s *ImageDigestTestSuite) addDeploymentWithContainerImage(name, containerIm
 	s.ctx.AddContainerToDeployment(s.T(), name, v1.Container{Name: containerName, Image: containerImage})
 }
 
+func (s *ImageDigestTestSuite) addDeploymentWithInitContainerImage(name, containerImage string) {
+	s.ctx.AddMockDeployment(s.T(), name)
+	s.ctx.AddInitContainerToDeployment(s.T(), name, v1.Container{Name: "test-init-container", Image: containerImage})
+}
+
+func (s *ImageDigestTestSuite) addDeploymentWithEphemeralContainerImage(name, containerImage string) {
+	s.ctx.AddMockDeployment(s.T(), name)
+	s.ctx.AddEphemeralContainerToDeployment(s.T(), name, v1.EphemeralContainer{
+		EphemeralContainerCommon: v1.EphemeralContainerCommon{Name: "test-ephemeral-container", Image: containerImage},
+	})
+}
+
 func (s *ImageDigestTestSuite) TestUnpinnedImagesFlagged() {
 	const (
-		taggedImage    = "dep-with-tagged-image"
-		latestImage    = "dep-with-latest-image"
-		untaggedImage  = "dep-with-untagged-image"
-		shortDigestImg = "dep-with-short-sha256-digest"
+		taggedImage       = "dep-with-tagged-image"
+		latestImage       = "dep-with-latest-image"
+		untaggedImage     = "dep-with-untagged-image"
+		shortDigestImg    = "dep-with-short-sha256-digest"
+		malformedDigest   = "dep-with-malformed-digest"
+		initUnpinned      = "dep-with-unpinned-init-container"
+		ephemeralUnpinned = "dep-with-unpinned-ephemeral-container"
 	)
 
 	s.addDeploymentWithContainerImage(taggedImage, "example.com/app:v1.2.3")
 	s.addDeploymentWithContainerImage(latestImage, "example.com/app:latest")
 	s.addDeploymentWithContainerImage(untaggedImage, "example.com/app")
 	s.addDeploymentWithContainerImage(shortDigestImg, "example.com/app@sha256:2cf0d5dcdb7680af443d09f850490eb79d9245b6e")
+	s.addDeploymentWithContainerImage(malformedDigest, "example.com/app@sha256:2cf0d5dcdb7680af443d09f850490eb79d9245b6e5c9b04b9a70ea38513b6c00:extra")
+	s.addDeploymentWithInitContainerImage(initUnpinned, "example.com/init:v1")
+	s.addDeploymentWithEphemeralContainerImage(ephemeralUnpinned, "example.com/ephemeral:v1")
 
 	s.Validate(s.ctx, []templates.TestCase{
 		{
@@ -65,6 +83,15 @@ func (s *ImageDigestTestSuite) TestUnpinnedImagesFlagged() {
 				},
 				shortDigestImg: {
 					{Message: "container \"test-container\" is using image \"example.com/app@sha256:2cf0d5dcdb7680af443d09f850490eb79d9245b6e\" which is not pinned to a digest. Pin the image to an immutable digest (for example, \"image@sha256:<digest>\") so that a tag cannot be re-pointed at a different image."},
+				},
+				malformedDigest: {
+					{Message: "container \"test-container\" is using image \"example.com/app@sha256:2cf0d5dcdb7680af443d09f850490eb79d9245b6e5c9b04b9a70ea38513b6c00:extra\" which is not pinned to a digest. Pin the image to an immutable digest (for example, \"image@sha256:<digest>\") so that a tag cannot be re-pointed at a different image."},
+				},
+				initUnpinned: {
+					{Message: "container \"test-init-container\" is using image \"example.com/init:v1\" which is not pinned to a digest. Pin the image to an immutable digest (for example, \"image@sha256:<digest>\") so that a tag cannot be re-pointed at a different image."},
+				},
+				ephemeralUnpinned: {
+					{Message: "container \"test-ephemeral-container\" is using image \"example.com/ephemeral:v1\" which is not pinned to a digest. Pin the image to an immutable digest (for example, \"image@sha256:<digest>\") so that a tag cannot be re-pointed at a different image."},
 				},
 			},
 			ExpectInstantiationError: false,
