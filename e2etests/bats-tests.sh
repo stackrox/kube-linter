@@ -580,6 +580,23 @@ get_value_from() {
   [[ "${count}" == "1" ]]
 }
 
+@test "no-image-digest" {
+  tmp="tests/checks/no-image-digest.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include no-image-digest --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment: container \"app\" is using image \"app:v1\" which is not pinned to a digest. Pin the image to an immutable digest (for example, \"image@sha256:<digest>\") so that a tag cannot be re-pointed at a different image." ]]
+  [[ "${message2}" == "DeploymentConfig: container \"app\" is using image \"app:v1\" which is not pinned to a digest. Pin the image to an immutable digest (for example, \"image@sha256:<digest>\") so that a tag cannot be re-pointed at a different image." ]]
+  [[ "${count}" == "2" ]]
+}
+
 @test "no-liveness-probe" {
   tmp="tests/checks/no-liveness-probe.yml"
   cmd="${KUBE_LINTER_BIN} lint --include no-liveness-probe --do-not-auto-add-defaults --format json ${tmp}"
