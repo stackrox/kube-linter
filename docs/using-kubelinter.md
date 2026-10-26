@@ -41,6 +41,7 @@ kube-linter lint /path/to/directory/containing/kustomization.yaml
 > For example,
 > - Use `--format=json` to get the output in JSON format.
 > - Use `--format=sarif` to get the output in the [SARIF spec](https://github.com/microsoft/sarif-tutorials).
+> - Use `--format=junit` to get a JUnit XML report that CI systems can show as test results. Each check is a test suite, and each lint error is a failing test case named after the object.
 
 ## Multiple Output Formats
 

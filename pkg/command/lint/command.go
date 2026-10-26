@@ -39,6 +39,7 @@ var (
 		Formatters: map[common.FormatType]common.FormatFunc{
 			common.JSONFormat:  common.FormatJSON,
 			common.SARIFFormat: formatLintSarif,
+			common.JUnitFormat: formatLintJUnit,
 			common.PlainFormat: plainTemplate.Execute,
 		},
 	}
