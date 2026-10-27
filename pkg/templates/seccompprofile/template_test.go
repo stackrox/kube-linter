@@ -65,9 +65,9 @@ func (s *SeccompProfileTestSuite) addDeployment(name string, podSC *v1.PodSecuri
 
 var localhostProfileRef = "my-profiles/profile.json"
 
-func containerWithProfile(name, profileType string) v1.Container {
+func containerWithProfile(profileType string) v1.Container {
 	return v1.Container{
-		Name: name,
+		Name: containerName,
 		SecurityContext: &v1.SecurityContext{
 			SeccompProfile: &v1.SeccompProfile{Type: v1.SeccompProfileType(profileType)},
 		},
@@ -88,12 +88,12 @@ func (s *SeccompProfileTestSuite) TestNoSeccompProfileFlagged() {
 	s.addDeployment(emptySecurityCtx, nil,
 		[]v1.Container{{Name: containerName, SecurityContext: &v1.SecurityContext{}}}, nil, nil)
 	s.addDeployment(unconfinedContainer, nil,
-		[]v1.Container{containerWithProfile(containerName, unconfinedProfile)}, nil, nil)
+		[]v1.Container{containerWithProfile(unconfinedProfile)}, nil, nil)
 	s.addDeployment(unconfinedPod,
 		&v1.PodSecurityContext{SeccompProfile: &v1.SeccompProfile{Type: v1.SeccompProfileTypeUnconfined}},
 		[]v1.Container{{Name: containerName}}, nil, nil)
 	s.addDeployment(emptyProfileType, nil,
-		[]v1.Container{containerWithProfile(containerName, "")}, nil, nil)
+		[]v1.Container{containerWithProfile("")}, nil, nil)
 
 	s.Validate(s.ctx, []templates.TestCase{
 		{
@@ -119,8 +119,8 @@ func (s *SeccompProfileTestSuite) TestSeccompProfileSetNotFlagged() {
 	)
 
 	s.addDeployment(containerRuntimeDefault, nil,
-		[]v1.Container{containerWithProfile(containerName, runtimeDefaultProfile)}, nil, nil)
-	localhostContainer := containerWithProfile(containerName, localhostProfile)
+		[]v1.Container{containerWithProfile(runtimeDefaultProfile)}, nil, nil)
+	localhostContainer := containerWithProfile(localhostProfile)
 	localhostContainer.SecurityContext.SeccompProfile.LocalhostProfile = &localhostProfileRef
 	s.addDeployment(containerLocalhost, nil,
 		[]v1.Container{localhostContainer}, nil, nil)
@@ -133,7 +133,7 @@ func (s *SeccompProfileTestSuite) TestSeccompProfileSetNotFlagged() {
 	// A container-level profile takes precedence over an "Unconfined" pod-level profile.
 	s.addDeployment(containerOverridesPod,
 		&v1.PodSecurityContext{SeccompProfile: &v1.SeccompProfile{Type: v1.SeccompProfileTypeUnconfined}},
-		[]v1.Container{containerWithProfile(containerName, runtimeDefaultProfile)}, nil, nil)
+		[]v1.Container{containerWithProfile(runtimeDefaultProfile)}, nil, nil)
 
 	s.Validate(s.ctx, []templates.TestCase{
 		{
@@ -150,7 +150,7 @@ func (s *SeccompProfileTestSuite) TestInitAndEphemeralContainers() {
 		podProfileCovers   = "pod-profile-covers-init-and-ephemeral"
 	)
 
-	compliant := containerWithProfile(containerName, runtimeDefaultProfile)
+	compliant := containerWithProfile(runtimeDefaultProfile)
 	s.addDeployment(initNoProfile, nil,
 		[]v1.Container{compliant},
 		[]v1.Container{{Name: initContainerName}}, nil)
