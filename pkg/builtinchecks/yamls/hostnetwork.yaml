@@ -1,6 +1,13 @@
 name: "host-network"
-description: "Alert on pods/deployment-likes with sharing host's network namespace"
-remediation: "Ensure the host's network namespace is not shared."
+description: >-
+  Alert on pods/deployment-likes sharing the host's network namespace.
+  Pods with hostNetwork: true bypass service mesh mTLS, silently disabling
+  encryption for inter-service traffic. They also gain access to
+  network-level attacks against other pods on the same node.
+remediation: >-
+  Ensure the host's network namespace is not shared. If host networking
+  is required, be aware that service mesh mTLS is bypassed and consider
+  alternative encryption for inter-service communication.
 scope:
   objectKinds:
     - DeploymentLike
