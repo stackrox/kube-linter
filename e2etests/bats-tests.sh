@@ -663,6 +663,23 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "no-seccomp-profile" {
+  tmp="tests/checks/no-seccomp-profile.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include no-seccomp-profile --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "Deployment: container \"app\" does not have a seccomp profile set. Set seccompProfile.type to \"RuntimeDefault\" or \"Localhost\" in the securityContext of the container or the pod." ]]
+  [[ "${message2}" == "DeploymentConfig: container \"app\" does not have a seccomp profile set. Set seccompProfile.type to \"RuntimeDefault\" or \"Localhost\" in the securityContext of the container or the pod." ]]
+  [[ "${count}" == "2" ]]
+}
+
 @test "non-existent-service-account" {
   tmp="tests/checks/non-existent-service-account.yml"
   cmd="${KUBE_LINTER_BIN} lint --include non-existent-service-account --do-not-auto-add-defaults --format json ${tmp}"
