@@ -435,6 +435,15 @@ version: v1beta.+
 ```yaml
 strategyTypeRegex: ^(RollingUpdate|Rolling)$
 ```
+## no-seccomp-profile
+
+**Enabled by default**: No
+
+**Description**: Indicates when a deployment-like object is running a container without a seccomp profile
+
+**Remediation**: Set a seccomp profile (for example, seccompProfile.type: RuntimeDefault) in the securityContext of each container or of the pod.
+
+**Template**: [seccomp-profile](templates.md#seccomp-profile)
 ## non-existent-service-account
 
 **Enabled by default**: Yes

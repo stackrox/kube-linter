@@ -888,6 +888,15 @@ KubeLinter supports the following templates:
   type: boolean
 ```
 
+## Seccomp Profile
+
+**Key**: `seccomp-profile`
+
+**Description**: Flag containers without a seccomp profile
+
+**Supported Objects**: DeploymentLike
+
+
 ## Service Account
 
 **Key**: `service-account`
