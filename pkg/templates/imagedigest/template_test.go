@@ -128,6 +128,35 @@ func (s *ImageDigestTestSuite) TestDigestPinnedImagesPass() {
 	})
 }
 
+func (s *ImageDigestTestSuite) TestOtherAlgorithmDigests() {
+	const (
+		sha384Digest     = "dep-with-sha384-digest"
+		shortSha384      = "dep-with-short-sha384-digest"
+		otherAlgo32Chars = "dep-with-32-char-other-digest"
+		emptyImage       = "dep-with-empty-image"
+	)
+
+	// Algorithms other than sha256 and sha512 count as a digest when the hex
+	// part is at least 32 characters, so a full sha384 digest and a 32-char
+	// digest pass, while a 16-char one is flagged.
+	s.addDeploymentWithContainerImage(sha384Digest, "example.com/app@sha384:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
+	s.addDeploymentWithContainerImage(shortSha384, "example.com/app@sha384:0123456789abcdef")
+	s.addDeploymentWithContainerImage(otherAlgo32Chars, "example.com/app@md5:0123456789abcdef0123456789abcdef")
+	s.addDeploymentWithContainerImage(emptyImage, "")
+
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				shortSha384: {
+					{Message: "container \"test-container\" is using image \"example.com/app@sha384:0123456789abcdef\" which is not pinned to a digest. Pin the image to an immutable digest (for example, \"image@sha256:<digest>\") so that a tag cannot be re-pointed at a different image."},
+				},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
 func (s *ImageDigestTestSuite) TestInvalidAllowListRegex() {
 	s.Validate(s.ctx, []templates.TestCase{
 		{
