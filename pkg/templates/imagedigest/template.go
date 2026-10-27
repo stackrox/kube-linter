@@ -61,8 +61,9 @@ func init() {
 }
 
 // hasDigest returns true if the image reference carries a content digest.
-// A sha256 digest is only valid at exactly 64 hex characters; other
-// algorithms must carry at least 32 hex characters to count as a digest.
+// A sha256 digest is only valid at exactly 64 hex characters and a sha512
+// digest at exactly 128; other algorithms must carry at least 32 hex
+// characters to count as a digest.
 func hasDigest(image string) bool {
 	matches := digestRegex.FindStringSubmatch(image)
 	if len(matches) != 3 {
@@ -70,6 +71,9 @@ func hasDigest(image string) bool {
 	}
 	if matches[1] == "sha256" {
 		return len(matches[2]) == 64
+	}
+	if matches[1] == "sha512" {
+		return len(matches[2]) == 128
 	}
 	return len(matches[2]) >= 32
 }

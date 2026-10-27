@@ -55,6 +55,7 @@ func (s *ImageDigestTestSuite) TestUnpinnedImagesFlagged() {
 		latestImage       = "dep-with-latest-image"
 		untaggedImage     = "dep-with-untagged-image"
 		shortDigestImg    = "dep-with-short-sha256-digest"
+		shortSha512Img    = "dep-with-short-sha512-digest"
 		malformedDigest   = "dep-with-malformed-digest"
 		initUnpinned      = "dep-with-unpinned-init-container"
 		ephemeralUnpinned = "dep-with-unpinned-ephemeral-container"
@@ -64,6 +65,7 @@ func (s *ImageDigestTestSuite) TestUnpinnedImagesFlagged() {
 	s.addDeploymentWithContainerImage(latestImage, "example.com/app:latest")
 	s.addDeploymentWithContainerImage(untaggedImage, "example.com/app")
 	s.addDeploymentWithContainerImage(shortDigestImg, "example.com/app@sha256:2cf0d5dcdb7680af443d09f850490eb79d9245b6e")
+	s.addDeploymentWithContainerImage(shortSha512Img, "example.com/app@sha512:401b09eab3c013d4ca54922bb802bec8")
 	s.addDeploymentWithContainerImage(malformedDigest, "example.com/app@sha256:2cf0d5dcdb7680af443d09f850490eb79d9245b6e5c9b04b9a70ea38513b6c00:extra")
 	s.addDeploymentWithInitContainerImage(initUnpinned, "example.com/init:v1")
 	s.addDeploymentWithEphemeralContainerImage(ephemeralUnpinned, "example.com/ephemeral:v1")
@@ -87,6 +89,9 @@ func (s *ImageDigestTestSuite) TestUnpinnedImagesFlagged() {
 				malformedDigest: {
 					{Message: "container \"test-container\" is using image \"example.com/app@sha256:2cf0d5dcdb7680af443d09f850490eb79d9245b6e5c9b04b9a70ea38513b6c00:extra\" which is not pinned to a digest. Pin the image to an immutable digest (for example, \"image@sha256:<digest>\") so that a tag cannot be re-pointed at a different image."},
 				},
+				shortSha512Img: {
+					{Message: "container \"test-container\" is using image \"example.com/app@sha512:401b09eab3c013d4ca54922bb802bec8\" which is not pinned to a digest. Pin the image to an immutable digest (for example, \"image@sha256:<digest>\") so that a tag cannot be re-pointed at a different image."},
+				},
 				initUnpinned: {
 					{Message: "container \"test-init-container\" is using image \"example.com/init:v1\" which is not pinned to a digest. Pin the image to an immutable digest (for example, \"image@sha256:<digest>\") so that a tag cannot be re-pointed at a different image."},
 				},
@@ -109,7 +114,7 @@ func (s *ImageDigestTestSuite) TestDigestPinnedImagesPass() {
 
 	s.addDeploymentWithContainerImage(digestOnly, "example.com/app@sha256:2cf0d5dcdb7680af443d09f850490eb79d9245b6e5c9b04b9a70ea38513b6c00")
 	s.addDeploymentWithContainerImage(tagAndDigest, "example.com/app:v1.2.3@sha256:2cf0d5dcdb7680af443d09f850490eb79d9245b6e5c9b04b9a70ea38513b6c00")
-	s.addDeploymentWithContainerImage(sha512Digest, "example.com/app@sha512:401b09eab3c013d4ca54922bb802bec8fd5318192b0a75f201d8b372742401b09eab3c013d4ca54922bb802bec8fd5318192b0a75f201d8b372742")
+	s.addDeploymentWithContainerImage(sha512Digest, "example.com/app@sha512:401b09eab3c013d4ca54922bb802bec8fd5318192b0a75f201d8b372742401b09eab3c013d4ca54922bb802bec8fd5318192b0a75f201d8b3727420123456789")
 	s.addDeploymentWithContainerImage(allowedByList, "localhost:5000/dev-image")
 
 	s.Validate(s.ctx, []templates.TestCase{
