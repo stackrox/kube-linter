@@ -81,9 +81,17 @@ func formatJUnit(out io.Writer, result run.Result) error {
 		if len(reports) == 0 {
 			suite.TestCases = append(suite.TestCases, junitTestCase{Name: checkName, ClassName: checkName})
 		}
+		// Some JUnit consumers (GitLab, for example) keep only the first case with a given classname and name,
+		// so repeated names in a suite get a counter.
+		seen := make(map[string]int)
 		for _, report := range reports {
+			name := junitCaseName(report)
+			seen[name]++
+			if n := seen[name]; n > 1 {
+				name = fmt.Sprintf("%s #%d", name, n)
+			}
 			suite.TestCases = append(suite.TestCases, junitTestCase{
-				Name:      report.Object.GetK8sObjectName().String(),
+				Name:      name,
 				ClassName: checkName,
 				File:      report.Object.Metadata.FilePath,
 				Failure: &junitFailure{
@@ -110,6 +118,16 @@ func formatJUnit(out io.Writer, result run.Result) error {
 	}
 	_, err := io.WriteString(out, "\n")
 	return err
+}
+
+// junitCaseName names a failing case after its object. Objects that failed to load have no name, so their file
+// path is used instead.
+func junitCaseName(report diagnostic.WithContext) string {
+	objectName := report.Object.GetK8sObjectName()
+	if objectName.Name == "" && report.Object.Metadata.FilePath != "" {
+		return report.Object.Metadata.FilePath
+	}
+	return objectName.String()
 }
 
 func junitFailureText(report diagnostic.WithContext) string {

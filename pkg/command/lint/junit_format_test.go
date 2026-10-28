@@ -108,6 +108,52 @@ func TestFormatJUnit(t *testing.T) {
 	assert.Equal(t, 1, loadFailure.Failures)
 	require.Len(t, loadFailure.TestCases, 1)
 	assert.Equal(t, "deploy/broken.yaml", loadFailure.TestCases[0].File)
+	assert.Equal(t, "deploy/broken.yaml", loadFailure.TestCases[0].Name)
+}
+
+func TestFormatJUnit_UniqueCaseNames(t *testing.T) {
+	pod := lintcontext.Object{
+		Metadata:  lintcontext.ObjectMetadata{FilePath: "deploy/pod.yaml"},
+		K8sObject: junitTestPod("prod", "web"),
+	}
+	loadFailure := func(path string) diagnostic.WithContext {
+		return diagnostic.WithContext{
+			Diagnostic: diagnostic.Diagnostic{Message: "failed to decode"},
+			Check:      "failed-to-load-object",
+			Object: lintcontext.Object{
+				Metadata:  lintcontext.ObjectMetadata{FilePath: path},
+				K8sObject: &unstructured.Unstructured{},
+			},
+		}
+	}
+	result := run.Result{
+		Checks: []config.Check{{Name: "latest-tag"}},
+		Reports: []diagnostic.WithContext{
+			{Diagnostic: diagnostic.Diagnostic{Message: `container "app" uses image "nginx:latest"`}, Check: "latest-tag", Object: pod},
+			{Diagnostic: diagnostic.Diagnostic{Message: `container "sidecar" uses image "envoy:latest"`}, Check: "latest-tag", Object: pod},
+			loadFailure("deploy/a.yaml"),
+			loadFailure("deploy/b.yaml"),
+			loadFailure("deploy/b.yaml"),
+		},
+	}
+
+	var buf bytes.Buffer
+	require.NoError(t, formatLintJUnit(&buf, result))
+	var got junitTestSuites
+	require.NoError(t, xml.Unmarshal(buf.Bytes(), &got))
+	require.Len(t, got.Suites, 2)
+
+	var names []string
+	for _, tc := range got.Suites[0].TestCases {
+		names = append(names, tc.Name)
+	}
+	assert.Equal(t, []string{"prod/web /v1, Kind=Pod", "prod/web /v1, Kind=Pod #2"}, names)
+
+	names = nil
+	for _, tc := range got.Suites[1].TestCases {
+		names = append(names, tc.Name)
+	}
+	assert.Equal(t, []string{"deploy/a.yaml", "deploy/b.yaml", "deploy/b.yaml #2"}, names)
 }
 
 func TestFormatJUnit_NoChecks(t *testing.T) {
