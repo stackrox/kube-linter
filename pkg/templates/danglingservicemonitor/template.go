@@ -63,7 +63,8 @@ func init() {
 							continue
 						}
 					}
-					if labelSelector.Matches(labels.Set(services.Labels)) && labelSelectorSet && !nsSelectorSet {
+					if labelSelector.Matches(labels.Set(services.Labels)) && labelSelectorSet && !nsSelectorSet &&
+						sameNamespace(serviceMonitor.Namespace, services.Namespace) {
 						// Found!
 						return nil
 					}
@@ -73,6 +74,22 @@ func init() {
 			}, nil
 		}),
 	})
+}
+
+// sameNamespace reports whether a service is discoverable by a service monitor
+// that sets no namespace selector. Prometheus Operator reads an empty
+// NamespaceSelector as the monitor's own namespace, so a service elsewhere does
+// not satisfy such a monitor.
+//
+// A manifest that leaves the namespace out carries nothing to compare - a Helm
+// template rendered without one, or a file meant to be applied with
+// "-n" - and is treated as being in the same namespace rather than reported.
+func sameNamespace(serviceMonitorNamespace, serviceNamespace string) bool {
+	if serviceMonitorNamespace == "" || serviceNamespace == "" {
+		return true
+	}
+
+	return serviceMonitorNamespace == serviceNamespace
 }
 
 func checkNamespaceSelector(namespaceSelector k8sMonitoring.NamespaceSelector, service *v1.Service) bool {
