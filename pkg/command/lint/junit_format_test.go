@@ -132,6 +132,7 @@ func TestFormatJUnit_UniqueCaseNames(t *testing.T) {
 			{Diagnostic: diagnostic.Diagnostic{Message: `container "app" uses image "nginx:latest"`}, Check: "latest-tag", Object: pod},
 			{Diagnostic: diagnostic.Diagnostic{Message: `container "sidecar" uses image "envoy:latest"`}, Check: "latest-tag", Object: pod},
 			loadFailure("deploy/a.yaml"),
+			loadFailure("deploy/b.yaml #2"),
 			loadFailure("deploy/b.yaml"),
 			loadFailure("deploy/b.yaml"),
 		},
@@ -153,7 +154,7 @@ func TestFormatJUnit_UniqueCaseNames(t *testing.T) {
 	for _, tc := range got.Suites[1].TestCases {
 		names = append(names, tc.Name)
 	}
-	assert.Equal(t, []string{"deploy/a.yaml", "deploy/b.yaml", "deploy/b.yaml #2"}, names)
+	assert.Equal(t, []string{"deploy/a.yaml", "deploy/b.yaml #2", "deploy/b.yaml", "deploy/b.yaml #3"}, names)
 }
 
 func TestFormatJUnit_NoChecks(t *testing.T) {

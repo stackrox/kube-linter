@@ -83,13 +83,17 @@ func formatJUnit(out io.Writer, result run.Result) error {
 		}
 		// Some JUnit consumers (GitLab, for example) keep only the first case with a given classname and name,
 		// so repeated names in a suite get a counter.
-		seen := make(map[string]int)
+		// A base name can itself look like "x #2", so check every candidate against the names already used.
+		used := make(map[string]bool)
+		count := make(map[string]int)
 		for _, report := range reports {
-			name := junitCaseName(report)
-			seen[name]++
-			if n := seen[name]; n > 1 {
-				name = fmt.Sprintf("%s #%d", name, n)
+			base := junitCaseName(report)
+			name := base
+			for used[name] {
+				count[base]++
+				name = fmt.Sprintf("%s #%d", base, count[base]+1)
 			}
+			used[name] = true
 			suite.TestCases = append(suite.TestCases, junitTestCase{
 				Name:      name,
 				ClassName: checkName,
