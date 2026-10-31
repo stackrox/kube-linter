@@ -12,6 +12,8 @@ import (
 
 	appsV1 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
+	discoveryV1 "k8s.io/api/discovery/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
@@ -63,6 +65,58 @@ func (s *DanglingServiceTestSuite) TestServiceEmptySelectorMatchesNoPods() {
 	s.AddDeploymentWithLabels(pod1, labelselector1)
 	s.AddDeploymentWithLabels(pod2, labelselector2)
 	s.AddService(serviceNone, emptyLabels)
+
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				serviceNone: {{Message: "service has no selector specified"}},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+func (s *DanglingServiceTestSuite) TestServiceEmptySelectorWithEndpoints() {
+	s.AddService(serviceNone, emptyLabels)
+	s.ctx.AddObject("endpoints", &v1.Endpoints{ObjectMeta: metaV1.ObjectMeta{Name: serviceNone}})
+
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				serviceNone: {},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+func (s *DanglingServiceTestSuite) TestServiceEmptySelectorWithEndpointSlice() {
+	s.AddService(serviceNone, emptyLabels)
+	s.ctx.AddObject("endpointslice", &discoveryV1.EndpointSlice{ObjectMeta: metaV1.ObjectMeta{
+		Name:   serviceNone + "-1",
+		Labels: map[string]string{discoveryV1.LabelServiceName: serviceNone},
+	}})
+
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				serviceNone: {},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+func (s *DanglingServiceTestSuite) TestServiceEmptySelectorWithEndpointsForOtherService() {
+	s.AddService(serviceNone, emptyLabels)
+	s.ctx.AddObject("endpoints", &v1.Endpoints{ObjectMeta: metaV1.ObjectMeta{Name: "another-service"}})
+	s.ctx.AddObject("endpointslice", &discoveryV1.EndpointSlice{ObjectMeta: metaV1.ObjectMeta{
+		Name:   "another-service-1",
+		Labels: map[string]string{discoveryV1.LabelServiceName: "another-service"},
+	}})
 
 	s.Validate(s.ctx, []templates.TestCase{
 		{

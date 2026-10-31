@@ -12,6 +12,7 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	"golang.stackrox.io/kube-linter/pkg/templates/danglingservice/internal/params"
 	v1 "k8s.io/api/core/v1"
+	discoveryV1 "k8s.io/api/discovery/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 )
@@ -40,6 +41,10 @@ func init() {
 				}
 				selector := service.Spec.Selector
 				if len(selector) == 0 {
+					// A service without a selector is backed by manually managed Endpoints or EndpointSlices.
+					if hasEndpoints(lintCtx, service) {
+						return nil
+					}
 					return []diagnostic.Diagnostic{{
 						Message: "service has no selector specified",
 					}}
@@ -72,4 +77,23 @@ func init() {
 			}, nil
 		}),
 	})
+}
+
+func hasEndpoints(lintCtx lintcontext.LintContext, service *v1.Service) bool {
+	for _, obj := range lintCtx.Objects() {
+		if obj.K8sObject.GetNamespace() != service.Namespace {
+			continue
+		}
+		switch o := obj.K8sObject.(type) {
+		case *v1.Endpoints:
+			if o.Name == service.Name {
+				return true
+			}
+		case *discoveryV1.EndpointSlice:
+			if o.Labels[discoveryV1.LabelServiceName] == service.Name {
+				return true
+			}
+		}
+	}
+	return false
 }
