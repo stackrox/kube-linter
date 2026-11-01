@@ -85,7 +85,7 @@ func hasEndpoints(lintCtx lintcontext.LintContext, service *v1.Service) bool {
 			continue
 		}
 		switch o := obj.K8sObject.(type) {
-		case *v1.Endpoints:
+		case *v1.Endpoints: //nolint:staticcheck // selectorless Services are still backed by core/v1 Endpoints
 			if o.Name == service.Name {
 				return true
 			}

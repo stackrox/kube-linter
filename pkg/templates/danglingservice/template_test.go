@@ -79,7 +79,7 @@ func (s *DanglingServiceTestSuite) TestServiceEmptySelectorMatchesNoPods() {
 
 func (s *DanglingServiceTestSuite) TestServiceEmptySelectorWithEndpoints() {
 	s.AddService(serviceNone, emptyLabels)
-	s.ctx.AddObject("endpoints", &v1.Endpoints{ObjectMeta: metaV1.ObjectMeta{Name: serviceNone}})
+	s.ctx.AddObject("endpoints", &v1.Endpoints{ObjectMeta: metaV1.ObjectMeta{Name: serviceNone}}) //nolint:staticcheck // core/v1 Endpoints is what the check accepts
 
 	s.Validate(s.ctx, []templates.TestCase{
 		{
@@ -112,7 +112,7 @@ func (s *DanglingServiceTestSuite) TestServiceEmptySelectorWithEndpointSlice() {
 
 func (s *DanglingServiceTestSuite) TestServiceEmptySelectorWithEndpointsForOtherService() {
 	s.AddService(serviceNone, emptyLabels)
-	s.ctx.AddObject("endpoints", &v1.Endpoints{ObjectMeta: metaV1.ObjectMeta{Name: "another-service"}})
+	s.ctx.AddObject("endpoints", &v1.Endpoints{ObjectMeta: metaV1.ObjectMeta{Name: "another-service"}}) //nolint:staticcheck // core/v1 Endpoints is what the check accepts
 	s.ctx.AddObject("endpointslice", &discoveryV1.EndpointSlice{ObjectMeta: metaV1.ObjectMeta{
 		Name:   "another-service-1",
 		Labels: map[string]string{discoveryV1.LabelServiceName: "another-service"},
