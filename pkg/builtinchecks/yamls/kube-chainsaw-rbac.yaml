@@ -1,0 +1,8 @@
+name: "kube-chainsaw-rbac"
+description: "Detects RBAC privilege escalation paths, dangerous verbs, sensitive resource access, and scope confusion using graph analysis powered by kube-chainsaw"
+remediation: "Review the RBAC configuration and apply least-privilege principles. See https://ugiordan.github.io/kube-chainsaw/ for detailed remediation guidance per rule."
+scope:
+  objectKinds:
+    - Any
+template: "kube-chainsaw"
+params: {}

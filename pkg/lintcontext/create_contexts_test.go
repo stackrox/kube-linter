@@ -40,6 +40,7 @@ func TestCreateContextsWithIgnorePaths(t *testing.T) {
 		"../../cmd/**/*",
 		"../../docs/**/*",
 		"../../internal/**/*",
+		"../../.gopath-loader/**/*",
 		"/**/*/checks/**/*",
 		"/**/*/test_helper/**/*",
 		"/**/*/testdata/**/*",
