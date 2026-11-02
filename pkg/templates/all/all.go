@@ -56,6 +56,7 @@ import (
 	_ "golang.stackrox.io/kube-linter/pkg/templates/restartpolicy"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/runasnonroot"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/sccdenypriv"
+	_ "golang.stackrox.io/kube-linter/pkg/templates/seccompprofile"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/serviceaccount"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/servicetype"
 	_ "golang.stackrox.io/kube-linter/pkg/templates/sortedkeys"
