@@ -925,6 +925,15 @@ KubeLinter supports the following templates:
   name: recursive
   required: false
   type: boolean
+- arrayElemType: string
+  description: IgnoredKeys is a list of keys whose values are not checked for sorting,
+    at any nesting level, for example "labels" and "annotations". The order of the
+    ignored key itself among its siblings is still checked.
+  name: ignoredKeys
+  negationAllowed: false
+  regexAllowed: false
+  required: false
+  type: array
 ```
 
 ## Startup Port Exposed
