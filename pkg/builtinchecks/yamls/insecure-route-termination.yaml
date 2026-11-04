@@ -1,0 +1,17 @@
+name: insecure-route-termination
+description: >-
+  OpenShift Route allows plaintext HTTP via InsecureEdgeTerminationPolicy: Allow.
+  Credential-bearing endpoints should enforce TLS by using Redirect or None.
+remediation: >-
+  Set spec.tls.insecureEdgeTerminationPolicy to 'Redirect' or 'None'.
+scope:
+  objectKinds:
+    - Any
+template: cel-expression
+params:
+  check: >
+    object.kind == 'Route' &&
+    has(object.spec.tls) &&
+    has(object.spec.tls.insecureEdgeTerminationPolicy) &&
+    object.spec.tls.insecureEdgeTerminationPolicy == 'Allow'
+    ? 'Route allows plaintext HTTP — credential-bearing endpoints should use Redirect or None' : ''
