@@ -328,13 +328,17 @@ get_value_from() {
   message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
   message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
   message4=$(get_value_from "${lines[0]}" '.Reports[3].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[3].Diagnostic.Message')
+  message5=$(get_value_from "${lines[0]}" '.Reports[4].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[4].Diagnostic.Message')
+  message6=$(get_value_from "${lines[0]}" '.Reports[5].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[5].Diagnostic.Message')
   count=$(get_value_from "${lines[0]}" '.Reports | length')
 
   [[ "${message1}" == "Deployment: The container \"app\" is referring to an unknown key \"chimpmunk\" in secret \"secretsquirrels\"" ]]
   [[ "${message2}" == "Deployment: The container \"app\" is referring to an unknown key \"configkey-wrong\" in config map \"testconfig\"" ]]
   [[ "${message3}" == "Deployment: The container \"app\" is referring to an unknown config map \"missingconfig\"" ]]
   [[ "${message4}" == "Deployment: The container \"app\" is referring to an unknown secret \"missingsecret\"" ]]
-  [[ "${count}" == "4" ]]
+  [[ "${message5}" == "Deployment: The container \"app\" is referring to an unknown config map \"missingenvfromconfig\"" ]]
+  [[ "${message6}" == "Deployment: The volume \"secret-volume\" is referring to an unknown secret \"missingvolumesecret\"" ]]
+  [[ "${count}" == "6" ]]
 }
 
 @test "env-var-secret" {
