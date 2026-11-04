@@ -1,0 +1,18 @@
+name: "container-runtime-sock"
+description: "Alert on deployments with the container runtime or crio socket mounted in containers. "
+remediation: >- 
+  Ensure the container runtime socket is not mounted inside any containers by removing the
+  associated Volume and VolumeMount in deployment yaml specification.
+  If the container runtime socket is mounted inside a container it could allow processes running
+  within the container to execute command against the runtime which would effectively allow for
+  full control of the host.
+  
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "host-mounts"
+params:
+  dirs:
+  - "docker.sock$"
+  - "crio.sock$"
+  - "containerd.sock$"

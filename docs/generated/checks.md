@@ -58,6 +58,24 @@ verbs:
 **Remediation**: Create and assign a separate role that has access to specific resources/actions needed for the service account.
 
 **Template**: [cluster-admin-role-binding](templates.md#cluster-admin-role-binding)
+## container-runtime-sock
+
+**Enabled by default**: Yes
+
+**Description**: Alert on deployments with the container runtime or crio socket mounted in containers. 
+
+**Remediation**: Ensure the container runtime socket is not mounted inside any containers by removing the associated Volume and VolumeMount in deployment yaml specification. If the container runtime socket is mounted inside a container it could allow processes running within the container to execute command against the runtime which would effectively allow for full control of the host.
+
+**Template**: [host-mounts](templates.md#host-mounts)
+
+**Parameters**:
+
+```yaml
+dirs:
+- docker.sock$
+- crio.sock$
+- containerd.sock$
+```
 ## dangling-horizontalpodautoscaler
 
 **Enabled by default**: No
@@ -151,22 +169,6 @@ serviceAccount: ^(|default)$
 ```yaml
 Key: ndots
 Value: "2"
-```
-## docker-sock
-
-**Enabled by default**: Yes
-
-**Description**: Alert on deployments with docker.sock mounted in containers. 
-
-**Remediation**: Ensure the Docker socket is not mounted inside any containers by removing the associated  Volume and VolumeMount in deployment yaml specification. If the Docker socket is mounted inside a container it could allow processes running within  the container to execute Docker commands which would effectively allow for full control of the host.
-
-**Template**: [host-mounts](templates.md#host-mounts)
-
-**Parameters**:
-
-```yaml
-dirs:
-- docker.sock$
 ```
 ## drop-net-raw-capability
 
