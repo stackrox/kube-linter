@@ -86,15 +86,13 @@ func parseObjects(data []byte, d runtime.Decoder) ([]k8sutil.Object, error) {
 	if list, ok := obj.(*v1.List); ok {
 		objs := make([]k8sutil.Object, 0, len(list.Items))
 		for i, item := range list.Items {
-			obj, _, err := d.Decode(item.Raw, nil, nil)
+			// Decode each item the same way as a top-level document, so custom resources
+			// fall back to unstructured and nested lists are flattened.
+			itemObjs, err := parseObjects(item.Raw, d)
 			if err != nil {
 				return nil, fmt.Errorf("decoding item %d in the list: %w", i, err)
 			}
-			asK8sObj, _ := obj.(k8sutil.Object)
-			if asK8sObj == nil {
-				return nil, fmt.Errorf("object was not a k8s object: %v", obj)
-			}
-			objs = append(objs, asK8sObj)
+			objs = append(objs, itemObjs...)
 		}
 		return objs, nil
 	}

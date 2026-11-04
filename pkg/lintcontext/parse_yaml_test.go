@@ -104,6 +104,88 @@ items:
 			expectName:  "pod1",
 		},
 		{
+			name: "List with a custom resource",
+			yamlData: `apiVersion: v1
+kind: List
+items:
+- apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: web
+  spec:
+    selector:
+      matchLabels:
+        app: web
+    template:
+      metadata:
+        labels:
+          app: web
+      spec:
+        containers:
+        - name: web
+          image: nginx:latest
+- apiVersion: autoscaling.k8s.io/v1
+  kind: VerticalPodAutoscaler
+  metadata:
+    name: web
+  spec:
+    targetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: web`,
+			expectError: false,
+			expectCount: 2,
+			expectKind:  "Deployment",
+			expectName:  "web",
+		},
+		{
+			name: "nested List",
+			yamlData: `apiVersion: v1
+kind: List
+items:
+- apiVersion: v1
+  kind: List
+  items:
+  - apiVersion: v1
+    kind: Pod
+    metadata:
+      name: pod1
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+  - apiVersion: example.com/v1
+    kind: CustomResource
+    metadata:
+      name: test-custom
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: service1`,
+			expectError: false,
+			expectCount: 3,
+			expectKind:  "Pod",
+			expectName:  "pod1",
+		},
+		{
+			name: "List with an invalid built-in item",
+			yamlData: `apiVersion: v1
+kind: List
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    name: pod1
+  spec:
+    containers:
+    - name: nginx
+      image: nginx:latest
+      ports:
+      - containerPort: "invalid-port-type"`,
+			expectError: true,
+			expectCount: 0,
+		},
+		{
 			name: "invalid YAML",
 			yamlData: `apiVersion: v1
 kind: Pod
