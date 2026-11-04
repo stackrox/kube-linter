@@ -49,6 +49,24 @@ verbs:
 - ^watch$
 - ^*$
 ```
+## automount-service-account-token
+
+**Enabled by default**: No
+
+**Description**: Pod spec does not explicitly set automountServiceAccountToken: false. If the workload does not call the Kubernetes API, consider disabling automatic token mounting to reduce attack surface. Note: this checks the pod spec only — a ServiceAccount-level setting may also control this behavior.
+
+**Remediation**: Set automountServiceAccountToken: false in the pod spec if the workload does not need to interact with the Kubernetes API.
+
+**Template**: [cel-expression](templates.md#cel)
+
+**Parameters**:
+
+```yaml
+check: |
+  (!has(object.spec.template.spec.automountServiceAccountToken) ||
+   object.spec.template.spec.automountServiceAccountToken == true)
+  ? 'service account token is auto-mounted — set automountServiceAccountToken: false if not needed' : ''
+```
 ## cluster-admin-role-binding
 
 **Enabled by default**: No
@@ -255,9 +273,9 @@ forbiddenServiceTypes:
 
 **Enabled by default**: Yes
 
-**Description**: Alert on pods/deployment-likes with sharing host's network namespace
+**Description**: Alert on pods/deployment-likes sharing the host's network namespace. Pods with hostNetwork: true bypass service mesh mTLS, silently disabling encryption for inter-service traffic. They also gain access to network-level attacks against other pods on the same node.
 
-**Remediation**: Ensure the host's network namespace is not shared.
+**Remediation**: Ensure the host's network namespace is not shared. If host networking is required, be aware that service mesh mTLS is bypassed and consider alternative encryption for inter-service communication.
 
 **Template**: [host-network](templates.md#host-network)
 ## host-pid
@@ -283,6 +301,26 @@ forbiddenServiceTypes:
 
 ```yaml
 minReplicas: 3
+```
+## init-container-security-gap
+
+**Enabled by default**: No
+
+**Description**: Init container does not set runAsNonRoot: true while the pod-level securityContext does. Init containers can run as root even when main containers are hardened via the pod-level security context.
+
+**Remediation**: Set runAsNonRoot: true in each init container's securityContext to match the pod-level restriction.
+
+**Template**: [cel-expression](templates.md#cel)
+
+**Parameters**:
+
+```yaml
+check: |
+  has(object.spec.template.spec.securityContext) && has(object.spec.template.spec.securityContext.runAsNonRoot) && object.spec.template.spec.securityContext.runAsNonRoot == true && has(object.spec.template.spec.initContainers) && object.spec.template.spec.initContainers.exists(c,
+    !has(c.securityContext) ||
+    !has(c.securityContext.runAsNonRoot) ||
+    c.securityContext.runAsNonRoot != true
+  ) ? 'init container may run as root despite pod-level runAsNonRoot — apply securityContext to init containers' : ''
 ```
 ## invalid-target-ports
 
@@ -524,6 +562,29 @@ acceptedPriorityClassNames:
 **Remediation**: Ensure privileged ports [0, 1024] are not mapped within containers.
 
 **Template**: [privileged-ports](templates.md#privileged-ports)
+## projected-token-long-expiration
+
+**Enabled by default**: No
+
+**Description**: Projected service account token volume with expirationSeconds greater than 24 hours. Long-lived tokens extracted from compromised pods remain valid for extended periods.
+
+**Remediation**: Set expirationSeconds to 3600 (1 hour) or less unless the workload specifically requires longer token lifetimes.
+
+**Template**: [cel-expression](templates.md#cel)
+
+**Parameters**:
+
+```yaml
+check: |
+  has(object.spec.template.spec.volumes) && object.spec.template.spec.volumes.exists(v,
+    has(v.projected) &&
+    v.projected.sources.exists(s,
+      has(s.serviceAccountToken) &&
+      has(s.serviceAccountToken.expirationSeconds) &&
+      s.serviceAccountToken.expirationSeconds > 86400
+    )
+  ) ? 'projected SA token with expirationSeconds > 24h — stolen tokens persist' : ''
+```
 ## read-secret-from-env-var
 
 **Enabled by default**: No
