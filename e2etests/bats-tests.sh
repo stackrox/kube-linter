@@ -420,6 +420,21 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "hpa-maximum-replicas" {
+  tmp="tests/checks/hpa-maximum-replicas.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include hpa-maximum-replicas --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+
+  [[ "${message1}" == "HorizontalPodAutoscaler: object has 150 replicas but maximum allowed replicas is 100" ]]
+  [[ "${count}" == "1" ]]
+}
+
 @test "hpa-minimum-three-replicas" {
   tmp="tests/checks/hpa-minimum-three-replicas.yml"
   cmd="${KUBE_LINTER_BIN} lint --include hpa-minimum-three-replicas --do-not-auto-add-defaults --format json ${tmp}"

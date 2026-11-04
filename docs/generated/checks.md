@@ -269,6 +269,21 @@ forbiddenServiceTypes:
 **Remediation**: Ensure the host's process namespace is not shared.
 
 **Template**: [host-pid](templates.md#host-pid)
+## hpa-maximum-replicas
+
+**Enabled by default**: No
+
+**Description**: Indicates when a HorizontalPodAutoscaler specifies more than the allowed maxReplicas
+
+**Remediation**: Lower the maxReplicas in the HorizontalPodAutoscaler, or raise the check's maxReplicas parameter, so that autoscaling stays within the capacity you intend to allow.
+
+**Template**: [hpa-maximum-replicas](templates.md#horizontalpodautoscaler-maximum-replicas)
+
+**Parameters**:
+
+```yaml
+maxReplicas: 100
+```
 ## hpa-minimum-three-replicas
 
 **Enabled by default**: No
