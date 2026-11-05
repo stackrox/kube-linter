@@ -445,6 +445,28 @@ KubeLinter supports the following templates:
   type: integer
 ```
 
+## Image Not Pinned By Digest
+
+**Key**: `image-not-pinned-by-digest`
+
+**Description**: Flag container images that are not pinned to a specific digest
+
+**Supported Objects**: DeploymentLike
+
+
+**Parameters**:
+
+```yaml
+- arrayElemType: string
+  description: list of regular expressions specifying pattern(s) for container images
+    to exempt from the digest check.
+  name: allowList
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: array
+```
+
 ## Image Pull Policy
 
 **Key**: `image-pull-policy`
