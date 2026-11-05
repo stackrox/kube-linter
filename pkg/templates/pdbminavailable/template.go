@@ -155,7 +155,10 @@ func getDeploymentLikeObjects(lintCtx lintcontext.LintContext, labelSelector lab
 		if podTemplateSpec, hasPods := extract.PodTemplateSpec(obj.K8sObject); hasPods {
 			maps.Copy(objectLabels, podTemplateSpec.Labels)
 		}
-		maps.Copy(objectLabels, selectors.MatchLabels)
+		// Jobs and CronJobs may omit the selector, so there are only pod template labels.
+		if selectors != nil {
+			maps.Copy(objectLabels, selectors.MatchLabels)
+		}
 
 		// Find any Deployment Likes whose pods the PDB selects
 		if labelSelector.Matches(objectLabels) {

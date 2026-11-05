@@ -11,6 +11,7 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	appsV1 "k8s.io/api/apps/v1"
 	autoscalingV2 "k8s.io/api/autoscaling/v2"
+	batchV1 "k8s.io/api/batch/v1"
 	v1 "k8s.io/api/policy/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -364,6 +365,37 @@ func (p *PDBTestSuite) TestPDBMinAvailableUnrelatedDeploymentWithMatchExpression
 			},
 		}
 		deployment.Spec.Template.Labels = map[string]string{"app": "other"}
+	})
+	p.ctx.AddMockPodDisruptionBudget(p.T(), "test-pdb")
+	p.ctx.ModifyPodDisruptionBudget(p.T(), "test-pdb", func(pdb *v1.PodDisruptionBudget) {
+		pdb.Namespace = "test"
+		pdb.Spec.Selector = &metaV1.LabelSelector{MatchLabels: map[string]string{"foo": "bar"}}
+		pdb.Spec.MinAvailable = &intstr.IntOrString{IntVal: 1}
+	})
+
+	p.Validate(p.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				"test-pdb": {},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+func (p *PDBTestSuite) TestPDBMinAvailableJobsWithoutSelector() {
+	p.ctx.AddMockJob(p.T(), "test-job")
+	p.ctx.ModifyJob(p.T(), "test-job", func(job *batchV1.Job) {
+		job.SetGroupVersionKind(batchV1.SchemeGroupVersion.WithKind("Job"))
+		job.Namespace = "test"
+		job.Spec.Template.Labels = map[string]string{"app": "job"}
+	})
+	p.ctx.AddMockCronJob(p.T(), "test-cronjob")
+	p.ctx.ModifyCronJob(p.T(), "test-cronjob", func(cronjob *batchV1.CronJob) {
+		cronjob.SetGroupVersionKind(batchV1.SchemeGroupVersion.WithKind("CronJob"))
+		cronjob.Namespace = "test"
+		cronjob.Spec.JobTemplate.Spec.Template.Labels = map[string]string{"app": "cronjob"}
 	})
 	p.ctx.AddMockPodDisruptionBudget(p.T(), "test-pdb")
 	p.ctx.ModifyPodDisruptionBudget(p.T(), "test-pdb", func(pdb *v1.PodDisruptionBudget) {
