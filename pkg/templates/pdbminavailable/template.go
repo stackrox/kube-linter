@@ -2,6 +2,7 @@ package pdbminavailable
 
 import (
 	"fmt"
+	"maps"
 	"math"
 	"strconv"
 	"strings"
@@ -103,14 +104,7 @@ func minAvailableCheck(lintCtx lintcontext.LintContext, object lintcontext.Objec
 	hpa := getHorizontalPodAutoscalers(lintCtx, pdb.Namespace)
 
 	// Evaluate Deployment Likes in the lintContext to see if they have MinAvailable set too low
-	deploymentLikes, err := getDeploymentLikeObjects(lintCtx, labelSelector, pdb.Namespace)
-	if err != nil {
-		return []diagnostic.Diagnostic{
-			{
-				Message: fmt.Sprintf("Failed to retrieve deployments matching the PDB's label selector within namespace %s: %s", pdb.Namespace, err),
-			},
-		}
-	}
+	deploymentLikes := getDeploymentLikeObjects(lintCtx, labelSelector, pdb.Namespace)
 
 	for _, dl := range deploymentLikes {
 		pdbMinAvailable := value
@@ -133,7 +127,7 @@ func minAvailableCheck(lintCtx lintcontext.LintContext, object lintcontext.Objec
 	return results
 }
 
-func getDeploymentLikeObjects(lintCtx lintcontext.LintContext, labelSelector labels.Selector, namespace string) ([]k8sutil.Object, error) {
+func getDeploymentLikeObjects(lintCtx lintcontext.LintContext, labelSelector labels.Selector, namespace string) []k8sutil.Object {
 
 	objectList := make([]k8sutil.Object, 0, len(lintCtx.Objects()))
 
@@ -148,30 +142,28 @@ func getDeploymentLikeObjects(lintCtx lintcontext.LintContext, labelSelector lab
 			continue
 		}
 
-		// Build Deployment labelSelector
 		// If there are no selectors on the object, then the PDB won't match the same pods as the Deployment Like
 		selectors, exists := extract.Selector(obj.K8sObject)
 		if !exists {
 			continue
 		}
 
-		objLabelSelector, err := metaV1.LabelSelectorAsSelector(selectors)
-		if err != nil {
-			return nil, err
+		// The PDB selects pods, so match it against the labels the pods get: the pod template labels,
+		// plus the selector's matchLabels, which every pod of a valid object carries anyway.
+		// The selector itself can't be turned into a label set when it uses matchExpressions.
+		objectLabels := labels.Set{}
+		if podTemplateSpec, hasPods := extract.PodTemplateSpec(obj.K8sObject); hasPods {
+			maps.Copy(objectLabels, podTemplateSpec.Labels)
 		}
+		maps.Copy(objectLabels, selectors.MatchLabels)
 
-		objectLabels, err := labels.ConvertSelectorToLabelsMap(objLabelSelector.String())
-		if err != nil {
-			return nil, err
-		}
-
-		// Find any Deployment Likes with the same selector as the PDB
+		// Find any Deployment Likes whose pods the PDB selects
 		if labelSelector.Matches(objectLabels) {
 			objectList = append(objectList, obj.K8sObject)
 		}
 	}
 
-	return objectList, nil
+	return objectList
 }
 
 func getIntOrPercentValueSafelyFromString(intOrStr string) (int, bool, error) {

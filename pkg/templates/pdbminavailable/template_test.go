@@ -318,3 +318,67 @@ func (p *PDBTestSuite) TestPDBWithMinAvailableButNoSelector() {
 		},
 	})
 }
+
+// a Deployment whose selector uses matchExpressions is matched through its pod template labels
+func (p *PDBTestSuite) TestPDBMinAvailableDeploymentSelectorWithMatchExpressions() {
+	p.ctx.AddMockDeployment(p.T(), "test-deploy")
+	p.ctx.ModifyDeployment(p.T(), "test-deploy", func(deployment *appsV1.Deployment) {
+		deployment.Namespace = "test"
+		deployment.Spec.Replicas = pointers.Int32(1)
+		deployment.Spec.Selector = &metaV1.LabelSelector{
+			MatchExpressions: []metaV1.LabelSelectorRequirement{
+				{Key: "foo", Operator: metaV1.LabelSelectorOpIn, Values: []string{"bar"}},
+			},
+		}
+		deployment.Spec.Template.Labels = map[string]string{"foo": "bar"}
+	})
+	p.ctx.AddMockPodDisruptionBudget(p.T(), "test-pdb")
+	p.ctx.ModifyPodDisruptionBudget(p.T(), "test-pdb", func(pdb *v1.PodDisruptionBudget) {
+		pdb.Namespace = "test"
+		pdb.Spec.Selector = &metaV1.LabelSelector{MatchLabels: map[string]string{"foo": "bar"}}
+		pdb.Spec.MinAvailable = &intstr.IntOrString{IntVal: 1}
+	})
+
+	p.Validate(p.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				"test-pdb": {
+					{Message: "The current number of replicas for deployment test-deploy is equal to or lower than the minimum number of replicas specified by its PDB."},
+				},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+// a Deployment with a matchExpressions selector that the PDB does not select must not break the check
+func (p *PDBTestSuite) TestPDBMinAvailableUnrelatedDeploymentWithMatchExpressions() {
+	p.ctx.AddMockDeployment(p.T(), "other-deploy")
+	p.ctx.ModifyDeployment(p.T(), "other-deploy", func(deployment *appsV1.Deployment) {
+		deployment.Namespace = "test"
+		deployment.Spec.Replicas = pointers.Int32(1)
+		deployment.Spec.Selector = &metaV1.LabelSelector{
+			MatchExpressions: []metaV1.LabelSelectorRequirement{
+				{Key: "app", Operator: metaV1.LabelSelectorOpExists},
+			},
+		}
+		deployment.Spec.Template.Labels = map[string]string{"app": "other"}
+	})
+	p.ctx.AddMockPodDisruptionBudget(p.T(), "test-pdb")
+	p.ctx.ModifyPodDisruptionBudget(p.T(), "test-pdb", func(pdb *v1.PodDisruptionBudget) {
+		pdb.Namespace = "test"
+		pdb.Spec.Selector = &metaV1.LabelSelector{MatchLabels: map[string]string{"foo": "bar"}}
+		pdb.Spec.MinAvailable = &intstr.IntOrString{IntVal: 1}
+	})
+
+	p.Validate(p.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				"test-pdb": {},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
