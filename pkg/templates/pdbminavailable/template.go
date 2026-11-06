@@ -108,7 +108,11 @@ func minAvailableCheck(lintCtx lintcontext.LintContext, object lintcontext.Objec
 
 	for _, dl := range deploymentLikes {
 		pdbMinAvailable := value
-		replicas, _ := extract.Replicas(dl)
+		replicas, hasReplicas := extract.Replicas(dl)
+		// Jobs, CronJobs and DaemonSets have no replica count to compare against.
+		if !hasReplicas {
+			continue
+		}
 		if int(replicas) == 1 {
 			// if replicas number not set on deployment, use HPA MinReplicas
 			replicas = transformReplicaIntoMinReplicas(dl, hpa, replicas)

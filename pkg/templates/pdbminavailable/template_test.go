@@ -414,3 +414,28 @@ func (p *PDBTestSuite) TestPDBMinAvailableJobsWithoutSelector() {
 		},
 	})
 }
+
+func (p *PDBTestSuite) TestPDBMinAvailableSelectsJobWithoutReplicas() {
+	p.ctx.AddMockJob(p.T(), "test-job")
+	p.ctx.ModifyJob(p.T(), "test-job", func(job *batchV1.Job) {
+		job.SetGroupVersionKind(batchV1.SchemeGroupVersion.WithKind("Job"))
+		job.Namespace = "test"
+		job.Spec.Template.Labels = map[string]string{"app": "job"}
+	})
+	p.ctx.AddMockPodDisruptionBudget(p.T(), "test-pdb")
+	p.ctx.ModifyPodDisruptionBudget(p.T(), "test-pdb", func(pdb *v1.PodDisruptionBudget) {
+		pdb.Namespace = "test"
+		pdb.Spec.Selector = &metaV1.LabelSelector{MatchLabels: map[string]string{"app": "job"}}
+		pdb.Spec.MinAvailable = &intstr.IntOrString{IntVal: 0}
+	})
+
+	p.Validate(p.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				"test-pdb": {},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
