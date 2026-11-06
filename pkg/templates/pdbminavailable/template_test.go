@@ -11,6 +11,7 @@ import (
 	"golang.stackrox.io/kube-linter/pkg/templates"
 	appsV1 "k8s.io/api/apps/v1"
 	autoscalingV2 "k8s.io/api/autoscaling/v2"
+	batchV1 "k8s.io/api/batch/v1"
 	v1 "k8s.io/api/policy/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -313,6 +314,126 @@ func (p *PDBTestSuite) TestPDBWithMinAvailableButNoSelector() {
 				"test-pdb": {
 					{Message: "PDB is missing required selector field: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget"},
 				},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+// a Deployment whose selector uses matchExpressions is matched through its pod template labels
+func (p *PDBTestSuite) TestPDBMinAvailableDeploymentSelectorWithMatchExpressions() {
+	p.ctx.AddMockDeployment(p.T(), "test-deploy")
+	p.ctx.ModifyDeployment(p.T(), "test-deploy", func(deployment *appsV1.Deployment) {
+		deployment.Namespace = "test"
+		deployment.Spec.Replicas = pointers.Int32(1)
+		deployment.Spec.Selector = &metaV1.LabelSelector{
+			MatchExpressions: []metaV1.LabelSelectorRequirement{
+				{Key: "foo", Operator: metaV1.LabelSelectorOpIn, Values: []string{"bar"}},
+			},
+		}
+		deployment.Spec.Template.Labels = map[string]string{"foo": "bar"}
+	})
+	p.ctx.AddMockPodDisruptionBudget(p.T(), "test-pdb")
+	p.ctx.ModifyPodDisruptionBudget(p.T(), "test-pdb", func(pdb *v1.PodDisruptionBudget) {
+		pdb.Namespace = "test"
+		pdb.Spec.Selector = &metaV1.LabelSelector{MatchLabels: map[string]string{"foo": "bar"}}
+		pdb.Spec.MinAvailable = &intstr.IntOrString{IntVal: 1}
+	})
+
+	p.Validate(p.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				"test-pdb": {
+					{Message: "The current number of replicas for deployment test-deploy is equal to or lower than the minimum number of replicas specified by its PDB."},
+				},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+// a Deployment with a matchExpressions selector that the PDB does not select must not break the check
+func (p *PDBTestSuite) TestPDBMinAvailableUnrelatedDeploymentWithMatchExpressions() {
+	p.ctx.AddMockDeployment(p.T(), "other-deploy")
+	p.ctx.ModifyDeployment(p.T(), "other-deploy", func(deployment *appsV1.Deployment) {
+		deployment.Namespace = "test"
+		deployment.Spec.Replicas = pointers.Int32(1)
+		deployment.Spec.Selector = &metaV1.LabelSelector{
+			MatchExpressions: []metaV1.LabelSelectorRequirement{
+				{Key: "app", Operator: metaV1.LabelSelectorOpExists},
+			},
+		}
+		deployment.Spec.Template.Labels = map[string]string{"app": "other"}
+	})
+	p.ctx.AddMockPodDisruptionBudget(p.T(), "test-pdb")
+	p.ctx.ModifyPodDisruptionBudget(p.T(), "test-pdb", func(pdb *v1.PodDisruptionBudget) {
+		pdb.Namespace = "test"
+		pdb.Spec.Selector = &metaV1.LabelSelector{MatchLabels: map[string]string{"foo": "bar"}}
+		pdb.Spec.MinAvailable = &intstr.IntOrString{IntVal: 1}
+	})
+
+	p.Validate(p.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				"test-pdb": {},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+func (p *PDBTestSuite) TestPDBMinAvailableJobsWithoutSelector() {
+	p.ctx.AddMockJob(p.T(), "test-job")
+	p.ctx.ModifyJob(p.T(), "test-job", func(job *batchV1.Job) {
+		job.SetGroupVersionKind(batchV1.SchemeGroupVersion.WithKind("Job"))
+		job.Namespace = "test"
+		job.Spec.Template.Labels = map[string]string{"app": "job"}
+	})
+	p.ctx.AddMockCronJob(p.T(), "test-cronjob")
+	p.ctx.ModifyCronJob(p.T(), "test-cronjob", func(cronjob *batchV1.CronJob) {
+		cronjob.SetGroupVersionKind(batchV1.SchemeGroupVersion.WithKind("CronJob"))
+		cronjob.Namespace = "test"
+		cronjob.Spec.JobTemplate.Spec.Template.Labels = map[string]string{"app": "cronjob"}
+	})
+	p.ctx.AddMockPodDisruptionBudget(p.T(), "test-pdb")
+	p.ctx.ModifyPodDisruptionBudget(p.T(), "test-pdb", func(pdb *v1.PodDisruptionBudget) {
+		pdb.Namespace = "test"
+		pdb.Spec.Selector = &metaV1.LabelSelector{MatchLabels: map[string]string{"foo": "bar"}}
+		pdb.Spec.MinAvailable = &intstr.IntOrString{IntVal: 1}
+	})
+
+	p.Validate(p.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				"test-pdb": {},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+func (p *PDBTestSuite) TestPDBMinAvailableSelectsJobWithoutReplicas() {
+	p.ctx.AddMockJob(p.T(), "test-job")
+	p.ctx.ModifyJob(p.T(), "test-job", func(job *batchV1.Job) {
+		job.SetGroupVersionKind(batchV1.SchemeGroupVersion.WithKind("Job"))
+		job.Namespace = "test"
+		job.Spec.Template.Labels = map[string]string{"app": "job"}
+	})
+	p.ctx.AddMockPodDisruptionBudget(p.T(), "test-pdb")
+	p.ctx.ModifyPodDisruptionBudget(p.T(), "test-pdb", func(pdb *v1.PodDisruptionBudget) {
+		pdb.Namespace = "test"
+		pdb.Spec.Selector = &metaV1.LabelSelector{MatchLabels: map[string]string{"app": "job"}}
+		pdb.Spec.MinAvailable = &intstr.IntOrString{IntVal: 0}
+	})
+
+	p.Validate(p.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				"test-pdb": {},
 			},
 			ExpectInstantiationError: false,
 		},
