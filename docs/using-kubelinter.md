@@ -162,6 +162,11 @@ pipeline step fails without any extra configuration. The examples below also
 pass `--fail-if-no-objects-found`, so that the step fails instead of passing
 when the directory contains no valid Kubernetes objects.
 
+`--fail-if-no-objects-found` does not fail the step if some files can't be
+parsed but others contain valid objects. To fail on any parse error, also add
+`--fail-on-invalid-resource`. This flag is deprecated in v0.8.3 and also fails
+on YAML files that contain only comments.
+
 <!-- tabs:start -->
 
 #### ** GitLab CI **
