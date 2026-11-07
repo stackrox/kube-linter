@@ -158,7 +158,9 @@ For other CI systems, you can use the KubeLinter container images published to
   the container. The binary is located at `/kube-linter`.
 
 KubeLinter exits with a non-zero status code when it finds lint errors, so the
-pipeline step fails without any extra configuration.
+pipeline step fails without any extra configuration. The examples below also
+pass `--fail-if-no-objects-found`, so that the step fails instead of passing
+when the directory contains no valid Kubernetes objects.
 
 <!-- tabs:start -->
 
@@ -172,7 +174,7 @@ kube-linter:
     name: stackrox/kube-linter:v0.8.3-alpine
     entrypoint: [""]
   script:
-    - /kube-linter lint --fail-on-invalid-resource deploy/
+    - /kube-linter lint --fail-if-no-objects-found deploy/
 ```
 
 #### ** Google Cloud Build **
@@ -182,12 +184,14 @@ image entrypoint and mounts your source in `/workspace`:
 steps:
   - id: kube-linter
     name: stackrox/kube-linter:v0.8.3
-    args: ["lint", "--fail-on-invalid-resource", "deploy/"]
+    args: ["lint", "--fail-if-no-objects-found", "deploy/"]
 ```
 
 #### ** Concourse CI **
 Add a task to your pipeline. In this example, `manifests` is a `git` resource
-that contains your Kubernetes `yaml` files in the `deploy/` directory:
+that contains your Kubernetes `yaml` files in the `deploy/` directory. The task
+runs from the root of the repository so that a `.kube-linter.yaml`
+configuration file there is picked up:
 ```yaml
 jobs:
   - name: kube-linter
@@ -206,7 +210,8 @@ jobs:
             - name: manifests
           run:
             path: /kube-linter
-            args: ["lint", "--fail-on-invalid-resource", "manifests/deploy/"]
+            args: ["lint", "--fail-if-no-objects-found", "deploy/"]
+            dir: manifests
 ```
 
 <!-- tabs:end -->
