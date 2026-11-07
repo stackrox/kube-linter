@@ -147,6 +147,70 @@ includes the following pre-commit hooks:
 
 If you're using GitHub, there's the [KubeLinter GitHub Action](README.md#kubelinter-github-action) available.
 
+For other CI systems, you can use the KubeLinter container images published to
+`stackrox/kube-linter` (Docker Hub) and `ghcr.io/stackrox/kube-linter`:
+
+- `<version>` (for example, `v0.8.3`) contains only the `/kube-linter` binary,
+  which is also the image entrypoint. Use it when your CI system passes
+  arguments directly to the entrypoint.
+- `<version>-alpine` (for example, `v0.8.3-alpine`) is based on Alpine Linux
+  and includes a shell. Use it when your CI system runs a shell script inside
+  the container. The binary is located at `/kube-linter`.
+
+KubeLinter exits with a non-zero status code when it finds lint errors, so the
+pipeline step fails without any extra configuration.
+
+<!-- tabs:start -->
+
+#### ** GitLab CI **
+Add a job to your `.gitlab-ci.yml` file. The entrypoint must be overridden
+because GitLab CI runs the `script` section in a shell:
+```yaml
+kube-linter:
+  stage: test
+  image:
+    name: stackrox/kube-linter:v0.8.3-alpine
+    entrypoint: [""]
+  script:
+    - /kube-linter lint --fail-on-invalid-resource deploy/
+```
+
+#### ** Google Cloud Build **
+Add a step to your `cloudbuild.yaml` file. Cloud Build passes `args` to the
+image entrypoint and mounts your source in `/workspace`:
+```yaml
+steps:
+  - id: kube-linter
+    name: stackrox/kube-linter:v0.8.3
+    args: ["lint", "--fail-on-invalid-resource", "deploy/"]
+```
+
+#### ** Concourse CI **
+Add a task to your pipeline. In this example, `manifests` is a `git` resource
+that contains your Kubernetes `yaml` files in the `deploy/` directory:
+```yaml
+jobs:
+  - name: kube-linter
+    plan:
+      - get: manifests
+        trigger: true
+      - task: lint
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: stackrox/kube-linter
+              tag: v0.8.3-alpine
+          inputs:
+            - name: manifests
+          run:
+            path: /kube-linter
+            args: ["lint", "--fail-on-invalid-resource", "manifests/deploy/"]
+```
+
+<!-- tabs:end -->
+
 Alternatively, you can grab the latest binary release with the following commands
 ```bash
 LOCATION=$(curl -s https://api.github.com/repos/stackrox/kube-linter/releases/latest \
