@@ -313,3 +313,92 @@ func TestHelmChartWithMalformedDependencies(t *testing.T) {
 	require.Len(t, lintCtx.InvalidObjects(), 1)
 	assert.Contains(t, lintCtx.InvalidObjects()[0].LoadErr.Error(), "processing dependencies")
 }
+
+func TestCreateContextsGroupDirectories(t *testing.T) {
+	const deployment = `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.31.7
+`
+	const service = `apiVersion: v1
+kind: Service
+metadata:
+  name: app
+spec:
+  selector:
+    app: app
+  ports:
+  - port: 80
+`
+	root := t.TempDir()
+	for file, content := range map[string]string{
+		filepath.Join("deployments", "app.yaml"): deployment,
+		filepath.Join("services", "app.yaml"):    service,
+	} {
+		require.NoError(t, os.MkdirAll(filepath.Dir(filepath.Join(root, file)), 0o755))
+		require.NoError(t, os.WriteFile(filepath.Join(root, file), []byte(content), 0o600))
+	}
+	chartDir, err := filepath.Abs(chartDirectory)
+	require.NoError(t, err)
+
+	objectCounts := func(contexts []LintContext) []int {
+		counts := make([]int, 0, len(contexts))
+		for _, ctx := range contexts {
+			counts = append(counts, len(ctx.Objects()))
+		}
+		return counts
+	}
+
+	t.Run("one context per directory by default", func(t *testing.T) {
+		contexts, err := CreateContextsWithOptions(Options{}, nil, root)
+		require.NoError(t, err)
+		assert.Equal(t, []int{1, 1}, objectCounts(contexts))
+	})
+
+	t.Run("one context for all directories when grouped", func(t *testing.T) {
+		contexts, err := CreateContextsWithOptions(Options{GroupDirectories: true}, nil, root)
+		require.NoError(t, err)
+		assert.Equal(t, []int{2}, objectCounts(contexts))
+	})
+
+	t.Run("files passed as separate arguments are grouped", func(t *testing.T) {
+		contexts, err := CreateContextsWithOptions(Options{GroupDirectories: true}, nil,
+			filepath.Join(root, "deployments", "app.yaml"), filepath.Join(root, "services"))
+		require.NoError(t, err)
+		assert.Equal(t, []int{2}, objectCounts(contexts))
+	})
+
+	t.Run("helm charts keep their own context when grouped", func(t *testing.T) {
+		contexts, err := CreateContextsWithOptions(Options{GroupDirectories: true}, nil, root, chartDir)
+		require.NoError(t, err)
+		require.Len(t, contexts, 2)
+		var filesPerContext [][]string
+		for _, ctx := range contexts {
+			files := make(map[string]struct{})
+			for _, obj := range ctx.Objects() {
+				files[obj.Metadata.FilePath] = struct{}{}
+			}
+			var inRoot []string
+			for file := range files {
+				if rel, err := filepath.Rel(root, file); err == nil && filepath.IsLocal(rel) {
+					inRoot = append(inRoot, rel)
+				}
+			}
+			filesPerContext = append(filesPerContext, inRoot)
+		}
+		// One context holds both plain YAML files, the other one (the chart) none of them.
+		assert.ElementsMatch(t, []int{0, 2}, []int{len(filesPerContext[0]), len(filesPerContext[1])})
+	})
+}

@@ -18,6 +18,11 @@ After you've [installed KubeLinter](README.md#installing-kubelinter), use the
   ```bash
   kube-linter lint /path/to/directory/containing/yaml-files/
   ```
+  Each directory is linted on its own, so an object can't be matched with objects from another directory. For example, the `dangling-service` check reports a Service in `services/` whose Deployment is in `deployments/`. To lint the YAML files of all directories as one group, add `--group-directories`:
+  ```bash
+  kube-linter lint --group-directories /path/to/directory/containing/yaml-files/
+  ```
+  Helm charts and Kustomize directories are still linted on their own.
 
 #### ** Helm **
 The path to a directory containing the `Chart.yaml` file:
