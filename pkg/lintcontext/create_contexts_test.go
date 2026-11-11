@@ -347,7 +347,7 @@ spec:
 		filepath.Join("deployments", "app.yaml"): deployment,
 		filepath.Join("services", "app.yaml"):    service,
 	} {
-		require.NoError(t, os.MkdirAll(filepath.Dir(filepath.Join(root, file)), 0o755))
+		require.NoError(t, os.MkdirAll(filepath.Dir(filepath.Join(root, file)), 0o750))
 		require.NoError(t, os.WriteFile(filepath.Join(root, file), []byte(content), 0o600))
 	}
 	chartDir, err := filepath.Abs(chartDirectory)
