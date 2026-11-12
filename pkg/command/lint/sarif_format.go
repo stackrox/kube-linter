@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/owenrumney/go-sarif/v2/sarif"
@@ -158,9 +159,53 @@ func addSarifResult(sarifRun *sarif.Run, cwd string, report *diagnostic.WithCont
 		WithMessage(sarif.NewTextMessage(messageText))
 	result.AddLocation(sarifLocation)
 
+	// Map Diagnostic.Severity to SARIF level
+	if report.Diagnostic.Severity != "" {
+		result.WithLevel(mapSeverityToSARIFLevel(report.Diagnostic.Severity))
+	} else {
+		// Default to warning when no severity is set
+		result.WithLevel("warning")
+	}
+
+	// Add Diagnostic.Metadata to SARIF properties bag
+	if len(report.Diagnostic.Metadata) > 0 {
+		pb := sarif.NewPropertyBag()
+		for k, v := range report.Diagnostic.Metadata {
+			if k == "tags" {
+				// SARIF reserves the property bag "tags" key as an array of strings.
+				pb.Add(k, []string{v})
+				continue
+			}
+			pb.AddString(k, v)
+		}
+		result.AttachPropertyBag(pb)
+	}
+
+	// Add partial fingerprints if fingerprint metadata is present
+	if fp, ok := report.Diagnostic.Metadata[diagnostic.MetaKeyFingerprint]; ok {
+		result.WithPartialFingerPrints(map[string]interface{}{
+			"primaryLocationLineHash": fp,
+		})
+	}
+
 	sarifRun.AddResult(result)
 
 	return nil
+}
+
+// mapSeverityToSARIFLevel maps kube-linter severity levels to SARIF levels.
+// SARIF supports: error, warning, note, none.
+func mapSeverityToSARIFLevel(severity diagnostic.Severity) string {
+	switch strings.ToLower(string(severity)) {
+	case "critical", "high":
+		return "error"
+	case "warning":
+		return "warning"
+	case "info":
+		return "note"
+	default:
+		return "warning"
+	}
 }
 
 // getArtifactURI tries to resolve path relative to cwd; if that fails, tries to get the absolute path with appended
