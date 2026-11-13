@@ -63,6 +63,7 @@ func Command() *cobra.Command {
 	var configPath string
 	var failIfNoObjects bool
 	var verbose bool
+	var groupDirectories bool
 	var errorOnInvalidResource bool
 	var formats []string
 	var outputs []string
@@ -114,7 +115,7 @@ func Command() *cobra.Command {
 				absArgs = append(absArgs, absArg)
 			}
 
-			lintCtxs, err := lintcontext.CreateContexts(ignorePaths, absArgs...)
+			lintCtxs, err := lintcontext.CreateContextsWithOptions(lintcontext.Options{GroupDirectories: groupDirectories}, ignorePaths, absArgs...)
 			if err != nil {
 				return err
 			}
@@ -222,6 +223,7 @@ func Command() *cobra.Command {
 	c.Flags().StringVar(&configPath, "config", "", "Path to config file")
 	c.Flags().BoolVarP(&failIfNoObjects, "fail-if-no-objects-found", "", false, "Return non-zero exit code if no valid objects are found or failed to parse")
 	c.Flags().BoolVarP(&verbose, "verbose", "v", false, "Enable verbose logging")
+	c.Flags().BoolVarP(&groupDirectories, "group-directories", "", false, "Lint the plain YAML files of all directories as one group, so that objects can reference each other across directories. By default, each directory is linted on its own")
 	c.Flags().StringSliceVar(&formats, "format", []string{common.PlainFormat},
 		fmt.Sprintf("Output format (can be repeated). Allowed values: %s",
 			strings.Join(formatters.GetEnabledFormatters(), ", ")))
