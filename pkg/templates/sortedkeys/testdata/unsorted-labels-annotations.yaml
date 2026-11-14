@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    zz-custom: "true"
+    aa-custom: "true"
+  labels:
+    version: v1
+    app: myapp
+  name: unsorted-labels-annotations
+spec:
+  template:
+    metadata:
+      annotations:
+        zz-custom: "true"
+        aa-custom: "true"
+      labels:
+        version: v1
+        app: myapp
+    spec:
+      containers:
+        - name: app
+          image: myapp:latest
