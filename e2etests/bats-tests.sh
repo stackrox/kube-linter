@@ -113,6 +113,30 @@ get_value_from() {
   [[ "${count}" == "1" ]]
 }
 
+@test "cluster-wide-secrets-access" {
+  tmp="tests/checks/cluster-wide-secrets-access.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include cluster-wide-secrets-access --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "1" ]]
+}
+
+@test "configmap-with-credentials" {
+  tmp="tests/checks/configmap-with-credentials.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include configmap-with-credentials --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "2" ]]
+}
+
 @test "dangling-horizontalpodautoscaler" {
   tmp="tests/checks/dangling-hpa.yml"
   cmd="${KUBE_LINTER_BIN} lint --include dangling-horizontalpodautoscaler --do-not-auto-add-defaults --format json ${tmp}"
@@ -369,6 +393,18 @@ get_value_from() {
   [[ "${count}" == "1" ]]
 }
 
+@test "externalname-service-redirect" {
+  tmp="tests/checks/externalname-service-redirect.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include externalname-service-redirect --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "1" ]]
+}
+
 @test "host-ipc" {
   tmp="tests/checks/host-ipc.yml"
   cmd="${KUBE_LINTER_BIN} lint --include host-ipc --do-not-auto-add-defaults --format json ${tmp}"
@@ -433,6 +469,18 @@ get_value_from() {
 
   [[ "${message1}" == "HorizontalPodAutoscaler: object has 2 replicas but minimum required replicas is 3" ]]
   [[ "${count}" == "1" ]]
+}
+
+@test "image-not-pinned-by-digest" {
+  tmp="tests/checks/image-not-pinned-by-digest.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include image-not-pinned-by-digest --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "2" ]]
 }
 
 @test "invalid-target-ports" {

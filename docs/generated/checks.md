@@ -58,6 +58,61 @@ verbs:
 **Remediation**: Create and assign a separate role that has access to specific resources/actions needed for the service account.
 
 **Template**: [cluster-admin-role-binding](templates.md#cluster-admin-role-binding)
+## cluster-wide-secrets-access
+
+**Enabled by default**: No
+
+**Description**: ClusterRoleBinding granting secrets access (get, list, watch, create, update, patch, delete) across all namespaces. When bound to an operator service account that reconciles tenant-controlled custom resources, this enables cross-namespace secret exfiltration (confused deputy).
+
+**Remediation**: Use namespaced RoleBindings to limit secrets access to required namespaces, or restrict the ClusterRole to specific resource names if cluster-wide access is necessary.
+
+**Template**: [access-to-resources](templates.md#access-to-resources)
+
+**Parameters**:
+
+```yaml
+resources:
+- ^secrets$
+- ^\*$
+verbs:
+- ^get$
+- ^list$
+- ^watch$
+- ^create$
+- ^update$
+- ^patch$
+- ^delete$
+- ^\*$
+```
+## configmap-with-credentials
+
+**Enabled by default**: No
+
+**Description**: ConfigMap contains keys with credential-like names (password, secret, token, api_key). Credentials should be stored in Secrets, not ConfigMaps.
+
+**Remediation**: Move credential values to a Secret resource. Reference the Secret from pod specs using secretKeyRef instead of configMapKeyRef.
+
+**Template**: [cel-expression](templates.md#cel)
+
+**Parameters**:
+
+```yaml
+check: |
+  object.kind == 'ConfigMap' && (
+    (has(object.data) &&
+     object.data.exists(k,
+       k.contains('password') || k.contains('secret') || k.contains('token') ||
+       k.contains('api_key') || k.contains('apikey') || k.contains('private_key') ||
+       k.contains('credential')
+     )) ||
+    (has(object.binaryData) &&
+     object.binaryData.exists(k,
+       k.contains('password') || k.contains('secret') || k.contains('token') ||
+       k.contains('api_key') || k.contains('apikey') || k.contains('private_key') ||
+       k.contains('credential')
+     ))
+  ) ? 'ConfigMap contains credential-like keys — use Secrets instead' : ''
+```
 ## dangling-horizontalpodautoscaler
 
 **Enabled by default**: No
@@ -242,6 +297,22 @@ forbiddenServiceTypes:
 - NodePort
 - LoadBalancer
 ```
+## externalname-service-redirect
+
+**Enabled by default**: No
+
+**Description**: Service with type: ExternalName redirects internal traffic to an external DNS name. If the external name resolves to an attacker-controlled host, this enables SSRF at the infrastructure level.
+
+**Remediation**: Use type: ClusterIP with an Endpoints object pointing to a known-safe IP, or validate that the externalName resolves to a trusted destination.
+
+**Template**: [cel-expression](templates.md#cel)
+
+**Parameters**:
+
+```yaml
+check: |
+  object.kind == 'Service' && has(object.spec) && object.spec.type == 'ExternalName' && has(object.spec.externalName) ? 'ExternalName service redirects cluster traffic to external DNS — potential SSRF vector' : ''
+```
 ## host-ipc
 
 **Enabled by default**: Yes
@@ -284,6 +355,15 @@ forbiddenServiceTypes:
 ```yaml
 minReplicas: 3
 ```
+## image-not-pinned-by-digest
+
+**Enabled by default**: No
+
+**Description**: Container images referenced by tag are mutable — a tag can be moved to point to a different image at any time. Pinning by digest guarantees the exact image content that will run.
+
+**Remediation**: Reference container images by digest (e.g. image@sha256:abc123...) instead of by tag.
+
+**Template**: [image-not-pinned-by-digest](templates.md#image-not-pinned-by-digest)
 ## invalid-target-ports
 
 **Enabled by default**: Yes
