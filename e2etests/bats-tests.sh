@@ -98,6 +98,42 @@ get_value_from() {
   [[ "${count}" == "1" ]]
 }
 
+@test "aggregate-to-admin-escalation" {
+  tmp="tests/checks/aggregate-to-admin-escalation.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include aggregate-to-admin-escalation --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "2" ]]
+}
+
+@test "approve-signers-without-resource-names" {
+  tmp="tests/checks/approve-signers-without-resource-names.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include approve-signers-without-resource-names --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "2" ]]
+}
+
+@test "bind-verb-in-role" {
+  tmp="tests/checks/bind-verb-in-role.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include bind-verb-in-role --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "2" ]]
+}
+
 @test "cluster-admin-role-binding" {
   tmp="tests/checks/cluster-admin-role-binding.yml"
   cmd="${KUBE_LINTER_BIN} lint --include cluster-admin-role-binding --do-not-auto-add-defaults --format json ${tmp}"
@@ -231,6 +267,18 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "deletecollection-verb-in-role" {
+  tmp="tests/checks/deletecollection-verb-in-role.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include deletecollection-verb-in-role --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "2" ]]
+}
+
 @test "deprecated-service-account-field" {
   tmp="tests/checks/deprecated-service-account-field.yml"
   cmd="${KUBE_LINTER_BIN} lint --include deprecated-service-account-field --do-not-auto-add-defaults --format json ${tmp}"
@@ -354,6 +402,18 @@ get_value_from() {
   [[ "${count}" == "2" ]]
 }
 
+@test "escalate-verb-in-role" {
+  tmp="tests/checks/escalate-verb-in-role.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include escalate-verb-in-role --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "3" ]]
+}
+
 @test "exposed-services" {
   tmp="tests/checks/exposed-services.yml"
   cmd="${KUBE_LINTER_BIN} lint --include exposed-services --do-not-auto-add-defaults --format json ${tmp}"
@@ -433,6 +493,18 @@ get_value_from() {
 
   [[ "${message1}" == "HorizontalPodAutoscaler: object has 2 replicas but minimum required replicas is 3" ]]
   [[ "${count}" == "1" ]]
+}
+
+@test "impersonate-without-resource-names" {
+  tmp="tests/checks/impersonate-without-resource-names.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include impersonate-without-resource-names --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "4" ]]
 }
 
 @test "invalid-target-ports" {
@@ -1124,6 +1196,18 @@ get_value_from() {
   [[ "${count}" == "1" ]]
 }
 
+@test "webhook-failure-policy-ignore" {
+  tmp="tests/checks/webhook-failure-policy-ignore.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include webhook-failure-policy-ignore --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "2" ]]
+}
+
 @test "wildcard-in-rules" {
   tmp="tests/checks/wildcard-in-rules.yml"
   cmd="${KUBE_LINTER_BIN} lint --include wildcard-in-rules --do-not-auto-add-defaults --format json ${tmp}"
@@ -1137,6 +1221,18 @@ get_value_from() {
 
   [[ "${message1}" == "Role: wildcard "*" in verb specification" ]]
   [[ "${count}" == "1" ]]
+}
+
+@test "wildcard-resource-verb-combo" {
+  tmp="tests/checks/wildcard-resource-verb-combo.yml"
+  cmd="${KUBE_LINTER_BIN} lint --include wildcard-resource-verb-combo --do-not-auto-add-defaults --format json ${tmp}"
+  run ${cmd}
+
+  print_info "${status}" "${output}" "${cmd}" "${tmp}"
+  [ "$status" -eq 1 ]
+
+  count=$(get_value_from "${lines[0]}" '.Reports | length')
+  [[ "${count}" == "2" ]]
 }
 
 @test "writable-host-mount" {
