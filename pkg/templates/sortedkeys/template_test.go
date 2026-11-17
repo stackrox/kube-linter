@@ -34,6 +34,7 @@ type testCase struct {
 	yamlFile            string
 	deploymentName      string
 	recursive           bool
+	ignoredKeys         []string
 	expectedDiagnostics []string
 }
 
@@ -216,6 +217,66 @@ func (s *SortedKeysTestSuite) TestSortedKeysTableDriven() {
 				"Keys are not sorted at data.service-b-config. Expected order: [<<, aa-priority, zz-custom], got: [<<, zz-custom, aa-priority]",
 			},
 		},
+
+		// Ignored keys test cases
+		{
+			name:           "labels_annotations_not_ignored",
+			yamlFile:       "unsorted-labels-annotations.yaml",
+			deploymentName: "unsorted-labels-annotations",
+			recursive:      true,
+			expectedDiagnostics: []string{
+				"Keys are not sorted at metadata.annotations. Expected order: [aa-custom, zz-custom], got: [zz-custom, aa-custom]",
+				"Keys are not sorted at metadata.labels. Expected order: [app, version], got: [version, app]",
+				"Keys are not sorted at spec.template.metadata.annotations. Expected order: [aa-custom, zz-custom], got: [zz-custom, aa-custom]",
+				"Keys are not sorted at spec.template.metadata.labels. Expected order: [app, version], got: [version, app]",
+				"Keys are not sorted at spec.template.spec.containers[0]. Expected order: [image, name], got: [name, image]",
+			},
+		},
+		{
+			name:           "labels_annotations_ignored",
+			yamlFile:       "unsorted-labels-annotations.yaml",
+			deploymentName: "unsorted-labels-annotations",
+			recursive:      true,
+			ignoredKeys:    []string{"labels", "annotations"},
+			expectedDiagnostics: []string{
+				"Keys are not sorted at spec.template.spec.containers[0]. Expected order: [image, name], got: [name, image]",
+			},
+		},
+		{
+			name:           "only_annotations_ignored",
+			yamlFile:       "unsorted-labels-annotations.yaml",
+			deploymentName: "unsorted-labels-annotations",
+			recursive:      true,
+			ignoredKeys:    []string{"annotations"},
+			expectedDiagnostics: []string{
+				"Keys are not sorted at metadata.labels. Expected order: [app, version], got: [version, app]",
+				"Keys are not sorted at spec.template.metadata.labels. Expected order: [app, version], got: [version, app]",
+				"Keys are not sorted at spec.template.spec.containers[0]. Expected order: [image, name], got: [name, image]",
+			},
+		},
+		{
+			// The anchor is defined under an ignored key, so its content must
+			// still be checked where it is aliased from a non-ignored key.
+			name:           "anchor_under_ignored_key_aliased_elsewhere",
+			yamlFile:       "reused-labels-unsorted.yaml",
+			deploymentName: "anchor-unsorted",
+			recursive:      true,
+			ignoredKeys:    []string{"labels"},
+			expectedDiagnostics: []string{
+				"Keys are not sorted at spec.selector.matchLabels. Expected order: [app, environment, version], got: [version, app, environment]",
+				"Keys are not sorted at spec.template.spec.containers[0]. Expected order: [image, name], got: [name, image]",
+			},
+		},
+		{
+			name:           "ignored_key_still_sorted_among_siblings",
+			yamlFile:       "unsorted-top-level.yaml",
+			deploymentName: "unsorted-deployment",
+			recursive:      true,
+			ignoredKeys:    []string{"kind"},
+			expectedDiagnostics: []string{
+				"Keys are not sorted at root. Expected order: [apiVersion, kind, metadata, spec], got: [apiVersion, metadata, spec, kind]",
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -256,7 +317,8 @@ func (s *SortedKeysTestSuite) TestSortedKeysTableDriven() {
 			s.Validate(s.ctx, []templates.TestCase{
 				{
 					Param: params.Params{
-						Recursive: tc.recursive,
+						Recursive:   tc.recursive,
+						IgnoredKeys: tc.ignoredKeys,
 					},
 					Diagnostics:              expectedDiags,
 					ExpectInstantiationError: false,
