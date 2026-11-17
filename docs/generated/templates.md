@@ -475,6 +475,46 @@ KubeLinter supports the following templates:
 **Supported Objects**: JobLike
 
 
+## RBAC Privilege Chain Analysis
+
+**Key**: `kube-chainsaw`
+
+**Description**: Detects RBAC privilege escalation paths, dangerous verbs, sensitive resource access, and scope confusion using graph analysis. Rules that require NetworkPolicy, SecurityContextConstraints, Service, Route or Secret objects are not supported and are rejected at configuration time
+
+**Supported Objects**: ClusterRole,Role,ClusterRoleBinding,RoleBinding,ServiceAccount,Pod,Deployment,DaemonSet,StatefulSet,Job,CronJob,ReplicaSet
+
+
+**Parameters**:
+
+```yaml
+- arrayElemType: string
+  description: ""
+  name: rules
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: array
+- arrayElemType: string
+  description: ""
+  name: excludeRules
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: array
+- description: ""
+  name: minSeverity
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
+- description: ""
+  name: suppressionsFile
+  negationAllowed: true
+  regexAllowed: true
+  required: false
+  type: string
+```
+
 ## kubeconform
 
 **Key**: `kubeconform`
