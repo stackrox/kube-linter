@@ -29,13 +29,23 @@ type Options struct {
 	// CustomDecoder allows users to supply a non-default decoder to parse k8s objects. This can be used
 	// to allow the linter to create contexts for k8s custom resources
 	CustomDecoder runtime.Decoder
+
+	// GroupDirectories puts the plain YAML files of all directories into one context instead of
+	// one context per directory, so that objects can reference each other across directories
+	// (e.g. a Service in services/ selecting a Deployment in deployments/).
+	// Helm charts and Kustomize directories are still linted as a context of their own.
+	GroupDirectories bool
 }
+
+// groupedContextKey is the key of the context shared by all plain YAML files when
+// Options.GroupDirectories is set. It can't clash with a path, as paths never contain a NUL byte.
+const groupedContextKey = "\x00grouped"
 
 // CreateContexts creates a context. Each context contains a set of files that should be linted
 // as a group.
-// Currently, each directory of Kube YAML files (or Helm charts) are treated as a separate context.
-// TODO: Figure out if it's useful to allow people to specify that files spanning different directories
-// should be treated as being in the same context.
+// Each directory of Kube YAML files (or Helm charts) is treated as a separate context.
+// Use CreateContextsWithOptions with Options.GroupDirectories to treat the YAML files of all
+// directories as being in the same context.
 func CreateContexts(ignorePaths []string, filesOrDirs ...string) ([]LintContext, error) {
 	return CreateContextsWithOptions(Options{}, ignorePaths, filesOrDirs...)
 }
@@ -104,6 +114,9 @@ fileOrDirsLoop:
 				}
 
 				dirName := filepath.Dir(currentPath)
+				if options.GroupDirectories {
+					dirName = groupedContextKey
+				}
 				// Load a file only if it ends in .yaml, OR it was explicitly passed by the user.
 				if knownYAMLExtensions.Contains(strings.ToLower(filepath.Ext(currentPath))) || fileOrDir == currentPath {
 					ctx := contextsByDir[dirName]
