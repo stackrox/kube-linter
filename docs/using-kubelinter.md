@@ -147,6 +147,80 @@ includes the following pre-commit hooks:
 
 If you're using GitHub, there's the [KubeLinter GitHub Action](README.md#kubelinter-github-action) available.
 
+For other CI systems, you can use the KubeLinter container images published to
+`stackrox/kube-linter` (Docker Hub) and `ghcr.io/stackrox/kube-linter`:
+
+- `<version>` (for example, `v0.8.3`) contains only the `/kube-linter` binary,
+  which is also the image entrypoint. Use it when your CI system passes
+  arguments directly to the entrypoint.
+- `<version>-alpine` (for example, `v0.8.3-alpine`) is based on Alpine Linux
+  and includes a shell. Use it when your CI system runs a shell script inside
+  the container. The binary is located at `/kube-linter`.
+
+KubeLinter exits with a non-zero status code when it finds lint errors, so the
+pipeline step fails without any extra configuration. The examples below also
+pass `--fail-if-no-objects-found`, so that the step fails instead of passing
+when the directory contains no valid Kubernetes objects.
+
+`--fail-if-no-objects-found` does not fail the step if some files can't be
+parsed but others contain valid objects. To fail on any parse error, also add
+`--fail-on-invalid-resource`. This flag is deprecated in v0.8.3 and also fails
+on YAML files that contain only comments.
+
+<!-- tabs:start -->
+
+#### ** GitLab CI **
+Add a job to your `.gitlab-ci.yml` file. The entrypoint must be overridden
+because GitLab CI runs the `script` section in a shell:
+```yaml
+kube-linter:
+  stage: test
+  image:
+    name: stackrox/kube-linter:v0.8.3-alpine
+    entrypoint: [""]
+  script:
+    - /kube-linter lint --fail-if-no-objects-found deploy/
+```
+
+#### ** Google Cloud Build **
+Add a step to your `cloudbuild.yaml` file. Cloud Build passes `args` to the
+image entrypoint and mounts your source in `/workspace`:
+```yaml
+steps:
+  - id: kube-linter
+    name: stackrox/kube-linter:v0.8.3
+    args: ["lint", "--fail-if-no-objects-found", "deploy/"]
+```
+
+#### ** Concourse CI **
+Add a task to your pipeline. In this example, `manifests` is a `git` resource
+that contains your Kubernetes `yaml` files in the `deploy/` directory. The task
+runs from the root of the repository so that a `.kube-linter.yaml`
+configuration file there is picked up:
+```yaml
+jobs:
+  - name: kube-linter
+    plan:
+      - get: manifests
+        trigger: true
+      - task: lint
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: stackrox/kube-linter
+              tag: v0.8.3-alpine
+          inputs:
+            - name: manifests
+          run:
+            path: /kube-linter
+            args: ["lint", "--fail-if-no-objects-found", "deploy/"]
+            dir: manifests
+```
+
+<!-- tabs:end -->
+
 Alternatively, you can grab the latest binary release with the following commands
 ```bash
 LOCATION=$(curl -s https://api.github.com/repos/stackrox/kube-linter/releases/latest \
