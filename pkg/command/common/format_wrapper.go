@@ -19,6 +19,8 @@ const (
 	// SARIFFormat is JSON-based standard for reporting lint errors.
 	// See https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=sarif
 	SARIFFormat = "sarif"
+	// JUnitFormat is the JUnit XML test report format understood by most CI systems.
+	JUnitFormat = "junit"
 )
 
 // FormatFunc sets contract formatter of each FormatType should follow.
