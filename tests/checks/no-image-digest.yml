@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dont-fire
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          image: app@sha256:2cf0d5dcdb7680af443d09f850490eb79d9245b6e5c9b04b9a70ea38513b6c00
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: dont-fire
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          image: app@sha256:2cf0d5dcdb7680af443d09f850490eb79d9245b6e5c9b04b9a70ea38513b6c00
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        image: app:v1
+---
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: app
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        image: app:v1
