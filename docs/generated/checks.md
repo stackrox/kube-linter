@@ -20,7 +20,7 @@ resources:
 - ^deployments$
 - ^statefulsets$
 - ^replicasets$
-- ^cronjob$
+- ^cronjobs$
 - ^jobs$
 - ^daemonsets$
 verbs:

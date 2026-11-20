@@ -32,3 +32,27 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: role1
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: role2
+  namespace: namespace-dev
+rules:
+  - apiGroups: ["batch"]
+    resources: ["cronjobs"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: role-binding2
+  namespace: namespace-dev
+subjects:
+  - kind: ServiceAccount
+    name: account2
+    namespace: namespace-dev
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: role2
