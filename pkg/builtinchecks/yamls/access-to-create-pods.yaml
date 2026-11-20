@@ -9,5 +9,5 @@ scope:
     - RoleBinding
 template: "access-to-resources"
 params:
-  resources: ["^pods$", "^deployments$", "^statefulsets$", "^replicasets$", "^cronjob$", "^jobs$","^daemonsets$"]
+  resources: ["^pods$", "^deployments$", "^statefulsets$", "^replicasets$", "^cronjobs$", "^jobs$","^daemonsets$"]
   verbs: ["^create$"]
