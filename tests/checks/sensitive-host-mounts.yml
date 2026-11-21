@@ -38,3 +38,23 @@ spec:
       - name: config
         hostPath:
           path: /etc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app3
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app3
+  template:
+    spec:
+      containers:
+      - name: app3
+        volumeMounts:
+        - name: config
+          mountPath: /etc
+      volumes:
+      - name: config
+        hostPath:
+          path: /etc/

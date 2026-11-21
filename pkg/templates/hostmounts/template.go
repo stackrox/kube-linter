@@ -2,6 +2,7 @@ package hostmounts
 
 import (
 	"fmt"
+	"path"
 	"regexp"
 
 	"golang.stackrox.io/kube-linter/pkg/check"
@@ -17,6 +18,24 @@ import (
 const (
 	templateKey = "host-mounts"
 )
+
+// matchesHostPath reports whether regex matches the host path as it is written
+// in the manifest or in its cleaned form. The default dirs are exact matches
+// such as "^/etc$", and a hostPath of "/etc/" mounts exactly the same directory
+// without matching that pattern, so a stray separator would otherwise hide a
+// sensitive mount. Cleaning also collapses "//etc" and "/etc/." for the same
+// reason. The path as written is tried first so that a user-supplied pattern
+// matching a literal trailing slash keeps working.
+//
+// path.Clean is used rather than filepath.Clean because a Kubernetes hostPath
+// is always slash separated, whatever platform kube-linter runs on.
+func matchesHostPath(regex *regexp.Regexp, hostPath string) bool {
+	if regex.MatchString(hostPath) {
+		return true
+	}
+	cleaned := path.Clean(hostPath)
+	return cleaned != hostPath && regex.MatchString(cleaned)
+}
 
 func init() {
 	templates.Register(check.Template{
@@ -49,7 +68,7 @@ func init() {
 						continue
 					}
 					for _, regex := range compiledRegexes {
-						if !regex.MatchString(v.HostPath.Path) {
+						if !matchesHostPath(regex, v.HostPath.Path) {
 							continue
 						}
 						for _, container := range containers {

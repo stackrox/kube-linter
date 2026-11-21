@@ -992,9 +992,12 @@ get_value_from() {
   message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
   count=$(get_value_from "${lines[0]}" '.Reports | length')
 
+  message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
+
   [[ "${message1}" == "Deployment: host system directory \"/etc\" is mounted on container \"app\"" ]]
   [[ "${message2}" == "DeploymentConfig: host system directory \"/etc\" is mounted on container \"app2\"" ]]
-  [[ "${count}" == "2" ]]
+  [[ "${message3}" == "Deployment: host system directory \"/etc/\" is mounted on container \"app3\"" ]]
+  [[ "${count}" == "3" ]]
 }
 
 @test "sorted-keys" {
