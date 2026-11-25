@@ -19,6 +19,7 @@ var (
 			replicationControllerGVK.GroupKind(),
 			jobGVK.GroupKind(),
 			cronJobGVK.GroupKind(),
+			rolloutGVK.GroupKind(),
 		} {
 			if _, ok := m[gk]; ok {
 				panic(fmt.Sprintf("group kind double-registered: %v", gk))

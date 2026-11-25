@@ -1,15 +1,19 @@
 package extract
 
 import (
+	"math"
 	"reflect"
 
 	ocsAppsV1 "github.com/openshift/api/apps/v1"
 	"golang.stackrox.io/kube-linter/pkg/extract/customtypes"
 	"golang.stackrox.io/kube-linter/pkg/k8sutil"
+	"golang.stackrox.io/kube-linter/pkg/objectkinds"
 	batchV1 "k8s.io/api/batch/v1"
 	batchV1Beta1 "k8s.io/api/batch/v1beta1"
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 // PodTemplateSpec extracts a pod template spec from the given object, if available.
@@ -24,6 +28,21 @@ func PodTemplateSpec(obj k8sutil.Object) (coreV1.PodTemplateSpec, bool) {
 		return obj.Spec.JobTemplate.Spec.Template, true
 	case *batchV1.CronJob:
 		return obj.Spec.JobTemplate.Spec.Template, true
+	case *unstructured.Unstructured:
+		if !objectkinds.IsDeploymentLike(obj.GroupVersionKind()) {
+			return coreV1.PodTemplateSpec{}, false
+		}
+
+		template, found, err := unstructured.NestedMap(obj.Object, "spec", "template")
+		if !found || err != nil {
+			return coreV1.PodTemplateSpec{}, false
+		}
+		unstructuredObj := &unstructured.Unstructured{Object: template}
+		var podTemplate coreV1.PodTemplateSpec
+		if err := runtime.DefaultUnstructuredConverter.FromUnstructured(unstructuredObj.Object, &podTemplate); err != nil {
+			return coreV1.PodTemplateSpec{}, false
+		}
+		return podTemplate, true
 	default:
 		objValue := reflect.Indirect(reflect.ValueOf(obj))
 		spec := objValue.FieldByName("Spec")
@@ -63,6 +82,21 @@ func Selector(obj k8sutil.Object) (*metaV1.LabelSelector, bool) {
 		return obj.Spec.JobTemplate.Spec.Selector, true
 	case *batchV1.CronJob:
 		return obj.Spec.JobTemplate.Spec.Selector, true
+	case *unstructured.Unstructured:
+		if !objectkinds.IsDeploymentLike(obj.GroupVersionKind()) {
+			return nil, false
+		}
+
+		template, found, err := unstructured.NestedMap(obj.Object, "spec", "selector")
+		if !found || err != nil {
+			return nil, false
+		}
+		unstructuredObj := &unstructured.Unstructured{Object: template}
+		var labelSelector metaV1.LabelSelector
+		if err := runtime.DefaultUnstructuredConverter.FromUnstructured(unstructuredObj.Object, &labelSelector); err != nil {
+			return nil, false
+		}
+		return &labelSelector, true
 	default:
 		objValue := reflect.Indirect(reflect.ValueOf(obj))
 		spec := objValue.FieldByName("Spec")
@@ -88,6 +122,24 @@ func Replicas(obj k8sutil.Object) (int32, bool) {
 	if depConfig, isDepConfig := obj.(*ocsAppsV1.DeploymentConfig); isDepConfig {
 		return depConfig.Spec.Replicas, true
 	}
+
+	if dep, isDep := obj.(*unstructured.Unstructured); isDep {
+		if !objectkinds.IsDeploymentLike(dep.GroupVersionKind()) {
+			return 0, false
+		}
+
+		val, found, err := unstructured.NestedInt64(dep.Object, "spec", "replicas")
+		if !found || err != nil {
+			return 1, true
+		}
+
+		if val < math.MaxInt32 && val > math.MinInt32 {
+			return int32(val), true
+		}
+
+		return math.MaxInt32, true
+	}
+
 	objValue := reflect.Indirect(reflect.ValueOf(obj))
 	spec := objValue.FieldByName("Spec")
 	if !spec.IsValid() {
