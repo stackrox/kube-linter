@@ -1,0 +1,23 @@
+name: projected-token-long-expiration
+description: >-
+  Projected service account token volume with expirationSeconds greater
+  than 24 hours. Long-lived tokens extracted from compromised pods remain
+  valid for extended periods.
+remediation: >-
+  Set expirationSeconds to 3600 (1 hour) or less unless the workload
+  specifically requires longer token lifetimes.
+scope:
+  objectKinds:
+    - DeploymentLike
+template: cel-expression
+params:
+  check: >
+    has(object.spec.template.spec.volumes) &&
+    object.spec.template.spec.volumes.exists(v,
+      has(v.projected) &&
+      v.projected.sources.exists(s,
+        has(s.serviceAccountToken) &&
+        has(s.serviceAccountToken.expirationSeconds) &&
+        s.serviceAccountToken.expirationSeconds > 86400
+      )
+    ) ? 'projected SA token with expirationSeconds > 24h — stolen tokens persist' : ''
