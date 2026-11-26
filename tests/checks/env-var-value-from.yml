@@ -174,3 +174,35 @@ spec:
                 secretKeyRef:
                   name: missingsecret
                   key: secretkey
+---
+# envFrom and volume references test cases
+---
+# This should fail: envFrom and a volume refer to objects that don't exist
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: should-fire-envfrom-and-volume
+spec:
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.14.2
+          envFrom:
+            - configMapRef:
+                name: missingenvfromconfig
+            - secretRef:
+                name: validsecret
+      volumes:
+        - name: secret-volume
+          secret:
+            secretName: missingvolumesecret
+        - name: config-volume
+          configMap:
+            name: testconfig

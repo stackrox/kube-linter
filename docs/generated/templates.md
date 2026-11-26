@@ -279,7 +279,7 @@ KubeLinter supports the following templates:
 
 **Key**: `env-value-from`
 
-**Description**: Flag resources which use env variables from secrets/configmaps not included in the release
+**Description**: Flag resources which use env variables or volumes from secrets/configmaps not included in the release
 
 **Supported Objects**: DeploymentLike
 
