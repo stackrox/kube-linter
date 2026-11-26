@@ -284,6 +284,22 @@ forbiddenServiceTypes:
 ```yaml
 minReplicas: 3
 ```
+## insecure-route-termination
+
+**Enabled by default**: No
+
+**Description**: OpenShift Route allows plaintext HTTP via InsecureEdgeTerminationPolicy: Allow. Credential-bearing endpoints should enforce TLS by using Redirect or None.
+
+**Remediation**: Set spec.tls.insecureEdgeTerminationPolicy to 'Redirect' or 'None'.
+
+**Template**: [cel-expression](templates.md#cel)
+
+**Parameters**:
+
+```yaml
+check: |
+  object.kind == 'Route' && has(object.spec.tls) && has(object.spec.tls.insecureEdgeTerminationPolicy) && object.spec.tls.insecureEdgeTerminationPolicy == 'Allow' ? 'Route allows plaintext HTTP — credential-bearing endpoints should use Redirect or None' : ''
+```
 ## invalid-target-ports
 
 **Enabled by default**: Yes
