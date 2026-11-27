@@ -32,8 +32,25 @@ var (
 }
 `)
 
+	ignoredKeysParamDesc = util.MustParseParameterDesc(`{
+	"Name": "ignoredKeys",
+	"Type": "array",
+	"Description": "IgnoredKeys is a list of keys whose values are not checked for sorting, at any nesting level, for example \"labels\" and \"annotations\". The order of the ignored key itself among its siblings is still checked.",
+	"Examples": null,
+	"Enum": null,
+	"SubParameters": null,
+	"ArrayElemType": "string",
+	"Required": false,
+	"NoRegex": true,
+	"NotNegatable": true,
+	"XXXStructFieldName": "IgnoredKeys",
+	"XXXIsPointer": false
+}
+`)
+
 	ParamDescs = []check.ParameterDesc{
 		recursiveParamDesc,
+		ignoredKeysParamDesc,
 	}
 )
 
