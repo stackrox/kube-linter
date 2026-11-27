@@ -1,0 +1,7 @@
+name: "no-seccomp-profile"
+description: "Indicates when a deployment-like object is running a container without a seccomp profile"
+remediation: "Set a seccomp profile (for example, seccompProfile.type: RuntimeDefault) in the securityContext of each container or of the pod."
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "seccomp-profile"
