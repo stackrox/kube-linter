@@ -77,10 +77,12 @@ get_value_from() {
   [ "$status" -eq 1 ]
 
   message1=$(get_value_from "${lines[0]}" '.Reports[0].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[0].Diagnostic.Message')
+  message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
   count=$(get_value_from "${lines[0]}" '.Reports | length')
 
   [[ "${message1}" == "RoleBinding: binding to \"role1\" role that has [create] access to [pods]" ]]
-  [[ "${count}" == "1" ]]
+  [[ "${message2}" == "RoleBinding: binding to \"role2\" role that has [create] access to [cronjobs]" ]]
+  [[ "${count}" == "2" ]]
 }
 
 @test "access-to-secrets" {
