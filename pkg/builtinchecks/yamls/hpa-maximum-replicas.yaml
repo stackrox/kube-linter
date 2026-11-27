@@ -1,0 +1,10 @@
+name: "hpa-maximum-replicas"
+description: "Indicates when a HorizontalPodAutoscaler specifies more than the allowed maxReplicas"
+remediation: >-
+  Lower the maxReplicas in the HorizontalPodAutoscaler, or raise the check's maxReplicas parameter, so that autoscaling stays within the capacity you intend to allow.
+scope:
+  objectKinds:
+    - HorizontalPodAutoscaler
+template: "hpa-maximum-replicas"
+params:
+  maxReplicas: 100

@@ -427,6 +427,24 @@ KubeLinter supports the following templates:
 **Supported Objects**: DeploymentLike
 
 
+## HorizontalPodAutoscaler Maximum replicas
+
+**Key**: `hpa-maximum-replicas`
+
+**Description**: Flag applications running more than the specified number of replicas
+
+**Supported Objects**: HorizontalPodAutoscaler
+
+
+**Parameters**:
+
+```yaml
+- description: The maximum number of replicas a HorizontalPodAutoscaler should have
+  name: maxReplicas
+  required: false
+  type: integer
+```
+
 ## HorizontalPodAutoscaler Minimum replicas
 
 **Key**: `hpa-minimum-replicas`
