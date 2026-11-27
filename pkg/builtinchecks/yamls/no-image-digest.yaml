@@ -1,0 +1,7 @@
+name: "no-image-digest"
+description: "Indicates when a deployment-like object is running a container whose image is not pinned to an immutable digest"
+remediation: "Pin container images to an immutable digest (for example, \"nginx@sha256:<digest>\") instead of relying on a mutable tag alone."
+scope:
+  objectKinds:
+    - DeploymentLike
+template: "image-digest"
