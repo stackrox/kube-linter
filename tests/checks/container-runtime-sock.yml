@@ -36,12 +36,12 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app
+  name: appdocker
 spec:
   template:
     spec:
       containers:
-      - name: app
+      - name: appdocker
         volumeMounts:
         - name: dockersock
           mountPath: "/var/run/docker.sock"
@@ -49,6 +49,47 @@ spec:
       - name: dockersock
         hostPath:
           path: /var/run/docker.sock
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appcontainerd
+spec:
+  template:
+    spec:
+      containers:
+      - name: appcontainerd
+        volumeMounts:
+        - name: containerdsock
+          mountPath: "/var/run/containerd.sock"
+      volumes:
+      - name: containerdsock
+        hostPath:
+          path: /var/run/containerd.sock
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: appcrio
+spec:
+  selector:
+    matchLabels:
+      app: appcrio
+  serviceName: "appcrio"
+  template:
+    metadata:
+      labels:
+        app: appcrio
+    spec:
+      containers:
+      - name: appcrio
+        volumeMounts:
+        - name: criosock
+          mountPath: "/var/run/crio.sock"
+      volumes:
+      - name: criosock
+        hostPath:
+          path: /var/run/crio.sock
 ---
 apiVersion: apps.openshift.io/v1
 kind: DeploymentConfig
