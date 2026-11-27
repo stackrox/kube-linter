@@ -204,6 +204,7 @@ get_value_from() {
   message2=$(get_value_from "${lines[0]}" '.Reports[1].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[1].Diagnostic.Message')
   message3=$(get_value_from "${lines[0]}" '.Reports[2].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[2].Diagnostic.Message')
   message4=$(get_value_from "${lines[0]}" '.Reports[3].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[3].Diagnostic.Message')
+  message5=$(get_value_from "${lines[0]}" '.Reports[4].Object.K8sObject.GroupVersionKind.Kind + ": " + .Reports[4].Diagnostic.Message')
 
   count=$(get_value_from "${lines[0]}" '.Reports | length')
 
@@ -211,7 +212,8 @@ get_value_from() {
   [[ "${message2}" == "ServiceMonitor: no services found matching the service monitor's label selector (app.kubernetes.io/name=app) and namespace selector ([])" ]]
   [[ "${message3}" == "ServiceMonitor: no services found matching the service monitor's label selector () and namespace selector ([test2])" ]]
   [[ "${message4}" == "ServiceMonitor: no services found matching the service monitor's label selector (app.kubernetes.io/name=app1) and namespace selector ([test2])" ]]
-  [[ "${count}" == "4" ]]
+  [[ "${message5}" == "ServiceMonitor: no services found matching the service monitor's label selector (app.kubernetes.io/name=monitoring-vs-application) and namespace selector ([])" ]]
+  [[ "${count}" == "5" ]]
 }
 
 @test "default-service-account" {

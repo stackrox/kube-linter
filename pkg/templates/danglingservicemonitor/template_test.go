@@ -89,6 +89,26 @@ func (s *DanglingServiceMonitorTestSuite) AddServiceWithNamespace(name, namespac
 	})
 }
 
+func (s *DanglingServiceMonitorTestSuite) AddServiceMonitorWithLabelSelectorInNamespace(
+	name string, labelSelector metaV1.LabelSelector, namespace string,
+) {
+	s.ctx.AddMockServiceMonitor(s.T(), name)
+	s.ctx.ModifyServiceMonitor(s.T(), name, func(servicemonitor *k8sMonitoring.ServiceMonitor) {
+		servicemonitor.Spec.Selector = labelSelector
+		servicemonitor.Namespace = namespace
+	})
+}
+
+func (s *DanglingServiceMonitorTestSuite) AddServiceWithLabelsInNamespace(
+	name string, labels *metaV1.LabelSelector, namespace string,
+) {
+	s.ctx.AddMockService(s.T(), name)
+	s.ctx.ModifyService(s.T(), name, func(service *coreV1.Service) {
+		service.Labels = labels.MatchLabels
+		service.Namespace = namespace
+	})
+}
+
 func (s *DanglingServiceMonitorTestSuite) TestServiceMonitorEmpty() {
 	s.AddServiceWithLabels(service1, &labelselector1)
 	s.AddServiceWithLabels(service2, &labelselector2)
@@ -178,6 +198,58 @@ func (s *DanglingServiceMonitorTestSuite) TestDanglingNamespaceSelector() {
 			Param: params.Params{},
 			Diagnostics: map[string][]diagnostic.Diagnostic{
 				servicemonitor1: {{Message: fmt.Sprintf("no services found matching the service monitor's label selector () and namespace selector (%v)", namespaceselector1.MatchNames)}},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+// An empty namespaceSelector means the service monitor's own namespace, so a
+// service that matches the labels from another namespace leaves it dangling.
+func (s *DanglingServiceMonitorTestSuite) TestEmptyNamespaceSelectorDoesNotReachAnotherNamespace() {
+	s.AddServiceWithLabelsInNamespace(service1, &labelselector1, namespace2)
+	s.AddServiceMonitorWithLabelSelectorInNamespace(servicemonitor1, labelselector1, namespace1)
+	label1, _ := metaV1.LabelSelectorAsSelector(&metaV1.LabelSelector{MatchLabels: labelselector1.MatchLabels})
+
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				servicemonitor1: {{Message: fmt.Sprintf(
+					"no services found matching the service monitor's label selector (%v) and namespace selector ([])", label1)}},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+// The same pair in one namespace is the control: it still matches.
+func (s *DanglingServiceMonitorTestSuite) TestEmptyNamespaceSelectorMatchesItsOwnNamespace() {
+	s.AddServiceWithLabelsInNamespace(service1, &labelselector1, namespace1)
+	s.AddServiceMonitorWithLabelSelectorInNamespace(servicemonitor1, labelselector1, namespace1)
+
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				servicemonitor1: {},
+			},
+			ExpectInstantiationError: false,
+		},
+	})
+}
+
+// A manifest with no namespace on either side carries nothing to compare, and
+// is the shape the e2e fixture's "dont-fire" pair uses.
+func (s *DanglingServiceMonitorTestSuite) TestNamespacelessManifestStillMatches() {
+	s.AddServiceWithLabelsInNamespace(service1, &labelselector1, "")
+	s.AddServiceMonitorWithLabelSelectorInNamespace(servicemonitor1, labelselector1, "")
+
+	s.Validate(s.ctx, []templates.TestCase{
+		{
+			Param: params.Params{},
+			Diagnostics: map[string][]diagnostic.Diagnostic{
+				servicemonitor1: {},
 			},
 			ExpectInstantiationError: false,
 		},
